@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.env
+*.sqlite
+*.db
+data/
+node_modules/
+dist/
+.codegraph/
+
+# Manuales SAS (copyright SAS Institute): solo locales, no se versionan
+docs/reference/sas/*.md
+!docs/reference/sas/README.md

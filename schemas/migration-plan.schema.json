@@ -1,0 +1,684 @@
+{
+  "$defs": {
+    "ChildJob": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "params": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Params",
+          "type": "array"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/PlanStep"
+          },
+          "title": "Steps",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "params",
+        "steps"
+      ],
+      "title": "ChildJob",
+      "type": "object"
+    },
+    "Connection": {
+      "properties": {
+        "type": {
+          "enum": [
+            "Main",
+            "Lookup",
+            "Reject",
+            "OnSubjobOk",
+            "OnComponentOk",
+            "Iterate"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "from_step": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "From Step"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "Connection",
+      "type": "object"
+    },
+    "ContextVariable": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "sas_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sas Value"
+        },
+        "suggested": {
+          "title": "Suggested",
+          "type": "string"
+        },
+        "origin": {
+          "title": "Origin",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "suggested",
+        "origin"
+      ],
+      "title": "ContextVariable",
+      "type": "object"
+    },
+    "Expression": {
+      "properties": {
+        "sas": {
+          "title": "Sas",
+          "type": "string"
+        },
+        "talend": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Talend"
+        },
+        "line": {
+          "title": "Line",
+          "type": "integer"
+        },
+        "requires_semantic_validation": {
+          "default": true,
+          "title": "Requires Semantic Validation",
+          "type": "boolean"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "sas",
+        "line"
+      ],
+      "title": "Expression",
+      "type": "object"
+    },
+    "LibraryNeeded": {
+      "properties": {
+        "sas_name": {
+          "title": "Sas Name",
+          "type": "string"
+        },
+        "engine": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Engine"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "suggested_connection": {
+          "title": "Suggested Connection",
+          "type": "string"
+        },
+        "note": {
+          "default": "Crear la conexi\u00f3n en Talend; no se copian credenciales",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sas_name",
+        "suggested_connection"
+      ],
+      "title": "LibraryNeeded",
+      "type": "object"
+    },
+    "Loc": {
+      "properties": {
+        "file": {
+          "title": "File",
+          "type": "string"
+        },
+        "line": {
+          "title": "Line",
+          "type": "integer"
+        },
+        "end_line": {
+          "title": "End Line",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "file",
+        "line",
+        "end_line"
+      ],
+      "title": "Loc",
+      "type": "object"
+    },
+    "Orchestration": {
+      "properties": {
+        "grid_tasks": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Grid Tasks",
+          "type": "array"
+        },
+        "schedules": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Schedules",
+          "type": "array"
+        },
+        "upstream": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Upstream",
+          "type": "array"
+        },
+        "downstream": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Downstream",
+          "type": "array"
+        }
+      },
+      "title": "Orchestration",
+      "type": "object"
+    },
+    "PlanStep": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "order": {
+          "title": "Order",
+          "type": "integer"
+        },
+        "subjob": {
+          "title": "Subjob",
+          "type": "string"
+        },
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operation Id"
+        },
+        "operation_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operation Type"
+        },
+        "component_candidate": {
+          "default": "por_determinar",
+          "title": "Component Candidate",
+          "type": "string"
+        },
+        "alternatives": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Alternatives",
+          "type": "array"
+        },
+        "purpose": {
+          "title": "Purpose",
+          "type": "string"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Property"
+          },
+          "default": [],
+          "title": "Properties"
+        },
+        "schema_columns": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SchemaColumn"
+          },
+          "title": "Schema Columns",
+          "type": "array"
+        },
+        "connections": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Connection"
+          },
+          "title": "Connections",
+          "type": "array"
+        },
+        "expressions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Expression"
+          },
+          "title": "Expressions",
+          "type": "array"
+        },
+        "assumptions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "pending": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Pending",
+          "type": "array"
+        },
+        "tests": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Tests",
+          "type": "array"
+        },
+        "evidence": {
+          "$ref": "#/$defs/Loc"
+        },
+        "confidence": {
+          "default": "high",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "status": {
+          "default": "propuesto",
+          "enum": [
+            "propuesto",
+            "pendiente",
+            "verificado",
+            "validado_manualmente",
+            "descartado"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "verified": {
+          "default": false,
+          "title": "Verified",
+          "type": "boolean"
+        },
+        "requires_semantic_validation": {
+          "default": false,
+          "title": "Requires Semantic Validation",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "order",
+        "subjob",
+        "action",
+        "purpose",
+        "evidence"
+      ],
+      "title": "PlanStep",
+      "type": "object"
+    },
+    "Property": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "origin": {
+          "title": "Origin",
+          "type": "string"
+        },
+        "verified": {
+          "default": false,
+          "title": "Verified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "origin"
+      ],
+      "title": "Property",
+      "type": "object"
+    },
+    "SchemaColumn": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "talend_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Talend Type"
+        },
+        "nullable": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nullable"
+        },
+        "length": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Length"
+        },
+        "precision": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Precision"
+        },
+        "origin": {
+          "default": "",
+          "title": "Origin",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "SchemaColumn",
+      "type": "object"
+    },
+    "ValidationCase": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "applies_to": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Applies To",
+          "type": "array"
+        },
+        "expected": {
+          "default": "Resultado igual al de SAS",
+          "title": "Expected",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "description",
+        "applies_to"
+      ],
+      "title": "ValidationCase",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "rules_version": {
+      "title": "Rules Version",
+      "type": "string"
+    },
+    "program": {
+      "title": "Program",
+      "type": "string"
+    },
+    "sha256": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sha256"
+    },
+    "job_name": {
+      "title": "Job Name",
+      "type": "string"
+    },
+    "job_status": {
+      "default": "needs_review",
+      "enum": [
+        "proposed",
+        "needs_review"
+      ],
+      "title": "Job Status",
+      "type": "string"
+    },
+    "steps": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PlanStep"
+      },
+      "title": "Steps",
+      "type": "array"
+    },
+    "children": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ChildJob"
+      },
+      "title": "Children",
+      "type": "array"
+    },
+    "validation_cases": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ValidationCase"
+      },
+      "title": "Validation Cases",
+      "type": "array"
+    },
+    "context_variables": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ContextVariable"
+      },
+      "title": "Context Variables",
+      "type": "array"
+    },
+    "libraries_needed": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/LibraryNeeded"
+      },
+      "title": "Libraries Needed",
+      "type": "array"
+    },
+    "orchestration": {
+      "$ref": "#/$defs/Orchestration",
+      "default": {
+        "grid_tasks": [],
+        "schedules": [],
+        "upstream": [],
+        "downstream": []
+      }
+    },
+    "unresolved": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Unresolved",
+      "type": "array"
+    }
+  },
+  "required": [
+    "project_id",
+    "rules_version",
+    "program",
+    "job_name"
+  ],
+  "title": "JobPlan",
+  "type": "object"
+}

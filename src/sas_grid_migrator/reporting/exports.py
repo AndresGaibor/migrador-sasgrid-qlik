@@ -1,0 +1,216 @@
+"""Exportación de planes: Markdown por programa, índice del lote, JSON y CSV de pasos."""
+
+import csv
+import io
+import re
+from pathlib import Path
+
+from sas_grid_migrator.dependency_graph.builder import DependencyReport
+from sas_grid_migrator.migration_planner.models import JobPlan, PlanSet, PlanStep
+
+CHECKLIST = Path(__file__).resolve().parents[3] / "templates" / "validation-checklist.md"
+
+
+def safe_name(program: str) -> str:
+    return re.sub(r"[^A-Za-z0-9._-]+", "__", program)
+
+
+def _step_md(s: PlanStep) -> list[str]:
+    ver = "verificado" if s.verified else "sin verificar"
+    out = [
+        f"### {s.order}. {s.purpose}",
+        "",
+        f"- **Acción:** {s.action} · **Componente:** `{s.component_candidate}` ({ver})"
+        + (
+            f" · alternativas: {', '.join(f'`{a}`' for a in s.alternatives)}"
+            if s.alternatives
+            else ""
+        ),
+        (
+            f"- **Subjob:** `{s.subjob}` · **Estado:** {s.status} · **Confianza:** {s.confidence}"
+            f" · **Origen SAS:** `{s.evidence.file}:{s.evidence.line}`"
+        ),
+    ]
+    if s.connections:
+        out.append(
+            "- **Conexiones:** "
+            + ", ".join(f"{c.type} desde `{c.from_step}`" for c in s.connections)
+        )
+    if s.properties:
+        out.append("- **Propiedades (nombres candidatos):**")
+        out += [
+            f"  - `{p.name}` = {('`' + p.value + '`') if p.value else '_por configurar_'} — {p.origin}"
+            for p in s.properties
+        ]
+    if s.schema_columns:
+        out.append(
+            "- **Esquema:** "
+            + ", ".join(
+                f"`{c.name}`" + (f":{c.talend_type}" if c.talend_type else "")
+                for c in s.schema_columns
+            )
+            + " _(tipos por determinar)_"
+        )
+    for e in s.expressions:
+        out.append(
+            f"- **Expresión** (línea {e.line}): SAS `{e.sas}`"
+            + (f" → Java `{e.talend}`" if e.talend else " → _sin traducción automática_")
+        )
+        out += [f"  - ⚠ {w}" for w in e.warnings]
+    if s.assumptions:
+        out.append("- **Supuestos:** " + "; ".join(s.assumptions))
+    if s.pending:
+        out.append("- **Pendientes:**")
+        out += [f"  - {p}" for p in s.pending]
+    if s.tests:
+        out.append("- **Pruebas:** " + ", ".join(f"`{t}`" for t in s.tests))
+    if s.note:
+        out.append(f"- **Decisión humana:** {s.note}")
+    out.append("")
+    return out
+
+
+def render_plan_md(plan: JobPlan) -> str:
+    n_steps = len(plan.steps) + sum(len(c.steps) for c in plan.children)
+    out = [
+        f"# Job `{plan.job_name}`",
+        "",
+        f"- **Programa SAS:** `{plan.program}`"
+        + (f" (sha256 `{plan.sha256[:12]}`)" if plan.sha256 else ""),
+        f"- **Estado:** {plan.job_status} · **Pasos:** {n_steps} · **Reglas:** v{plan.rules_version}",
+        "- **Aviso:** componentes y propiedades son candidatos; ninguno está verificado contra Talend salvo marca explícita.",
+        "",
+    ]
+    if plan.orchestration.schedules or plan.orchestration.upstream or plan.orchestration.grid_tasks:
+        o = plan.orchestration
+        out += ["## Orquestación", ""]
+        if o.schedules:
+            out.append("- Planificación: " + "; ".join(o.schedules))
+        if o.upstream:
+            out.append("- Depende de (datos): " + ", ".join(f"`{u}`" for u in o.upstream))
+        if o.downstream:
+            out.append("- Lo consumen: " + ", ".join(f"`{u}`" for u in o.downstream))
+        if o.grid_tasks:
+            out.append("- Tareas Grid: " + ", ".join(f"`{t}`" for t in o.grid_tasks))
+        out.append("")
+    if plan.context_variables:
+        out += ["## Variables de contexto", ""]
+        out += [
+            f"- `{c.suggested}` ← SAS `{c.name}`"
+            + (f" = `{c.sas_value}`" if c.sas_value else "")
+            + f" ({c.origin})"
+            for c in plan.context_variables
+        ]
+        out.append("")
+    if plan.libraries_needed:
+        out += ["## Conexiones a crear", ""]
+        out += [
+            f"- `{x.sas_name}` ({x.engine or 'BASE'}{', ' + x.path if x.path else ''}) → {x.suggested_connection}. {x.note}"
+            for x in plan.libraries_needed
+        ]
+        out.append("")
+    out += ["## Pasos", ""]
+    for s in plan.steps:
+        out += _step_md(s)
+    for c in plan.children:
+        out += [f"## Job hijo / joblet para `%{c.name}`({', '.join(c.params)})", ""]
+        for s in c.steps:
+            out += _step_md(s)
+    if plan.unresolved:
+        out += ["## Sin resolver", ""] + [f"- {u}" for u in plan.unresolved[:50]]
+        if len(plan.unresolved) > 50:
+            out.append(f"- … y {len(plan.unresolved) - 50} más")
+        out.append("")
+    if plan.validation_cases:
+        out += ["## Casos de validación", ""]
+        out += [f"- `{v.id}` ({v.kind}): {v.description}" for v in plan.validation_cases]
+        out.append("")
+    if CHECKLIST.exists():
+        out += [CHECKLIST.read_text().strip(), ""]
+    return "\n".join(out)
+
+
+def render_index_md(ps: PlanSet, deps: DependencyReport | None = None) -> str:
+    out = [
+        f"# Plan de migración — proyecto `{ps.project_id}`",
+        "",
+        f"Reglas v{ps.rules_version} · {len(ps.plans)} programas",
+        "",
+    ]
+    if deps:
+        out += ["## Orden de procesamiento sugerido", ""]
+        for i, layer in enumerate(deps.processing_order, 1):
+            out.append(f"{i}. " + ", ".join(f"`{p}`" for p in layer))
+        if deps.cycles:
+            out += [
+                "",
+                "Ciclos detectados (requieren decisión): "
+                + "; ".join(" ↔ ".join(c) for c in deps.cycles),
+            ]
+        out.append("")
+    out += [
+        "## Jobs",
+        "",
+        "| Job | Programa | Estado | Pasos | Pendientes |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for p in ps.plans:
+        steps = p.steps + [s for c in p.children for s in c.steps]
+        out.append(
+            f"| `{p.job_name}` | `{p.program}` | {p.job_status} | {len(steps)} | {sum(1 for s in steps if s.pending)} |"
+        )
+    return "\n".join(out) + "\n"
+
+
+def steps_csv(ps: PlanSet) -> str:
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow(
+        [
+            "job",
+            "programa",
+            "paso_id",
+            "orden",
+            "subjob",
+            "componente",
+            "verificado",
+            "estado",
+            "confianza",
+            "linea_sas",
+            "proposito",
+            "pendientes",
+        ]
+    )
+    for p in ps.plans:
+        for s in p.steps + [x for c in p.children for x in c.steps]:
+            w.writerow(
+                [
+                    p.job_name,
+                    p.program,
+                    s.id,
+                    s.order,
+                    s.subjob,
+                    s.component_candidate,
+                    s.verified,
+                    s.status,
+                    s.confidence,
+                    s.evidence.line,
+                    s.purpose,
+                    " | ".join(s.pending),
+                ]
+            )
+    return buf.getvalue()
+
+
+def write_exports(ps: PlanSet, out_dir: Path, deps: DependencyReport | None = None) -> list[Path]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    written = []
+    for p in ps.plans:
+        base = out_dir / safe_name(p.program)
+        (base.with_suffix(".md")).write_text(render_plan_md(p))
+        (base.with_suffix(".json")).write_text(p.model_dump_json(indent=2))
+        written += [base.with_suffix(".md"), base.with_suffix(".json")]
+    for name, content in (("index.md", render_index_md(ps, deps)), ("steps.csv", steps_csv(ps))):
+        (out_dir / name).write_text(content)
+        written.append(out_dir / name)
+    return written

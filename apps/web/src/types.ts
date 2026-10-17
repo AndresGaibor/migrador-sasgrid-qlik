@@ -1,0 +1,75 @@
+export type Project = { id: string; name: string; created_at: string };
+export type SourceFile = { path: string; sha256: string; size: number; kind: string; encoding: string | null };
+export type Manifest = { files: SourceFile[]; skipped: { path: string; reason: string }[] };
+export type Coverage = { tag: string; priority: string; count: number };
+export type Summary = {
+  programs: number;
+  statements: number;
+  unrecognized: number;
+  macro_fragments: number;
+  findings_by_priority: Record<string, number>;
+  coverage: Coverage[];
+};
+export type ProgramRow = { file: string; statements: number; findings: number };
+export type Finding = {
+  code: string;
+  severity: string;
+  message: string;
+  priority: "P0" | "P1" | "P2" | null;
+  evidence: { file: string; line: number };
+};
+export type Program = { file: string; findings: Finding[]; stats: { statements: number; unrecognized: number } };
+export type DatasetInfo = { id: string; role: string; producers: string[]; consumers: string[] };
+export type DataEdge = { source: string; target: string; datasets: string[]; kind: string };
+export type GridTask = {
+  id: string;
+  kind: string;
+  source_file: string;
+  line: number;
+  resolved_program: string | null;
+  match_status: string | null;
+  queue: string | null;
+  waits: boolean;
+  after: string[];
+};
+export type Deps = {
+  datasets: DatasetInfo[];
+  edges: DataEdge[];
+  processing_order: string[][];
+  cycles: string[][];
+  unresolved: { kind: string; name: string; file: string; line: number; detail: string }[];
+  orchestration: { tasks: GridTask[]; schedules: { file: string; text: string }[]; order: string[] };
+};
+export type PlanRow = { program: string; job_name: string; job_status: string; steps: number; pending: number; done: number };
+export const STATUSES = ["propuesto", "pendiente", "verificado", "validado_manualmente", "descartado"] as const;
+export type Step = {
+  id: string;
+  order: number;
+  subjob: string;
+  action: string;
+  component_candidate: string;
+  alternatives: string[];
+  purpose: string;
+  properties: { name: string; value: string | null; origin: string; verified: boolean }[];
+  connections: { type: string; from_step: string | null }[];
+  expressions: { sas: string; talend: string | null; line: number; warnings: string[] }[];
+  assumptions: string[];
+  pending: string[];
+  tests: string[];
+  evidence: { file: string; line: number };
+  confidence: string;
+  status: (typeof STATUSES)[number];
+  note: string | null;
+  verified: boolean;
+};
+export type JobPlan = {
+  program: string;
+  job_name: string;
+  job_status: string;
+  steps: Step[];
+  children: { name: string; params: string[]; steps: Step[] }[];
+  validation_cases: { id: string; kind: string; description: string }[];
+  context_variables: { name: string; suggested: string; sas_value: string | null }[];
+  libraries_needed: { sas_name: string; engine: string | null; path: string | null; suggested_connection: string }[];
+  unresolved: string[];
+};

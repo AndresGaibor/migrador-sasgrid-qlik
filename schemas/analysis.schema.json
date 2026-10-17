@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Analysis",
+  "description": "Placeholder v0; se define en F1/F2.",
+  "type": "object"
+}

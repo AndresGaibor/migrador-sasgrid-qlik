@@ -1,0 +1,346 @@
+{
+ "version": "1",
+ "description": "Clasificación de construcciones SAS por prioridad. P0/P1/P2 según docs/sas-coverage.md.",
+ "default_proc": {
+  "priority": "P2",
+  "severity": "warning",
+  "message": "PROC sin regla: documentar lógica y decisión manual."
+ },
+ "unknown": {
+  "priority": "P2",
+  "severity": "warning",
+  "message": "Construcción sin regla."
+ },
+ "constructs": {
+  "data_step": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "data_null": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "set_concatenate": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "multiple_outputs": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Varias salidas en un DATA step: probable tMap con varias salidas o filtros por salida."
+  },
+  "merge": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "MERGE BY: semántica de coincidencia y valores missing distinta a un join; validar duplicados por clave."
+  },
+  "update_stmt": {
+   "priority": "P2",
+   "severity": "warning",
+   "message": "UPDATE/MODIFY: actualización por clave sin equivalente directo; decisión manual."
+  },
+  "modify_stmt": {
+   "priority": "P2",
+   "severity": "warning",
+   "message": "MODIFY modifica el dataset in situ; decisión manual."
+  },
+  "retain": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "RETAIN mantiene estado entre filas: requiere variables de componente o agregación."
+  },
+  "array": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Arrays: expandir a columnas o normalizar con tNormalize/tDenormalize."
+  },
+  "infile_input": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Lectura de archivo plano: confirmar formato físico, delimitadores y esquema."
+  },
+  "datalines": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Datos incrustados en el código: pasar a tFixedFlowInput o archivo."
+  },
+  "file_output": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Escritura a archivo mediante FILE/PUT."
+  },
+  "explicit_output": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "OUTPUT explícito: controla qué filas salen; revisar lógica."
+  },
+  "call_execute": {
+   "priority": "P2",
+   "severity": "warning",
+   "message": "CALL EXECUTE genera código en ejecución; documentar la lógica generada."
+  },
+  "call_symput": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "CALL SYMPUT crea macrovariables desde datos; modelar como contexto o variable global."
+  },
+  "call_routine": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "CALL routine: revisar equivalente."
+  },
+  "hash": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "Hash object: equivale a un lookup (tMap) o tHashInput."
+  },
+  "first_last": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "FIRST./LAST.: requiere datos ordenados por BY; usar agrupación o tAggregateRow/tSortRow."
+  },
+  "date_functions": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "Funciones de fecha SAS (base 1960): validar conversiones y epoch."
+  },
+  "missing_handling": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Tratamiento de missing: distinguir null de cadena vacía y orden de missing en comparaciones."
+  },
+  "format_conversion": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "PUT/INPUT con formatos: conversión de tipos a validar."
+  },
+  "macro_indirect_reference": {
+   "priority": "P2",
+   "severity": "warning",
+   "message": "Referencia indirecta de macro (&&var&i): no resoluble sin ejecutar; documentar."
+  },
+  "proc:sql": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "proc:sort": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "proc:append": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "proc:format": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "PROC FORMAT: catálogos de formatos como tablas de lookup."
+  },
+  "proc:datasets": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "PROC DATASETS: operaciones de mantenimiento; revisar si aplican."
+  },
+  "proc:means": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Estadísticas por grupo: tAggregateRow."
+  },
+  "proc:summary": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Estadísticas por grupo: tAggregateRow."
+  },
+  "proc:freq": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Frecuencias: agregación con conteo."
+  },
+  "proc:print": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Salida de reporte; normalmente se descarta."
+  },
+  "proc:transpose": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "PROC TRANSPOSE: tNormalize/tDenormalize."
+  },
+  "proc:import": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "PROC IMPORT: componente de lectura de archivo."
+  },
+  "proc:export": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "PROC EXPORT: componente de escritura de archivo."
+  },
+  "proc:contents": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Metadatos del dataset."
+  },
+  "proc:copy": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Copia de datasets."
+  },
+  "proc:compare": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Comparación; útil en validación."
+  },
+  "external_file_io": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "E/S de archivo externo: confirmar ruta y formato."
+  },
+  "sql_join": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "sql_outer_join": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "sql_group_by": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "sql_aggregate": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "sql_subquery": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Subconsulta: dividir en pasos o usar lookup."
+  },
+  "sql_calculated": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "CALCULATED: reutiliza alias calculados en la misma consulta."
+  },
+  "sql_set_operation": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "UNION/INTERSECT/EXCEPT: tUnite o equivalentes."
+  },
+  "sql_into_macro": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "SELECT INTO :macrovar: crea macrovariables desde datos."
+  },
+  "sql_implicit_join": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "Join implícito por coma: confirmar condición en WHERE."
+  },
+  "sql_passthrough": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "SQL pass-through: el SQL se ejecuta en el motor externo; migrarlo tal cual a un componente de base de datos."
+  },
+  "sql_delete_from": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "DELETE en SQL."
+  },
+  "sql_update": {
+   "priority": "P1",
+   "severity": "warning",
+   "message": "UPDATE en SQL."
+  },
+  "sql_insert_into": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "INSERT INTO."
+  },
+  "sql_drop": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "DROP en SQL."
+  },
+  "sql_alter": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "ALTER en SQL."
+  },
+  "libname": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "filename": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "macro_let": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "include_static": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "options": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "macro_def": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "macro_params": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "macro_call": {
+   "priority": "P0",
+   "severity": "info",
+   "message": ""
+  },
+  "filename_pipe": {
+   "priority": "P2",
+   "severity": "warning",
+   "message": "FILENAME PIPE ejecuta un comando externo."
+  },
+  "include_dynamic": {
+   "priority": "P2",
+   "severity": "warning",
+   "message": "%INCLUDE dinámico: ruta no resoluble estáticamente."
+  },
+  "macro_control": {
+   "priority": "P1",
+   "severity": "info",
+   "message": "Lógica de macro (%IF/%DO): generación condicional de código."
+  },
+  "x_command": {
+   "priority": "P2",
+   "severity": "warning",
+   "message": "Comando del sistema operativo (X): fuera de alcance de Talend; mover a orquestación."
+  },
+  "systask": {
+   "priority": "P2",
+   "severity": "warning",
+   "message": "SYSTASK: ejecución de comandos del sistema; mover a orquestación."
+  }
+ }
+}
