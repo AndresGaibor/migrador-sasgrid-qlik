@@ -278,6 +278,34 @@ async def verify_project_plans(project_id: str, body: VerifyBody) -> dict:
     return {"catalog_components": sorted(catalog.components), **stats}
 
 
+@app.get("/api/talend/catalog")
+def talend_catalog(q: str = "", family: str | None = None) -> dict:
+    from sas_grid_migrator.talend_adapter.catalog import load_catalog
+
+    cat = load_catalog()
+    return {
+        "count": len(cat.components),
+        "families": {f: len(v) for f, v in cat.data["families"].items()},
+        "components": cat.search(q, family)[:300],
+    }
+
+
+@app.get("/api/talend/catalog/{name}")
+def talend_component(name: str) -> dict:
+    from sas_grid_migrator.talend_adapter.catalog import load_catalog
+
+    cat = load_catalog()
+    comp = cat.get(name)  # solo nombres del catálogo: nada del usuario llega a una ruta de archivo
+    if comp is None:
+        raise HTTPException(404, "componente no está en el catálogo")
+    doc = Path(__file__).resolve().parents[1] / "docs" / "reference" / "talend" / f"{name}.md"
+    return {
+        **comp,
+        "variants": cat.variants_of(name),
+        "doc_markdown": doc.read_text(encoding="utf-8") if doc.exists() else None,
+    }
+
+
 # UI compilada (apps/web/dist): se monta al final para que /api/* tenga prioridad
 _dist = Path(os.environ.get("SGM_WEB_DIST", Path(__file__).resolve().parents[1] / "web" / "dist"))
 if _dist.is_dir():

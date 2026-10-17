@@ -20,3 +20,5 @@ Repo: `talend_repo_status`, `talend_repo_sources`.
 - Las tools de edición solo operan en modo workspace local, no repo.
 - `talend_inspect_component` es la vía prevista para verificar nombres de propiedades y esquemas; no hay tool de catálogo global de componentes (solo componentes de un job existente), así que un componente que no aparezca en ningún Job de referencia queda `verified: false`.
 - El servidor además puede levantar un tunnel hacia OpenAI (`bun run start`); usar `bun run start:server` para el adaptador.
+
+- Con el catálogo (`rules/talend/components.json`) ya no hace falta un servidor vivo para conocer los nombres internos de parámetros; talend-mcp se usa solo para contrastar un Job real (`verified`).

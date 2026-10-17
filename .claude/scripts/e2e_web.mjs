@@ -18,7 +18,7 @@ await step("1-proyectos", async () => {
   await p.waitForURL(/importar/);
 });
 await step("2-importar", async () => {
-  await p.fill("input", fixtures);
+  await p.fill("input[placeholder^='/ruta']", fixtures);
   await p.click("button:has-text('Importar')");
   await p.waitForSelector("text=archivos");
 });
@@ -51,6 +51,13 @@ await step("8-exportar", async () => {
   await p.click("nav.tabs >> text=Exportar");
   await p.click("text=Exportar planes");
   await p.waitForSelector("text=steps.csv");
+});
+await step("9-catalogo", async () => {
+  await p.click("nav >> text=Catálogo Talend");
+  await p.fill("input[placeholder^='tFilterRow']", "tFilterRow");
+  await p.click("a:has-text('tFilterRow')");
+  await p.waitForSelector("h2:has-text('Parámetros')");
+  await p.waitForSelector("td.mono:has-text('LOGICAL_OP')");
 });
 await b.close();
 if (errors.length) { console.log("ERRORES", errors); process.exit(1); }

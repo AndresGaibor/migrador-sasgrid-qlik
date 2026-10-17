@@ -2,7 +2,7 @@
 
 - **Programa SAS:** `p0_clientes_activos.sas` (sha256 `2ba7aecba508`)
 - **Estado:** needs_review · **Pasos:** 11 · **Reglas:** v1
-- **Aviso:** componentes y propiedades son candidatos; ninguno está verificado contra Talend salvo marca explícita.
+- **Aviso:** los nombres de componente y propiedad provienen del catálogo oficial de Talend; solo los marcados «verificado» se contrastaron con un Job real vía talend-mcp.
 
 ## Conexiones a crear
 
@@ -15,7 +15,7 @@
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
 - **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `clientes` — SAS p0_clientes_activos.sas:5
   - `QUERY` = _por configurar_ — regla mappings
   - `CONNECTION` = _por configurar_ — regla mappings
@@ -29,9 +29,10 @@
 
 - **Acción:** add_component · **Componente:** `tMap` (sin verificar)
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `op_5_read_1`
-- **Propiedades (nombres candidatos):**
-  - `Output columns` = `id → cliente_id` — SAS p0_clientes_activos.sas:5
+- **Propiedades:**
+  - `Output columns` (Editor del componente (no es un parámetro plano)) = `id → cliente_id` — SAS p0_clientes_activos.sas:5
 - **Esquema:** `cliente_id` _(tipos por determinar)_
 - **Pruebas:** `vc_op_5_rename_1_schema`
 
@@ -39,12 +40,13 @@
 
 - **Acción:** add_component · **Componente:** `tFilterRow` (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:7`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfilterrow)
 - **Conexiones:** Main desde `op_5_rename_1`
-- **Propiedades (nombres candidatos):**
-  - `LOGICAL_OP` = `&&` — SAS p0_clientes_activos.sas:7
-  - `CONDITIONS` = `estado == 'A'; saldo > 0` — SAS p0_clientes_activos.sas:7
-  - `USE_ADVANCED` = `false` — SAS p0_clientes_activos.sas:7
-  - `ADVANCED_COND` = _por configurar_ — regla mappings
+- **Propiedades:**
+  - `LOGICAL_OP` (Logical operator used to combine conditions) = `&&` — SAS p0_clientes_activos.sas:7 · nombre oficial · opciones: OR, AND
+  - `CONDITIONS` (Conditions) = `estado == 'A'; saldo > 0` — SAS p0_clientes_activos.sas:7 · nombre oficial
+  - `USE_ADVANCED` (Use advanced mode) = `false` — SAS p0_clientes_activos.sas:7 · nombre oficial
+  - `ADVANCED_COND` (Advanced) = _por configurar_ — regla mappings · nombre oficial
 - **Esquema:** `estado`, `saldo` _(tipos por determinar)_
 - **Expresión** (línea 7): SAS `estado = 'A' and saldo > 0` → Java `(input_row.estado.equals("A") && (input_row.saldo > 0))`
 - **Pruebas:** `vc_op_7_filter_1_row_count`, `vc_op_7_filter_1_nulls`, `vc_op_7_filter_1_empty`
@@ -53,10 +55,11 @@
 
 - **Acción:** add_component · **Componente:** `tMap` (sin verificar) · alternativas: `tJavaRow`
 - **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p0_clientes_activos.sas:5`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `op_7_filter_1`
-- **Propiedades (nombres candidatos):**
-  - `Expressions` = `0 asignaciones, 3 condicionales` — SAS p0_clientes_activos.sas:5
-  - `Var table` = _por configurar_ — regla mappings
+- **Propiedades:**
+  - `Expressions` (Editor del componente (no es un parámetro plano)) = `0 asignaciones, 3 condicionales` — SAS p0_clientes_activos.sas:5
+  - `Var table` (Editor del componente (no es un parámetro plano)) = _por configurar_ — regla mappings
 - **Expresión** (línea 9): SAS `if saldo >= 100000 then segmento = 'ALTO'` → _sin traducción automática_
   - ⚠ Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow
 - **Expresión** (línea 10): SAS `else if saldo >= 10000 then segmento = 'MEDIO'` → _sin traducción automática_
@@ -72,18 +75,20 @@
 
 - **Acción:** add_component · **Componente:** `tFilterColumns` (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfiltercolumns)
 - **Conexiones:** Main desde `op_5_compute_1`
-- **Propiedades (nombres candidatos):**
-  - `SCHEMA` = `drop: estado` — SAS p0_clientes_activos.sas:5
+- **Propiedades:**
+  - `SCHEMA` (Schema) = `drop: estado` — SAS p0_clientes_activos.sas:5 · nombre oficial
 - **Pruebas:** `vc_op_5_select_columns_1_schema`
 
 ### 6. Conservar/descartar columnas
 
 - **Acción:** add_component · **Componente:** `tFilterColumns` (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfiltercolumns)
 - **Conexiones:** Main desde `op_5_select_columns_1`
-- **Propiedades (nombres candidatos):**
-  - `SCHEMA` = `keep: cliente_id, nombre, saldo, segmento` — SAS p0_clientes_activos.sas:5
+- **Propiedades:**
+  - `SCHEMA` (Schema) = `keep: cliente_id, nombre, saldo, segmento` — SAS p0_clientes_activos.sas:5 · nombre oficial
 - **Esquema:** `cliente_id`, `nombre`, `saldo`, `segmento` _(tipos por determinar)_
 - **Pruebas:** `vc_op_5_select_columns_2_schema`
 
@@ -92,7 +97,7 @@
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
 - **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Conexiones:** Main desde `op_5_select_columns_2`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `clientes_activos` — SAS p0_clientes_activos.sas:5
   - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
   - `ACTION_ON_DATA` = _por configurar_ — regla mappings
@@ -107,7 +112,7 @@
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
 - **Subjob:** `s15` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
 - **Conexiones:** OnSubjobOk desde `op_5_write_1`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `clientes_activos` — SAS p0_clientes_activos.sas:15
   - `QUERY` = _por configurar_ — regla mappings
   - `CONNECTION` = _por configurar_ — regla mappings
@@ -122,9 +127,10 @@
 
 - **Acción:** add_component · **Componente:** `tSortRow` (sin verificar)
 - **Subjob:** `s15` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsortrow)
 - **Conexiones:** Main desde `op_15_read_1`
-- **Propiedades (nombres candidatos):**
-  - `CRITERIA` = `cliente_id` — SAS p0_clientes_activos.sas:15
+- **Propiedades:**
+  - `CRITERIA` (Criteria) = `cliente_id` — SAS p0_clientes_activos.sas:15 · nombre oficial
 - **Esquema:** `cliente_id` _(tipos por determinar)_
 - **Pruebas:** `vc_op_15_sort_1_ordering`
 
@@ -132,9 +138,10 @@
 
 - **Acción:** add_component · **Componente:** `tUniqRow` (sin verificar)
 - **Subjob:** `s15` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tuniqrow)
 - **Conexiones:** Main desde `op_15_sort_1`
-- **Propiedades (nombres candidatos):**
-  - `UNIQUE_KEY` = `cliente_id` — SAS p0_clientes_activos.sas:15
+- **Propiedades:**
+  - `UNIQUE_KEY` (Unique key) = `cliente_id` — SAS p0_clientes_activos.sas:15 · nombre oficial
 - **Esquema:** `cliente_id` _(tipos por determinar)_
 - **Pruebas:** `vc_op_15_dedupe_1_duplicates`
 
@@ -143,7 +150,7 @@
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
 - **Subjob:** `s15` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
 - **Conexiones:** Main desde `op_15_dedupe_1`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `clientes_activos_ord` — SAS p0_clientes_activos.sas:15
   - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
   - `ACTION_ON_DATA` = _por configurar_ — regla mappings

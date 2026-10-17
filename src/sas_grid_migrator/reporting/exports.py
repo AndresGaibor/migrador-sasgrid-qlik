@@ -31,15 +31,31 @@ def _step_md(s: PlanStep) -> list[str]:
             f" · **Origen SAS:** `{s.evidence.file}:{s.evidence.line}`"
         ),
     ]
+    if s.doc_url or s.variants:
+        out.append(
+            "- **Referencia:** "
+            + (f"[documentación]({s.doc_url})" if s.doc_url else "")
+            + (f" · variantes: {', '.join(f'`{v}`' for v in s.variants[:8])}" if s.variants else "")
+        )
     if s.connections:
         out.append(
             "- **Conexiones:** "
             + ", ".join(f"{c.type} desde `{c.from_step}`" for c in s.connections)
         )
     if s.properties:
-        out.append("- **Propiedades (nombres candidatos):**")
+        out.append("- **Propiedades:**")
         out += [
-            f"  - `{p.name}` = {('`' + p.value + '`') if p.value else '_por configurar_'} — {p.origin}"
+            f"  - `{p.name}`"
+            + (f" ({p.label})" if p.label else "")
+            + f" = {('`' + p.value + '`') if p.value else '_por configurar_'} — {p.origin}"
+            + (
+                " · nombre oficial"
+                if p.in_catalog
+                else " · _no está en el catálogo_"
+                if p.in_catalog is False
+                else ""
+            )
+            + (f" · opciones: {', '.join(p.options[:8])}" if p.options else "")
             for p in s.properties
         ]
     if s.schema_columns:
@@ -78,7 +94,7 @@ def render_plan_md(plan: JobPlan) -> str:
         f"- **Programa SAS:** `{plan.program}`"
         + (f" (sha256 `{plan.sha256[:12]}`)" if plan.sha256 else ""),
         f"- **Estado:** {plan.job_status} · **Pasos:** {n_steps} · **Reglas:** v{plan.rules_version}",
-        "- **Aviso:** componentes y propiedades son candidatos; ninguno está verificado contra Talend salvo marca explícita.",
+        "- **Aviso:** los nombres de componente y propiedad provienen del catálogo oficial de Talend; solo los marcados «verificado» se contrastaron con un Job real vía talend-mcp.",
         "",
     ]
     if plan.orchestration.schedules or plan.orchestration.upstream or plan.orchestration.grid_tasks:

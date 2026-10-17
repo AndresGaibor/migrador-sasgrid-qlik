@@ -103,6 +103,11 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
   );
 }
 
+function ComponentLink({ name, known }: { name: string; known?: boolean | null }) {
+  const base = name.split(" ")[0];
+  return known ? <a href={`#/catalogo/${base}`}><code>{name}</code></a> : <code>{name}</code>;
+}
+
 function StepCard({ s, onDecide }: { s: Step; onDecide: (s: Step, status: string, note: string | null) => Promise<void> }) {
   const [note, setNote] = useState(s.note ?? "");
   const [err, setErr] = useState<string>();
@@ -111,13 +116,14 @@ function StepCard({ s, onDecide }: { s: Step; onDecide: (s: Step, status: string
     <article className="step">
       <h3>{s.order}. {s.purpose}</h3>
       <p>
-        <code>{s.component_candidate}</code> <Badge tone={s.verified ? "ok" : "warn"}>{s.verified ? "verificado" : "sin verificar"}</Badge>{" "}
+        <ComponentLink name={s.component_candidate} known={s.in_catalog} /> <Badge tone={s.verified ? "ok" : "warn"}>{s.verified ? "verificado" : "sin verificar"}</Badge>{" "}
         <span className="muted">{s.evidence.file}:{s.evidence.line} · subjob {s.subjob} · confianza {s.confidence}</span>
       </p>
       {s.alternatives.length > 0 && <p className="muted">Alternativas: {s.alternatives.join(", ")}</p>}
+      {s.variants && s.variants.length > 0 && <p className="muted">Variantes: {s.variants.slice(0, 8).join(", ")}</p>}
       {s.connections.length > 0 && <p>Conexiones: {s.connections.map((c) => `${c.type}${c.from_step ? " ← " + c.from_step : ""}`).join(", ")}</p>}
       {s.properties.length > 0 && (
-        <ul>{s.properties.map((p) => <li key={p.name}><code>{p.name}</code> = {p.value ? <code>{p.value}</code> : <i>por configurar</i>} <span className="muted">({p.origin})</span></li>)}</ul>
+        <ul>{s.properties.map((p) => <li key={p.name}><code>{p.name}</code>{p.label && <> ({p.label})</>} = {p.value ? <code>{p.value}</code> : <i>por configurar</i>} <span className="muted">({p.origin})</span> {p.in_catalog && <Badge tone="ok">nombre oficial</Badge>}{p.in_catalog === false && <Badge tone="warn">no está en el catálogo</Badge>}{p.options && p.options.length > 0 && <span className="muted"> opciones: {p.options.slice(0, 8).join(", ")}</span>}</li>)}</ul>
       )}
       {s.expressions.map((e, i) => (
         <p key={i}>

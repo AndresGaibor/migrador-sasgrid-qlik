@@ -1,4 +1,5 @@
 import { useHash } from "./hooks";
+import { CatalogView } from "./views/CatalogView";
 import { ProjectView } from "./views/ProjectView";
 import { ProjectsView } from "./views/ProjectsView";
 import { SettingsView } from "./views/SettingsView";
@@ -14,11 +15,14 @@ export function App() {
         </a>
         <nav>
           <a href="#/">Proyectos</a>
+          <a href="#/catalogo">Catálogo Talend</a>
           <a href="#/settings">Ajustes</a>
         </nav>
       </header>
       <main>
-        {hash === "/settings" ? (
+        {hash.startsWith("/catalogo") ? (
+          <CatalogView name={hash.split("/")[2]} />
+        ) : hash === "/settings" ? (
           <SettingsView />
         ) : m ? (
           <ProjectView id={m[1]} tab={m[2] ?? "resumen"} rest={m[3]} go={go} />

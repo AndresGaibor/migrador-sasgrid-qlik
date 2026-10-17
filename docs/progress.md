@@ -14,3 +14,5 @@
 Tests Python: 69 (unit, integration, golden). Tests web: `cd apps/web && bun test`. Nada commiteado: todo en el índice de git.
 
 Pendiente fuera de alcance: servidor talend-mcp vivo para marcar componentes `verified`; piloto con programas reales del cliente (`docs/pilot-report.md`).
+
+Mejora posterior: catálogo oficial de 577 componentes + documentación local (550) + UI/API de catálogo; ver `docs/architecture.md`.

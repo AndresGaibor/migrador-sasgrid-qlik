@@ -2,7 +2,7 @@
 
 - **Programa SAS:** `p2_codigo_dinamico.sas` (sha256 `2f491b9a85c4`)
 - **Estado:** needs_review · **Pasos:** 6 · **Reglas:** v1
-- **Aviso:** componentes y propiedades son candidatos; ninguno está verificado contra Talend salvo marca explícita.
+- **Aviso:** los nombres de componente y propiedad provienen del catálogo oficial de Talend; solo los marcados «verificado» se contrastaron con un Job real vía talend-mcp.
 
 ## Variables de contexto
 
@@ -17,7 +17,7 @@
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
 - **Subjob:** `s2` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p2_codigo_dinamico.sas:2`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `tablas_a_procesar` — SAS p2_codigo_dinamico.sas:2
   - `QUERY` = _por configurar_ — regla mappings
   - `CONNECTION` = _por configurar_ — regla mappings
@@ -40,9 +40,10 @@
 
 - **Acción:** add_component · **Componente:** `tSystem` (sin verificar)
 - **Subjob:** `s7` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:7`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsystem)
 - **Conexiones:** OnSubjobOk desde `op_4_dynamic_code_1`
-- **Propiedades (nombres candidatos):**
-  - `COMMAND` = `x 'cp /data/out/reporte.csv /archivo/historico/'` — SAS p2_codigo_dinamico.sas:7
+- **Propiedades:**
+  - `COMMAND` (Command) = `x 'cp /data/out/reporte.csv /archivo/historico/'` — SAS p2_codigo_dinamico.sas:7 · nombre oficial
 - **Supuestos:** Comando del SO: mover a orquestación
 - **Pendientes:**
   - Moverlo a la orquestación o confirmar necesidad
@@ -51,9 +52,10 @@
 
 - **Acción:** add_component · **Componente:** `tSystem` (sin verificar)
 - **Subjob:** `s8` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:8`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsystem)
 - **Conexiones:** OnSubjobOk desde `op_7_os_command_1`
-- **Propiedades (nombres candidatos):**
-  - `COMMAND` = `systask command "gzip /data/out/reporte.csv" wait` — SAS p2_codigo_dinamico.sas:8
+- **Propiedades:**
+  - `COMMAND` (Command) = `systask command "gzip /data/out/reporte.csv" wait` — SAS p2_codigo_dinamico.sas:8 · nombre oficial
 - **Supuestos:** Comando del SO: mover a orquestación
 - **Pendientes:**
   - Moverlo a la orquestación o confirmar necesidad
@@ -62,10 +64,11 @@
 
 - **Acción:** add_component · **Componente:** `tRunJob` (sin verificar) · alternativas: `Joblet`
 - **Subjob:** `s17` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p2_codigo_dinamico.sas:17`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/trunjob)
 - **Conexiones:** OnSubjobOk desde `op_8_os_command_1`
-- **Propiedades (nombres candidatos):**
-  - `PROCESS` = `bucle` — SAS p2_codigo_dinamico.sas:17
-  - `CONTEXT_PARAMS` = _por configurar_ — regla mappings
+- **Propiedades:**
+  - `PROCESS` (Job) = `bucle` — SAS p2_codigo_dinamico.sas:17 · nombre oficial
+  - `CONTEXTPARAMS` (Context Param) = _por configurar_ — regla mappings · nombre oficial
 - **Pendientes:**
   - Job o joblet hijo que implementa la macro
   - Crear/identificar el Job hijo para %bucle (definida en p2_codigo_dinamico.sas)
@@ -76,7 +79,7 @@
 
 - **Acción:** add_component · **Componente:** `tDBRow` (sin verificar) · alternativas: `ninguno`
 - **Subjob:** `m:bucle:s14` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:14`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `QUERY` = _por configurar_ — regla mappings
 - **Pendientes:**
   - Decidir si la operación de mantenimiento aplica en el destino

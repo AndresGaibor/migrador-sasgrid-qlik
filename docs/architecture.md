@@ -76,6 +76,14 @@ Medido sobre el corpus: 58 programas, 372 datasets, 6 tareas de macro orquestado
 - No existe catálogo global. `verification.py` construye un catálogo desde Jobs de referencia y marca `verified` solo si el componente y todas las propiedades del paso aparecen ahí.
 - Limitación: el clon revisado de talend-mcp no arranca (`Tool duplicada: talend_bridge_select_component`), así que el adaptador se validó contra su código y mocks, no contra un servidor vivo. Además `inspect_component` en ese código devuelve un componente vacío; el adaptador descarta componentes sin `componentName`.
 
+## Catálogo de componentes Talend
+
+- `rules/talend/components.json` (577 componentes, 91 familias): generado por `tools/build_talend_catalog.py` desde las definiciones XML de Talaxie (Apache-2.0). Por componente: descripción, familias, conectores (FLOW/REJECT/ITERATE/…), parámetros con **nombre interno**, etiqueta, campo, requerido, valor por defecto, opciones de listas cerradas, columnas de tablas de parámetros y drivers (`imports`). `variants` agrupa tecnologías hermanas (tOracleInput ↔ tMysqlInput) solo para familias de bases de datos, nube y ficheros.
+- Un nombre que está en el catálogo es un nombre real de Talend (`in_catalog`); `verified` sigue significando «contrastado en un Job real vía talend-mcp». Las propiedades de tMap son del editor del mapper y se marcan aparte; `generic_components` en las reglas lista los que existen en Studio pero no en el catálogo abierto (tDBInput, tHiveInput…).
+- Documentación en prosa: `tools/fetch_talend_docs.py` descarga de help.qlik.com (resumen + «Standard properties» + subpáginas) a `docs/reference/talend/` (no se versiona: copyright de Qlik). 550 de 577 componentes tienen página; los 27 sin ella son internos (tMapIn, tSortIn…).
+- API: `GET /api/talend/catalog[?q=&family=]`, `GET /api/talend/catalog/{componente}` (incluye la doc local si existe). UI: «Catálogo Talend».
+- Test de coherencia: toda propiedad y componente de `rules/mappings` existe en el catálogo (encontró `KEY/VALUE` → `VARIABLES` y `CONTEXT_PARAMS` → `CONTEXTPARAMS`).
+
 ## API prevista
 
 `POST /api/projects`, `POST /api/projects/{id}/imports`, `POST /api/projects/{id}/analyses`, `GET /api/projects/{id}/inventory`, `GET /api/projects/{id}/dependencies`, `GET /api/projects/{id}/programs` y `GET /api/projects/{id}/programs/{path}` (en lugar de `/api/programs/{id}`: el programa se identifica por proyecto + ruta), `POST|GET /api/projects/{id}/plans`, `GET /api/projects/{id}/plans/{path}[?format=md]`, `PATCH /api/projects/{id}/plans/{path}/steps/{step_id}`, `POST /api/projects/{id}/plans/verify`, `POST /api/projects/{id}/exports`, `GET /api/integrations/talend/health`, `POST /api/integrations/talend/inspect`.

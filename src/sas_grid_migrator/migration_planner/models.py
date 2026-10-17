@@ -15,6 +15,9 @@ class Property(BaseModel):
     value: str | None = None
     origin: str  # "SAS archivo:línea" | "regla mappings" | "usuario"
     verified: bool = False
+    in_catalog: bool | None = None  # nombre existe en el catálogo oficial (None: no aplica/editor)
+    label: str | None = None  # etiqueta del parámetro en Talend Studio
+    options: list[str] = []  # valores admitidos si es una lista cerrada
 
 
 class SchemaColumn(BaseModel):
@@ -62,6 +65,9 @@ class PlanStep(BaseModel):
     status: StepStatus = "propuesto"
     note: str | None = None  # decisión humana
     verified: bool = False  # componente y propiedades contrastados con talend-mcp
+    in_catalog: bool | None = None  # el componente existe en el catálogo oficial de Talend
+    doc_url: str | None = None
+    variants: list[str] = []  # componentes hermanos (otra tecnología)
     requires_semantic_validation: bool = False
 
 

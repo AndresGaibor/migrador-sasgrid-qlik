@@ -1,4 +1,4 @@
-import type { Deps, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, Summary } from "./types";
+import type { CatalogComponent, CatalogList, Deps, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, Summary } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -50,5 +50,8 @@ export const api = {
       body: JSON.stringify({ status, note }),
     }),
   exportAll: (id: string) => post<{ directory: string; files: string[] }>(`/projects/${id}/exports`),
+  catalog: (q: string, family: string) =>
+    req<CatalogList>(`/talend/catalog?q=${encodeURIComponent(q)}${family ? `&family=${encodeURIComponent(family)}` : ""}`),
+  component: (name: string) => req<CatalogComponent>(`/talend/catalog/${encodeURIComponent(name)}`),
   talendHealth: () => req<{ available: boolean; jobs?: number; error?: string }>("/integrations/talend/health"),
 };

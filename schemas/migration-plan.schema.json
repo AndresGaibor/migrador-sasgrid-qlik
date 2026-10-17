@@ -417,6 +417,38 @@
           "title": "Verified",
           "type": "boolean"
         },
+        "in_catalog": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "In Catalog"
+        },
+        "doc_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doc Url"
+        },
+        "variants": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Variants",
+          "type": "array"
+        },
         "requires_semantic_validation": {
           "default": false,
           "title": "Requires Semantic Validation",
@@ -460,6 +492,38 @@
           "default": false,
           "title": "Verified",
           "type": "boolean"
+        },
+        "in_catalog": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "In Catalog"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "options": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Options",
+          "type": "array"
         }
       },
       "required": [

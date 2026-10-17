@@ -2,7 +2,7 @@
 
 - **Programa SAS:** `p1_merge_first_last.sas` (sha256 `8642d7b05dfe`)
 - **Estado:** needs_review · **Pasos:** 13 · **Reglas:** v1
-- **Aviso:** componentes y propiedades son candidatos; ninguno está verificado contra Talend salvo marca explícita.
+- **Aviso:** los nombres de componente y propiedad provienen del catálogo oficial de Talend; solo los marcados «verificado» se contrastaron con un Job real vía talend-mcp.
 
 ## Pasos
 
@@ -10,8 +10,9 @@
 
 - **Acción:** add_component · **Componente:** `tFixedFlowInput` (sin verificar) · alternativas: `tMap (lookup)`, `Rutina Java`
 - **Subjob:** `s2` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p1_merge_first_last.sas:2`
-- **Propiedades (nombres candidatos):**
-  - `VALUES` = _por configurar_ — regla mappings
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput)
+- **Propiedades:**
+  - `VALUES` (Values) = _por configurar_ — regla mappings · nombre oficial
 - **Pendientes:**
   - Decidir cómo representar el formato (tabla de lookup o expresión)
 - **Pruebas:** `vc_op_2_format_definition_1_schema`
@@ -21,7 +22,7 @@
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
 - **Subjob:** `s6` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:6`
 - **Conexiones:** OnSubjobOk desde `op_2_format_definition_1`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `pagos` — SAS p1_merge_first_last.sas:6
   - `QUERY` = _por configurar_ — regla mappings
   - `CONNECTION` = _por configurar_ — regla mappings
@@ -35,9 +36,10 @@
 
 - **Acción:** add_component · **Componente:** `tSortRow` (sin verificar)
 - **Subjob:** `s6` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:6`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsortrow)
 - **Conexiones:** Main desde `op_6_read_1`
-- **Propiedades (nombres candidatos):**
-  - `CRITERIA` = `cliente_id, fecha_pago` — SAS p1_merge_first_last.sas:6
+- **Propiedades:**
+  - `CRITERIA` (Criteria) = `cliente_id, fecha_pago` — SAS p1_merge_first_last.sas:6 · nombre oficial
 - **Esquema:** `cliente_id`, `fecha_pago` _(tipos por determinar)_
 - **Pruebas:** `vc_op_6_sort_1_ordering`
 
@@ -46,7 +48,7 @@
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
 - **Subjob:** `s6` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:6`
 - **Conexiones:** Main desde `op_6_sort_1`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `pagos` — SAS p1_merge_first_last.sas:6
   - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
   - `ACTION_ON_DATA` = _por configurar_ — regla mappings
@@ -61,7 +63,7 @@
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
 - **Subjob:** `s7` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:7`
 - **Conexiones:** OnSubjobOk desde `op_6_write_1`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `clientes` — SAS p1_merge_first_last.sas:7
   - `QUERY` = _por configurar_ — regla mappings
   - `CONNECTION` = _por configurar_ — regla mappings
@@ -75,9 +77,10 @@
 
 - **Acción:** add_component · **Componente:** `tSortRow` (sin verificar)
 - **Subjob:** `s7` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:7`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsortrow)
 - **Conexiones:** Main desde `op_7_read_1`
-- **Propiedades (nombres candidatos):**
-  - `CRITERIA` = `cliente_id` — SAS p1_merge_first_last.sas:7
+- **Propiedades:**
+  - `CRITERIA` (Criteria) = `cliente_id` — SAS p1_merge_first_last.sas:7 · nombre oficial
 - **Esquema:** `cliente_id` _(tipos por determinar)_
 - **Pruebas:** `vc_op_7_sort_1_ordering`
 
@@ -86,7 +89,7 @@
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
 - **Subjob:** `s7` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:7`
 - **Conexiones:** Main desde `op_7_sort_1`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `clientes` — SAS p1_merge_first_last.sas:7
   - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
   - `ACTION_ON_DATA` = _por configurar_ — regla mappings
@@ -101,7 +104,7 @@
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
 - **Subjob:** `s9` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:9`
 - **Conexiones:** OnSubjobOk desde `op_7_write_1`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `clientes` — SAS p1_merge_first_last.sas:9
   - `QUERY` = _por configurar_ — regla mappings
   - `CONNECTION` = _por configurar_ — regla mappings
@@ -115,7 +118,7 @@
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
 - **Subjob:** `s9` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:9`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `pagos` — SAS p1_merge_first_last.sas:9
   - `QUERY` = _por configurar_ — regla mappings
   - `CONNECTION` = _por configurar_ — regla mappings
@@ -129,11 +132,12 @@
 
 - **Acción:** add_component · **Componente:** `tMap` (sin verificar) · alternativas: `tJoin`
 - **Subjob:** `s9` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p1_merge_first_last.sas:9`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `op_9_read_1`, Lookup desde `op_9_read_2`
-- **Propiedades (nombres candidatos):**
-  - `Join model` = `Left Outer Join` — SAS p1_merge_first_last.sas:9
-  - `Match model` = _por configurar_ — regla mappings
-  - `Expression key` = `cliente_id` — SAS p1_merge_first_last.sas:9
+- **Propiedades:**
+  - `Join model` (Editor del componente (no es un parámetro plano)) = `Left Outer Join` — SAS p1_merge_first_last.sas:9
+  - `Match model` (Editor del componente (no es un parámetro plano)) = _por configurar_ — regla mappings
+  - `Expression key` (Editor del componente (no es un parámetro plano)) = `cliente_id` — SAS p1_merge_first_last.sas:9
 - **Esquema:** `cliente_id` _(tipos por determinar)_
 - **Supuestos:** MERGE BY no es un join SQL: con claves repetidas en ambos lados el resultado difiere
 - **Pendientes:**
@@ -144,10 +148,11 @@
 
 - **Acción:** add_component · **Componente:** `tMap` (sin verificar) · alternativas: `tJavaRow`
 - **Subjob:** `s9` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p1_merge_first_last.sas:9`
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `op_9_join_1`
-- **Propiedades (nombres candidatos):**
-  - `Expressions` = `3 asignaciones, 3 condicionales` — SAS p1_merge_first_last.sas:9
-  - `Var table` = _por configurar_ — regla mappings
+- **Propiedades:**
+  - `Expressions` (Editor del componente (no es un parámetro plano)) = `3 asignaciones, 3 condicionales` — SAS p1_merge_first_last.sas:9
+  - `Var table` (Editor del componente (no es un parámetro plano)) = _por configurar_ — regla mappings
 - **Esquema:** `dias`, `mes_pago`, `tramo` _(tipos por determinar)_
 - **Expresión** (línea 18): SAS `intck('day', fecha_pago, today())` → _sin traducción automática_
   - ⚠ Sin traducción automática: función intck
@@ -181,7 +186,7 @@
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
 - **Subjob:** `s9` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:9`
 - **Conexiones:** Main desde `op_9_stateful_1`
-- **Propiedades (nombres candidatos):**
+- **Propiedades:**
   - `TABLE` = `pagos_cliente` — SAS p1_merge_first_last.sas:9
   - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
   - `ACTION_ON_DATA` = _por configurar_ — regla mappings

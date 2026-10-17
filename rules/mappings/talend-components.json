@@ -1,541 +1,559 @@
 {
- "version": "1",
- "note": "Nombres de componentes y propiedades CANDIDATOS tomados del conocimiento de Talend; ninguno está verificado hasta contrastarlo con talend-mcp (talend_inspect_component sobre un Job de referencia).",
- "engines": {
-  "oracle": {
-   "input": "tOracleInput",
-   "output": "tOracleOutput"
-  },
-  "teradata": {
-   "input": "tTeradataInput",
-   "output": "tTeradataOutput"
-  },
-  "db2": {
-   "input": "tDB2Input",
-   "output": "tDB2Output"
-  },
-  "odbc": {
-   "input": "tDBInput",
-   "output": "tDBOutput"
-  },
-  "postgres": {
-   "input": "tPostgresqlInput",
-   "output": "tPostgresqlOutput"
-  },
-  "sqlsvr": {
-   "input": "tMSSqlInput",
-   "output": "tMSSqlOutput"
-  },
-  "mysql": {
-   "input": "tMysqlInput",
-   "output": "tMysqlOutput"
-  },
-  "redshift": {
-   "input": "tRedshiftInput",
-   "output": "tRedshiftOutput"
-  },
-  "greenplm": {
-   "input": "tGreenplumInput",
-   "output": "tGreenplumOutput"
-  },
-  "hadoop": {
-   "input": "tHiveInput",
-   "output": "tHiveOutput"
-  },
-  "impala": {
-   "input": "tImpalaInput",
-   "output": "tImpalaOutput"
-  },
-  "netezza": {
-   "input": "tNetezzaInput",
-   "output": "tNetezzaOutput"
-  },
-  "aster": {
-   "input": "tDBInput",
-   "output": "tDBOutput"
-  },
-  "hawq": {
-   "input": "tDBInput",
-   "output": "tDBOutput"
-  }
- },
- "type_hints": {
-  "character": "String",
-  "numeric": "Double (o BigDecimal/Integer si es monetario/entero)",
-  "date": "Date (SAS cuenta días desde 1960-01-01; Talend usa epoch 1970)",
-  "datetime": "Date (SAS cuenta segundos desde 1960-01-01)",
-  "missing_numeric": "null",
-  "missing_character": "cadena vacía o null (decidir; SAS no distingue)"
- },
- "operations": {
-  "read": {
-   "component": "@engine.input",
-   "alternatives": [
-    "tFileInputDelimited",
-    "tDBInput"
-   ],
-   "properties": [
-    "TABLE",
-    "QUERY",
-    "CONNECTION"
-   ],
-   "required": [
-    "Formato físico o sistema de origen del dataset",
-    "Esquema y tipos de columnas"
-   ],
-   "tests": [
-    {
-     "kind": "row_count",
-     "text": "Mismo número de filas leídas que en SAS"
+  "version": "1",
+  "note": "Nombres de componentes y propiedades CANDIDATOS tomados del conocimiento de Talend; ninguno está verificado hasta contrastarlo con talend-mcp (talend_inspect_component sobre un Job de referencia). Propiedades de tMap: se configuran en el editor del mapper (parámetro MAP), no son parámetros planos. generic_components: genéricos o de Big Data que existen en Talend Studio pero no en el catálogo abierto (Talaxie); su documentación está en docs/reference/talend.",
+  "engines": {
+    "oracle": {
+      "input": "tOracleInput",
+      "output": "tOracleOutput"
     },
-    {
-     "kind": "schema",
-     "text": "Mismos nombres y tipos de columna"
-    }
-   ]
-  },
-  "read_file": {
-   "component": "tFileInputDelimited",
-   "alternatives": [
-    "tFileInputPositional",
-    "tFileInputExcel"
-   ],
-   "properties": [
-    "FILENAME",
-    "FIELDSEPARATOR",
-    "HEADER",
-    "ENCODING"
-   ],
-   "required": [
-    "Ruta del archivo, delimitador y codificación",
-    "Esquema (ancho fijo o delimitado)"
-   ],
-   "tests": [
-    {
-     "kind": "row_count",
-     "text": "Mismas filas leídas, incluidas filas inválidas"
+    "teradata": {
+      "input": "tTeradataInput",
+      "output": "tTeradataOutput"
     },
-    {
-     "kind": "nulls",
-     "text": "Campos vacíos y missing se cargan igual que en SAS"
-    }
-   ]
-  },
-  "inline_data": {
-   "component": "tFixedFlowInput",
-   "alternatives": [],
-   "properties": [
-    "VALUES"
-   ],
-   "required": [
-    "Confirmar los datos incrustados"
-   ],
-   "tests": [
-    {
-     "kind": "row_count",
-     "text": "Mismas filas"
-    }
-   ]
-  },
-  "filter": {
-   "component": "tFilterRow",
-   "alternatives": [
-    "tMap"
-   ],
-   "properties": [
-    "LOGICAL_OP",
-    "CONDITIONS",
-    "USE_ADVANCED",
-    "ADVANCED_COND"
-   ],
-   "required": [],
-   "tests": [
-    {
-     "kind": "row_count",
-     "text": "Filas que cumplen el filtro igual a SAS"
+    "db2": {
+      "input": "tDB2Input",
+      "output": "tDB2Output"
     },
-    {
-     "kind": "nulls",
-     "text": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)"
+    "odbc": {
+      "input": "tDBInput",
+      "output": "tDBOutput"
     },
-    {
-     "kind": "empty",
-     "text": "Entrada vacía produce salida vacía"
-    }
-   ]
-  },
-  "join": {
-   "component": "tMap",
-   "alternatives": [
-    "tJoin"
-   ],
-   "properties": [
-    "Join model",
-    "Match model",
-    "Expression key"
-   ],
-   "required": [
-    "Columnas clave y tipos en ambos lados"
-   ],
-   "tests": [
-    {
-     "kind": "duplicates",
-     "text": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)"
+    "postgres": {
+      "input": "tPostgresqlInput",
+      "output": "tPostgresqlOutput"
     },
-    {
-     "kind": "row_count",
-     "text": "Filas sin pareja en cada lado"
+    "sqlsvr": {
+      "input": "tMSSqlInput",
+      "output": "tMSSqlOutput"
     },
-    {
-     "kind": "nulls",
-     "text": "Claves nulas no deben emparejarse (o sí, según SAS)"
-    }
-   ]
-  },
-  "union": {
-   "component": "tUnite",
-   "alternatives": [
-    "tMap"
-   ],
-   "properties": [],
-   "required": [
-    "Esquemas compatibles entre entradas"
-   ],
-   "tests": [
-    {
-     "kind": "row_count",
-     "text": "Suma de filas de las entradas (UNION sin ALL elimina duplicados)"
-    }
-   ]
-  },
-  "aggregate": {
-   "component": "tAggregateRow",
-   "alternatives": [
-    "tMap"
-   ],
-   "properties": [
-    "GROUPBYS",
-    "OPERATIONS"
-   ],
-   "required": [],
-   "tests": [
-    {
-     "kind": "aggregates",
-     "text": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS"
+    "mysql": {
+      "input": "tMysqlInput",
+      "output": "tMysqlOutput"
     },
-    {
-     "kind": "numeric",
-     "text": "Tolerancia numérica y redondeo"
-    }
-   ]
-  },
-  "sort": {
-   "component": "tSortRow",
-   "alternatives": [],
-   "properties": [
-    "CRITERIA"
-   ],
-   "required": [],
-   "tests": [
-    {
-     "kind": "ordering",
-     "text": "Solo si el orden forma parte del contrato; SAS ordena missing primero"
-    }
-   ]
-  },
-  "dedupe": {
-   "component": "tUniqRow",
-   "alternatives": [],
-   "properties": [
-    "UNIQUE_KEY"
-   ],
-   "required": [],
-   "tests": [
-    {
-     "kind": "duplicates",
-     "text": "Se conserva la misma fila por clave (NODUPKEY conserva la primera)"
-    }
-   ]
-  },
-  "project": {
-   "component": "tMap",
-   "alternatives": [],
-   "properties": [
-    "Output columns",
-    "Expressions"
-   ],
-   "required": [],
-   "tests": [
-    {
-     "kind": "schema",
-     "text": "Columnas y tipos de salida"
-    }
-   ]
-  },
-  "select_columns": {
-   "component": "tFilterColumns",
-   "alternatives": [
-    "tMap"
-   ],
-   "properties": [
-    "SCHEMA"
-   ],
-   "required": [],
-   "tests": [
-    {
-     "kind": "schema",
-     "text": "Solo las columnas esperadas"
-    }
-   ]
-  },
-  "rename": {
-   "component": "tMap",
-   "alternatives": [],
-   "properties": [
-    "Output columns"
-   ],
-   "required": [],
-   "tests": [
-    {
-     "kind": "schema",
-     "text": "Nombres de columna finales"
-    }
-   ]
-  },
-  "compute": {
-   "component": "tMap",
-   "alternatives": [
-    "tJavaRow"
-   ],
-   "properties": [
-    "Expressions",
-    "Var table"
-   ],
-   "required": [
-    "Tipos de las columnas calculadas"
-   ],
-   "tests": [
-    {
-     "kind": "nulls",
-     "text": "Cálculos con valores missing (SAS propaga missing en aritmética)"
+    "redshift": {
+      "input": "tRedshiftInput",
+      "output": "tRedshiftOutput"
     },
-    {
-     "kind": "dates",
-     "text": "Fechas calculadas (epoch 1960 vs 1970)"
+    "greenplm": {
+      "input": "tGreenplumInput",
+      "output": "tGreenplumOutput"
     },
-    {
-     "kind": "numeric",
-     "text": "Redondeo y precisión"
-    }
-   ]
-  },
-  "stateful": {
-   "component": "por_determinar",
-   "alternatives": [
-    "tSortRow + tAggregateRow",
-    "tJavaRow",
-    "tMap con variables"
-   ],
-   "properties": [],
-   "required": [
-    "Diseño manual de la lógica con estado entre filas (RETAIN/FIRST./LAST.)"
-   ],
-   "tests": [
-    {
-     "kind": "ordering",
-     "text": "Resultado depende del orden de entrada: probar con datos desordenados y con claves repetidas"
+    "hadoop": {
+      "input": "tHiveInput",
+      "output": "tHiveOutput"
     },
-    {
-     "kind": "duplicates",
-     "text": "Grupos de una sola fila y de muchas filas"
-    }
-   ]
-  },
-  "write": {
-   "component": "@engine.output",
-   "alternatives": [
-    "tFileOutputDelimited",
-    "tDBOutput"
-   ],
-   "properties": [
-    "TABLE",
-    "ACTION_ON_TABLE",
-    "ACTION_ON_DATA",
-    "CONNECTION"
-   ],
-   "required": [
-    "Sistema y tabla/archivo de destino"
-   ],
-   "tests": [
-    {
-     "kind": "row_count",
-     "text": "Filas escritas iguales"
+    "impala": {
+      "input": "tImpalaInput",
+      "output": "tImpalaOutput"
     },
-    {
-     "kind": "schema",
-     "text": "Esquema destino"
+    "netezza": {
+      "input": "tNetezzaInput",
+      "output": "tNetezzaOutput"
+    },
+    "aster": {
+      "input": "tDBInput",
+      "output": "tDBOutput"
+    },
+    "hawq": {
+      "input": "tDBInput",
+      "output": "tDBOutput"
     }
-   ]
   },
-  "write_file": {
-   "component": "tFileOutputDelimited",
-   "alternatives": [
-    "tFileOutputPositional",
-    "tFileOutputExcel"
-   ],
-   "properties": [
-    "FILENAME",
-    "FIELDSEPARATOR",
-    "INCLUDEHEADER",
-    "ENCODING"
-   ],
-   "required": [
-    "Ruta y formato del archivo de salida"
-   ],
-   "tests": [
-    {
-     "kind": "row_count",
-     "text": "Mismas filas"
+  "type_hints": {
+    "character": "String",
+    "numeric": "Double (o BigDecimal/Integer si es monetario/entero)",
+    "date": "Date (SAS cuenta días desde 1960-01-01; Talend usa epoch 1970)",
+    "datetime": "Date (SAS cuenta segundos desde 1960-01-01)",
+    "missing_numeric": "null",
+    "missing_character": "cadena vacía o null (decidir; SAS no distingue)"
+  },
+  "operations": {
+    "read": {
+      "component": "@engine.input",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "properties": [
+        "TABLE",
+        "QUERY",
+        "CONNECTION"
+      ],
+      "required": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        {
+          "kind": "row_count",
+          "text": "Mismo número de filas leídas que en SAS"
+        },
+        {
+          "kind": "schema",
+          "text": "Mismos nombres y tipos de columna"
+        }
+      ]
+    },
+    "read_file": {
+      "component": "tFileInputDelimited",
+      "alternatives": [
+        "tFileInputPositional",
+        "tFileInputExcel"
+      ],
+      "properties": [
+        "FILENAME",
+        "FIELDSEPARATOR",
+        "HEADER",
+        "ENCODING"
+      ],
+      "required": [
+        "Ruta del archivo, delimitador y codificación",
+        "Esquema (ancho fijo o delimitado)"
+      ],
+      "tests": [
+        {
+          "kind": "row_count",
+          "text": "Mismas filas leídas, incluidas filas inválidas"
+        },
+        {
+          "kind": "nulls",
+          "text": "Campos vacíos y missing se cargan igual que en SAS"
+        }
+      ]
+    },
+    "inline_data": {
+      "component": "tFixedFlowInput",
+      "alternatives": [],
+      "properties": [
+        "VALUES"
+      ],
+      "required": [
+        "Confirmar los datos incrustados"
+      ],
+      "tests": [
+        {
+          "kind": "row_count",
+          "text": "Mismas filas"
+        }
+      ]
+    },
+    "filter": {
+      "component": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "properties": [
+        "LOGICAL_OP",
+        "CONDITIONS",
+        "USE_ADVANCED",
+        "ADVANCED_COND"
+      ],
+      "required": [],
+      "tests": [
+        {
+          "kind": "row_count",
+          "text": "Filas que cumplen el filtro igual a SAS"
+        },
+        {
+          "kind": "nulls",
+          "text": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)"
+        },
+        {
+          "kind": "empty",
+          "text": "Entrada vacía produce salida vacía"
+        }
+      ]
+    },
+    "join": {
+      "component": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "properties": [
+        "Join model",
+        "Match model",
+        "Expression key"
+      ],
+      "required": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        {
+          "kind": "duplicates",
+          "text": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)"
+        },
+        {
+          "kind": "row_count",
+          "text": "Filas sin pareja en cada lado"
+        },
+        {
+          "kind": "nulls",
+          "text": "Claves nulas no deben emparejarse (o sí, según SAS)"
+        }
+      ]
+    },
+    "union": {
+      "component": "tUnite",
+      "alternatives": [
+        "tMap"
+      ],
+      "properties": [],
+      "required": [
+        "Esquemas compatibles entre entradas"
+      ],
+      "tests": [
+        {
+          "kind": "row_count",
+          "text": "Suma de filas de las entradas (UNION sin ALL elimina duplicados)"
+        }
+      ]
+    },
+    "aggregate": {
+      "component": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "properties": [
+        "GROUPBYS",
+        "OPERATIONS"
+      ],
+      "required": [],
+      "tests": [
+        {
+          "kind": "aggregates",
+          "text": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS"
+        },
+        {
+          "kind": "numeric",
+          "text": "Tolerancia numérica y redondeo"
+        }
+      ]
+    },
+    "sort": {
+      "component": "tSortRow",
+      "alternatives": [],
+      "properties": [
+        "CRITERIA"
+      ],
+      "required": [],
+      "tests": [
+        {
+          "kind": "ordering",
+          "text": "Solo si el orden forma parte del contrato; SAS ordena missing primero"
+        }
+      ]
+    },
+    "dedupe": {
+      "component": "tUniqRow",
+      "alternatives": [],
+      "properties": [
+        "UNIQUE_KEY"
+      ],
+      "required": [],
+      "tests": [
+        {
+          "kind": "duplicates",
+          "text": "Se conserva la misma fila por clave (NODUPKEY conserva la primera)"
+        }
+      ]
+    },
+    "project": {
+      "component": "tMap",
+      "alternatives": [],
+      "properties": [
+        "Output columns",
+        "Expressions"
+      ],
+      "required": [],
+      "tests": [
+        {
+          "kind": "schema",
+          "text": "Columnas y tipos de salida"
+        }
+      ]
+    },
+    "select_columns": {
+      "component": "tFilterColumns",
+      "alternatives": [
+        "tMap"
+      ],
+      "properties": [
+        "SCHEMA"
+      ],
+      "required": [],
+      "tests": [
+        {
+          "kind": "schema",
+          "text": "Solo las columnas esperadas"
+        }
+      ]
+    },
+    "rename": {
+      "component": "tMap",
+      "alternatives": [],
+      "properties": [
+        "Output columns"
+      ],
+      "required": [],
+      "tests": [
+        {
+          "kind": "schema",
+          "text": "Nombres de columna finales"
+        }
+      ]
+    },
+    "compute": {
+      "component": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "properties": [
+        "Expressions",
+        "Var table"
+      ],
+      "required": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        {
+          "kind": "nulls",
+          "text": "Cálculos con valores missing (SAS propaga missing en aritmética)"
+        },
+        {
+          "kind": "dates",
+          "text": "Fechas calculadas (epoch 1960 vs 1970)"
+        },
+        {
+          "kind": "numeric",
+          "text": "Redondeo y precisión"
+        }
+      ]
+    },
+    "stateful": {
+      "component": "por_determinar",
+      "alternatives": [
+        "tSortRow + tAggregateRow",
+        "tJavaRow",
+        "tMap con variables"
+      ],
+      "properties": [],
+      "required": [
+        "Diseño manual de la lógica con estado entre filas (RETAIN/FIRST./LAST.)"
+      ],
+      "tests": [
+        {
+          "kind": "ordering",
+          "text": "Resultado depende del orden de entrada: probar con datos desordenados y con claves repetidas"
+        },
+        {
+          "kind": "duplicates",
+          "text": "Grupos de una sola fila y de muchas filas"
+        }
+      ]
+    },
+    "write": {
+      "component": "@engine.output",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "properties": [
+        "TABLE",
+        "ACTION_ON_TABLE",
+        "ACTION_ON_DATA",
+        "CONNECTION"
+      ],
+      "required": [
+        "Sistema y tabla/archivo de destino"
+      ],
+      "tests": [
+        {
+          "kind": "row_count",
+          "text": "Filas escritas iguales"
+        },
+        {
+          "kind": "schema",
+          "text": "Esquema destino"
+        }
+      ]
+    },
+    "write_file": {
+      "component": "tFileOutputDelimited",
+      "alternatives": [
+        "tFileOutputPositional",
+        "tFileOutputExcel"
+      ],
+      "properties": [
+        "FILENAME",
+        "FIELDSEPARATOR",
+        "INCLUDEHEADER",
+        "ENCODING"
+      ],
+      "required": [
+        "Ruta y formato del archivo de salida"
+      ],
+      "tests": [
+        {
+          "kind": "row_count",
+          "text": "Mismas filas"
+        }
+      ]
+    },
+    "append": {
+      "component": "@engine.output",
+      "alternatives": [
+        "tDBOutput"
+      ],
+      "properties": [
+        "TABLE",
+        "ACTION_ON_DATA"
+      ],
+      "required": [
+        "Tabla base destino"
+      ],
+      "tests": [
+        {
+          "kind": "row_count",
+          "text": "Filas añadidas"
+        }
+      ]
+    },
+    "format_definition": {
+      "component": "tFixedFlowInput",
+      "alternatives": [
+        "tMap (lookup)",
+        "Rutina Java"
+      ],
+      "properties": [
+        "VALUES"
+      ],
+      "required": [
+        "Decidir cómo representar el formato (tabla de lookup o expresión)"
+      ],
+      "tests": [
+        {
+          "kind": "schema",
+          "text": "Valores formateados iguales para todo el rango"
+        }
+      ]
+    },
+    "set_variable": {
+      "component": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "properties": [
+        "VARIABLES"
+      ],
+      "required": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": []
+    },
+    "macro_call": {
+      "component": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "properties": [
+        "PROCESS",
+        "CONTEXTPARAMS"
+      ],
+      "required": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": []
+    },
+    "include": {
+      "component": "tRunJob",
+      "alternatives": [
+        "Joblet",
+        "Rutina"
+      ],
+      "properties": [
+        "PROCESS"
+      ],
+      "required": [
+        "Confirmar si el programa incluido se migra como Job hijo"
+      ],
+      "tests": []
+    },
+    "dynamic_code": {
+      "component": "por_determinar",
+      "alternatives": [
+        "tRunJob con contexto",
+        "tFlowToIterate + tRunJob"
+      ],
+      "properties": [],
+      "required": [
+        "Documentar el código que genera CALL EXECUTE y decidir diseño"
+      ],
+      "tests": []
+    },
+    "os_command": {
+      "component": "tSystem",
+      "alternatives": [],
+      "properties": [
+        "COMMAND"
+      ],
+      "required": [
+        "Moverlo a la orquestación o confirmar necesidad"
+      ],
+      "tests": []
+    },
+    "report": {
+      "component": "ninguno",
+      "alternatives": [
+        "tLogRow",
+        "tFileOutputDelimited"
+      ],
+      "properties": [],
+      "required": [
+        "Decidir si el reporte se migra o se descarta"
+      ],
+      "tests": []
+    },
+    "maintenance": {
+      "component": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "properties": [
+        "QUERY"
+      ],
+      "required": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": []
+    },
+    "unsupported": {
+      "component": "por_determinar",
+      "alternatives": [],
+      "properties": [],
+      "required": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": []
     }
-   ]
   },
-  "append": {
-   "component": "@engine.output",
-   "alternatives": [
-    "tDBOutput"
-   ],
-   "properties": [
-    "TABLE",
-    "ACTION_ON_DATA"
-   ],
-   "required": [
-    "Tabla base destino"
-   ],
-   "tests": [
-    {
-     "kind": "row_count",
-     "text": "Filas añadidas"
-    }
-   ]
+  "editor_properties": {
+    "tMap": [
+      "Join model",
+      "Match model",
+      "Expression key",
+      "Output columns",
+      "Expressions",
+      "Var table"
+    ]
   },
-  "format_definition": {
-   "component": "tFixedFlowInput",
-   "alternatives": [
-    "tMap (lookup)",
-    "Rutina Java"
-   ],
-   "properties": [
-    "VALUES"
-   ],
-   "required": [
-    "Decidir cómo representar el formato (tabla de lookup o expresión)"
-   ],
-   "tests": [
-    {
-     "kind": "schema",
-     "text": "Valores formateados iguales para todo el rango"
-    }
-   ]
-  },
-  "set_variable": {
-   "component": "tSetGlobalVar",
-   "alternatives": [
-    "tJava",
-    "tFlowToIterate"
-   ],
-   "properties": [
-    "KEY",
-    "VALUE"
-   ],
-   "required": [
-    "Origen del valor y alcance de la variable"
-   ],
-   "tests": []
-  },
-  "macro_call": {
-   "component": "tRunJob",
-   "alternatives": [
-    "Joblet"
-   ],
-   "properties": [
-    "PROCESS",
-    "CONTEXT_PARAMS"
-   ],
-   "required": [
-    "Job o joblet hijo que implementa la macro"
-   ],
-   "tests": []
-  },
-  "include": {
-   "component": "tRunJob",
-   "alternatives": [
-    "Joblet",
-    "Rutina"
-   ],
-   "properties": [
-    "PROCESS"
-   ],
-   "required": [
-    "Confirmar si el programa incluido se migra como Job hijo"
-   ],
-   "tests": []
-  },
-  "dynamic_code": {
-   "component": "por_determinar",
-   "alternatives": [
-    "tRunJob con contexto",
-    "tFlowToIterate + tRunJob"
-   ],
-   "properties": [],
-   "required": [
-    "Documentar el código que genera CALL EXECUTE y decidir diseño"
-   ],
-   "tests": []
-  },
-  "os_command": {
-   "component": "tSystem",
-   "alternatives": [],
-   "properties": [
-    "COMMAND"
-   ],
-   "required": [
-    "Moverlo a la orquestación o confirmar necesidad"
-   ],
-   "tests": []
-  },
-  "report": {
-   "component": "ninguno",
-   "alternatives": [
-    "tLogRow",
-    "tFileOutputDelimited"
-   ],
-   "properties": [],
-   "required": [
-    "Decidir si el reporte se migra o se descarta"
-   ],
-   "tests": []
-  },
-  "maintenance": {
-   "component": "tDBRow",
-   "alternatives": [
-    "ninguno"
-   ],
-   "properties": [
-    "QUERY"
-   ],
-   "required": [
-    "Decidir si la operación de mantenimiento aplica en el destino"
-   ],
-   "tests": []
-  },
-  "unsupported": {
-   "component": "por_determinar",
-   "alternatives": [],
-   "properties": [],
-   "required": [
-    "Documentar la lógica y decidir el diseño manualmente"
-   ],
-   "tests": []
-  }
- }
+  "generic_components": [
+    "tDBInput",
+    "tDBOutput",
+    "tDBRow",
+    "tHiveInput",
+    "tHiveOutput",
+    "tImpalaInput",
+    "tImpalaOutput"
+  ]
 }

@@ -24,6 +24,7 @@ from sas_grid_migrator.migration_planner.models import (
     SchemaColumn,
     ValidationCase,
 )
+from sas_grid_migrator.talend_adapter.catalog import load_catalog
 
 _AGG = re.compile(
     r"^(count|sum|avg|mean|min|max)\s*\(\s*(?:distinct\s+)?(.*?)\s*\)$", re.IGNORECASE | re.DOTALL
@@ -44,6 +45,8 @@ class MappingRules(BaseModel):
     version: str
     engines: dict[str, dict[str, str]]
     operations: dict[str, OpRule]
+    editor_properties: dict[str, list[str]] = {}
+    generic_components: list[str] = []
 
 
 def load_mapping_rules(path: Path | None = None) -> MappingRules:
@@ -61,6 +64,7 @@ def slug(s: str) -> str:
 class _Planner:
     def __init__(self, rules: MappingRules, libs: dict[str, LibraryRef], file: str):
         self.rules, self.libs, self.file = rules, libs, file
+        self.catalog = load_catalog()
         self.cases: list[ValidationCase] = []
         self.used_libs: set[str] = set()
 
@@ -286,10 +290,10 @@ class _Planner:
         elif op.type == "read_file" or op.type == "write_file":
             props["FILENAME"] = d.get("file")
         elif op.type == "set_variable":
-            props["KEY"] = d.get("macro_variable")
+            props["VARIABLES"] = f"KEY={d.get('macro_variable')}"
         elif op.type == "macro_call":
             props["PROCESS"] = d.get("name")
-            props["CONTEXT_PARAMS"] = d.get("args") or None
+            props["CONTEXTPARAMS"] = d.get("args") or None
             if d.get("defined_in"):
                 pend.append(
                     f"Crear/identificar el Job hijo para %{d['name']} (definida en {d['defined_in']})"
@@ -317,6 +321,19 @@ class _Planner:
             for n, v in values.items()
             if n not in rule.properties and v
         ]
+        base = comp.split(" ")[0]
+        cat = self.catalog.get(base)
+        known = self.catalog.params(base)
+        editor = set(self.rules.editor_properties.get(base, []))
+        for p in props:
+            if p.name in known:
+                p.in_catalog = True
+                p.label = known[p.name].get("label")
+                p.options = [i["name"] for i in known[p.name].get("items", [])][:30]
+            elif p.name in editor:
+                p.label = "Editor del componente (no es un parámetro plano)"
+            elif cat:
+                p.in_catalog = False
         sid = f"{prefix}{op.id}"
         tests = []
         for t in rule.tests:
@@ -342,6 +359,15 @@ class _Planner:
             operation_id=op.id,
             operation_type=op.type,
             component_candidate=comp,
+            in_catalog=True
+            if cat
+            else (
+                False
+                if base.startswith("t") and base not in self.rules.generic_components
+                else None
+            ),
+            doc_url=cat.get("doc_url") if cat else None,
+            variants=self.catalog.variants_of(base)[:12] if cat else [],
             alternatives=alts,
             purpose=self.purpose(op),
             properties=props,

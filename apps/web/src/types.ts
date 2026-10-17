@@ -50,7 +50,7 @@ export type Step = {
   component_candidate: string;
   alternatives: string[];
   purpose: string;
-  properties: { name: string; value: string | null; origin: string; verified: boolean }[];
+  properties: { name: string; value: string | null; origin: string; verified: boolean; in_catalog?: boolean | null; label?: string | null; options?: string[] }[];
   connections: { type: string; from_step: string | null }[];
   expressions: { sas: string; talend: string | null; line: number; warnings: string[] }[];
   assumptions: string[];
@@ -61,6 +61,9 @@ export type Step = {
   status: (typeof STATUSES)[number];
   note: string | null;
   verified: boolean;
+  in_catalog?: boolean | null;
+  doc_url?: string | null;
+  variants?: string[];
 };
 export type JobPlan = {
   program: string;
@@ -72,4 +75,27 @@ export type JobPlan = {
   context_variables: { name: string; suggested: string; sas_value: string | null }[];
   libraries_needed: { sas_name: string; engine: string | null; path: string | null; suggested_connection: string }[];
   unresolved: string[];
+};
+export type CatalogItem = { name: string; description: string; families: string[]; parameters: number };
+export type CatalogList = { count: number; families: Record<string, number>; components: CatalogItem[] };
+export type CatalogParam = {
+  name: string;
+  label?: string;
+  field?: string;
+  required?: boolean;
+  advanced?: boolean;
+  default?: string;
+  show_if?: string;
+  items?: { name: string; label?: string; value?: string; default?: boolean }[];
+  columns?: { name: string; field?: string }[];
+};
+export type CatalogComponent = CatalogItem & {
+  status?: string;
+  version?: string;
+  doc_url?: string;
+  connectors: { type: string; name?: string; max_input?: string; max_output?: string }[];
+  parameters: CatalogParam[];
+  imports?: { module?: string; mvn?: string; required_if?: string }[];
+  variants: string[];
+  doc_markdown: string | null;
 };
