@@ -13,3 +13,4 @@
 - **API**: `SGM_IMPORT_ROOTS` limita las rutas importables (403 fuera de ellas). Si no se define, cualquier ruta local es importable: usar solo en máquina de un usuario, escuchando en `127.0.0.1`.
 - **Talend**: allowlist de solo lectura (`policy.assert_allowed`) en cada llamada; `inspect_job` solo acepta rutas `.item`.
 - El análisis y los planes funcionan sin Talend.
+- **Despliegue**: `ops/systemd/` (API en `127.0.0.1:38421`, datos en `/var/lib/sgm`, `SGM_IMPORT_ROOTS=/var/lib/sgm/imports`, unidad endurecida). La app **no tiene autenticación**: el acceso remoto solo por Tailscale Serve (tailnet), nunca público. La subida de ZIP (`POST /api/projects/{id}/uploads`) pasa por las mismas validaciones que una carpeta.

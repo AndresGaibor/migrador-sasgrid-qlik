@@ -70,3 +70,26 @@ def test_api_import_roots(tmp_path, monkeypatch):
         == 403
     )
     assert c.post(f"/api/projects/{pid}/imports", json={"path": str(ok)}).status_code == 201
+
+
+def test_api_upload_zip_and_static_ui(tmp_path, monkeypatch):
+    import io
+    import zipfile
+
+    import apps.api.main as m
+    from fastapi.testclient import TestClient
+
+    monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
+    c = TestClient(m.app)
+    pid = c.post("/api/projects", json={"name": "x"}).json()["id"]
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("a/x.sas", "data a; run;")
+        z.writestr("../evil.sas", "x")
+    r = c.post(f"/api/projects/{pid}/uploads", files={"file": ("p.zip", buf.getvalue())})
+    assert r.status_code == 201
+    m_ = r.json()
+    assert [f["path"] for f in m_["files"]] == ["a/x.sas"]
+    assert any(s["reason"] == "ruta insegura" for s in m_["skipped"])
+    bad = c.post(f"/api/projects/{pid}/uploads", files={"file": ("p.zip", b"no es zip")})
+    assert bad.status_code == 422

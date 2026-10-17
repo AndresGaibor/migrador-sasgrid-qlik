@@ -20,11 +20,30 @@ export function ImportTab({ id, go }: { id: string; go: (h: string) => void }) {
       setBusy(false);
     }
   };
+  const upload = async (f: File | undefined) => {
+    if (!f) return;
+    setBusy(true);
+    setErr(undefined);
+    try {
+      await api.upload(id, f);
+      go(`/p/${id}/inventario`);
+    } catch (x) {
+      setErr((x as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <>
       <h1>Importar</h1>
+      <div className="row">
+        <label>
+          Subir ZIP con los programas
+          <input type="file" accept=".zip" disabled={busy} onChange={(e) => upload(e.target.files?.[0])} />
+        </label>
+      </div>
       <p className="muted">
-        Carpeta o ZIP en el servidor local. Se copia una instantánea; el original no se modifica. Reimportar borra
+        También puedes indicar una carpeta o ZIP que ya esté en el servidor (solo bajo las rutas permitidas). Se copia una instantánea; el original no se modifica. Reimportar borra
         análisis y planes derivados (las decisiones por paso se conservan).
       </p>
       <form onSubmit={run} className="row">

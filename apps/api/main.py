@@ -1,6 +1,8 @@
+import os
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from sas_grid_migrator import __version__
@@ -78,6 +80,30 @@ def import_batch(project_id: str, body: NewImport) -> Manifest:
         return s.import_batch(project_id, src)
     except ImportError_ as e:
         raise HTTPException(422, str(e)) from e
+
+
+@app.post("/api/projects/{project_id}/uploads", status_code=201)
+async def upload_zip(project_id: str, file: UploadFile) -> Manifest:
+    """Importa un ZIP subido desde el navegador (mismas validaciones que una ruta local)."""
+    import tempfile
+
+    s = store()
+    _require(s, project_id)
+    limit = s.settings.max_total_bytes
+    s.settings.data_dir.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=s.settings.data_dir) as tmp:
+        zip_path = Path(tmp) / "upload.zip"
+        size = 0
+        with zip_path.open("wb") as out:
+            while chunk := await file.read(1024 * 1024):
+                size += len(chunk)
+                if size > limit:
+                    raise HTTPException(413, "archivo demasiado grande")
+                out.write(chunk)
+        try:
+            return s.import_batch(project_id, zip_path)
+        except ImportError_ as e:
+            raise HTTPException(422, str(e)) from e
 
 
 @app.get("/api/projects/{project_id}/inventory")
@@ -250,3 +276,9 @@ async def verify_project_plans(project_id: str, body: VerifyBody) -> dict:
     stats = verify_plans(ps, catalog)
     s.plans_path(project_id).write_text(ps.model_dump_json())
     return {"catalog_components": sorted(catalog.components), **stats}
+
+
+# UI compilada (apps/web/dist): se monta al final para que /api/* tenga prioridad
+_dist = Path(os.environ.get("SGM_WEB_DIST", Path(__file__).resolve().parents[1] / "web" / "dist"))
+if _dist.is_dir():
+    app.mount("/", StaticFiles(directory=_dist, html=True), name="web")

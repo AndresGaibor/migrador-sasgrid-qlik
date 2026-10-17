@@ -1,0 +1,15 @@
+[Unit]
+Description=SAS Grid Migrator HTTPS endpoint through Tailscale Serve (tailnet only)
+Requires=tailscaled.service sgm-api.service
+After=tailscaled.service sgm-api.service
+PartOf=tailscaled.service sgm-api.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# 3900: libre en este host; el backend escucha en 127.0.0.1:38421
+ExecStart=/usr/bin/tailscale serve --bg --https 3900 127.0.0.1:38421
+ExecStop=/usr/bin/tailscale serve --https=3900 off
+
+[Install]
+WantedBy=multi-user.target

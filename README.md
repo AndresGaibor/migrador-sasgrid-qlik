@@ -24,6 +24,8 @@ uv run sgm plan <project_id> [-o dir]         # planes por Job + index.md + step
 uv run uvicorn apps.api.main:app --reload   # API local
 ```
 
+Despliegue persistente (systemd + Tailscale Serve): ver [ops/systemd/README.md](ops/systemd/README.md).
+
 Frontend (`apps/web`, React + TS + Vite + Bun):
 
 ```bash

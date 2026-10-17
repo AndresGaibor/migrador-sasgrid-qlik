@@ -26,6 +26,16 @@ export const api = {
   projects: () => req<Project[]>("/projects"),
   createProject: (name: string) => post<Project>("/projects", { name }),
   importPath: (id: string, path: string) => post<Manifest>(`/projects/${id}/imports`, { path }),
+  upload: async (id: string, file: File) => {
+    const body = new FormData();
+    body.append("file", file);
+    const res = await fetch(`/api/projects/${id}/uploads`, { method: "POST", body });
+    if (!res.ok) {
+      const b = await res.json().catch(() => ({}));
+      throw new ApiError(res.status, b.detail ?? res.statusText);
+    }
+    return (await res.json()) as Manifest;
+  },
   inventory: (id: string) => req<Manifest>(`/projects/${id}/inventory`),
   analyze: (id: string) => post<Summary>(`/projects/${id}/analyses`),
   programs: (id: string) => req<ProgramRow[]>(`/projects/${id}/programs`),
