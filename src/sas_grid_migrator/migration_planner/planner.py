@@ -141,6 +141,11 @@ class _Planner:
         if op.type in ("read", "write", "append"):
             ds = (op.inputs or op.outputs or [""])[0]
             props["TABLE"] = ds.split(".")[-1] if ds else None
+            if op.type == "write":  # DATA lib.x reemplaza el dataset
+                props["TABLE_ACTION"], props["DATA_ACTION"] = "DROP_CREATE", "INSERT"
+                pend.append("Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo")
+            elif op.type == "append":
+                props["TABLE_ACTION"], props["DATA_ACTION"] = "NONE", "INSERT"
         elif op.type == "filter":
             t = translate(d.get("expression", ""))
             exprs.append(Expression(sas=t.sas, talend=t.talend, line=line, warnings=t.warnings))

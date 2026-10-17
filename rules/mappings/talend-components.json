@@ -359,8 +359,8 @@
       ],
       "properties": [
         "TABLE",
-        "ACTION_ON_TABLE",
-        "ACTION_ON_DATA",
+        "TABLE_ACTION",
+        "DATA_ACTION",
         "CONNECTION"
       ],
       "required": [
@@ -406,7 +406,7 @@
       ],
       "properties": [
         "TABLE",
-        "ACTION_ON_DATA"
+        "DATA_ACTION"
       ],
       "required": [
         "Tabla base destino"

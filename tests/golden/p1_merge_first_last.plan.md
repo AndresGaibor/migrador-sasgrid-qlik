@@ -50,12 +50,13 @@
 - **Conexiones:** Main desde `op_6_sort_1`
 - **Propiedades:**
   - `TABLE` = `pagos` — SAS p1_merge_first_last.sas:6
-  - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
-  - `ACTION_ON_DATA` = _por configurar_ — regla mappings
+  - `TABLE_ACTION` = `DROP_CREATE` — SAS p1_merge_first_last.sas:6
+  - `DATA_ACTION` = `INSERT` — SAS p1_merge_first_last.sas:6
   - `CONNECTION` = _por configurar_ — regla mappings
 - **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
+  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_6_write_1_row_count`, `vc_op_6_write_1_schema`
 
 ### 5. Leer work.clientes
@@ -91,12 +92,13 @@
 - **Conexiones:** Main desde `op_7_sort_1`
 - **Propiedades:**
   - `TABLE` = `clientes` — SAS p1_merge_first_last.sas:7
-  - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
-  - `ACTION_ON_DATA` = _por configurar_ — regla mappings
+  - `TABLE_ACTION` = `DROP_CREATE` — SAS p1_merge_first_last.sas:7
+  - `DATA_ACTION` = `INSERT` — SAS p1_merge_first_last.sas:7
   - `CONNECTION` = _por configurar_ — regla mappings
 - **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
+  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_7_write_1_row_count`, `vc_op_7_write_1_schema`
 
 ### 8. Leer work.clientes
@@ -188,12 +190,13 @@
 - **Conexiones:** Main desde `op_9_stateful_1`
 - **Propiedades:**
   - `TABLE` = `pagos_cliente` — SAS p1_merge_first_last.sas:9
-  - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
-  - `ACTION_ON_DATA` = _por configurar_ — regla mappings
+  - `TABLE_ACTION` = `DROP_CREATE` — SAS p1_merge_first_last.sas:9
+  - `DATA_ACTION` = `INSERT` — SAS p1_merge_first_last.sas:9
   - `CONNECTION` = _por configurar_ — regla mappings
 - **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
+  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_9_write_1_row_count`, `vc_op_9_write_1_schema`
 
 ## Casos de validación

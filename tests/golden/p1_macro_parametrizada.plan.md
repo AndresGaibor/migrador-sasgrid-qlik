@@ -69,12 +69,13 @@
 - **Conexiones:** Main desde `m:extraer_mes:op_6_project_1`
 - **Propiedades:**
   - `TABLE` = _por configurar_ — regla mappings
-  - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
-  - `ACTION_ON_DATA` = _por configurar_ — regla mappings
+  - `TABLE_ACTION` = `DROP_CREATE` — SAS p1_macro_parametrizada.sas:6
+  - `DATA_ACTION` = `INSERT` — SAS p1_macro_parametrizada.sas:6
   - `CONNECTION` = _por configurar_ — regla mappings
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
   - Librería o sistema de origen no determinable (nombre dinámico)
+  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_m:extraer_mes:op_6_write_1_row_count`, `vc_m:extraer_mes:op_6_write_1_schema`
 
 ## Sin resolver

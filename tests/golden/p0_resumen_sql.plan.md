@@ -143,12 +143,13 @@
 - **Conexiones:** Main desde `op_6_filter_2`
 - **Propiedades:**
   - `TABLE` = `ventas_resumen` — SAS p0_resumen_sql.sas:6
-  - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
-  - `ACTION_ON_DATA` = _por configurar_ — regla mappings
+  - `TABLE_ACTION` = `DROP_CREATE` — SAS p0_resumen_sql.sas:6
+  - `DATA_ACTION` = `INSERT` — SAS p0_resumen_sql.sas:6
   - `CONNECTION` = _por configurar_ — regla mappings
 - **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
+  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_6_write_1_row_count`, `vc_op_6_write_1_schema`
 
 ## Casos de validación

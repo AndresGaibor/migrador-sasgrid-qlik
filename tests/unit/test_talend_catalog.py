@@ -53,6 +53,17 @@ def test_mapping_rules_match_official_catalog():
         if cat.has(base):
             known = set(cat.params(base)) | set(editor.get(base, []))
             bad += [f"{op}: {base}.{p}" for p in r.get("properties", []) if p not in known]
+    ops = RULES["operations"]
+    want = {
+        "input": ops["read"]["properties"],
+        "output": sorted({*ops["write"]["properties"], *ops["append"]["properties"]}),
+    }
+    for eng, roles in RULES["engines"].items():
+        for role, comp in roles.items():
+            if cat.has(comp):
+                bad += [
+                    f"engine {eng}: {comp}.{p}" for p in want[role] if p not in cat.params(comp)
+                ]
     for eng, roles in RULES["engines"].items():
         bad += [
             f"engine {eng}: {c}"
@@ -80,3 +91,30 @@ def test_variants_only_for_technology_families():
     assert cat.variants_of("tFilterRow") == []  # Processing: «Row» no es un rol de base de datos
     assert cat.variants_of("tSortRow") == []
     assert "tMysqlRow" in cat.variants_of("tOracleRow")
+
+
+def test_planner_values_for_closed_lists_are_valid(tmp_path):
+    """Todo valor que el planificador fija en una lista cerrada es una opción real del catálogo."""
+    from pathlib import Path
+
+    from sas_grid_migrator.config import Settings
+    from sas_grid_migrator.migration_planner.service import generate_plans
+    from sas_grid_migrator.persistence.store import Store
+
+    st = Store(Settings(data_dir=tmp_path / "d"))
+    p = st.create_project("c")
+    st.import_batch(p.id, Path(__file__).parent.parent / "fixtures" / "sas")
+    cat = load_catalog()
+    bad = []
+    for plan in generate_plans(st, p.id).plans:
+        for s in plan.steps + [x for c in plan.children for x in c.steps]:
+            known = cat.params(s.component_candidate.split(" ")[0])
+            for pr in s.properties:
+                spec = known.get(pr.name)
+                if spec and spec.get("items") and pr.value:
+                    ok = {i["name"] for i in spec["items"]} | {
+                        i.get("value") for i in spec["items"]
+                    }
+                    if pr.value not in ok:
+                        bad.append((s.component_candidate, pr.name, pr.value))
+    assert not bad, bad[:5]

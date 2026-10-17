@@ -99,12 +99,13 @@
 - **Conexiones:** Main desde `op_5_select_columns_2`
 - **Propiedades:**
   - `TABLE` = `clientes_activos` — SAS p0_clientes_activos.sas:5
-  - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
-  - `ACTION_ON_DATA` = _por configurar_ — regla mappings
+  - `TABLE_ACTION` = `DROP_CREATE` — SAS p0_clientes_activos.sas:5
+  - `DATA_ACTION` = `INSERT` — SAS p0_clientes_activos.sas:5
   - `CONNECTION` = _por configurar_ — regla mappings
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
   - Librería stg es de tipo BASE en /data/staging: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo
+  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_5_write_1_row_count`, `vc_op_5_write_1_schema`
 
 ### 8. Leer stg.clientes_activos
@@ -152,12 +153,13 @@
 - **Conexiones:** Main desde `op_15_dedupe_1`
 - **Propiedades:**
   - `TABLE` = `clientes_activos_ord` — SAS p0_clientes_activos.sas:15
-  - `ACTION_ON_TABLE` = _por configurar_ — regla mappings
-  - `ACTION_ON_DATA` = _por configurar_ — regla mappings
+  - `TABLE_ACTION` = `DROP_CREATE` — SAS p0_clientes_activos.sas:15
+  - `DATA_ACTION` = `INSERT` — SAS p0_clientes_activos.sas:15
   - `CONNECTION` = _por configurar_ — regla mappings
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
   - Librería stg es de tipo BASE en /data/staging: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo
+  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_15_write_1_row_count`, `vc_op_15_write_1_schema`
 
 ## Casos de validación
