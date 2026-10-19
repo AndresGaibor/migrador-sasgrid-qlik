@@ -1,37 +1,41 @@
 import { api } from "../api";
+import { useState } from "react";
+import { Icon } from "../components/Icon";
 import { H, W, layout } from "../graph";
 import { useAsync } from "../hooks";
 import type { Deps } from "../types";
-import { Badge, Load } from "./common";
+import { Badge, Load, link } from "./common";
 
 export function DepsTab({ id }: { id: string }) {
   const q = useAsync(() => api.deps(id), [id]);
   return (
     <>
-      <h1>Dependencias</h1>
-      <Load q={q}>{(d) => <DepsBody d={d} />}</Load>
+      <h1>Explora tu flujo de datos</h1>
+      <p className="subtitle">Descubre cómo se conectan tus programas y en qué orden se pueden ejecutar.</p>
+      <Load q={q}>{(d) => <DepsBody d={d} id={id} />}</Load>
     </>
   );
 }
 
-function DepsBody({ d }: { d: Deps }) {
+function DepsBody({ d, id }: { d: Deps; id: string }) {
+  const [zoom, setZoom] = useState(1);
   const programs = d.processing_order.flat().length;
   const g = layout(d.processing_order, d.edges);
   return (
     <>
-      <h2>Procesamiento (datos)</h2>
+      <h2>Conexiones entre programas</h2>
       <p className="muted">
-        Qué programa produce o consume cada dataset. Una columna por capa; los de una misma capa son independientes.
-        {" "}{programs} unidades · {d.edges.length} aristas · {d.datasets.length} datasets.
+        Cada tarjeta es un programa y cada línea representa datos compartidos. Lee el flujo de izquierda a derecha; los programas de una misma columna pueden ejecutarse de forma independiente.
       </p>
       {d.cycles.length > 0 && (
         <p className="error">
           Ciclos (requieren decisión): {d.cycles.map((c) => c.join(" ↔ ")).join("; ")}
         </p>
       )}
-      {g.nodes.length > 0 && g.nodes.length <= 150 ? (
-        <div className="graph" tabIndex={0} role="img" aria-label="Grafo de procesamiento por capas">
-          <svg width={g.width + 4} height={g.height + 4}>
+      <div className="graph-toolbar"><span className="muted">{programs} programas · {d.edges.length} conexiones · {d.datasets.length} conjuntos de datos</span><div className="zoom-controls"><button className="secondary" aria-label="Alejar flujo" disabled={zoom <= .5} onClick={() => setZoom(Math.max(.5, zoom - .25))}>−</button><button className="secondary" onClick={() => setZoom(1)} title="Restablecer tamaño">{Math.round(zoom * 100)}%</button><button className="secondary" aria-label="Acercar flujo" disabled={zoom >= 2} onClick={() => setZoom(Math.min(2, zoom + .25))}>+</button></div></div>
+      {g.nodes.length === 0 ? <div className="empty-state"><Icon name="flow" size={32} /><h3>Aún no hay un flujo para mostrar</h3><p>Carga y analiza tus programas desde el resumen del proyecto.</p><a className="button" href={link(id, "resumen")}>Ir al resumen <Icon name="arrow" size={17} /></a></div> : g.nodes.length <= 150 ? (
+        <div className="graph" tabIndex={0} role="region" aria-label="Flujo de datos. Selecciona un programa para ver su análisis.">
+          <svg width={(g.width + 12) * zoom} height={(g.height + 12) * zoom} viewBox={`-6 -6 ${g.width + 12} ${g.height + 12}`}>
             {g.links.map((l, i) => (
               <path
                 key={i}
@@ -42,11 +46,16 @@ function DepsBody({ d }: { d: Deps }) {
               </path>
             ))}
             {g.nodes.map((n) => (
-              <g key={n.id} transform={`translate(${n.x},${n.y})`}>
-                <rect width={W} height={H} rx={4} className="node" />
-                <text x={8} y={18}>{n.id.length > 26 ? "…" + n.id.slice(-25) : n.id}</text>
+              <a key={n.id} href={link(id, "programas", n.id)} aria-label={`Ver programa ${n.id}`}>
+              <g transform={`translate(${n.x},${n.y})`}>
+                <rect width={W} height={H} rx={7} className="node" />
+                <text x={13} y={26}>{n.id.length > 26 ? "…" + n.id.slice(-25) : n.id}</text>
+                <text x={13} y={45} className="node-caption">Programa SAS · Ver análisis</text>
+                <circle cx={0} cy={H / 2} r={4} className="node-port" />
+                <circle cx={W} cy={H / 2} r={4} className="node-port" />
                 <title>{n.id}</title>
               </g>
+              </a>
             ))}
           </svg>
         </div>
@@ -58,8 +67,8 @@ function DepsBody({ d }: { d: Deps }) {
         </ol>
       )}
 
-      <h2>Orquestación (Grid)</h2>
-      <p className="muted">Tareas de lote y planificación. Es un modelo distinto del de procesamiento.</p>
+      <h2>Orden de ejecución en SAS Grid</h2>
+      <p className="muted">Tareas programadas y condiciones de espera que coordinan la ejecución de tus programas.</p>
       {d.orchestration.tasks.length === 0 ? (
         <p>No se detectaron tareas Grid.</p>
       ) : (
@@ -85,7 +94,7 @@ function DepsBody({ d }: { d: Deps }) {
         <ul>{d.orchestration.schedules.map((s, i) => <li key={i}>{s.file}: {s.text}</li>)}</ul>
       )}
 
-      <h2>Sin resolver ({d.unresolved.length})</h2>
+      <h2>Conexiones por revisar ({d.unresolved.length})</h2>
       <details>
         <summary>Ver lista</summary>
         <ul>

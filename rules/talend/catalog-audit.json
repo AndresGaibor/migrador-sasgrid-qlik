@@ -1,0 +1,2144 @@
+{
+  "source_kind": "community XML mirror; not an official Qlik/Talend source",
+  "source_url": "https://github.com/Talaxie/tdi-studio-se (Apache-2.0), components/*/*_java.xml",
+  "generated_from": "components/*/*_java.xml in Talaxie/tdi-studio-se; labels from *_messages.properties",
+  "official_documentation_version": "Talend Studio 8.0 R2026-09 documentation baseline (Qlik Help); Talend Studio Lite 8.0.1 patch R2026-08v1 detected locally, interactive validation pending",
+  "installed_environment_version": "Talend Studio Lite 8.0.1 patch R2026-08v1 (8.0.1.20260820_0911-patch)",
+  "installed_environment_status": "installation detected at C:\\Talend\\8.0.1\\studio; interactive validation and license/workspace access not confirmed",
+  "checked_at": "2026-10-19",
+  "scope": "Names recommended by current operation mappings and engine input/output mappings (read-only inspection).",
+  "limitations": [
+    "Community XML component VERSION is not the Qlik Studio release version.",
+    "Qlik component guides state availability can depend on product edition, installed features, framework, and monthly update.",
+    "A Standard Job properties page documents user-facing settings, but does not establish equivalence between community XML internal parameter keys and Studio runtime schema.",
+    "Items with needs_review require a direct official page/property comparison; no Studio runtime check was performed."
+  ],
+  "recommended_components": {
+    "tAggregateRow": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Processing"
+      ],
+      "official_version": "8.0",
+      "official_family": "Processing",
+      "official_purpose": "Receives and aggregates a flow by one or more columns.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "SCHEMA",
+        "GROUPBYS",
+        "OPERATIONS",
+        "LIST_DELIMITER",
+        "USE_FINANCIAL_PRECISION",
+        "CHECK_TYPE_OVERFLOW",
+        "CHECK_ULP"
+      ],
+      "official_essential_property_labels": [
+        "Group by",
+        "Operations"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tDB2Input": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/DB2"
+      ],
+      "official_version": "8.0",
+      "official_family": "Databases",
+      "official_purpose": "Executes a DB query and passes selected fields downstream.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/db2/tdb2input",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "PROPERTY",
+        "HOST",
+        "TYPE",
+        "PORT",
+        "DBNAME",
+        "SCHEMA_DB",
+        "USER",
+        "PASS",
+        "SCHEMA",
+        "TABLE",
+        "QUERYSTORE",
+        "GUESS_SCHEMA",
+        "QUERY",
+        "NOTE",
+        "SPECIFY_DATASOURCE_ALIAS",
+        "DATASOURCE_ALIAS",
+        "MAPPING",
+        "PROPERTIES",
+        "NOTE",
+        "TRIM_ALL_COLUMN",
+        "TRIM_COLUMN"
+      ],
+      "official_essential_property_labels": [
+        "Host",
+        "Port",
+        "Database",
+        "Schema",
+        "Query type and Query"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tDB2Output": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/DB2"
+      ],
+      "official_version": "8.0",
+      "official_family": "Databases",
+      "official_purpose": "Writes or changes data in a DB2 table.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/db2/tdb2output",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "PROPERTY",
+        "HOST",
+        "TYPE",
+        "PORT",
+        "DBNAME",
+        "TABLESCHEMA",
+        "USER",
+        "PASS",
+        "TABLE",
+        "TABLE_ACTION",
+        "DATA_ACTION",
+        "NOTE_CUSTOMER",
+        "SCHEMA_FLOW",
+        "SCHEMA_REJECT",
+        "NOTE",
+        "SPECIFY_DATASOURCE_ALIAS",
+        "DATASOURCE_ALIAS",
+        "DIE_ON_ERROR",
+        "MAPPING",
+        "PROPERTIES",
+        "NOTE",
+        "USE_ALTERNATE_SCHEMA",
+        "ALTERNATE_SCHEMA",
+        "ENCODING",
+        "COMMIT_EVERY",
+        "ADD_COLS",
+        "USE_FIELD_OPTIONS",
+        "FIELD_OPTIONS",
+        "CONVERT_COLUMN_TABLE_TO_UPPERCASE",
+        "ENABLE_DEBUG_MODE",
+        "SUPPORT_NULL_WHERE",
+        "USE_BATCH_SIZE",
+        "BATCH_SIZE",
+        "SCHEMA_OPT_NUM"
+      ],
+      "official_essential_property_labels": [
+        "Table",
+        "Action on table",
+        "Action on data",
+        "Schema"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tDBInput": {
+      "catalog_entry_present": false,
+      "catalog_version": null,
+      "catalog_family": null,
+      "official_version": "8.0",
+      "official_family": "Databases (DB Generic)",
+      "official_purpose": "Extracts data from a database.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/db-generic/db-generic-component",
+      "official_reference_scope": "family_index",
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Recommended by current mapping but absent from generated XML catalog.",
+        "Official DB Generic index confirms component name and purpose, but component-specific properties were not compared.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tDBOutput": {
+      "catalog_entry_present": false,
+      "catalog_version": null,
+      "catalog_family": null,
+      "official_version": "8.0",
+      "official_family": "Databases (DB Generic)",
+      "official_purpose": "Writes or changes database data.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/db-generic/db-generic-component",
+      "official_reference_scope": "family_index",
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Recommended by current mapping but absent from generated XML catalog.",
+        "Official DB Generic index confirms component name and purpose, but component-specific properties were not compared.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tDBRow": {
+      "catalog_entry_present": false,
+      "catalog_version": null,
+      "catalog_family": null,
+      "official_version": "8.0",
+      "official_family": "Databases (DB Generic)",
+      "official_purpose": "Executes the stated SQL query.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/db-generic/db-generic-component",
+      "official_reference_scope": "family_index",
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Recommended by current mapping but absent from generated XML catalog.",
+        "Official DB Generic index confirms component name and purpose, but component-specific properties were not compared.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tFileInputDelimited": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "File/Input"
+      ],
+      "official_version": "8.0",
+      "official_family": "File",
+      "official_purpose": "Reads delimited rows into schema fields.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "SCHEMA",
+        "USE_EXISTING_DYNAMIC",
+        "DYNAMIC",
+        "FILENAMETEXT",
+        "FILENAME",
+        "CSV_OPTION",
+        "ROWSEPARATOR",
+        "CSVROWSEPARATOR",
+        "FIELDSEPARATOR",
+        "ESCAPE_CHAR",
+        "TEXT_ENCLOSURE",
+        "HEADER",
+        "FOOTER",
+        "LIMIT",
+        "REMOVE_EMPTY_ROW",
+        "UNCOMPRESS",
+        "DIE_ON_ERROR",
+        "SCHEMA_REJECT",
+        "TEMP_DIR",
+        "ADVANCED_SEPARATOR",
+        "THOUSANDS_SEPARATOR",
+        "DECIMAL_SEPARATOR",
+        "RANDOM",
+        "NB_RANDOM",
+        "TRIMALL",
+        "TRIMSELECT",
+        "CHECK_FIELDS_NUM",
+        "CHECK_DATE",
+        "ENCODING",
+        "SPLITRECORD",
+        "ENABLE_DECODE",
+        "DECODE_COLS",
+        "DESTINATION",
+        "USE_HEADER_AS_IS",
+        "SCHEMA_OPT_NUM"
+      ],
+      "official_essential_property_labels": [
+        "File Name/Stream",
+        "Row separator",
+        "Field separator",
+        "Header",
+        "Schema",
+        "Encoding"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tFileInputExcel": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "File/Input"
+      ],
+      "official_version": "8.0",
+      "official_family": "File",
+      "official_purpose": "Reads an Excel file row by row into schema fields.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/excel/tfileinputexcel",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "VERSION_2007",
+        "FILENAME",
+        "PASSWORD",
+        "ALL_SHEETS",
+        "SHEETLIST",
+        "HEADER",
+        "FOOTER",
+        "LIMIT",
+        "AFFECT_EACH_SHEET",
+        "FIRST_COLUMN",
+        "LAST_COLUMN",
+        "DIE_ON_ERROR",
+        "SCHEMA",
+        "SCHEMA_REJECT",
+        "ADVANCED_SEPARATOR",
+        "THOUSANDS_SEPARATOR",
+        "DECIMAL_SEPARATOR",
+        "TRIMALL",
+        "TRIMSELECT",
+        "CONVERTDATETOSTRING",
+        "DATESELECT",
+        "ENCODING",
+        "READ_REAL_VALUE",
+        "STOPREAD_ON_EMPTYROW",
+        "NOVALIDATE_ON_CELL",
+        "SUPPRESS_WARN",
+        "GENERATION_MODE",
+        "INCLUDE_PHONETICRUNS",
+        "CONFIGURE_INFLATION_RATIO",
+        "INFLATION_RATIO"
+      ],
+      "official_essential_property_labels": [
+        "File name",
+        "Sheet name",
+        "Header",
+        "Schema"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tFileInputPositional": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "File/Input"
+      ],
+      "official_version": "8.0",
+      "official_family": "File",
+      "official_purpose": "Reads a positional file according to a pattern.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/positional/tfileinputpositional",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_DYNAMIC",
+        "DYNAMIC",
+        "FILENAME",
+        "ROWSEPARATOR",
+        "ADVANCED_OPTION",
+        "PATTERN",
+        "PATTERN_UNITS",
+        "FORMATS",
+        "REMOVE_EMPTY_ROW",
+        "UNCOMPRESS",
+        "DIE_ON_ERROR",
+        "HEADER",
+        "FOOTER",
+        "LIMIT",
+        "SCHEMA",
+        "SCHEMA_REJECT",
+        "PROCESS_LONG_ROW",
+        "ADVANCED_SEPARATOR",
+        "THOUSANDS_SEPARATOR",
+        "DECIMAL_SEPARATOR",
+        "TRIMALL",
+        "CHECK_DATE",
+        "TRIMSELECT",
+        "ENCODING"
+      ],
+      "official_essential_property_labels": [
+        "File name",
+        "Pattern",
+        "Schema"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tFileOutputDelimited": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "File/Output"
+      ],
+      "official_version": "8.0",
+      "official_family": "File",
+      "official_purpose": "Writes input data to a delimited file using its schema.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileoutputdelimited-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USESTREAM",
+        "STREAMNAME",
+        "FILENAME",
+        "ROWSEPARATOR",
+        "OS_LINE_SEPARATOR_AS_ROW_SEPARATOR",
+        "CSVROWSEPARATOR",
+        "FIELDSEPARATOR",
+        "APPEND",
+        "INCLUDEHEADER",
+        "COMPRESS",
+        "SCHEMA",
+        "ADVANCED_SEPARATOR",
+        "THOUSANDS_SEPARATOR",
+        "DECIMAL_SEPARATOR",
+        "CSV_OPTION",
+        "ESCAPE_CHAR",
+        "TEXT_ENCLOSURE",
+        "CREATE",
+        "SPLIT",
+        "SPLIT_EVERY",
+        "FLUSHONROW",
+        "FLUSHONROW_NUM",
+        "ROW_MODE",
+        "ENCODING",
+        "DELETE_EMPTYFILE",
+        "FILE_EXIST_EXCEPTION",
+        "SCHEMA_OPT_NUM"
+      ],
+      "official_essential_property_labels": [
+        "File Name",
+        "Field separator",
+        "Include Header",
+        "Schema"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tFileOutputExcel": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "File/Output"
+      ],
+      "official_version": "8.0",
+      "official_family": "File",
+      "official_purpose": "Writes data to an Excel workbook.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/excel/tfileoutputexcel",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "VERSION_2007",
+        "USESTREAM",
+        "STREAMNAME",
+        "FILENAME",
+        "SHEETNAME",
+        "INCLUDEHEADER",
+        "APPEND_FILE",
+        "APPEND_SHEET",
+        "FIRST_CELL_Y_ABSOLUTE",
+        "FIRST_CELL_X",
+        "FIRST_CELL_Y",
+        "KEEP_CELL_FORMATING",
+        "FONT",
+        "IS_ALL_AUTO_SZIE",
+        "AUTO_SZIE_SETTING",
+        "PROTECT_FILE",
+        "PASSWORD",
+        "SCHEMA",
+        "CREATE",
+        "FLUSHONROW",
+        "FLUSHONROW_NUM",
+        "ADVANCED_SEPARATOR",
+        "THOUSANDS_SEPARATOR",
+        "DECIMAL_SEPARATOR",
+        "TRUNCATE_EXCEEDING_CHARACTERS",
+        "ENCODING",
+        "DELETE_EMPTYFILE",
+        "RECALCULATE_FORMULA",
+        "STREAMING_APPEND",
+        "SCHEMA_OPT_NUM",
+        "USE_SHARED_STRINGS_TABLE"
+      ],
+      "official_essential_property_labels": [
+        "File name",
+        "Sheet name",
+        "Schema"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tFileOutputPositional": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "File/Output"
+      ],
+      "official_version": null,
+      "official_family": null,
+      "official_purpose": null,
+      "official_url": null,
+      "official_reference_scope": null,
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_DYNAMIC",
+        "DYNAMIC",
+        "USESTREAM",
+        "STREAMNAME",
+        "FILENAME",
+        "SCHEMA",
+        "ROWSEPARATOR",
+        "APPEND",
+        "INCLUDEHEADER",
+        "COMPRESS",
+        "FORMATS",
+        "ADVANCED_SEPARATOR",
+        "THOUSANDS_SEPARATOR",
+        "DECIMAL_SEPARATOR",
+        "USE_BYTE",
+        "CREATE",
+        "FLUSHONROW",
+        "FLUSHONROW_NUM",
+        "ROW_MODE",
+        "ENCODING",
+        "DELETE_EMPTYFILE"
+      ],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "No official component-specific page confirmed in this audit pass.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tFilterColumns": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "Processing"
+      ],
+      "official_version": "8.0",
+      "official_family": "Processing",
+      "official_purpose": "Orders, removes, or adds columns to homogenize a schema.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "SCHEMA"
+      ],
+      "official_essential_property_labels": [
+        "Schema and Edit Schema"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tFilterRow": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Processing"
+      ],
+      "official_version": "8.0",
+      "official_family": "Processing",
+      "official_purpose": "Filters input rows with one or more conditions.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "SCHEMA",
+        "SCHEMA_FILTER",
+        "SCHEMA_REJECT",
+        "LOGICAL_OP",
+        "CONDITIONS",
+        "USE_ADVANCED",
+        "ADVANCED_COND"
+      ],
+      "official_essential_property_labels": [
+        "Logical operator used to combine conditions",
+        "Conditions",
+        "Use advanced mode"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tFixedFlowInput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Misc"
+      ],
+      "official_version": "8.0",
+      "official_family": "Misc",
+      "official_purpose": "Generates a fixed flow from internal values.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput/tfixedflowinput-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "SCHEMA",
+        "NB_ROWS",
+        "USE_SINGLEMODE",
+        "VALUES",
+        "USE_INTABLE",
+        "INTABLE",
+        "USE_INLINECONTENT",
+        "ROWSEPARATOR",
+        "FIELDSEPARATOR",
+        "INLINECONTENT"
+      ],
+      "official_essential_property_labels": [
+        "Mode",
+        "Number of rows",
+        "Values",
+        "Schema"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tFlowToIterate": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "Orchestration"
+      ],
+      "official_version": "8.0",
+      "official_family": "Orchestration",
+      "official_purpose": "Stores each input row in iterative global variables.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/tflowtoiterate",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "DEFAULT_MAP",
+        "MAP"
+      ],
+      "official_essential_property_labels": [
+        "Customize",
+        "Use the default (key, value) in global variables"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tGreenplumInput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/Greenplum"
+      ],
+      "official_version": "8.0",
+      "official_family": "Databases",
+      "official_purpose": "Executes a query and passes returned fields downstream.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/greenplum/tgreenpluminput",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "HOST",
+        "TYPE",
+        "PORT",
+        "DBNAME",
+        "SCHEMA_DB",
+        "USER",
+        "PASS",
+        "SCHEMA",
+        "TABLE",
+        "QUERYSTORE",
+        "GUESS_SCHEMA",
+        "QUERY",
+        "MAPPING",
+        "PROPERTIES",
+        "DB_DRIVER",
+        "ENCODING",
+        "USE_CURSOR",
+        "CURSOR_SIZE",
+        "TRIM_ALL_COLUMN",
+        "TRIM_COLUMN"
+      ],
+      "official_essential_property_labels": [
+        "Host",
+        "Port",
+        "Database",
+        "Schema",
+        "Query"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tGreenplumOutput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/Greenplum"
+      ],
+      "official_version": "8.0",
+      "official_family": "Databases",
+      "official_purpose": "Writes or changes data in a Greenplum table.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/greenplum/tgreenplumoutput",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "HOST",
+        "PORT",
+        "DBNAME",
+        "TYPE",
+        "SCHEMA_DB",
+        "USER",
+        "PASS",
+        "TABLE",
+        "TABLE_ACTION",
+        "DATA_ACTION",
+        "SCHEMA_FLOW",
+        "SCHEMA_REJECT",
+        "DIE_ON_ERROR",
+        "MAPPING",
+        "PROPERTIES",
+        "USE_ALTERNATE_SCHEMA",
+        "ALTERNATE_SCHEMA",
+        "DB_DRIVER",
+        "ENCODING",
+        "COMMIT_EVERY",
+        "ADD_COLS",
+        "USE_FIELD_OPTIONS",
+        "FIELD_OPTIONS",
+        "SUPPORT_NULL_WHERE",
+        "USE_BATCH",
+        "BATCH_SIZE"
+      ],
+      "official_essential_property_labels": [
+        "Table",
+        "Action on table",
+        "Action on data",
+        "Schema"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tHiveInput": {
+      "catalog_entry_present": false,
+      "catalog_version": null,
+      "catalog_family": null,
+      "official_version": "8.0",
+      "official_family": "Big Data and Databases",
+      "official_purpose": "Reads data from Hive.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveinput-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [],
+      "official_essential_property_labels": [
+        "Database",
+        "Query type and Query",
+        "Schema",
+        "Distribution"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Recommended by current mapping but absent from generated XML catalog.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tHiveOutput": {
+      "catalog_entry_present": false,
+      "catalog_version": null,
+      "catalog_family": null,
+      "official_version": "8.0",
+      "official_family": "Databases (framework-specific)",
+      "official_purpose": "Writes to Hive in applicable Spark jobs; the Standard framework uses tHiveLoad instead.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveoutput",
+      "official_reference_scope": "component_overview",
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Recommended by current mapping but absent from generated XML catalog.",
+        "Qlik documents tHiveOutput for Spark frameworks; tHiveLoad is used instead in Standard Jobs. Framework must be specified before this recommendation can be accepted.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tImpalaInput": {
+      "catalog_entry_present": false,
+      "catalog_version": null,
+      "catalog_family": null,
+      "official_version": "8.0",
+      "official_family": "Big Data",
+      "official_purpose": "Executes Impala select queries and sends rows downstream.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/impala/timpalainput",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [],
+      "official_essential_property_labels": [
+        "Query",
+        "Schema",
+        "Connection",
+        "Distribution"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Recommended by current mapping but absent from generated XML catalog.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tImpalaOutput": {
+      "catalog_entry_present": false,
+      "catalog_version": null,
+      "catalog_family": null,
+      "official_version": "8.0",
+      "official_family": "Big Data (archived 7.3 reference only)",
+      "official_purpose": null,
+      "official_url": "https://help.qlik.com/talend/en-US/components/7.3/impala/timpalaoutput-standard-properties",
+      "official_reference_scope": "archived_standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Recommended by current mapping but absent from generated XML catalog.",
+        "Only archived 7.3 Standard-properties page surfaced; no current 8.0 page confirmed.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tJava": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "Custom_Code"
+      ],
+      "official_version": "8.0",
+      "official_family": "Custom Code",
+      "official_purpose": "Runs user-provided Java code.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/java-custom-code/tjava-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "CODE",
+        "IMPORT"
+      ],
+      "official_essential_property_labels": [
+        "Code",
+        "Import"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tJavaRow": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "Custom_Code"
+      ],
+      "official_version": "8.0",
+      "official_family": "Custom Code",
+      "official_purpose": "Runs user-provided Java code for each row.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/java-custom-code/tjavarow-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "SCHEMA",
+        "CODE",
+        "IMPORT"
+      ],
+      "official_essential_property_labels": [
+        "Code",
+        "Schema",
+        "Import"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tJoin": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "Processing"
+      ],
+      "official_version": "8.0",
+      "official_family": "Processing",
+      "official_purpose": "Joins main and lookup flows on matching columns.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tjoin",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "SCHEMA",
+        "SCHEMA_REJECT",
+        "USE_LOOKUP_COLS",
+        "LOOKUP_COLS",
+        "JOIN_KEY",
+        "USE_INNER_JOIN"
+      ],
+      "official_essential_property_labels": [
+        "Input key attribute",
+        "Lookup key attribute",
+        "Include lookup columns in output"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tLogRow": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "Logs_Errors"
+      ],
+      "official_version": "8.0",
+      "official_family": "Logs & Errors",
+      "official_purpose": "Displays rows in the Run view.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/logs-and-errors/tlogrow-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "SCHEMA",
+        "BASIC_MODE",
+        "TABLE_PRINT",
+        "VERTICAL",
+        "PRINT_UNIQUE",
+        "PRINT_LABEL",
+        "PRINT_UNIQUE_LABEL",
+        "FIELDSEPARATOR",
+        "PRINT_HEADER",
+        "PRINT_UNIQUE_NAME",
+        "PRINT_COLNAMES",
+        "USE_FIXED_LENGTH",
+        "LENGTHS",
+        "PRINT_CONTENT_WITH_LOG4J",
+        "SCHEMA_OPT_NUM"
+      ],
+      "official_essential_property_labels": [
+        "Mode",
+        "Separator",
+        "Print header"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tMSSqlInput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/MS_SQL_Server"
+      ],
+      "official_version": "8.0",
+      "official_family": "Databases",
+      "official_purpose": "Reads rows from Microsoft SQL Server or Azure SQL using a query.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/mssql/tmssqlinput",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "PROPERTY",
+        "HOST",
+        "DRIVER",
+        "TYPE",
+        "PORT",
+        "DB_SCHEMA",
+        "DBNAME",
+        "USER",
+        "PASS",
+        "SCHEMA",
+        "TABLE",
+        "QUERYSTORE",
+        "GUESS_SCHEMA",
+        "QUERY",
+        "NOTE",
+        "SPECIFY_DATASOURCE_ALIAS",
+        "DATASOURCE_ALIAS",
+        "MAPPING",
+        "PROPERTIES",
+        "ACTIVE_DIR_AUTH",
+        "ENCODING",
+        "TRIM_ALL_COLUMN",
+        "TRIM_COLUMN",
+        "SET_QUERY_TIMEOUT",
+        "QUERY_TIMEOUT_IN_SECONDS"
+      ],
+      "official_essential_property_labels": [
+        "JDBC Provider",
+        "Query type and Query",
+        "Schema",
+        "Use an existing connection"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tMSSqlOutput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/MS_SQL_Server"
+      ],
+      "official_version": "8.0",
+      "official_family": "Databases",
+      "official_purpose": "Writes or changes data in SQL Server or Azure SQL.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/mssql/tmssqloutput",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "DRIVER",
+        "HOST",
+        "PORT",
+        "DB_SCHEMA",
+        "DBNAME",
+        "TYPE",
+        "USER",
+        "PASS",
+        "TABLE",
+        "TABLE_ACTION",
+        "IDENTITY_INSERT",
+        "DATA_ACTION",
+        "NOTE",
+        "SPECIFY_IDENTITY_FIELD",
+        "IDENTITY_FIELD",
+        "START_VALUE",
+        "STEP",
+        "SCHEMA_FLOW",
+        "SCHEMA_REJECT",
+        "NOTE",
+        "SPECIFY_DATASOURCE_ALIAS",
+        "DATASOURCE_ALIAS",
+        "DIE_ON_ERROR",
+        "MAPPING",
+        "PROPERTIES",
+        "ACTIVE_DIR_AUTH",
+        "USE_ALTERNATE_SCHEMA",
+        "ALTERNATE_SCHEMA",
+        "ENCODING",
+        "COMMIT_EVERY",
+        "ADD_COLS",
+        "USE_FIELD_OPTIONS",
+        "FIELD_OPTIONS",
+        "IGNORE_DATE_OUTOF_RANGE",
+        "ENABLE_DEBUG_MODE",
+        "SUPPORT_NULL_WHERE",
+        "USE_BATCH_SIZE",
+        "BATCH_SIZE",
+        "SET_QUERY_TIMEOUT",
+        "QUERY_TIMEOUT_IN_SECONDS"
+      ],
+      "official_essential_property_labels": [
+        "Table",
+        "Action on table",
+        "Action on data",
+        "Schema"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tMap": {
+      "catalog_entry_present": true,
+      "catalog_version": "2.1",
+      "catalog_family": [
+        "Processing"
+      ],
+      "official_version": "8.0",
+      "official_family": "Processing",
+      "official_purpose": "Maps, routes, and transforms data between input and output flows.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "MAP",
+        "LINK_STYLE",
+        "TEMPORARY_DATA_DIRECTORY",
+        "PREVIEW",
+        "DIE_ON_ERROR",
+        "LKUP_PARALLELIZE",
+        "LEVENSHTEIN",
+        "JACCARD",
+        "ENABLE_AUTO_CONVERT_TYPE",
+        "ROWS_BUFFER_SIZE",
+        "CHANGE_HASH_AND_EQUALS_FOR_BIGDECIMAL"
+      ],
+      "official_essential_property_labels": [
+        "Map editor"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tMysqlInput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/MySQL"
+      ],
+      "official_version": "8.0",
+      "official_family": "Databases",
+      "official_purpose": "Reads MySQL data using a query.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/mysql/tmysqlinput-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "DB_VERSION",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "HOST",
+        "PORT",
+        "DBNAME",
+        "TYPE",
+        "USER",
+        "PASS",
+        "SCHEMA",
+        "TABLE",
+        "QUERYSTORE",
+        "GUESS_SCHEMA",
+        "QUERY",
+        "NOTE",
+        "SPECIFY_DATASOURCE_ALIAS",
+        "DATASOURCE_ALIAS",
+        "MAPPING",
+        "PROPERTIES",
+        "ENCODING",
+        "ENABLE_STREAM",
+        "TRIM_ALL_COLUMN",
+        "TRIM_COLUMN"
+      ],
+      "official_essential_property_labels": [
+        "Host",
+        "Port",
+        "Database",
+        "Table Name",
+        "Query type and Query",
+        "Schema"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tMysqlOutput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/MySQL"
+      ],
+      "official_version": "8.0",
+      "official_family": "Databases",
+      "official_purpose": "Writes or changes data in a MySQL table.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/mysql/tmysqloutput-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "DB_VERSION",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "TYPE",
+        "HOST",
+        "PORT",
+        "DBNAME",
+        "USER",
+        "PASS",
+        "TABLE",
+        "TABLE_ACTION",
+        "DATA_ACTION",
+        "SCHEMA_FLOW",
+        "SCHEMA_REJECT",
+        "NOTE",
+        "SPECIFY_DATASOURCE_ALIAS",
+        "DATASOURCE_ALIAS",
+        "DIE_ON_ERROR",
+        "MAPPING",
+        "PROPERTIES",
+        "EXTENDINSERT",
+        "NOTE",
+        "NB_ROWS_PER_INSERT",
+        "USE_BATCH_SIZE",
+        "BATCH_SIZE",
+        "ENCODING",
+        "COMMIT_EVERY",
+        "ADD_COLS",
+        "USE_FIELD_OPTIONS",
+        "FIELD_OPTIONS",
+        "USE_HINT_OPTIONS",
+        "HINT_OPTIONS",
+        "ENABLE_DEBUG_MODE",
+        "ON_DUPLICATE_KEY_UPDATE",
+        "DUPLICATED_KEYS",
+        "SUPPORT_NULL_WHERE"
+      ],
+      "official_essential_property_labels": [
+        "Table",
+        "Action on table",
+        "Action on data",
+        "Schema"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tNetezzaInput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/Netezza"
+      ],
+      "official_version": "8.0",
+      "official_family": "Databases",
+      "official_purpose": "Reads Netezza rows using a query.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/netezza/tnetezzainput",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "NOTE",
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "HOST",
+        "TYPE",
+        "PORT",
+        "DBNAME",
+        "USER",
+        "PASS",
+        "SCHEMA",
+        "TABLE",
+        "QUERYSTORE",
+        "GUESS_SCHEMA",
+        "QUERY",
+        "MAPPING",
+        "PROPERTIES",
+        "ENCODING",
+        "USE_CURSOR",
+        "CURSOR_SIZE",
+        "TRIM_ALL_COLUMN",
+        "TRIM_COLUMN"
+      ],
+      "official_essential_property_labels": [
+        "Table Name",
+        "Query type and Query",
+        "Schema"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tNetezzaOutput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/Netezza"
+      ],
+      "official_version": null,
+      "official_family": null,
+      "official_purpose": null,
+      "official_url": null,
+      "official_reference_scope": null,
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "NOTE",
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "TYPE",
+        "HOST",
+        "PORT",
+        "DBNAME",
+        "USER",
+        "PASS",
+        "TABLE",
+        "TABLE_ACTION",
+        "DATA_ACTION",
+        "SCHEMA_FLOW",
+        "SCHEMA_REJECT",
+        "DIE_ON_ERROR",
+        "MAPPING",
+        "PROPERTIES",
+        "USE_BATCH_SIZE",
+        "BATCH_SIZE",
+        "ENCODING",
+        "COMMIT_EVERY",
+        "ADD_COLS",
+        "USE_FIELD_OPTIONS",
+        "FIELD_OPTIONS",
+        "SUPPORT_NULL_WHERE"
+      ],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "No official component-specific page confirmed in this audit pass.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tOracleInput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/Oracle"
+      ],
+      "official_version": "8.0",
+      "official_family": "Databases",
+      "official_purpose": "Reads Oracle rows using a query.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toracleinput-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "CONNECTION_TYPE",
+        "DB_VERSION",
+        "RAC_URL",
+        "HOST",
+        "TYPE",
+        "PORT",
+        "DBNAME",
+        "LOCAL_SERVICE_NAME",
+        "SCHEMA_DB",
+        "USER",
+        "PASS",
+        "JDBC_URL",
+        "SCHEMA",
+        "TABLE",
+        "QUERYSTORE",
+        "GUESS_SCHEMA",
+        "QUERY",
+        "NOTE",
+        "SPECIFY_DATASOURCE_ALIAS",
+        "DATASOURCE_ALIAS",
+        "MAPPING",
+        "PROPERTIES",
+        "NOTE",
+        "IS_CONVERT_XMLTYPE",
+        "CONVERT_XMLTYPE",
+        "ENCODING",
+        "USE_CURSOR",
+        "CURSOR_SIZE",
+        "TRIM_ALL_COLUMN",
+        "TRIM_COLUMN",
+        "NO_NULL_VALUES",
+        "SUPPORT_NLS"
+      ],
+      "official_essential_property_labels": [
+        "Table name",
+        "Query type and Query",
+        "Schema"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tOracleOutput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/Oracle"
+      ],
+      "official_version": null,
+      "official_family": null,
+      "official_purpose": null,
+      "official_url": null,
+      "official_reference_scope": null,
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "CONNECTION_TYPE",
+        "DB_VERSION",
+        "RAC_URL",
+        "HOST",
+        "PORT",
+        "TYPE",
+        "DBNAME",
+        "LOCAL_SERVICE_NAME",
+        "TABLESCHEMA",
+        "USER",
+        "PASS",
+        "TABLE",
+        "TABLE_ACTION",
+        "NOTE",
+        "DATA_ACTION",
+        "SCHEMA_FLOW",
+        "SCHEMA_REJECT",
+        "NOTE",
+        "SPECIFY_DATASOURCE_ALIAS",
+        "DATASOURCE_ALIAS",
+        "DIE_ON_ERROR",
+        "MAPPING",
+        "JDBC_URL",
+        "PROPERTIES",
+        "NOTE",
+        "USE_ALTERNATE_SCHEMA",
+        "ALTERNATE_SCHEMA",
+        "ENCODING",
+        "COMMIT_EVERY",
+        "ADD_COLS",
+        "USE_FIELD_OPTIONS",
+        "FIELD_OPTIONS",
+        "USE_HINT_OPTIONS",
+        "HINT_OPTIONS",
+        "CONVERT_COLUMN_TABLE_TO_UPPERCASE",
+        "CONTAIN_BLOB_FROM_OTHER_DB",
+        "ENABLE_DEBUG_MODE",
+        "USE_BATCH_SIZE",
+        "USE_BATCH_AND_USE_CONN",
+        "BATCH_SIZE",
+        "SUPPORT_NULL_WHERE",
+        "USE_TIMESTAMP_FOR_DATE_TYPE",
+        "TRIM_CHAR",
+        "SUPPORT_NLS"
+      ],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "No official component-specific page confirmed in this audit pass.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tPostgresqlInput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/PostgreSQL"
+      ],
+      "official_version": null,
+      "official_family": null,
+      "official_purpose": null,
+      "official_url": null,
+      "official_reference_scope": null,
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "DB_VERSION",
+        "HOST",
+        "TYPE",
+        "PORT",
+        "DBNAME",
+        "SCHEMA_DB",
+        "USER",
+        "PASS",
+        "SCHEMA",
+        "TABLE",
+        "QUERYSTORE",
+        "GUESS_SCHEMA",
+        "QUERY",
+        "NOTE",
+        "SPECIFY_DATASOURCE_ALIAS",
+        "DATASOURCE_ALIAS",
+        "MAPPING",
+        "PROPERTIES",
+        "ENCODING",
+        "USE_CURSOR",
+        "CURSOR_SIZE",
+        "TRIM_ALL_COLUMN",
+        "TRIM_COLUMN"
+      ],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "No official component-specific page confirmed in this audit pass.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tPostgresqlOutput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/PostgreSQL"
+      ],
+      "official_version": null,
+      "official_family": null,
+      "official_purpose": null,
+      "official_url": null,
+      "official_reference_scope": null,
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "DB_VERSION",
+        "HOST",
+        "PORT",
+        "DBNAME",
+        "TYPE",
+        "SCHEMA_DB",
+        "USER",
+        "PASS",
+        "TABLE",
+        "TABLE_ACTION",
+        "DATA_ACTION",
+        "SCHEMA_FLOW",
+        "SCHEMA_REJECT",
+        "USE_SPATIAL_OPTIONS",
+        "SPATIAL_INDEX",
+        "GEOMETRY_COLUMNS",
+        "NOTE",
+        "SPECIFY_DATASOURCE_ALIAS",
+        "DATASOURCE_ALIAS",
+        "DIE_ON_ERROR",
+        "MAPPING",
+        "USE_ALTERNATE_SCHEMA",
+        "ALTERNATE_SCHEMA",
+        "PROPERTIES",
+        "SAVE_POINT",
+        "ENCODING",
+        "COMMIT_EVERY",
+        "ADD_COLS",
+        "USE_FIELD_OPTIONS",
+        "FIELD_OPTIONS",
+        "ENABLE_DEBUG_MODE",
+        "SUPPORT_NULL_WHERE",
+        "CONVERT_COLUMN_TABLE_TO_LOWERCASE",
+        "USE_BATCH_SIZE",
+        "BATCH_SIZE"
+      ],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "No official component-specific page confirmed in this audit pass.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tRedshiftInput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/Amazon/Redshift",
+        "Cloud/Amazon/Redshift"
+      ],
+      "official_version": null,
+      "official_family": null,
+      "official_purpose": null,
+      "official_url": null,
+      "official_reference_scope": null,
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "DRIVER_VERSION",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "HOST",
+        "TYPE",
+        "PORT",
+        "DBNAME",
+        "SCHEMA_DB",
+        "USER",
+        "PASS",
+        "PROPERTIES",
+        "USE_STRING_PROPERTIES",
+        "ENTRY_PROPERTIES",
+        "SCHEMA",
+        "TABLE",
+        "QUERYSTORE",
+        "GUESS_SCHEMA",
+        "QUERY",
+        "MAPPING",
+        "USE_LOG_FILE",
+        "LOG_FILE",
+        "LOG_LEVEL",
+        "ENCODING",
+        "USE_CURSOR",
+        "CURSOR_SIZE",
+        "TRIM_ALL_COLUMN",
+        "TRIM_COLUMN",
+        "JDBC_URL"
+      ],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "No official component-specific page confirmed in this audit pass.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tRedshiftOutput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/Amazon/Redshift",
+        "Cloud/Amazon/Redshift"
+      ],
+      "official_version": null,
+      "official_family": null,
+      "official_purpose": null,
+      "official_url": null,
+      "official_reference_scope": null,
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "DRIVER_VERSION",
+        "CONNECTION",
+        "HOST",
+        "PORT",
+        "DBNAME",
+        "TYPE",
+        "SCHEMA_DB",
+        "USER",
+        "PASS",
+        "PROPERTIES",
+        "USE_STRING_PROPERTIES",
+        "ENTRY_PROPERTIES",
+        "TABLE",
+        "TABLE_ACTION",
+        "DATA_ACTION",
+        "SCHEMA_FLOW",
+        "SCHEMA_REJECT",
+        "DIE_ON_ERROR",
+        "MAPPING",
+        "USE_ALTERNATE_SCHEMA",
+        "ALTERNATE_SCHEMA",
+        "EXTENDINSERT",
+        "NOTE",
+        "NB_ROWS_PER_INSERT",
+        "ENCODING",
+        "COMMIT_EVERY",
+        "ADD_COLS",
+        "USE_FIELD_OPTIONS",
+        "FIELD_OPTIONS",
+        "SUPPORT_NULL_WHERE",
+        "USE_BATCH",
+        "BATCH_SIZE",
+        "TABLE_WITH_SCHEMA",
+        "JDBC_URL"
+      ],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "No official component-specific page confirmed in this audit pass.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tRunJob": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "System",
+        "Orchestration"
+      ],
+      "official_version": "8.0",
+      "official_family": "System and Orchestration",
+      "official_purpose": "Calls a child Job and passes context parameters.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/system/trunjob-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "SCHEMA",
+        "USE_DYNAMIC_JOB",
+        "CONTEXT_JOB",
+        "PROCESS",
+        "CONTEXT_NAME",
+        "USE_INDEPENDENT_PROCESS",
+        "DIE_ON_CHILD_ERROR",
+        "TRANSMIT_WHOLE_CONTEXT",
+        "CONTEXTPARAMS",
+        "PROPAGATE_CHILD_RESULT",
+        "PRINT_PARAMETER",
+        "TRANSMIT_ORIGINAL_CONTEXT",
+        "USE_CHILD_JVM_SETTING",
+        "USE_CUSTOM_JVM_SETTING",
+        "JVM_ARGUMENTS",
+        "USE_DYNAMIC_CONTEXT",
+        "DYNAMIC_CONTEXT",
+        "USE_EXTRA_CLASSPATH",
+        "EXTRA_CLASSPATH",
+        "LOAD_CONTEXT_FROM_FILE"
+      ],
+      "official_essential_property_labels": [
+        "Job",
+        "Version",
+        "Context",
+        "Context Param"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tSetGlobalVar": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "Custom_Code"
+      ],
+      "official_version": "8.0",
+      "official_family": "Custom Code",
+      "official_purpose": "Defines and sets global variables.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "VARIABLES"
+      ],
+      "official_essential_property_labels": [
+        "Variables"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tSortRow": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Processing"
+      ],
+      "official_version": "8.0",
+      "official_family": "Processing",
+      "official_purpose": "Sorts input by one or more columns.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "SCHEMA",
+        "CRITERIA",
+        "EXTERNAL",
+        "TEMPFILE",
+        "CREATEDIR",
+        "EXTERNAL_SORT_BUFFERSIZE"
+      ],
+      "official_essential_property_labels": [
+        "Criteria"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tSystem": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "System"
+      ],
+      "official_version": "8.0",
+      "official_family": "System",
+      "official_purpose": "Runs system commands in a Job.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/system/tsystem",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "ROOTDIR",
+        "DIRECTORY",
+        "USE_SINGLE_COMMAND",
+        "COMMAND",
+        "USE_ARRAY_COMMAND",
+        "ARRAY_COMMAND",
+        "OUTPUT",
+        "ERROROUTPUT",
+        "SCHEMA",
+        "PARAMS"
+      ],
+      "official_essential_property_labels": [
+        "Use Single Command",
+        "Use Array Command",
+        "Standard Output and Error Output"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tTeradataInput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/Teradata"
+      ],
+      "official_version": null,
+      "official_family": null,
+      "official_purpose": null,
+      "official_url": null,
+      "official_reference_scope": null,
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "TYPE",
+        "HOST",
+        "DBNAME",
+        "USER",
+        "PASS",
+        "SCHEMA",
+        "TABLE",
+        "QUERYSTORE",
+        "GUESS_SCHEMA",
+        "QUERY",
+        "MAPPING",
+        "PROPERTIES",
+        "ENCODING",
+        "TRIM_ALL_COLUMN",
+        "TRIM_COLUMN",
+        "QUERY_BAND",
+        "ACTIVATE_QUERY_LOGGING",
+        "QUERY_BAND_PARAMETERS"
+      ],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "No official component-specific page confirmed in this audit pass.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tTeradataOutput": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.102",
+      "catalog_family": [
+        "Databases/DB Specifics/Teradata"
+      ],
+      "official_version": null,
+      "official_family": null,
+      "official_purpose": null,
+      "official_url": null,
+      "official_reference_scope": null,
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "PROPERTY",
+        "USE_EXISTING_CONNECTION",
+        "CONNECTION",
+        "HOST",
+        "TYPE",
+        "DBNAME",
+        "USER",
+        "PASS",
+        "TABLE",
+        "TABLE_ACTION",
+        "CREATE_TABLE_TYPE",
+        "DATA_ACTION",
+        "SCHEMA_FLOW",
+        "SCHEMA_REJECT",
+        "DIE_ON_ERROR",
+        "MAPPING",
+        "PROPERTIES",
+        "COMMIT_EVERY",
+        "NOTE",
+        "ADD_COLS",
+        "QUERY_BAND",
+        "ACTIVATE_QUERY_LOGGING",
+        "QUERY_BAND_PARAMETERS",
+        "USE_FIELD_OPTIONS",
+        "FIELD_OPTIONS",
+        "ENABLE_DEBUG_MODE",
+        "USE_BATCH_SIZE",
+        "USE_BATCH_AND_USE_CONN",
+        "BATCH_SIZE",
+        "NOTE",
+        "SUPPORT_NULL_WHERE"
+      ],
+      "official_essential_property_labels": [],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "No official component-specific page confirmed in this audit pass.",
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tUniqRow": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "Data_Quality"
+      ],
+      "official_version": "8.0",
+      "official_family": "Data Quality",
+      "official_purpose": "Separates unique rows from duplicate rows.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/deduplication/tuniqrow-standard-properties",
+      "official_reference_scope": "standard_properties",
+      "checked_at": "2026-10-19",
+      "verification_status": "partially_verified",
+      "catalog_internal_property_names": [
+        "SCHEMA",
+        "SCHEMA_UNIQUE",
+        "SCHEMA_DUPLICATE",
+        "UNIQUE_KEY",
+        "ONLY_ONCE_EACH_DUPLICATED_KEY",
+        "IS_VIRTUAL_COMPONENT",
+        "BUFFER_SIZE",
+        "TEMP_DIRECTORY",
+        "CHANGE_HASH_AND_EQUALS_FOR_BIGDECIMAL"
+      ],
+      "official_essential_property_labels": [
+        "Unique key"
+      ],
+      "property_comparison_status": "official_labels_recorded_but_internal_key_crosswalk_pending",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    },
+    "tUnite": {
+      "catalog_entry_present": true,
+      "catalog_version": "0.101",
+      "catalog_family": [
+        "Orchestration"
+      ],
+      "official_version": "8.0",
+      "official_family": "Orchestration",
+      "official_purpose": "Combines flows from multiple sources.",
+      "official_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tunite",
+      "official_reference_scope": "component_page",
+      "checked_at": "2026-10-19",
+      "verification_status": "needs_review",
+      "catalog_internal_property_names": [
+        "SCHEMA"
+      ],
+      "official_essential_property_labels": [
+        "Schema"
+      ],
+      "property_comparison_status": "needs_review",
+      "limitations": [
+        "Talend Studio Lite 8.0.1 R2026-08v1 was detected locally; no component visibility or runtime result is claimed because no test job was executed."
+      ]
+    }
+  },
+  "official_sources": [
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/processing/processing",
+      "use": "Official Processing component index and component summaries."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/db-generic/db-generic-component",
+      "use": "Official DB Generic names and purposes; confirms tDBInput/tDBOutput/tDBRow."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveinput-standard-properties",
+      "use": "Official tHiveInput Standard Job family/properties; version note says distribution/Hive version removed from R2024-04."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveoutput",
+      "use": "Official tHiveOutput scope; cross-check framework before recommendation."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveload",
+      "use": "Official note that tHiveOutput does not exist in Standard Jobs; tHiveLoad provides Standard output."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/impala/timpalainput",
+      "use": "Official tImpalaInput Standard Job reference; page states Big Data family and feature-manager installation required."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/7.3/impala/timpalaoutput-standard-properties",
+      "use": "Archived 7.3 reference surfaced for tImpalaOutput; not accepted as 8.0 verification."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "use": "Official tMap Standard properties."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+      "use": "Official tFileInputDelimited Standard properties."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/mssql/tmssqlinput",
+      "use": "Official tMSSqlInput purpose, Databases family, and query/connection settings."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/mssql/tmssqloutput",
+      "use": "Official tMSSqlOutput purpose, Databases family, and write actions."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/release-notes/8.0/r2026-09-studio",
+      "use": "Official Talend Studio 8.0 R2026-09 release baseline; does not prove that this workspace has that release or entitlement."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/db-generic/tdbinput",
+      "use": "Official tDBInput Standard Job reference, Databases family, all Talend products; covers generic configured database input."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/db-generic/tdb-generic-component",
+      "use": "Official DB Generic index listing tDBInput, tDBOutput, and tDBRow and their purposes."
+    },
+    {
+      "url": "https://help.qlik.com/talend/en-US/components/8.0/impala/impala-component",
+      "use": "Official Impala component index listing tImpalaInput and tImpalaOutput; index alone does not verify essential properties or edition availability."
+    }
+  ],
+  "verification_status_definitions": {
+    "partially_verified": "Qlik Help 8.0 component or Standard Job properties page was consulted for identity/family/purpose and the listed essential property labels. Community XML internal keys have not been cross-walked to those labels; Studio availability/runtime behavior is not verified.",
+    "needs_review": "Official component-specific property comparison is incomplete, the source is archived/only an index, or no official page was confirmed."
+  },
+  "target_version": {
+    "product": "Talend Studio",
+    "major_version": "8.0",
+    "monthly_release": "R2026-09",
+    "documentation_baseline_url": "https://help.qlik.com/talend/en-US/release-notes/8.0/r2026-09-studio",
+    "framework": "Standard Jobs, except where a component reference explicitly documents another framework",
+    "decision_date": "2026-10-19",
+    "status": "documentation_target_environment_unconfirmed",
+    "reason": "Qlik Help publishes the 8.0 R2026-09 Studio monthly release notes as the official documentation baseline observed on the decision date. Talend Studio Lite 8.0.1 patch R2026-08v1 was detected locally; exact licensed edition/workspace access and runtime validation remain unconfirmed."
+  },
+  "mapping_scope": {
+    "source_file": "rules/mappings/talend-components.json (read-only; no mapping changes in this step)",
+    "support_boundary": "Current concrete component candidates in operation rules plus all configured engine input/output choices. A concrete candidate is catalog scope, not proof of semantic support or Talend runtime validity.",
+    "core_components_required_for_catalog": [
+      "tAggregateRow",
+      "tDB2Input",
+      "tDB2Output",
+      "tDBInput",
+      "tDBOutput",
+      "tDBRow",
+      "tFileInputDelimited",
+      "tFileOutputDelimited",
+      "tFilterColumns",
+      "tFilterRow",
+      "tFixedFlowInput",
+      "tGreenplumInput",
+      "tGreenplumOutput",
+      "tHiveInput",
+      "tHiveOutput",
+      "tImpalaInput",
+      "tImpalaOutput",
+      "tMSSqlInput",
+      "tMSSqlOutput",
+      "tMap",
+      "tMysqlInput",
+      "tMysqlOutput",
+      "tNetezzaInput",
+      "tNetezzaOutput",
+      "tOracleInput",
+      "tOracleOutput",
+      "tPostgresqlInput",
+      "tPostgresqlOutput",
+      "tRedshiftInput",
+      "tRedshiftOutput",
+      "tRunJob",
+      "tSetGlobalVar",
+      "tSortRow",
+      "tSystem",
+      "tTeradataInput",
+      "tTeradataOutput",
+      "tUniqRow",
+      "tUnite"
+    ],
+    "conditional_alternative_components": [
+      "tFileInputExcel",
+      "tFileInputPositional",
+      "tFileOutputExcel",
+      "tFileOutputPositional",
+      "tFlowToIterate",
+      "tJava",
+      "tJavaRow",
+      "tJoin",
+      "tLogRow"
+    ],
+    "unresolved_operations_excluded_from_component_scope": [
+      "stateful",
+      "dynamic_code",
+      "unsupported",
+      "report"
+    ],
+    "decision_pending_operations": [
+      "maintenance"
+    ],
+    "deferred_operations_note": "These operations lack a confirmed target design or are explicitly unresolved; do not broaden catalog verification based on them. maintenance still contributes its tDBRow candidate to the core set because it is explicitly named by the mapping rule, but its use remains decision-pending.",
+    "component_count": 47,
+    "core_component_count": 38,
+    "conditional_alternative_count": 9,
+    "catalog_wide_expansion": "deferred until the core and conditional mapping candidate sets are fully audited."
+  },
+  "studio_validation": {
+    "status": "pending",
+    "checked_at": "2026-10-19",
+    "installed_product": "Talend Studio Lite",
+    "installed_version": "8.0.1.20260820_0911-patch (R2026-08v1)",
+    "installed_path": "C:\\Talend\\8.0.1\\studio",
+    "evidence": [
+      "C:\\Talend\\8.0.1\\studio\\.eclipseproduct",
+      "C:\\Talend\\8.0.1\\studio\\plugins\\org.talend.rcp.branding.generic_8.0.3.20260601_1447"
+    ],
+    "execution_result": "not_run",
+    "blocker": "The required computer-use Node runtime failed to initialize because its kernel-assets path was missing; connected desktop automation devices were offline. No test project or Job was created or executed.",
+    "documentation_baseline": "Talend Studio 8.0 R2026-09; installed patch is R2026-08v1, so monthly-version parity is not established.",
+    "equivalence_claim": "none"
+  }
+}

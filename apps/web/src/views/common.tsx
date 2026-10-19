@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import type { Async } from "../hooks";
+import { Icon } from "../components/Icon";
 
 export function Load<T>({ q, children }: { q: Async<T>; children: (d: T) => ReactNode }) {
-  if (q.loading && !q.data) return <p className="muted">Cargando…</p>;
-  if (q.error) return <p className="error" role="alert">{q.error}</p>;
+  if (q.loading && !q.data) return <div className="loading-state" role="status"><span className="spinner" /> Cargando información…</div>;
+  if (q.error) return <div className="notice error-notice" role="alert"><Icon name="warning" /><div><strong>No pudimos cargar esta información</strong><p>{q.error === "Failed to fetch" ? "No se pudo conectar con el servicio. Comprueba que esté en funcionamiento e inténtalo de nuevo." : q.error}</p><button className="secondary" onClick={q.reload}>Volver a intentar</button></div></div>;
   return q.data ? <>{children(q.data)}</> : null;
 }
 

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { api } from "../api";
 import { useAsync } from "../hooks";
-import { Badge, Load } from "./common";
+import { Icon } from "../components/Icon";
+import { Badge, Load, link } from "./common";
 
 export function ImportTab({ id, go }: { id: string; go: (h: string) => void }) {
   const [path, setPath] = useState("");
@@ -9,90 +10,52 @@ export function ImportTab({ id, go }: { id: string; go: (h: string) => void }) {
   const [err, setErr] = useState<string>();
   const run = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBusy(true);
-    setErr(undefined);
-    try {
-      await api.importPath(id, path.trim());
-      go(`/p/${id}/inventario`);
-    } catch (x) {
-      setErr((x as Error).message);
-    } finally {
-      setBusy(false);
-    }
+    if (busy) return;
+    setBusy(true); setErr(undefined);
+    try { await api.importPath(id, path.trim()); go(`/p/${id}/inventario`); }
+    catch (x) { setErr((x as Error).message); }
+    finally { setBusy(false); }
   };
   const upload = async (f: File | undefined) => {
-    if (!f) return;
-    setBusy(true);
-    setErr(undefined);
-    try {
-      await api.upload(id, f);
-      go(`/p/${id}/inventario`);
-    } catch (x) {
-      setErr((x as Error).message);
-    } finally {
-      setBusy(false);
-    }
+    if (!f || busy) return;
+    if (!f.name.toLowerCase().endsWith(".zip")) { setErr("Selecciona un archivo ZIP que contenga tus programas SAS."); return; }
+    setBusy(true); setErr(undefined);
+    try { await api.upload(id, f); go(`/p/${id}/inventario`); }
+    catch (x) { setErr((x as Error).message); }
+    finally { setBusy(false); }
   };
-  return (
-    <>
-      <h1>Importar</h1>
-      <div className="row">
-        <label>
-          Subir ZIP con los programas
-          <input type="file" accept=".zip" disabled={busy} onChange={(e) => upload(e.target.files?.[0])} />
-        </label>
+  return <>
+    <h1>Carga tus archivos SAS</h1>
+    <p className="subtitle">El primer paso es reunir los programas que quieres migrar. Tus archivos originales no se modifican.</p>
+    <section className="panel">
+      <div className="panel-heading"><Icon name="upload" size={24} /><div><h2>Selecciona un archivo ZIP</h2><p>La forma más sencilla de comenzar.</p></div><Badge tone="ok">Recomendado</Badge></div>
+      <div className="upload-zone" aria-busy={busy}>
+        <Icon name="upload" size={38} /><h3>{busy ? "Estamos cargando tus archivos…" : "Tus programas, en un solo archivo"}</h3>
+        <p>Comprime la carpeta de programas SAS en formato ZIP y selecciónala aquí.</p>
+        <label><span className="sr-only">Archivo ZIP con tus programas SAS</span><input type="file" accept=".zip,application/zip" disabled={busy} onChange={(e) => { void upload(e.target.files?.[0]); e.target.value = ""; }} /></label>
+        <small>Se incluirán los archivos compatibles con el análisis.</small>
+        {busy && <div role="status" className="loading-state"><span className="spinner" /> Cargando e identificando archivos…</div>}
       </div>
-      <p className="muted">
-        También puedes indicar una carpeta o ZIP que ya esté en el servidor (solo bajo las rutas permitidas). Se copia una instantánea; el original no se modifica. Reimportar borra
-        análisis y planes derivados (las decisiones por paso se conservan).
-      </p>
-      <form onSubmit={run} className="row">
-        <label>
-          Ruta
-          <input value={path} onChange={(e) => setPath(e.target.value)} placeholder="/ruta/a/programas" required />
-        </label>
-        <button disabled={busy || !path.trim()}>{busy ? "Importando…" : "Importar"}</button>
-      </form>
-      {err && <p className="error" role="alert">{err}</p>}
-    </>
-  );
+      {err && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{err}</span></div>}
+    </section>
+    <div className="notice warning"><Icon name="info" /><span><strong>Si ya cargaste archivos en este proyecto:</strong> una nueva carga reemplaza el lote anterior y elimina sus análisis y planes. Se conservan las decisiones guardadas por paso.</span></div>
+    <details><summary>Opciones avanzadas: importar desde una carpeta del servidor</summary><p className="muted">Usa esta opción si los archivos ya están en el equipo donde funciona el servicio. La carpeta debe estar dentro de las rutas permitidas.</p><form onSubmit={run} className="row"><label className="grow">Ruta de la carpeta o del ZIP<input value={path} onChange={(e) => setPath(e.target.value)} placeholder="Ruta completa de la carpeta o archivo ZIP" required disabled={busy} /></label><button disabled={busy || !path.trim()}><Icon name="folder" size={18} />{busy ? "Importando…" : "Importar desde ruta"}</button></form></details>
+  </>;
 }
 
 export function InventoryTab({ id }: { id: string }) {
   const q = useAsync(() => api.inventory(id), [id]);
-  return (
-    <>
-      <h1>Inventario</h1>
-      <Load q={q}>
-        {(m) => (
-          <>
-            <p>
-              {m.files.length} archivos · {m.skipped.length} omitidos
-            </p>
-            <table>
-              <thead>
-                <tr><th>Ruta</th><th>Tipo</th><th>Bytes</th><th>sha256</th></tr>
-              </thead>
-              <tbody>
-                {m.files.map((f) => (
-                  <tr key={f.path}>
-                    <td>{f.path}</td>
-                    <td><Badge>{f.kind}</Badge></td>
-                    <td className="num">{f.size}</td>
-                    <td className="mono">{f.sha256.slice(0, 12)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {m.skipped.length > 0 && (
-              <details>
-                <summary>Omitidos ({m.skipped.length})</summary>
-                <ul>{m.skipped.map((s) => <li key={s.path}>{s.path} — {s.reason}</li>)}</ul>
-              </details>
-            )}
-          </>
-        )}
-      </Load>
-    </>
-  );
+  return <>
+    <h1>Mis archivos</h1><p className="subtitle">Estos son los archivos que se incluyeron en tu proyecto. El siguiente paso es analizarlos.</p>
+    <Load q={q}>{(m) => m.files.length === 0 ? <div className="empty-state"><span className="empty-icon"><Icon name="folder" size={30} /></span><h3>{m.skipped.length ? "No encontramos archivos compatibles" : "Aún no hay archivos"}</h3><p>{m.skipped.length ? `Se omitieron ${m.skipped.length} archivos. Revisa los motivos y carga un ZIP con programas SAS compatibles.` : "Carga un ZIP con tus programas para empezar."}</p><a className="button" href={link(id, "importar")}><Icon name="upload" size={18} /> Cargar archivos</a></div> : <>
+      <section className="import-result" aria-label="Resultado de la carga">
+        <div className="import-result-title"><span aria-hidden="true">✅</span><div><h2>Carga completada</h2><p>Revisamos tu paquete y ya puedes iniciar el análisis.</p></div></div>
+        <div className="import-result-metrics"><div><strong>{m.files.length}</strong><span>archivos incluidos</span></div><div><strong>{m.files.filter((f) => f.kind === "sas").length}</strong><span>programas SAS</span></div><div><strong>{m.skipped.length}</strong><span>archivos omitidos</span></div></div>
+        <a className="button" href={link(id, "resumen")}><Icon name="chart" size={18} /> Analizar mis programas <Icon name="arrow" size={17} /></a>
+      </section>
+      <div className="section-heading" style={{ marginTop: 24 }}><h2>Archivos incluidos</h2><Badge tone="ok">{m.files.length} listos</Badge></div>
+      <table><thead><tr><th>Archivo</th><th>Tipo</th><th className="num">Tamaño</th><th>Identificador de integridad</th></tr></thead><tbody>{m.files.map((f) => <tr key={f.path}><td><Icon name="file" size={15} /> {f.path}</td><td><Badge>{f.kind}</Badge></td><td className="num">{new Intl.NumberFormat("es", { maximumFractionDigits: 1 }).format(f.size / 1024)} KB</td><td className="mono" title={f.sha256}>{f.sha256.slice(0, 12)}</td></tr>)}</tbody></table>
+    </>}</Load>
+    {q.data && q.data.skipped.length > 0 && <details><summary>Archivos que no se incluyeron ({q.data.skipped.length})</summary><p className="muted">Estos archivos se omitieron durante la carga por los siguientes motivos:</p><ul>{q.data.skipped.map((s) => <li key={s.path}>{s.path} — {s.reason}</li>)}</ul></details>}
+  </>;
 }

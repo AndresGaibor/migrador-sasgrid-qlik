@@ -17,6 +17,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 DOC_URL = "https://help.qlik.com/talend/en-US/components/8.0/{}"
+AUDIT_FILE = Path(__file__).resolve().parents[1] / "rules" / "talend" / "catalog-audit.json"
 # sufijos de rol, del más largo al más corto, para agrupar variantes por tecnología
 ROLES = [
     "OutputBulkExec", "OutputBulk", "BulkExec", "TableList", "ColumnList", "LastInsertId", "SCDELT",
@@ -151,7 +152,7 @@ def split_variant(name: str) -> tuple[str, str] | None:
     return None
 
 
-def build(src: Path) -> dict:
+def build(src: Path, audit_file: Path = AUDIT_FILE) -> dict:
     comps = {}
     for d in sorted(p for p in src.iterdir() if p.is_dir() and p.name.startswith("t")):
         xml = d / f"{d.name}_java.xml"
@@ -174,7 +175,7 @@ def build(src: Path) -> dict:
             variants.setdefault(v[0], {}).setdefault(v[1], []).append(n)
     # un rol solo es útil si hay más de una tecnología
     variants = {r: t for r, t in variants.items() if len(t) > 1}
-    return {
+    catalog = {
         "source": "https://github.com/Talaxie/tdi-studio-se (Apache-2.0), components/*/*_java.xml",
         "doc_base": DOC_URL.format("<componente en minúsculas>"),
         "count": len(comps),
@@ -182,14 +183,30 @@ def build(src: Path) -> dict:
         "variants": variants,
         "components": comps,
     }
+    if audit_file.exists():
+        audit = json.loads(audit_file.read_text(encoding="utf-8"))
+        for name, record in audit.get("recommended_components", {}).items():
+            if name not in comps:
+                continue
+            url = record.get("official_url")
+            if url and record.get("official_reference_scope") in (
+                "component_page", "standard_properties"
+            ):
+                comps[name]["doc_url"] = url
+            else:
+                # No exponer la URL genérica generada por nombre como si estuviera verificada.
+                comps[name].pop("doc_url", None)
+        catalog["official_audit"] = audit
+    return catalog
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("components_dir", type=Path)
     ap.add_argument("--out", type=Path, default=Path("rules/talend/components.json"))
+    ap.add_argument("--audit", type=Path, default=AUDIT_FILE)
     a = ap.parse_args()
-    cat = build(a.components_dir)
+    cat = build(a.components_dir, a.audit)
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(cat, ensure_ascii=False, indent=1, sort_keys=False) + "\n")
     print(
