@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -13,6 +14,7 @@ from sas_grid_migrator.dependency_graph.builder import (
     load_dependencies,
 )
 from sas_grid_migrator.domain.models import Manifest, Project
+from sas_grid_migrator.domain.redaction import redact
 from sas_grid_migrator.ingestion.importer import ImportError_
 from sas_grid_migrator.migration_planner.models import JobPlan, PlanSet
 from sas_grid_migrator.migration_planner.service import (
@@ -154,6 +156,28 @@ def get_program(project_id: str, path: str) -> ParsedProgram:
     raise HTTPException(404, "programa no encontrado")
 
 
+@app.get("/api/projects/{project_id}/source/{path:path}")
+def source_evidence(project_id: str, path: str, line: int) -> PlainTextResponse:
+    s = store()
+    _require(s, project_id)
+    source = next((item for item in s.get_manifest(project_id).files if item.path == path), None)
+    if source is None or source.encoding is None:
+        raise HTTPException(404, "archivo de texto no encontrado")
+    root = s.source_dir(project_id).resolve()
+    target = (root / path).resolve()
+    if not target.is_relative_to(root):
+        raise HTTPException(404, "archivo no encontrado")
+    text = target.read_text(encoding=source.encoding, errors="replace")
+    lines = redact(text, path).splitlines()
+    if line < 1 or line > len(lines):
+        raise HTTPException(404, "línea no encontrada")
+    start, end = max(1, line - 2), min(len(lines), line + 2)
+    return PlainTextResponse(
+        "\n".join(f"{n:>5} | {lines[n - 1]}" for n in range(start, end + 1)),
+        media_type="text/plain; charset=utf-8",
+    )
+
+
 @app.get("/api/projects/{project_id}/dependencies")
 def dependencies(project_id: str) -> DependencyReport:
     s = store()
@@ -201,6 +225,11 @@ def list_plans(project_id: str) -> list[dict]:
     return out
 
 
+@app.get("/api/projects/{project_id}/plans/grid-recommendations")
+def list_grid_recommendations(project_id: str) -> list[dict]:
+    return [item.model_dump(mode="json") for item in _plans(project_id).grid_recommendations]
+
+
 @app.patch("/api/projects/{project_id}/plans/{program:path}/steps/{step_id}")
 def patch_step(project_id: str, program: str, step_id: str, body: Decision) -> JobPlan:
     s = store()
@@ -238,6 +267,19 @@ def export_plans(project_id: str) -> dict:
         "files": [f.name for f in files],
         "steps_csv_rows": steps_csv(ps).count("\n") - 1,
     }
+
+
+@app.get("/api/projects/{project_id}/exports/{name}")
+def download_export(project_id: str, name: str) -> FileResponse:
+    s = store()
+    _plans(project_id)
+    out = s.settings.data_dir / "projects" / project_id / "exports"
+    if Path(name).name != name:
+        raise HTTPException(404, "exportación no encontrada")
+    target = (out / name).resolve()
+    if not target.is_relative_to(out.resolve()) or not target.is_file():
+        raise HTTPException(404, "exportación no encontrada")
+    return FileResponse(target, filename=name)
 
 
 class TalendInspect(BaseModel):
@@ -283,7 +325,7 @@ async def verify_project_plans(project_id: str, body: VerifyBody) -> dict:
     except TalendError as e:
         raise HTTPException(502, str(e)) from e
     stats = verify_plans(ps, catalog)
-    s.plans_path(project_id).write_text(ps.model_dump_json())
+    s.plans_path(project_id).write_text(ps.model_dump_json(), encoding="utf-8")
     return {"catalog_components": sorted(catalog.components), **stats}
 
 

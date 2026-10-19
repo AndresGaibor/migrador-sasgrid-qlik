@@ -21,7 +21,7 @@ export function ExportTab({ id }: { id: string }) {
       {r && (
         <>
           <p>Carpeta: <code>{r.directory}</code> · {r.files.length} archivos</p>
-          <ul>{r.files.slice(0, 20).map((f) => <li key={f}>{f}</li>)}</ul>
+          <ul>{r.files.map((f) => <li key={f}><a href={api.exportFile(id, f)} download>{f}</a></li>)}</ul>
         </>
       )}
     </>

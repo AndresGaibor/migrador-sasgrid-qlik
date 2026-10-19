@@ -1,8 +1,8 @@
 # Job `job_p1_merge_first_last`
 
-- **Programa SAS:** `p1_merge_first_last.sas` (sha256 `8642d7b05dfe`)
+- **Programa SAS:** `p1_merge_first_last.sas` (sha256 `e59f0d643755`)
 - **Estado:** needs_review · **Pasos:** 13 · **Reglas:** v1
-- **Aviso:** los nombres de componente y propiedad provienen del catálogo oficial de Talend; solo los marcados «verificado» se contrastaron con un Job real vía talend-mcp.
+- **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Pasos
 

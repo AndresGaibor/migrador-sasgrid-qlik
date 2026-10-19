@@ -1,8 +1,8 @@
 # Job `job_p0_resumen_sql`
 
-- **Programa SAS:** `p0_resumen_sql.sas` (sha256 `45215ef70662`)
+- **Programa SAS:** `p0_resumen_sql.sas` (sha256 `fb6d9d23beef`)
 - **Estado:** needs_review · **Pasos:** 9 · **Reglas:** v1
-- **Aviso:** los nombres de componente y propiedad provienen del catálogo oficial de Talend; solo los marcados «verificado» se contrastaron con un Job real vía talend-mcp.
+- **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Variables de contexto
 

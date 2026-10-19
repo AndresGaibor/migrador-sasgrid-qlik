@@ -1,4 +1,4 @@
-import type { CatalogComponent, CatalogList, Deps, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, Summary } from "./types";
+import type { CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, Summary } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -40,9 +40,12 @@ export const api = {
   analyze: (id: string) => post<Summary>(`/projects/${id}/analyses`),
   programs: (id: string) => req<ProgramRow[]>(`/projects/${id}/programs`),
   program: (id: string, file: string) => req<Program>(`/projects/${id}/programs/${enc(file)}`),
+  sourceEvidence: (id: string, file: string, line: number) =>
+    `/api/projects/${id}/source/${file.split("/").map(encodeURIComponent).join("/")}?line=${line}`,
   deps: (id: string) => req<Deps>(`/projects/${id}/dependencies`),
   generatePlans: (id: string) => post<{ plans: number }>(`/projects/${id}/plans`),
   plans: (id: string) => req<PlanRow[]>(`/projects/${id}/plans`),
+  gridRecommendations: (id: string) => req<GridRecommendation[]>(`/projects/${id}/plans/grid-recommendations`),
   plan: (id: string, file: string) => req<JobPlan>(`/projects/${id}/plans/${enc(file)}`),
   decide: (id: string, file: string, step: string, status: string, note: string | null) =>
     req<JobPlan>(`/projects/${id}/plans/${enc(file)}/steps/${step}`, {
@@ -50,6 +53,7 @@ export const api = {
       body: JSON.stringify({ status, note }),
     }),
   exportAll: (id: string) => post<{ directory: string; files: string[] }>(`/projects/${id}/exports`),
+  exportFile: (id: string, name: string) => `/api/projects/${id}/exports/${encodeURIComponent(name)}`,
   catalog: (q: string, family: string) =>
     req<CatalogList>(`/talend/catalog?q=${encodeURIComponent(q)}${family ? `&family=${encodeURIComponent(family)}` : ""}`),
   component: (name: string) => req<CatalogComponent>(`/talend/catalog/${encodeURIComponent(name)}`),

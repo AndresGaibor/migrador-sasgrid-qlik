@@ -71,10 +71,10 @@ def analyze_project(store: Store, project_id: str) -> Analysis:
     analysis = Analysis(
         project_id=project_id, rules_version=rules.version, programs=programs, coverage=cov
     )
-    store.analysis_path(project_id).write_text(analysis.model_dump_json())
+    store.analysis_path(project_id).write_text(analysis.model_dump_json(), encoding="utf-8")
     return analysis
 
 
 def load_analysis(store: Store, project_id: str) -> Analysis | None:
     p = store.analysis_path(project_id)
-    return Analysis.model_validate(json.loads(p.read_text())) if p.exists() else None
+    return Analysis.model_validate(json.loads(p.read_text(encoding="utf-8"))) if p.exists() else None

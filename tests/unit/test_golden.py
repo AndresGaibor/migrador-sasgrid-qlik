@@ -34,6 +34,6 @@ def test_plan_markdown_matches_golden(plans, program):
     got = render_plan_md(plans[program])
     path = GOLDEN / f"{Path(program).stem}.plan.md"
     if os.environ.get("UPDATE_GOLDEN"):
-        path.write_text(got)
+        path.write_text(got, encoding="utf-8")
     assert path.exists(), f"falta {path.name}; ejecuta con UPDATE_GOLDEN=1"
-    assert got == path.read_text()
+    assert got == path.read_text(encoding="utf-8")

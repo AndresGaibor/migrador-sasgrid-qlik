@@ -6,6 +6,7 @@ Nada de lo que produce está verificado: componentes y propiedades son candidato
 
 import re
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -16,6 +17,7 @@ from sas_grid_migrator.migration_planner.models import (
     Connection,
     ContextVariable,
     Expression,
+    GridRecommendation,
     JobPlan,
     LibraryNeeded,
     Orchestration,
@@ -24,6 +26,7 @@ from sas_grid_migrator.migration_planner.models import (
     SchemaColumn,
     ValidationCase,
 )
+from sas_grid_migrator.sas_parser.ast import Loc
 from sas_grid_migrator.talend_adapter.catalog import load_catalog
 
 _AGG = re.compile(
@@ -41,10 +44,34 @@ class OpRule(BaseModel):
     tests: list[dict[str, str]] = []
 
 
+class GridRule(BaseModel):
+    component: str | None = None
+    connection: str | None = None
+    properties: list[str] = []
+    required: list[str] = []
+    status: Literal["supported", "partial", "unsupported"]
+    instruction: str
+    reason: str
+
+
+class GridPattern(BaseModel):
+    id: str
+    status: Literal["supported", "partial", "unsupported"]
+    description: str
+    limitations: list[str]
+    prerequisites: list[str]
+
+
+class GridCatalog(BaseModel):
+    version: str
+    patterns: list[GridPattern]
+
+
 class MappingRules(BaseModel):
     version: str
     engines: dict[str, dict[str, str]]
     operations: dict[str, OpRule]
+    grid: dict[str, GridRule] = {}
     editor_properties: dict[str, list[str]] = {}
     generic_components: list[str] = []
 
@@ -54,7 +81,63 @@ def load_mapping_rules(path: Path | None = None) -> MappingRules:
         path
         or Path(__file__).resolve().parents[3] / "rules" / "mappings" / "talend-components.json"
     )
-    return MappingRules.model_validate_json(p.read_text())
+    rules = MappingRules.model_validate_json(p.read_text(encoding="utf-8"))
+    validate_grid_mappings(rules, load_grid_catalog())
+    return rules
+
+
+def load_grid_catalog(path: Path | None = None) -> GridCatalog:
+    p = path or Path(__file__).resolve().parents[3] / "rules" / "sas" / "grid_catalog.json"
+    return GridCatalog.model_validate_json(p.read_text(encoding="utf-8"))
+
+
+def validate_grid_mappings(rules: MappingRules, catalog: GridCatalog) -> None:
+    patterns = {pattern.id: pattern for pattern in catalog.patterns}
+    if rules.grid.keys() != patterns.keys():
+        raise ValueError("Grid catalog and Talend mappings must contain the same pattern ids")
+    talend = load_catalog()
+    for pattern_id, rule in rules.grid.items():
+        if rule.status != patterns[pattern_id].status:
+            raise ValueError(f"Grid status differs between catalog and mapping: {pattern_id}")
+        if rule.component and not talend.has(rule.component):
+            raise ValueError(f"Grid mapping references unknown Talend component: {pattern_id}")
+        if rule.connection and not any(
+            connector["type"] == rule.connection
+            for connector in talend.get("tRunJob")["connectors"]
+        ):
+            raise ValueError(f"Grid mapping references unknown Talend connection: {pattern_id}")
+
+
+def grid_recommendation(
+    pattern_id: str,
+    catalog: GridCatalog,
+    rules: MappingRules,
+    evidence: Loc,
+    *,
+    target_program: str | None = None,
+    details: dict[str, object] | None = None,
+    dependencies: list[str] | None = None,
+) -> GridRecommendation:
+    pattern = next((p for p in catalog.patterns if p.id == pattern_id), None)
+    rule = rules.grid.get(pattern_id)
+    if pattern is None or rule is None:
+        raise ValueError(f"No Grid catalog mapping for pattern: {pattern_id}")
+    item = load_catalog().get(rule.component) if rule.component else None
+    return GridRecommendation(
+        id=f"{evidence.file}:{evidence.line}:{pattern_id}",
+        pattern_id=pattern_id,
+        catalog_version=catalog.version,
+        status=rule.status,
+        instruction=rule.instruction,
+        reason=rule.reason,
+        component_candidate=rule.component,
+        doc_url=item.get("doc_url") if item else None,
+        required=rule.required,
+        dependencies=dependencies or [],
+        target_program=target_program,
+        evidence=evidence,
+        details=details or {},
+    )
 
 
 def slug(s: str) -> str:

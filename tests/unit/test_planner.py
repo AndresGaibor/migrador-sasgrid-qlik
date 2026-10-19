@@ -65,6 +65,31 @@ def test_plan_steps_have_contract(tmp_path):
     assert not any(s.verified for p in ps.plans for s in p.steps)
 
 
+def test_grid_recommendations_use_versioned_catalog_and_keep_unsupported_evidence(tmp_path):
+    store, pid = project(tmp_path)
+    ps = generate_plans(store, pid)
+    assert ps.grid_recommendations
+    patterns = {r.pattern_id: r for r in ps.grid_recommendations}
+    catalog = json.loads((ROOT / "rules/sas/grid_catalog.json").read_text(encoding="utf-8"))
+    assert {entry["id"] for entry in catalog["patterns"]} <= patterns.keys()
+    assert all(r.reason and r.evidence.file and r.evidence.line > 0 for r in ps.grid_recommendations)
+    assert {"sasgsub.submit", "sasgsub.job_options", "sasgsub.set_parameters"} <= patterns.keys()
+    submit = patterns["sasgsub.submit"]
+    assert submit.status == "partial" and submit.component_candidate == "tRunJob"
+    assert submit.catalog_version == "1" and submit.doc_url and submit.evidence.line == 7
+    assert submit.required and submit.reason and submit.instruction
+
+    unknown = next(r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.unverified_options")
+    assert unknown.status == "unsupported" and unknown.evidence.line == 4
+    assert unknown.details["unknown_options"] == ["-grid", "-queue", "-name", "-wait"]
+    lsf = [r for r in ps.grid_recommendations if r.pattern_id == "scheduler.lsf"]
+    assert [(r.status, r.evidence.line) for r in lsf] == [("unsupported", 5), ("unsupported", 6)]
+    missing = next(r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.missing_option_value")
+    assert missing.status == "unsupported" and missing.details["incomplete_options"] == ["-gridqueue"]
+    batch = next(r for r in ps.grid_recommendations if r.pattern_id == "sas_batch.sysin")
+    assert batch.evidence.line == 3 and batch.details["program"].endswith("program with spaces.sas")
+
+
 def test_context_variables_from_let(tmp_path):
     store, pid = project(tmp_path)
     generate_plans(store, pid)
@@ -105,7 +130,9 @@ def test_exports(tmp_path):
     files = write_exports(ps, out_dir)
     names = {f.name for f in files}
     assert {"index.md", "steps.csv", "p0_resumen_sql.md", "p0_resumen_sql.json"} <= names
-    exported_md = (out_dir / "p0_resumen_sql.md").read_text()
+    index = (tmp_path / "out/index.md").read_text(encoding="utf-8")
+    assert "scheduler.lsf" in index and "Documentacion oficial Talend" in index
+    exported_md = (out_dir / "p0_resumen_sql.md").read_text(encoding="utf-8")
     icons = re.findall(r"!\[Icono Talend\]\(assets/talend-icons/([^)]+)\)", exported_md)
     assert icons and all((out_dir / "assets" / "talend-icons" / icon).is_file() for icon in icons)
     assert (out_dir / "assets" / "talend-icons" / "LICENSE").is_file()
@@ -125,6 +152,8 @@ def test_api_plans(tmp_path, monkeypatch):
     c.post(f"/api/projects/{pid}/imports", json={"path": str(FIXTURES)})
     assert c.get(f"/api/projects/{pid}/plans").status_code == 409
     assert c.post(f"/api/projects/{pid}/plans").status_code == 201
+    grid = c.get(f"/api/projects/{pid}/plans/grid-recommendations")
+    assert grid.status_code == 200 and any(x["pattern_id"] == "sasgsub.submit" for x in grid.json())
     rows = c.get(f"/api/projects/{pid}/plans").json()
     assert any(r["program"] == "p0_clientes_activos.sas" for r in rows)
     plan = c.get(f"/api/projects/{pid}/plans/p0_clientes_activos.sas").json()

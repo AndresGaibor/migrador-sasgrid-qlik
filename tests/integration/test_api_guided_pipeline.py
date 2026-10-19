@@ -54,11 +54,18 @@ def test_uploaded_grid_zip_produces_persistent_exportable_guide(tmp_path, monkey
     body = plan.json()
     assert body["orchestration"]["grid_tasks"] == [task["id"]]
     assert body["steps"]
+    assert any(x["pattern_id"] == "sasgsub.submit" for x in body["orchestration"]["grid_recommendations"])
     assert body["steps"][0]["evidence"] == {
         "file": "sas/daily.sas",
         "line": 1,
         "end_line": 3,
     }
+    source = client.get(f"/api/projects/{project_id}/source/sas/daily.sas?line=2")
+    assert source.status_code == 200 and "2 | set source.daily;" in source.text
+    assert client.get(f"/api/projects/{project_id}/source/../sgm.sqlite?line=1").status_code == 404
+    recommendations = client.get(f"/api/projects/{project_id}/plans/grid-recommendations")
+    assert recommendations.status_code == 200
+    assert any(item["pattern_id"] == "sasgsub.submit" for item in recommendations.json())
 
     step_id = body["steps"][0]["id"]
     updated = client.patch(
@@ -73,6 +80,9 @@ def test_uploaded_grid_zip_produces_persistent_exportable_guide(tmp_path, monkey
     exported = client.post(f"/api/projects/{project_id}/exports")
     assert exported.status_code == 201, exported.text
     assert {"index.md", "steps.csv"} <= set(exported.json()["files"])
+    download = client.get(f"/api/projects/{project_id}/exports/steps.csv")
+    assert download.status_code == 200 and download.text.startswith("job,programa,paso_id")
+    assert client.get(f"/api/projects/{project_id}/exports/../plans.json").status_code == 404
     export_dir = tmp_path / "data" / "projects" / project_id / "exports"
     plan_json = next(export_dir.glob("*.json"))
     exported_plan = json.loads(plan_json.read_text())

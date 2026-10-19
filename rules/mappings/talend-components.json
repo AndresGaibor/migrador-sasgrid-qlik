@@ -537,6 +537,89 @@
       "tests": []
     }
   },
+  "grid": {
+    "sasgsub.submit": {
+      "component": "tRunJob",
+      "properties": [],
+      "required": ["Implement and validate the child Job before invocation", "Confirm job context parameters"],
+      "status": "partial",
+      "instruction": "Crea un Job hijo para el programa SAS identificado y configura su invocación solo después de validar entradas y parámetros.",
+      "reason": "The planner emits this candidate, but the fixture syntax is illustrative and no SAS Grid version has been confirmed."
+    },
+    "sasgsub.job_options": {
+      "component": null,
+      "properties": [],
+      "required": ["Confirm target scheduler and execution settings"],
+      "status": "partial",
+      "instruction": "Confirma con el equipo de operación cómo trasladar cola, nombre y espera al orquestador objetivo.",
+      "reason": "Queue and Grid job name have no verified Talend component property mapping."
+    },
+    "sasgsub.unverified_options": {
+      "component": null,
+      "properties": [],
+      "required": ["Confirm option syntax and semantics before defining a mapping"],
+      "status": "unsupported",
+      "instruction": "No traslades estas opciones; valida su significado con la versión de SAS Grid y decide el diseño manualmente.",
+      "reason": "These option spellings are not interpreted by the current analyzer."
+    },
+    "sasgsub.missing_option_value": {
+      "component": null,
+      "properties": [],
+      "required": ["Recover the missing value from the authoritative job definition"],
+      "status": "unsupported",
+      "instruction": "Deten esta recomendacion y recupera el valor faltante antes de disenar la orquestacion.",
+      "reason": "A required option value is absent; do not infer it."
+    },
+    "sasgsub.set_parameters": {
+      "component": "tRunJob",
+      "properties": [],
+      "required": ["Define and validate matching child Job context parameters"],
+      "status": "partial",
+      "instruction": "Define variables de contexto en el Job hijo y copia únicamente los valores resueltos y confirmados.",
+      "reason": "The planner preserves parsed values as evidence, but shell expansion and values with spaces are not resolved."
+    },
+    "sas_batch.sysin": {
+      "component": "tRunJob",
+      "properties": [],
+      "required": ["Implement and validate the child Job", "Confirm SAS batch options"],
+      "status": "partial",
+      "instruction": "Implementa el programa como Job Talend y confirma primero qué opciones batch conservan su significado.",
+      "reason": "The planner emits a child-Job candidate, but the batch environment and option semantics are unconfirmed."
+    },
+    "sas_macro_step.include_dispatch": {
+      "component": "tRunJob",
+      "properties": [],
+      "required": ["Review macro dispatch semantics", "Confirm child Job and context parameters"],
+      "status": "partial",
+      "instruction": "Crea un Job hijo para cada programa resuelto y confirma sus parámetros antes de conectar la secuencia.",
+      "reason": "The analyzer resolves tested macro dispatches, but macro defaults and failure behavior require review."
+    },
+    "shell.inferred_sequence": {
+      "component": null,
+      "connection": "SUBJOB_OK",
+      "properties": [],
+      "required": ["Review inferred order and all source failure branches"],
+      "status": "partial",
+      "instruction": "Revisa ramas y condiciones del script; conecta Jobs solo cuando el orden inferido esté confirmado.",
+      "reason": "The planner preserves the inferred dependency, but untested shell control flow can change execution order."
+    },
+    "scheduler.control_m": {
+      "component": null,
+      "properties": [],
+      "required": ["Recreate the authoritative schedule in the chosen scheduler"],
+      "status": "partial",
+      "instruction": "Obtén la definición real de Control-M y recrea calendario y dependencias en el planificador elegido.",
+      "reason": "Only a comment is captured; Control-M calendars, dependencies, and job definitions are not parsed."
+    },
+    "scheduler.lsf": {
+      "component": null,
+      "properties": [],
+      "required": ["Provide representative LSF scripts and confirm target scheduler"],
+      "status": "unsupported",
+      "instruction": "Revisa manualmente el comando LSF y documenta un diseño de orquestación antes de migrarlo.",
+      "reason": "Commands are detected, but LSF options and execution semantics are not parsed."
+    }
+  },
   "editor_properties": {
     "tMap": [
       "Join model",

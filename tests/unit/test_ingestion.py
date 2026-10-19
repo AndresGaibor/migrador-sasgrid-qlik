@@ -38,7 +38,10 @@ def test_folder_import_hashes_and_skips(tmp_path):
     (src / ".git" / "config").write_text("x")
     (src / "a.sas").write_bytes("data x; run; /* ñ */".encode("cp1252"))
     (src / "big.sas").write_bytes(b"x" * 50)
-    (src / "link.sas").symlink_to(src / "a.sas")
+    try:
+        (src / "link.sas").symlink_to(src / "a.sas")
+    except OSError as exc:
+        pytest.skip(f"Windows no permite crear symlinks en este entorno: {exc}")
     files, skipped = import_source(src, tmp_path / "dest", cfg(tmp_path, max_file_bytes=40))
     by = {f.path: f for f in files}
     assert set(by) == {"a.sas"}

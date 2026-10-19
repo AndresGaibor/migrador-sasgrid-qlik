@@ -1,8 +1,8 @@
 # Job `job_p1_macro_parametrizada`
 
-- **Programa SAS:** `p1_macro_parametrizada.sas` (sha256 `527e5bc7c423`)
+- **Programa SAS:** `p1_macro_parametrizada.sas` (sha256 `2b04d3a17bfa`)
 - **Estado:** needs_review · **Pasos:** 5 · **Reglas:** v1
-- **Aviso:** los nombres de componente y propiedad provienen del catálogo oficial de Talend; solo los marcados «verificado» se contrastaron con un Job real vía talend-mcp.
+- **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Pasos
 

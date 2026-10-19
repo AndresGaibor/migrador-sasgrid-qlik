@@ -31,6 +31,23 @@ export type GridTask = {
   queue: string | null;
   waits: boolean;
   after: string[];
+  unknown_options: string[];
+  incomplete_options: string[];
+};
+export type GridRecommendation = {
+  id: string;
+  pattern_id: string;
+  catalog_version: string;
+  status: "supported" | "partial" | "unsupported";
+  instruction: string;
+  reason: string;
+  component_candidate: string | null;
+  doc_url: string | null;
+  required: string[];
+  dependencies: string[];
+  target_program: string | null;
+  evidence: { file: string; line: number; end_line: number };
+  details: Record<string, unknown>;
 };
 export type Deps = {
   datasets: DatasetInfo[];
@@ -38,7 +55,7 @@ export type Deps = {
   processing_order: string[][];
   cycles: string[][];
   unresolved: { kind: string; name: string; file: string; line: number; detail: string }[];
-  orchestration: { tasks: GridTask[]; schedules: { file: string; text: string }[]; order: string[] };
+  orchestration: { tasks: GridTask[]; schedules: { file: string; line: number; text: string }[]; order: string[] };
 };
 export type PlanRow = { program: string; job_name: string; job_status: string; steps: number; pending: number; done: number };
 export const STATUSES = ["propuesto", "pendiente", "verificado", "validado_manualmente", "descartado"] as const;
@@ -74,6 +91,7 @@ export type JobPlan = {
   validation_cases: { id: string; kind: string; description: string }[];
   context_variables: { name: string; suggested: string; sas_value: string | null }[];
   libraries_needed: { sas_name: string; engine: string | null; path: string | null; suggested_connection: string }[];
+  orchestration: { grid_tasks: string[]; grid_recommendations: GridRecommendation[]; schedules: string[]; upstream: string[]; downstream: string[] };
   unresolved: string[];
 };
 export type CatalogItem = { name: string; description: string; families: string[]; parameters: number };

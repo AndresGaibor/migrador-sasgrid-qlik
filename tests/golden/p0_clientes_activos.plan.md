@@ -1,8 +1,8 @@
 # Job `job_p0_clientes_activos`
 
-- **Programa SAS:** `p0_clientes_activos.sas` (sha256 `2ba7aecba508`)
+- **Programa SAS:** `p0_clientes_activos.sas` (sha256 `21ee224bdf60`)
 - **Estado:** needs_review · **Pasos:** 11 · **Reglas:** v1
-- **Aviso:** los nombres de componente y propiedad provienen del catálogo oficial de Talend; solo los marcados «verificado» se contrastaron con un Job real vía talend-mcp.
+- **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Conexiones a crear
 

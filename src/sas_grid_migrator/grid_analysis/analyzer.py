@@ -8,7 +8,6 @@ orquestación, nunca una conexión de filas entre componentes. Las dependencias 
 import re
 import shlex
 from collections.abc import Callable
-from itertools import pairwise
 
 from pydantic import BaseModel
 
@@ -36,6 +35,8 @@ class GridTask(BaseModel):
     waits: bool = False
     params: dict[str, str] = {}
     condition: str | None = None
+    unknown_options: list[str] = []
+    incomplete_options: list[str] = []
     after: list[str] = []  # ids de tareas de las que depende
     inferred: bool = True
     notes: list[str] = []
@@ -43,6 +44,7 @@ class GridTask(BaseModel):
 
 class Schedule(BaseModel):
     file: str
+    line: int
     text: str
 
 
@@ -87,6 +89,19 @@ def shell_tasks(file: str, text: str, files: "list[str] | PathIndex") -> list[Gr
         if em and not re.search(r"\bsas(gsub)?\b", em.group(2)):
             env[em.group(1)] = em.group(2).strip("'\"")
             continue
+        external = re.search(r"\b(bsub|bjobs)\b", stmt)
+        if external:
+            tasks.append(
+                GridTask(
+                    id=f"{file}#{len(tasks) + 1}",
+                    kind="unsupported_scheduler",
+                    source_file=file,
+                    line=line,
+                    match_status="unsupported",
+                    notes=[f"LSF command {external.group(1)} is not interpreted"],
+                )
+            )
+            continue
         m = re.search(r"\b(sasgsub|sas)\b(?=\s)", stmt)
         if not m or not re.search(r"\.sas\b", stmt, re.IGNORECASE):
             continue
@@ -99,6 +114,8 @@ def shell_tasks(file: str, text: str, files: "list[str] | PathIndex") -> list[Gr
             cond = "previous_success" if re.search(r'"\$\?"\s*-eq\s*0', cond) else cond
         toks = _tokens(stmt[m.start() :])
         opts: dict[str, str] = {}
+        unknown: list[str] = []
+        incomplete: list[str] = []
         prog = None
         params = dict(env)
         i = 1
@@ -122,6 +139,27 @@ def shell_tasks(file: str, text: str, files: "list[str] | PathIndex") -> list[Gr
                 opts[low] = "1"
             elif _PROGRAM.search(t) and prog is None:
                 prog = t
+            elif low.startswith("-") and low not in {
+                "-gridsubmitpgm",
+                "-sysin",
+                "-gridjobname",
+                "-gridqueue",
+                "-sysparm",
+                "-set",
+                "-gridsasoptions",
+                "-gridwaitresults",
+            }:
+                unknown.append(t)
+            elif low in {
+                "-gridsubmitpgm",
+                "-sysin",
+                "-gridjobname",
+                "-gridqueue",
+                "-sysparm",
+                "-set",
+                "-gridsasoptions",
+            }:
+                incomplete.append(t)
             i += 1
         if "-sysparm" in opts:
             params["sysparm"] = opts["-sysparm"]
@@ -141,11 +179,18 @@ def shell_tasks(file: str, text: str, files: "list[str] | PathIndex") -> list[Gr
                 waits=kind == "sas_batch" or "-gridwaitresults" in opts,
                 params=params,
                 condition=cond,
+                unknown_options=unknown,
+                incomplete_options=incomplete,
             )
         )
-    for prev, cur in pairwise(tasks):
-        if prev.waits or cur.condition:
+    prev = None
+    for cur in tasks:
+        if cur.kind == "unsupported_scheduler":
+            prev = None
+            continue
+        if prev and (prev.waits or cur.condition):
             cur.after = [prev.id]
+        prev = cur
     return tasks
 
 
@@ -231,7 +276,8 @@ def analyze_grid(
     for f in [p.file for p in programs] + shell_files:
         m = _SCHEDULE.search(read(f)[:3000])
         if m:
-            schedules.append(Schedule(file=f, text=m.group(1).strip()))
+            line = read(f)[:3000][: m.start()].count("\n") + 1
+            schedules.append(Schedule(file=f, line=line, text=m.group(1).strip()))
     order = _topological(tasks)
     return Orchestration(tasks=tasks, schedules=schedules, order=order)
 

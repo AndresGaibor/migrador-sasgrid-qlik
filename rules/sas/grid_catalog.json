@@ -1,0 +1,134 @@
+{
+  "version": "1",
+  "scope": "Only patterns exercised by tests/fixtures/sas/grid and real project fixtures; this is not a complete SAS Grid or scheduler catalog.",
+  "change_policy": "Add a new pattern id when command semantics or supported forms change; do not broaden an existing form without adding a fixture and parser test.",
+  "counts": {"unit": "catalog entries by status", "supported": 0, "partial": 7, "unsupported": 3},
+  "system": {"name": "SAS Grid / external schedulers", "version": null},
+  "status_definitions": {
+    "supported": "Fixture syntax is confirmed for a named source version, parser output is tested, and the generated recommendation is checked end to end. No current entry meets this bar.",
+    "partial": "The pattern is parsed and a conservative recommendation is generated, but syntax/version or downstream equivalence is not confirmed.",
+    "unsupported": "The occurrence is identified, but its semantics and safe Talend equivalent are unknown; preserve evidence and require manual review."
+  },
+  "patterns": [
+    {
+      "id": "sasgsub.submit",
+      "command": "sasgsub",
+      "forms": ["sasgsub -gridsubmitpgm <program.sas>", "sasgsub <options> -gridsubmitpgm <program.sas>"],
+      "description": "Submit one SAS program to SAS Grid.",
+      "parsed_fields": ["program", "resolved_program", "match_status", "line"],
+      "fixture": {"path": "tests/fixtures/sas/grid/ejecutar_lote.sh", "lines": [5, 6, 7]},
+      "status": "partial",
+      "limitations": ["Fixture labels sasgsub option names illustrative; verify syntax against the target SAS Grid version."],
+      "talend_pattern": "Represent each migrated SAS program as a child Job; invoke and pass context only after its implementation is confirmed.",
+      "prerequisites": ["Identify the SAS program and its inputs/outputs.", "Define the Talend child Job and its context values."]
+    },
+    {
+      "id": "sasgsub.job_options",
+      "command": "sasgsub options",
+      "forms": ["-gridjobname <name>", "-gridqueue <queue>", "-gridwaitresults"],
+      "description": "Parse job name, queue, and wait-for-results flag from a sasgsub command.",
+      "parsed_fields": ["job_name", "queue", "waits"],
+      "fixture": {"path": "tests/fixtures/sas/grid/ejecutar_lote.sh", "lines": [5, 6, 7]},
+      "status": "partial",
+      "limitations": ["Option spellings in this fixture are illustrative and are not confirmed for any SAS Grid release.", "No Talend property is inferred for queue or Grid job name."],
+      "talend_pattern": "Preserve ordering explicitly between child Jobs; recreate queue and scheduler settings in the target orchestration platform after confirmation.",
+      "prerequisites": ["Confirm the target scheduler and required execution order."]
+    },
+    {
+      "id": "sasgsub.unverified_options",
+      "command": "sasgsub options",
+      "forms": ["-grid <grid>", "-queue <queue>", "-name <name>", "-wait"],
+      "description": "Options present in the coverage fixture but not interpreted by the current analyzer.",
+      "parsed_fields": [],
+      "fixture": {"path": "tests/fixtures/sas/grid/coverage_variants.sh", "lines": [4]},
+      "status": "unsupported",
+      "limitations": ["The analyzer does not parse these spellings or assign them semantics; values remain unclaimed."],
+      "talend_pattern": null,
+      "prerequisites": ["Confirm option syntax against the target SAS Grid release and add parser behavior before mapping."]
+    },
+    {
+      "id": "sasgsub.missing_option_value",
+      "command": "sasgsub options",
+      "forms": ["Recognized option without a required following value"],
+      "description": "Report a known option whose required value is absent.",
+      "parsed_fields": ["incomplete_options"],
+      "fixture": {"path": "tests/fixtures/sas/grid/coverage_variants.sh", "lines": [7]},
+      "status": "unsupported",
+      "limitations": ["An incomplete value cannot be inferred safely; the analyzer leaves it empty."],
+      "talend_pattern": null,
+      "prerequisites": ["Provide the missing value and confirm it against the original job definition."]
+    },
+    {
+      "id": "sasgsub.set_parameters",
+      "command": "sasgsub parameter options",
+      "forms": ["-set <name> <value>", "-gridsasoptions \"-set <name> <value>\""],
+      "description": "Capture literal parameter values set on the submitted SAS invocation.",
+      "parsed_fields": ["params"],
+      "fixture": {"path": "tests/fixtures/sas/grid/ejecutar_lote.sh", "lines": [5]},
+      "status": "partial",
+      "limitations": ["The fixture uses illustrative options; shell expansion and values containing spaces are not fully modeled.", "Values are not wired into generated Talend plans."],
+      "talend_pattern": "Pass confirmed values as child Job context parameters; never infer unresolved shell or SAS macro values.",
+      "prerequisites": ["Resolve each value at runtime and define matching child Job context parameters."]
+    },
+    {
+      "id": "sas_batch.sysin",
+      "command": "sas",
+      "forms": ["sas -sysin <program.sas>", "sas <program.sas>"],
+      "description": "Recognize a batch SAS invocation and its input program.",
+      "parsed_fields": ["program", "resolved_program", "match_status", "line", "params"],
+      "fixture": {"path": "tests/fixtures/sas/grid/coverage_variants.sh", "lines": [3]},
+      "status": "partial",
+      "limitations": ["The fixture is synthetic and does not establish support for a specific SAS batch environment.", "The migration planner does not consume GridTask records."],
+      "talend_pattern": "Implement the program as a Talend Job and pass confirmed parameters through context.",
+      "prerequisites": ["Confirm SAS runtime options, program dependencies, and parameter semantics."]
+    },
+    {
+      "id": "sas_macro_step.include_dispatch",
+      "command": "SAS macro step dispatch",
+      "forms": ["Macro call that resolves a program argument and includes it dynamically"],
+      "description": "Resolve macro-dispatched SAS programs into ordered child-job candidates.",
+      "parsed_fields": ["program", "resolved_program", "params", "after"],
+      "fixture": {"path": "tests/fixtures/sas/real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas", "lines": [121, 124, 127, 130]},
+      "status": "partial",
+      "limitations": ["Only macros whose included program argument is statically resolvable are expanded.", "The fixture does not prove all macro dispatch semantics are preserved."],
+      "talend_pattern": "Implement each resolved program as a child Job and pass only confirmed macro parameters as context.",
+      "prerequisites": ["Review macro body, default parameters, dynamic values, and failure handling."]
+    },
+    {
+      "id": "shell.inferred_sequence",
+      "command": "shell command sequence",
+      "forms": ["sequential sasgsub commands", "command guarded by previous-success condition"],
+      "description": "Infer an execution dependency from adjacent recognized commands and a success condition.",
+      "parsed_fields": ["after", "condition", "inferred", "order"],
+      "fixture": {"path": "tests/fixtures/sas/grid/ejecutar_lote.sh", "lines": [5, 6, 7]},
+      "status": "partial",
+      "limitations": ["Order is inferred from script order; shell control flow beyond the tested success condition is not modeled.", "Inferred dependencies are not emitted in migration plans."],
+      "talend_pattern": "Connect confirmed child Jobs with an OnSubjobOk dependency after validating the source control flow.",
+      "prerequisites": ["Review all branches, retries, failure handling, and external scheduler dependencies."]
+    },
+    {
+      "id": "scheduler.control_m",
+      "command": "Control-M schedule header",
+      "forms": ["Schedule: <free text containing Control-M>"],
+      "description": "Capture schedule text from SAS or shell file comments; does not parse a Control-M definition.",
+      "parsed_fields": ["schedule.text", "schedule.file"],
+      "fixture": {"path": "tests/fixtures/sas/real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas", "lines": [6]},
+      "status": "partial",
+      "limitations": ["Only a comment header is read; calendar, dependencies, resources, and Control-M job definitions are not parsed.", "No Talend scheduling recommendation is generated."],
+      "talend_pattern": "Recreate and validate the schedule in the organization's chosen scheduler.",
+      "prerequisites": ["Obtain the authoritative scheduler definition and confirm calendars and dependencies."]
+    },
+    {
+      "id": "scheduler.lsf",
+      "command": "LSF",
+      "forms": ["bsub", "bjobs"],
+      "description": "Identify LSF submission/status commands without interpreting their semantics.",
+      "parsed_fields": [],
+      "fixture": {"path": "tests/fixtures/sas/grid/coverage_variants.sh", "lines": [5, 6]},
+      "status": "unsupported",
+      "limitations": ["Commands are detected only; queue, job state, dependencies, and exit semantics are not parsed."],
+      "talend_pattern": null,
+      "prerequisites": ["Supply representative scripts and the target LSF version before defining support."]
+    }
+  ]
+}

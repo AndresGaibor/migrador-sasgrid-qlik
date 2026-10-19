@@ -152,6 +152,111 @@
       "title": "Expression",
       "type": "object"
     },
+    "GridRecommendation": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "pattern_id": {
+          "title": "Pattern Id",
+          "type": "string"
+        },
+        "catalog_version": {
+          "title": "Catalog Version",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "supported",
+            "partial",
+            "unsupported"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "instruction": {
+          "title": "Instruction",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "component_candidate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Component Candidate"
+        },
+        "doc_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doc Url"
+        },
+        "required": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Required",
+          "type": "array"
+        },
+        "dependencies": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependencies",
+          "type": "array"
+        },
+        "target_program": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Program"
+        },
+        "evidence": {
+          "$ref": "#/$defs/Loc"
+        },
+        "details": {
+          "additionalProperties": true,
+          "default": {},
+          "title": "Details",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "pattern_id",
+        "catalog_version",
+        "status",
+        "instruction",
+        "reason",
+        "evidence"
+      ],
+      "title": "GridRecommendation",
+      "type": "object"
+    },
     "LibraryNeeded": {
       "properties": {
         "sas_name": {
@@ -230,6 +335,14 @@
             "type": "string"
           },
           "title": "Grid Tasks",
+          "type": "array"
+        },
+        "grid_recommendations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/GridRecommendation"
+          },
+          "title": "Grid Recommendations",
           "type": "array"
         },
         "schedules": {
@@ -723,6 +836,7 @@
       "$ref": "#/$defs/Orchestration",
       "default": {
         "grid_tasks": [],
+        "grid_recommendations": [],
         "schedules": [],
         "upstream": [],
         "downstream": []

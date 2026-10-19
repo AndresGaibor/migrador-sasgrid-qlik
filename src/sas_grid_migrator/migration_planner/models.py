@@ -100,8 +100,25 @@ class ChildJob(BaseModel):
     steps: list[PlanStep]
 
 
+class GridRecommendation(BaseModel):
+    id: str
+    pattern_id: str
+    catalog_version: str
+    status: Literal["supported", "partial", "unsupported"]
+    instruction: str
+    reason: str
+    component_candidate: str | None = None
+    doc_url: str | None = None
+    required: list[str] = []
+    dependencies: list[str] = []
+    target_program: str | None = None
+    evidence: Loc
+    details: dict[str, object] = {}
+
+
 class Orchestration(BaseModel):
     grid_tasks: list[str] = []
+    grid_recommendations: list[GridRecommendation] = []
     schedules: list[str] = []
     upstream: list[str] = []  # programas de los que depende por datos
     downstream: list[str] = []
@@ -129,3 +146,4 @@ class PlanSet(BaseModel):
     project_id: str
     rules_version: str
     plans: list[JobPlan]
+    grid_recommendations: list[GridRecommendation] = []

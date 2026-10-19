@@ -1,8 +1,8 @@
 # Job `job_p2_codigo_dinamico`
 
-- **Programa SAS:** `p2_codigo_dinamico.sas` (sha256 `2f491b9a85c4`)
+- **Programa SAS:** `p2_codigo_dinamico.sas` (sha256 `d7a2b64f8e9e`)
 - **Estado:** needs_review · **Pasos:** 6 · **Reglas:** v1
-- **Aviso:** los nombres de componente y propiedad provienen del catálogo oficial de Talend; solo los marcados «verificado» se contrastaron con un Job real vía talend-mcp.
+- **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Variables de contexto
 

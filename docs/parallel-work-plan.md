@@ -19,17 +19,17 @@ Para declarar este objetivo cumplido, el producto debe ofrecer:
 
 ### Avance verificado en el repositorio
 
-- **SAS Grid:** existe análisis parcial en `src/sas_grid_migrator/grid_analysis/analyzer.py` y fixtures en `tests/fixtures/sas/grid/`, pero no existe aún `rules/sas/grid_catalog.json`. El análisis actual no demuestra cobertura completa ni trazabilidad versionada de los patrones soportados.
+- **SAS Grid:** existe `rules/sas/grid_catalog.json` v1 con 10 entradas: 0 `supported`, 7 `partial`, 3 `unsupported`. El planner consume catálogo y mappings, con motivo y evidencia por ocurrencia. Las formas `sasgsub` son ilustrativas y no están confirmadas contra una versión real de SAS Grid; no elevar a `supported`.
 - **Talend:** `rules/talend/components.json` separa ahora el inventario oficial Qlik R2026-01 (693 componentes) de 577 esquemas estructurados derivados de Talaxie/Talend Open Studio. Hay 398 nombres en común, 295 componentes oficiales sin esquema abierto y 179 esquemas fuera de ese inventario. El inventario oficial se muestra por separado en la web; no se debe llamar oficial a los parámetros derivados de Talaxie. La documentación local enlaza fuentes oficiales, pero aún falta trazabilidad/verificación por componente y versión para todo componente recomendado.
-- **Backend (Andres):** se admite ZIP de proyecto y archivo `.sas` individual. `tests/integration/test_api_guided_pipeline.py` verifica con un fixture el flujo API de carga, análisis, generación/lectura de plan, cambio de estado y exportación. Esto cubre un recorrido básico, no todos los errores, límites de seguridad ni el consumo de un catálogo versionado de Grid.
-- **Web/catálogo (Byron):** la vista distingue el inventario oficial del esquema comunitario y los planes incluyen iconos Talend con sus avisos/licencia. `bun test` y `bun run build` pasan; no se ha demostrado un E2E de navegador para carga → guía → progreso → recarga → exportación.
-- **Verificación del estado actual:** `uv run pytest -q` (83 passed), `uv run ruff check .`, `cd apps/web && bun test` (2 passed) y `cd apps/web && bun run build` pasan. La prueba API vuelve a leer el estado actualizado, pero no verifica persistencia tras reiniciar el servicio. No se ha hecho validación en Talend Studio.
+- **Backend (Andres):** se admite ZIP de proyecto y archivo `.sas` individual. La integración cubre ZIP multiarchivo, análisis, planes, recomendaciones Grid, evidencia, actualización del progreso y exportación. El progreso se guarda en la base del proyecto.
+- **Web/catálogo (Byron):** la UI conecta el contrato API, muestra evidencia navegable, recomendaciones Grid, catálogo Talend y enlaces de exportación. `bun test` y `bun run build` pasan. El runner Playwright cubre el flujo requerido, pero no se pudo ejecutar porque Playwright no está instalado en este entorno.
+- **Verificación del estado actual:** `pytest -q` (87 passed, 1 skipped), `ruff check .`, `cd apps/web && bun test` (2 passed) y `cd apps/web && bun run build` pasan. El test omitido requiere privilegio de symlink que Windows no concede aquí. No se ha hecho validación en Talend Studio.
 
 ### Estado por frente (no declarar 100% todavía)
 
-- **Joseph:** pendiente entregar la matriz versionada de SAS Grid, con fuentes, variantes, límites, mappings y pruebas por patrón.
-- **Andres:** completado el esqueleto de ingesta y el happy path de la API. Pendiente especificar/reprobar el contrato completo de entrada, consumir y validar la matriz de Joseph, cubrir fallos/seguridad y determinismo, y comprobar persistencia del progreso tras reinicio según la política acordada.
-- **Byron:** completados el inventario oficial Qlik separado de los esquemas comunitarios y la presentación de catálogo/iconos. Pendiente verificación oficial por componente requerido, prueba E2E de navegador y validación Studio cuando esté disponible.
+- **Joseph:** matriz versionada, mappings y resultados verificables por entrada integrados. La sintaxis de ejemplos `sasgsub` sigue sin fuente de versión y todas esas entradas continúan parciales.
+- **Andres:** integrado el catálogo al planner y validado ZIP → guía exportada por API. Siguen pendientes cobertura ampliada de errores/seguridad y pruebas tras reinicio del servicio.
+- **Byron:** UI y catálogo conectados al API, con evidencia, progreso y exportaciones. Pendiente ejecutar el E2E con Playwright instalado y verificar componentes en Studio cuando esté disponible.
 
 Estos avances describen solo lo que está comprobado en el repositorio; no equivalen a terminar el producto. Las brechas restantes y la definición de “100%” se mantienen en los criterios que siguen.
 

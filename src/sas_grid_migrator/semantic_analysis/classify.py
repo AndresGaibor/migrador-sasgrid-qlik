@@ -32,7 +32,7 @@ def default_rules_path() -> Path:
 
 
 def load_rules(path: Path | None = None) -> Rules:
-    return Rules.model_validate_json((path or default_rules_path()).read_text())
+    return Rules.model_validate_json((path or default_rules_path()).read_text(encoding="utf-8"))
 
 
 def _tags(nodes: list[Node]):

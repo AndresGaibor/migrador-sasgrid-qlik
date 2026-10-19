@@ -105,6 +105,7 @@ function Body({ c }: { c: CatalogComponent }) {
     <>
       <h1 className="component-heading"><ComponentIcon name={c.name} /> {c.name}</h1>
       <p>{c.description}</p>
+      <p className="muted">Los esquemas y parametros son candidatos derivados de la comunidad. El enlace oficial no significa que el componente o sus propiedades se hayan probado en Studio.</p>
       <p className="muted">
         Familias: {c.families.join(", ")} · versión {c.version} · {c.status}
         {c.doc_url && <> · <a href={c.doc_url} target="_blank" rel="noreferrer">documentación oficial</a></>}

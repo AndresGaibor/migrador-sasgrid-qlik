@@ -350,10 +350,10 @@ def build_dependencies(store: Store, project_id: str) -> DependencyReport:
         return redact(text, path)
 
     report = build_report(analysis, all_files, shell, read)
-    store.dependencies_path(project_id).write_text(report.model_dump_json())
+    store.dependencies_path(project_id).write_text(report.model_dump_json(), encoding="utf-8")
     return report
 
 
 def load_dependencies(store: Store, project_id: str) -> DependencyReport | None:
     p = store.dependencies_path(project_id)
-    return DependencyReport.model_validate(json.loads(p.read_text())) if p.exists() else None
+    return DependencyReport.model_validate(json.loads(p.read_text(encoding="utf-8"))) if p.exists() else None

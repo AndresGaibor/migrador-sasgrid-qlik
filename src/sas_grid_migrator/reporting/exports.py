@@ -2,6 +2,7 @@
 
 import csv
 import io
+import json
 import re
 import shutil
 from pathlib import Path
@@ -102,6 +103,28 @@ def _step_md(s: PlanStep, icon_base: str = "/talend-icons") -> list[str]:
     return out
 
 
+def _grid_recommendation_md(item) -> list[str]:
+    out = [
+        f"### `{item.pattern_id}` ({item.status})",
+        "",
+        f"- **Accion:** {item.instruction}",
+        f"- **Motivo/limite:** {item.reason}",
+        f"- **Evidencia:** `{item.evidence.file}:{item.evidence.line}` | catalogo Grid v{item.catalog_version}",
+    ]
+    if item.component_candidate:
+        out.append(f"- **Componente candidato:** `{item.component_candidate}`")
+    if item.doc_url:
+        out.append(f"- **Documentacion oficial Talend:** {item.doc_url}")
+    if item.dependencies:
+        out.append("- **Depende de:** " + ", ".join(f"`{x}`" for x in item.dependencies))
+    if item.required:
+        out.append("- **Confirmar:** " + "; ".join(item.required))
+    if item.details:
+        out += ["- **Datos interpretados:**", "", "```json", json.dumps(item.details, ensure_ascii=False, indent=2), "```"]
+    out.append("")
+    return out
+
+
 def render_plan_md(plan: JobPlan, icon_base: str = "/talend-icons") -> str:
     n_steps = len(plan.steps) + sum(len(c.steps) for c in plan.children)
     out = [
@@ -110,7 +133,7 @@ def render_plan_md(plan: JobPlan, icon_base: str = "/talend-icons") -> str:
         f"- **Programa SAS:** `{plan.program}`"
         + (f" (sha256 `{plan.sha256[:12]}`)" if plan.sha256 else ""),
         f"- **Estado:** {plan.job_status} · **Pasos:** {n_steps} · **Reglas:** v{plan.rules_version}",
-        "- **Aviso:** los nombres de componente y propiedad provienen del catálogo oficial de Talend; solo los marcados «verificado» se contrastaron con un Job real vía talend-mcp.",
+        "- **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.",
         "",
     ]
     if plan.orchestration.schedules or plan.orchestration.upstream or plan.orchestration.grid_tasks:
@@ -125,6 +148,10 @@ def render_plan_md(plan: JobPlan, icon_base: str = "/talend-icons") -> str:
         if o.grid_tasks:
             out.append("- Tareas Grid: " + ", ".join(f"`{t}`" for t in o.grid_tasks))
         out.append("")
+        if o.grid_recommendations:
+            out += ["### Recomendaciones Grid", ""]
+            for item in o.grid_recommendations:
+                out += _grid_recommendation_md(item)
     if plan.context_variables:
         out += ["## Variables de contexto", ""]
         out += [
@@ -158,7 +185,7 @@ def render_plan_md(plan: JobPlan, icon_base: str = "/talend-icons") -> str:
         out += [f"- `{v.id}` ({v.kind}): {v.description}" for v in plan.validation_cases]
         out.append("")
     if CHECKLIST.exists():
-        out += [CHECKLIST.read_text().strip(), ""]
+        out += [CHECKLIST.read_text(encoding="utf-8").strip(), ""]
     return "\n".join(out)
 
 
@@ -191,6 +218,10 @@ def render_index_md(ps: PlanSet, deps: DependencyReport | None = None) -> str:
         out.append(
             f"| `{p.job_name}` | `{p.program}` | {p.job_status} | {len(steps)} | {sum(1 for s in steps if s.pending)} |"
         )
+    if ps.grid_recommendations:
+        out += ["", "## Recomendaciones Grid del proyecto", ""]
+        for item in ps.grid_recommendations:
+            out += _grid_recommendation_md(item)
     return "\n".join(out) + "\n"
 
 
@@ -250,10 +281,10 @@ def write_exports(ps: PlanSet, out_dir: Path, deps: DependencyReport | None = No
     written = []
     for p in ps.plans:
         base = out_dir / safe_name(p.program)
-        (base.with_suffix(".md")).write_text(render_plan_md(p, "assets/talend-icons"))
-        (base.with_suffix(".json")).write_text(p.model_dump_json(indent=2))
+        (base.with_suffix(".md")).write_text(render_plan_md(p, "assets/talend-icons"), encoding="utf-8")
+        (base.with_suffix(".json")).write_text(p.model_dump_json(indent=2), encoding="utf-8")
         written += [base.with_suffix(".md"), base.with_suffix(".json")]
     for name, content in (("index.md", render_index_md(ps, deps)), ("steps.csv", steps_csv(ps))):
-        (out_dir / name).write_text(content)
+        (out_dir / name).write_text(content, encoding="utf-8")
         written.append(out_dir / name)
     return written
