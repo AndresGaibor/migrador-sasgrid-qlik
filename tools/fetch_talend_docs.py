@@ -6,9 +6,10 @@
 
 Por componente del catálogo: página resumen + páginas «Standard properties» (se omiten Spark/MapReduce/Storm
 y escenarios). Reanudable (salta lo ya descargado). Salida: docs/reference/talend/<componente>.md
-(gitignorada: el contenido es de Qlik, solo para consulta local) e index.json con el estado de cada uno.
+(gitignorada: el contenido es de Qlik, solo para consulta local) e index.json con el estado de cada uno. Sigue
+redirecciones oficiales y permite actualizar el caché con `--refresh`.
 
-Uso: uv run tools/fetch_talend_docs.py [--workers 4] [--version 8.0] [--only tFilterRow,tMap]
+Uso: uv run tools/fetch_talend_docs.py [--workers 4] [--version 8.0] [--only tFilterRow,tMap] [--refresh]
 """
 
 import argparse
@@ -21,8 +22,6 @@ from pathlib import Path
 from urllib.parse import urljoin
 
 import httpx
-from bs4 import BeautifulSoup
-from markdownify import markdownify
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "reference" / "talend"
@@ -34,7 +33,7 @@ lock = threading.Lock()
 def get(client: httpx.Client, url: str) -> httpx.Response | None:
     for attempt in range(3):
         try:
-            r = client.get(url, follow_redirects=False, timeout=30)
+            r = client.get(url, follow_redirects=True, timeout=30)
             if r.status_code in (429, 503):
                 time.sleep(5 * (attempt + 1))
                 continue
@@ -45,6 +44,9 @@ def get(client: httpx.Client, url: str) -> httpx.Response | None:
 
 
 def topic(html: str, url: str, name: str) -> tuple[str, list[str]]:
+    from bs4 import BeautifulSoup  # pyright: ignore[reportMissingImports]
+    from markdownify import markdownify  # pyright: ignore[reportMissingImports]
+
     soup = BeautifulSoup(html, "html.parser")
     node = soup.find(id="topicContent")
     if node is None:
@@ -71,9 +73,11 @@ def topic(html: str, url: str, name: str) -> tuple[str, list[str]]:
 MAX_PAGES = 8
 
 
-def fetch_component(client: httpx.Client, name: str, version: str, delay: float) -> dict:
+def fetch_component(
+    client: httpx.Client, name: str, version: str, delay: float, refresh: bool
+) -> dict:
     target = OUT / f"{name}.md"
-    if target.exists():
+    if target.exists() and not refresh:
         return {"name": name, "status": "cached"}
     url = BASE.format(v=version) + name.lower()
     r = get(client, url)
@@ -106,6 +110,9 @@ def main() -> None:
     ap.add_argument("--version", default="8.0")
     ap.add_argument("--delay", type=float, default=0.3)
     ap.add_argument("--only", default="")
+    ap.add_argument(
+        "--refresh", action="store_true", help="vuelve a descargar aunque ya exista el Markdown"
+    )
     a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     names = sorted(json.loads((ROOT / "rules/talend/components.json").read_text())["components"])
@@ -113,15 +120,26 @@ def main() -> None:
         names = [n for n in names if n in a.only.split(",")]
     headers = {"User-Agent": "sgm-docs-fetch/1.0 (uso local; contacto: repo migrador-sasgrid-qlik)"}
     results = []
-    with httpx.Client(headers=headers) as client, ThreadPoolExecutor(a.workers) as pool:
+    with (
+        httpx.Client(headers=headers, follow_redirects=True) as client,
+        ThreadPoolExecutor(a.workers) as pool,
+    ):
         for i, res in enumerate(
-            pool.map(lambda n: fetch_component(client, n, a.version, a.delay), names), 1
+            pool.map(lambda n: fetch_component(client, n, a.version, a.delay, a.refresh), names), 1
         ):
             results.append(res)
             if i % 25 == 0 or i == len(names):
                 ok = sum(1 for r in results if r["status"] in ("ok", "cached"))
                 print(f"{i}/{len(names)} ok={ok}", flush=True)
-    (OUT / "index.json").write_text(json.dumps(results, ensure_ascii=False, indent=1))
+    index_path = OUT / "index.json"
+    previous = (
+        {r["name"]: r for r in json.loads(index_path.read_text())} if index_path.exists() else {}
+    )
+    previous.update({r["name"]: r for r in results})
+    index_names = sorted(previous) if a.only else names
+    index_path.write_text(
+        json.dumps([previous[n] for n in index_names], ensure_ascii=False, indent=1)
+    )
     print("sin página:", [r["name"] for r in results if r["status"].startswith("sin")][:40])
 
 

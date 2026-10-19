@@ -38,8 +38,8 @@ export function ImportTab({ id, go }: { id: string; go: (h: string) => void }) {
       <h1>Importar</h1>
       <div className="row">
         <label>
-          Subir ZIP con los programas
-          <input type="file" accept=".zip" disabled={busy} onChange={(e) => upload(e.target.files?.[0])} />
+          Subir ZIP del proyecto o un archivo .sas
+          <input type="file" accept=".zip,.sas" disabled={busy} onChange={(e) => upload(e.target.files?.[0])} />
         </label>
       </div>
       <p className="muted">

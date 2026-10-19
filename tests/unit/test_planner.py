@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 
 from apps.api.main import app as api
@@ -100,9 +101,15 @@ def test_exports(tmp_path):
     assert "## Pasos" in md and "p0_resumen_sql.sas:" in md and "Checklist" in md
     rows = steps_csv(ps).splitlines()
     assert rows[0].startswith("job,programa,paso_id") and len(rows) > 10
-    files = write_exports(ps, tmp_path / "out")
+    out_dir = tmp_path / "out"
+    files = write_exports(ps, out_dir)
     names = {f.name for f in files}
     assert {"index.md", "steps.csv", "p0_resumen_sql.md", "p0_resumen_sql.json"} <= names
+    exported_md = (out_dir / "p0_resumen_sql.md").read_text()
+    icons = re.findall(r"!\[Icono Talend\]\(assets/talend-icons/([^)]+)\)", exported_md)
+    assert icons and all((out_dir / "assets" / "talend-icons" / icon).is_file() for icon in icons)
+    assert (out_dir / "assets" / "talend-icons" / "LICENSE").is_file()
+    assert (out_dir / "assets" / "talend-icons" / "NOTICE.md").is_file()
     assert JobPlan.model_validate(json.loads((tmp_path / "out/p0_resumen_sql.json").read_text()))
 
 

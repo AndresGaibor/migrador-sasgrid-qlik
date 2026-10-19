@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../api";
 import { useAsync } from "../hooks";
+import { ComponentIcon } from "../components/ComponentIcon";
 import type { CatalogComponent, CatalogParam } from "../types";
 import { Badge, Load } from "./common";
 
@@ -16,8 +17,7 @@ function CatalogList() {
     <>
       <h1>Catálogo de componentes Talend</h1>
       <p className="muted">
-        Nombres internos de parámetros, conectores, variantes y drivers del catálogo oficial (Talaxie / Talend Open Studio).
-        La documentación completa se descarga con <code>tools/fetch_talend_docs.py</code>.
+        Esquemas estructurados derivados de las definiciones abiertas de Talend Open Studio (Talaxie). El inventario oficial de Qlik aparece abajo; la documentación se descarga con <code>tools/fetch_talend_docs.py</code>.
       </p>
       <div className="row">
         <label>
@@ -43,7 +43,7 @@ function CatalogList() {
               <tbody>
                 {d.components.map((c) => (
                   <tr key={c.name}>
-                    <td><a href={`#/catalogo/${c.name}`}>{c.name}</a></td>
+                    <td><a href={`#/catalogo/${c.name}`}><ComponentIcon name={c.name} /> {c.name}</a></td>
                     <td>{c.description}</td>
                     <td>{c.families.join(", ")}</td>
                     <td className="num">{c.parameters}</td>
@@ -54,6 +54,23 @@ function CatalogList() {
           </>
         )}
       </Load>
+      {res.data?.official_inventory && (
+        <details>
+          <summary>
+            Inventario oficial Qlik {res.data.official_inventory.release} ({res.data.official_inventory.count} componentes)
+          </summary>
+          <p><a href={res.data.official_inventory.source} target="_blank" rel="noreferrer">Fuente oficial: componentes soportados y lineage</a></p>
+          <table>
+            <thead><tr><th>Componente</th><th>Conectividad</th><th>Disponible desde</th><th>Nota</th></tr></thead>
+            <tbody>{res.data.official_inventory.components.map((c) => (
+              <tr key={c.name}>
+                <td><code>{c.name}</code></td><td>{c.connectivity ?? ""}</td>
+                <td>{c.available_from ?? ""}</td><td>{c.note ?? ""}</td>
+              </tr>
+            ))}</tbody>
+          </table>
+        </details>
+      )}
     </>
   );
 }
@@ -86,7 +103,7 @@ function ComponentDetail({ name }: { name: string }) {
 function Body({ c }: { c: CatalogComponent }) {
   return (
     <>
-      <h1>{c.name}</h1>
+      <h1 className="component-heading"><ComponentIcon name={c.name} /> {c.name}</h1>
       <p>{c.description}</p>
       <p className="muted">
         Familias: {c.families.join(", ")} · versión {c.version} · {c.status}

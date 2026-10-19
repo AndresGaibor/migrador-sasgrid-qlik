@@ -58,7 +58,7 @@
 
 ### 4. Unir (inner join): dwh.ventas, dwh.clientes, dwh.productos
 
-- **Acción:** add_component · **Componente:** `tMap` (sin verificar) · alternativas: `tJoin`
+- **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJoin`
 - **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `op_6_read_1`, Lookup desde `op_6_read_2`, Lookup desde `op_6_read_3`
@@ -75,7 +75,7 @@
 
 ### 5. Unir (left join): dwh.ventas, dwh.clientes, dwh.productos
 
-- **Acción:** add_component · **Componente:** `tMap` (sin verificar) · alternativas: `tJoin`
+- **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJoin`
 - **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `op_6_join_1`
@@ -92,7 +92,7 @@
 
 ### 6. Filtrar filas (WHERE): year(v.fecha) = &anio.
 
-- **Acción:** add_component · **Componente:** `tFilterRow` (sin verificar) · alternativas: `tMap`
+- **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfilterrow)
 - **Conexiones:** Main desde `op_6_join_2`
@@ -109,7 +109,7 @@
 
 ### 7. Agregar por c.region, p.categoria
 
-- **Acción:** add_component · **Componente:** `tAggregateRow` (sin verificar) · alternativas: `tMap`
+- **Acción:** add_component · **Componente:** `tAggregateRow` ![Icono Talend](/talend-icons/tAggregateRow_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/taggregaterow)
 - **Conexiones:** Main desde `op_6_filter_1`
@@ -121,7 +121,7 @@
 
 ### 8. Filtrar filas (HAVING): calculated total_monto > 1000
 
-- **Acción:** add_component · **Componente:** `tFilterRow` (sin verificar) · alternativas: `tMap`
+- **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfilterrow)
 - **Conexiones:** Main desde `op_6_aggregate_1`

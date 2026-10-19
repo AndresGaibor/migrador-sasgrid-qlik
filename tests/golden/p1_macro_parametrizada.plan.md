@@ -8,7 +8,7 @@
 
 ### 1. Invocar macro %extraer_mes
 
-- **Acción:** add_component · **Componente:** `tRunJob` (sin verificar) · alternativas: `Joblet`
+- **Acción:** add_component · **Componente:** `tRunJob` ![Icono Talend](/talend-icons/tRunJob_icon32.png) (sin verificar) · alternativas: `Joblet`
 - **Subjob:** `s13` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:13`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/trunjob)
 - **Propiedades:**
@@ -36,7 +36,7 @@
 
 ### 2. Filtrar filas (WHERE): month(fecha) = &m.
 
-- **Acción:** add_component · **Componente:** `tFilterRow` (sin verificar) · alternativas: `tMap`
+- **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `m:extraer_mes:s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfilterrow)
 - **Conexiones:** Main desde `m:extraer_mes:op_6_read_1`
@@ -53,7 +53,7 @@
 
 ### 3. Seleccionar/calcular columnas
 
-- **Acción:** add_component · **Componente:** `tMap` (sin verificar)
+- **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar)
 - **Subjob:** `m:extraer_mes:s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `m:extraer_mes:op_6_filter_1`
