@@ -54,7 +54,9 @@ def test_uploaded_grid_zip_produces_persistent_exportable_guide(tmp_path, monkey
     body = plan.json()
     assert body["orchestration"]["grid_tasks"] == [task["id"]]
     assert body["steps"]
-    assert any(x["pattern_id"] == "sasgsub.submit" for x in body["orchestration"]["grid_recommendations"])
+    assert any(
+        x["pattern_id"] == "sasgsub.submit" for x in body["orchestration"]["grid_recommendations"]
+    )
     assert body["steps"][0]["evidence"] == {
         "file": "sas/daily.sas",
         "line": 1,

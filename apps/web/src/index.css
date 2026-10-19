@@ -1,0 +1,89 @@
+/* Orden de capas: el reset de Tailwind (base) va antes que los estilos de Byron,
+   y las utilidades de los componentes de shadcn van al final. Sin esta línea el
+   reset de Tailwind apagaría h1, botones y tablas de styles.css. */
+@layer theme, base, byron, components, utilities;
+@import "./styles.css" layer(byron);
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Los mismos tokens que styles.css: verde de marca, lienzo gris claro, esquinas de 5px.
+   Así los componentes de shadcn se ven igual que el resto de la interfaz de Byron. */
+:root {
+  --radius: 5px;
+  --background: #f7f8fa;
+  --foreground: #30363a;
+  --card: #ffffff;
+  --card-foreground: #30363a;
+  --popover: #ffffff;
+  --popover-foreground: #30363a;
+  --primary: #00873e;
+  --primary-foreground: #ffffff;
+  --secondary: #ffffff;
+  --secondary-foreground: #30363a;
+  --sh-muted: #f1f3f4;
+  --sh-muted-foreground: #697279;
+  --sh-accent: #edf1ee;
+  --sh-accent-foreground: #30363a;
+  --destructive: #b53030;
+  --border: #e0e4e6;
+  --input: #cbd2d5;
+  --ring: #00873e;
+  --warning: #936000;
+  --success: #08733d;
+}
+
+@theme inline {
+  --font-sans: "Segoe UI", Arial, sans-serif;
+  --font-mono: ui-monospace, Consolas, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--sh-muted);
+  --color-muted-foreground: var(--sh-muted-foreground);
+  --color-accent: var(--sh-accent);
+  --color-accent-foreground: var(--sh-accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
+  --radius-sm: calc(var(--radius) - 1px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 1px);
+  --radius-xl: calc(var(--radius) + 2px);
+}
+
+/* shadcn asume controles de 32-36px; aquí se igualan a los 40px de styles.css. */
+[data-slot="button"] { min-height: 40px; padding: 9px 17px; border-radius: var(--radius); font-weight: 600; font-size: 14px; }
+  [data-slot="button"][data-size="sm"] { min-height: 34px; padding: 7px 12px; }
+  [data-slot="button"][data-size="xs"] { min-height: 28px; padding: 4px 8px; font-size: 12px; font-weight: 500; }
+  [data-slot="button"][data-size="icon"], [data-slot="button"][data-size="icon-sm"] { min-height: 34px; min-width: 34px; padding: 7px; }
+  [data-slot="input"], [data-slot="select-trigger"] { min-height: 41px; padding: 8px 11px; border-radius: var(--radius); background: #fff; font-size: 14px; }
+  [data-slot="select-trigger"][data-size="sm"] { min-height: 34px; padding: 6px 10px; }
+  [data-slot="input"][data-size="sm"] { min-height: 34px; padding: 6px 10px; }
+  [data-slot="badge"] { border-radius: 4px; }
+  [data-slot="dialog-content"] { border-radius: var(--radius); }
+
+/* Los botones de shadcn toman la forma de los de Byron: blanco con borde, o texto verde. */
+[data-slot="button"][data-variant="outline"] { background: #fff; border-color: #cdd3d6; color: var(--fg); }
+[data-slot="button"][data-variant="outline"]:hover { background: #f1f4f2; border-color: #99a89f; }
+[data-slot="button"][data-variant="link"] { color: var(--accent); text-decoration: none; }
+[data-slot="button"][data-variant="link"]:hover { text-decoration: underline; }
+[data-slot="dialog-content"] { background: #fff; }
+
+/* Grafo de dependencias (SVG), con los colores del tema. */
+.graph { overflow: auto; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); }
+.graph svg text { fill: var(--fg); font-size: 12px; font-family: "Segoe UI", Arial, sans-serif; }
+.graph svg .node-caption { fill: var(--muted); font-size: 11px; }
+.graph svg .node { fill: var(--panel); stroke: var(--line); }
+.graph svg a:hover .node { stroke: var(--accent); }
+.graph svg .edge { fill: none; stroke: var(--line); stroke-width: 1.2; }
+.graph svg .node-port { fill: var(--accent); }

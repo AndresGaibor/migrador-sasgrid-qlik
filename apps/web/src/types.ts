@@ -69,6 +69,9 @@ export type Step = {
   purpose: string;
   properties: { name: string; value: string | null; origin: string; verified: boolean; in_catalog?: boolean | null; label?: string | null; options?: string[] }[];
   connections: { type: string; from_step: string | null }[];
+  operation_id?: string | null;
+  operation_type?: string | null;
+  schema_columns?: { name: string; talend_type: string | null }[];
   expressions: { sas: string; talend: string | null; line: number; warnings: string[] }[];
   assumptions: string[];
   pending: string[];

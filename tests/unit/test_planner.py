@@ -72,20 +72,28 @@ def test_grid_recommendations_use_versioned_catalog_and_keep_unsupported_evidenc
     patterns = {r.pattern_id: r for r in ps.grid_recommendations}
     catalog = json.loads((ROOT / "rules/sas/grid_catalog.json").read_text(encoding="utf-8"))
     assert {entry["id"] for entry in catalog["patterns"]} <= patterns.keys()
-    assert all(r.reason and r.evidence.file and r.evidence.line > 0 for r in ps.grid_recommendations)
+    assert all(
+        r.reason and r.evidence.file and r.evidence.line > 0 for r in ps.grid_recommendations
+    )
     assert {"sasgsub.submit", "sasgsub.job_options", "sasgsub.set_parameters"} <= patterns.keys()
     submit = patterns["sasgsub.submit"]
     assert submit.status == "partial" and submit.component_candidate == "tRunJob"
     assert submit.catalog_version == "1" and submit.doc_url and submit.evidence.line == 7
     assert submit.required and submit.reason and submit.instruction
 
-    unknown = next(r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.unverified_options")
+    unknown = next(
+        r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.unverified_options"
+    )
     assert unknown.status == "unsupported" and unknown.evidence.line == 4
     assert unknown.details["unknown_options"] == ["-grid", "-queue", "-name", "-wait"]
     lsf = [r for r in ps.grid_recommendations if r.pattern_id == "scheduler.lsf"]
     assert [(r.status, r.evidence.line) for r in lsf] == [("unsupported", 5), ("unsupported", 6)]
-    missing = next(r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.missing_option_value")
-    assert missing.status == "unsupported" and missing.details["incomplete_options"] == ["-gridqueue"]
+    missing = next(
+        r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.missing_option_value"
+    )
+    assert missing.status == "unsupported" and missing.details["incomplete_options"] == [
+        "-gridqueue"
+    ]
     batch = next(r for r in ps.grid_recommendations if r.pattern_id == "sas_batch.sysin")
     assert batch.evidence.line == 3 and batch.details["program"].endswith("program with spaces.sas")
 
@@ -172,3 +180,19 @@ def test_api_plans(tmp_path, monkeypatch):
     assert c.get(f"/api/projects/{pid}/plans/nada.sas").status_code == 404
     e = c.post(f"/api/projects/{pid}/exports")
     assert e.status_code == 201 and "steps.csv" in e.json()["files"]
+
+
+def test_format_rows_extracts_value_tables():
+    from sas_grid_migrator.migration_planner.planner import _format_rows
+
+    rows = _format_rows(
+        [
+            "value $ACCTTYPE\n    'CHK'  = 'Checking'\n    OTHER  = 'Unknown'\n  ",
+            "value RISK\n 1 = 'Low'",
+        ]
+    )
+    assert rows == [
+        ("ACCTTYPE", "CHK", "Checking"),
+        ("ACCTTYPE", "OTHER", "Unknown"),
+        ("RISK", "1", "Low"),
+    ]

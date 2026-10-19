@@ -284,3 +284,9 @@ textarea { width: 100%; resize: vertical; }
 .export-guide p { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
 .export-guide small { color: var(--muted); font-size: 11px; }
 @media (max-width: 650px) { .export-guide { align-items: stretch; flex-direction: column; } .export-guide .export-downloads button { flex: 1; } }
+.do-list { margin: 8px 0 12px; padding-left: 22px; display: grid; gap: 12px; }
+.do-value { margin: 4px 0; padding: 8px 10px; background: #f3f6f4; border: 1px solid #cfd9d3; border-radius: 6px; font-family: ui-monospace, monospace; white-space: pre-wrap; user-select: all; }
+.do-check { color: #8a4b00; }
+.step-group > summary { cursor: pointer; padding: 4px 0; }
+.step-group[open] > summary { margin-bottom: 10px; }
+.guide-job-meta progress { width: 120px; height: 6px; accent-color: var(--accent); }

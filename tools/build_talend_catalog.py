@@ -18,7 +18,9 @@ from pathlib import Path
 
 DOC_URL = "https://help.qlik.com/talend/en-US/components/8.0/{}"
 AUDIT_FILE = Path(__file__).resolve().parents[1] / "rules" / "talend" / "catalog-audit.json"
-OFFICIAL_INVENTORY_FILE = Path(__file__).resolve().parents[1] / "rules" / "talend" / "components.json"
+OFFICIAL_INVENTORY_FILE = (
+    Path(__file__).resolve().parents[1] / "rules" / "talend" / "components.json"
+)
 # sufijos de rol, del más largo al más corto, para agrupar variantes por tecnología
 ROLES = [
     "OutputBulkExec", "OutputBulk", "BulkExec", "TableList", "ColumnList", "LastInsertId", "SCDELT",
@@ -200,7 +202,8 @@ def build(src: Path, audit_file: Path = AUDIT_FILE) -> dict:
                 continue
             url = record.get("official_url")
             if url and record.get("official_reference_scope") in (
-                "component_page", "standard_properties"
+                "component_page",
+                "standard_properties",
             ):
                 comps[name]["doc_url"] = url
             else:

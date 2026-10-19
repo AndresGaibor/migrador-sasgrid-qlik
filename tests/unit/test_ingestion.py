@@ -77,6 +77,17 @@ def test_zip_bomb_entry_skipped(tmp_path):
     assert not files and skipped[0].reason == "supera max_file_bytes"
 
 
+def test_zip_appledouble_metadata_is_skipped(tmp_path):
+    z = tmp_path / "mac.zip"
+    with zipfile.ZipFile(z, "w") as zf:
+        zf.writestr("daily.sas", "data x; run;")
+        zf.writestr("._daily.sas", "metadata")
+        zf.writestr("__MACOSX/._daily.sas", "metadata")
+    files, skipped = import_source(z, tmp_path / "dest", cfg(tmp_path))
+    assert [f.path for f in files] == ["daily.sas"]
+    assert {s.path for s in skipped} == {"._daily.sas", "__MACOSX/._daily.sas"}
+
+
 def test_global_limits_reject_batch(tmp_path):
     src = tmp_path / "src"
     src.mkdir()

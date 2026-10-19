@@ -422,7 +422,7 @@ def _proc_step(n: ProcStep, c: _Ctx) -> list[IROperation]:
     elif n.name == "format":
         add(
             "format_definition",
-            details={"statements": [s.text for s in n.statements][:20]},
+            details={"statements": [s.text for s in n.statements][:500]},
             confidence="medium",
         )
     elif n.name in ("import", "export"):

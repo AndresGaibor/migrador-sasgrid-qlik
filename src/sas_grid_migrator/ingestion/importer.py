@@ -14,7 +14,7 @@ from pathlib import Path, PurePosixPath
 from sas_grid_migrator.config import Settings
 from sas_grid_migrator.domain.models import FileKind, Skipped, SourceFile
 
-EXCLUDED_DIRS = {".git", "node_modules", "__pycache__", ".svn"}
+EXCLUDED_DIRS = {".git", "node_modules", "__pycache__", ".svn", "__MACOSX"}
 KIND_BY_SUFFIX = {
     ".sas": FileKind.SAS,
     ".sh": FileKind.SHELL,
@@ -120,7 +120,8 @@ def import_source(
         if data is None or rel is None:
             skipped.append(Skipped(path=raw, reason=reason or "ruta insegura"))
             continue
-        if any(part in EXCLUDED_DIRS for part in rel.split("/")):
+        # "._x" son metadatos AppleDouble que macOS añade al comprimir, no código
+        if any(part in EXCLUDED_DIRS for part in rel.split("/")) or PurePosixPath(rel).name.startswith("._"):
             skipped.append(Skipped(path=rel, reason="directorio excluido"))
             continue
         total += len(data)

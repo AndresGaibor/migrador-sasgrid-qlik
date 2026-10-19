@@ -36,6 +36,25 @@ _KEY = re.compile(r"(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)")
 _READS = {"read", "read_file", "inline_data"}
 
 
+_FMT_NAME = re.compile(r"^\s*value\s+\$?(\w+)", re.IGNORECASE)
+_FMT_ROW = re.compile(r"^\s*('(?:[^']|'')*'|\"[^\"]*\"|[^=\s][^=]*?)\s*=\s*('(?:[^']|'')*'|\"[^\"]*\")\s*$")
+
+
+def _format_rows(statements: list[str]) -> list[tuple[str, str, str]]:
+    """Filas (formato, código, etiqueta) de los `value` de un PROC FORMAT; rangos y OTHER se copian tal cual."""
+    rows: list[tuple[str, str, str]] = []
+    for text in statements:
+        lines = text.splitlines()
+        head = _FMT_NAME.match(lines[0]) if lines else None
+        if not head:
+            continue
+        for ln in lines[1:]:
+            m = _FMT_ROW.match(ln)
+            if m:
+                rows.append((head.group(1), m.group(1).strip("'\""), m.group(2).strip("'\"")))
+    return rows
+
+
 class OpRule(BaseModel):
     component: str
     alternatives: list[str] = []
@@ -221,7 +240,13 @@ class _Planner:
                 col(c)
             return e
 
-        if op.type in ("read", "write", "append"):
+        if op.type == "format_definition":
+            rows = _format_rows(d.get("statements", []))
+            if rows:
+                for c in ("FORMAT", "CODE", "LABEL"):
+                    col(c)
+                props["VALUES"] = "\n".join(" | ".join(r) for r in rows)
+        elif op.type in ("read", "write", "append"):
             ds = (op.inputs or op.outputs or [""])[0]
             props["TABLE"] = ds.split(".")[-1] if ds else None
             if op.type == "write":  # DATA lib.x reemplaza el dataset
