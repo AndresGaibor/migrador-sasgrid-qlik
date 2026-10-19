@@ -1,125 +1,129 @@
-# Trabajo paralelo: SAS Grid → Talend
+# Plan de trabajo para completar SAS Grid → Talend guiado en la web
 
-## Objetivo y punto de partida
+## Meta del producto
 
-Este plan asigna trabajo concreto a **Joseph, Andres y Byron**, en tres frentes que pueden avanzar simultáneamente. El proyecto ya cuenta con importación segura, API, parser, dependencias/Grid, IR, generación y exportación de planes, frontend y catálogo Talend. La tarea es validar y mejorar esas capacidades, no reconstruirlas.
+El objetivo no es solo que pasen pruebas o que cada persona termine un sprint. El resultado final buscado es que una persona pueda entregar a la aplicación un proyecto/archivo SAS Grid y recibir en la web una guía de migración a Talend que pueda seguir, paso a paso, con evidencia del código fuente y sin ocultar lo que no se puede determinar.
 
-Estado y diseño existente: `docs/progress.md`, `docs/architecture.md`, `docs/sas-coverage.md`, `docs/pilot-report.md`. Antes de tomar cualquier punto, buscar si ya tiene implementación o test. Si ya funciona, producir evidencia de validación en vez de rehacerlo.
+Para declarar este objetivo cumplido, el producto debe ofrecer:
 
-**Objetivo del primer sprint:** tres entregas revisables e independientes: un recorrido backend probado por Andres, dos mejoras SAS acotadas por Joseph y un flujo web validado por Byron. Cada persona trabaja en su rama/worktree y no edita las rutas propietarias de otra persona.
+1. **Catálogo SAS Grid:** inventario versionado y con fuentes para los comandos, opciones, parámetros, directivas y patrones de planificación/Grid que el proyecto declara soportar. Debe indicar qué se reconoce, cómo se interpreta, a qué acción Talend se asocia, qué evidencia genera y qué no se soporta todavía.
+2. **Catálogo Talend con trazabilidad oficial:** inventario navegable de componentes/artefactos Talend usados por las recomendaciones, propiedades pertinentes, compatibilidad/versionado y enlace a documentación oficial de Qlik/Talend. No llamar “oficial” a un dato solo porque aparezca en un catálogo comunitario o en Studio.
+3. **Recorrido guiado en la web:** cargar un archivo/proyecto, analizar dependencias SAS Grid, y ver por cada programa/job un orden de pasos accionables para construir/configurar el equivalente en Talend. Cada paso debe enlazar la evidencia SAS (archivo y línea), el componente/artefacto recomendado, valores o decisiones requeridos, dependencias/orden y referencia oficial; permitir registrar progreso y exportar la guía.
+4. **Límites transparentes:** todo caso ambiguo, incompleto o no soportado queda señalado con su motivo y la acción humana necesaria. No ejecutar SAS ni escribir directamente en Talend Studio como si la aplicación pudiera garantizar equivalencia automática.
 
-## Contrato y reglas compartidas
+### Qué significa “100%” en este plan
 
-El contrato vigente está en `src/sas_grid_migrator/migration_planner/models.py`; el JSON Schema sincronizado está en `schemas/migration-plan.schema.json`.
+“100%” significa pasar todos los criterios de aceptación de abajo **para la matriz de soporte publicada y probada**, con fuentes, cobertura y limitaciones explícitas. No significa traducir cualquier programa SAS/Grid imaginable ni asegurar equivalencia en producción sin validación del usuario. Cada entrada fuera de la matriz queda identificada como no soportada; no se presenta como resultado terminado.
 
-- No crear otro formato de plan ni reemplazar el contrato por el JSON de un prototipo.
-- No cambiar modelos/esquema durante el primer sprint, salvo que un caso real no pueda expresarse. En ese caso, describir el caso, acordarlo con Andres y actualizar modelo, esquema, pruebas y consumidor frontend en un PR coordinado.
-- Preservar evidencia SAS (`archivo:línea`), estados `in_catalog` y `verified` diferenciados, y resultados inciertos como pendientes/no traducibles con motivo.
-- Las reglas de conversión deben seguir usando el catálogo existente `rules/talend/components.json`; no editar a mano el catálogo generado.
-- No declarar equivalencia o verificación de Talend solo porque un componente aparezca en el catálogo.
+## Estado real y brechas conocidas
 
-## Andres — backend e integración de extremo a extremo
+- Ya existe análisis parcial de SAS Grid en `src/sas_grid_migrator/grid_analysis/analyzer.py` y fixtures en `tests/fixtures/sas/grid/`; eso **no equivale todavía a un catálogo completo/versionado** ni demuestra cobertura de todas las variantes de Grid encontradas en los inputs objetivo.
+- Existe `rules/talend/components.json` con componentes procedentes de un catálogo XML comunitario (fork Talaxie). `docs/reference/talend/README.md` contiene referencias a documentación oficial para una parte de los componentes, pero el origen comunitario del catálogo no debe confundirse con una publicación estructurada oficial de Qlik. Falta completar y exponer trazabilidad por componente y versión, además de resolver huecos sin inventar parámetros.
+- Ya se puede importar ZIP y generar planes; el estado actual no demuestra todavía un tutorial web de extremo a extremo, persistencia del progreso paso a paso ni cobertura de upload ZIP en las pruebas E2E existentes.
+- La guía existente describe un primer sprint. **No declara a Joseph, Andres ni Byron al 100%.** Este documento sustituye ese alcance por los criterios de producto que siguen.
 
-**Meta:** demostrar con una prueba reproducible que las piezas backend existentes producen un plan utilizable y exportable, y cerrar la brecha que esa prueba revele.
+## Contrato funcional compartido
 
-**Rama sugerida:** `feature/integration-e2e`.
+- Mantener el modelo de plan de `src/sas_grid_migrator/migration_planner/models.py` y sincronizar `schemas/migration-plan.schema.json` si se acuerda un cambio de contrato.
+- Los pasos deben ser útiles sin leer el código de la aplicación: nombre del paso, instrucción concreta, resultado esperado, evidencia `archivo:línea`, componentes/artefactos y propiedades sugeridos, dependencias previas, elecciones que debe resolver la persona, estado y motivo de bloqueo si aplica.
+- Separar “conocido por el catálogo”, “documentado oficialmente”, “probado en versión de Talend” y “validado en un Job de prueba”. No intercambiar estas etiquetas.
+- Ningún dato desconocido se convierte en un valor supuesto. Conservar el código/valor original como evidencia, pedir decisión y explicar el riesgo.
+- ZIP es el formato inicial acordado para un proyecto con varios archivos. Un SAS o script suelto se acepta solo si el recorrido y la detección de dependencias pueden funcionar sin perder contexto; en otro caso, explicar en la UI que se requiere un ZIP.
 
-**Rutas que puede cambiar:** `apps/api/`, `src/sas_grid_migrator/ingestion/`, `src/sas_grid_migrator/intermediate_representation/`, `src/sas_grid_migrator/migration_planner/` excepto `expressions.py`, `schemas/` solo con acuerdo, `tests/integration/`, `tests/unit/test_ingestion.py`, un nuevo `tests/integration/test_api_e2e.py` si hace falta y `docs/progress.md`. Andres no edita `tests/unit/test_planner.py`, que Joseph puede necesitar para expresiones/reglas.
+## Joseph — catálogo y cobertura SAS Grid → recomendaciones
 
-**No cambiar durante el trabajo normal:** `rules/sas/`, `rules/mappings/`, `src/sas_grid_migrator/migration_planner/expressions.py`, `apps/web/` ni el catálogo generado. Coordinar si una corrección cruza esas fronteras.
+**Meta:** que cada patrón SAS/Grid dentro de la matriz publicada tenga clasificación, evidencia, límites, pruebas y una recomendación Talend conservadora o un resultado explícito de no soportado.
 
-### Tareas detalladas
+**Propietario de datos/reglas:** `rules/sas/grid_catalog.json` (crear si se confirma que no existe), `rules/sas/constructs.json`, `rules/mappings/talend-components.json`, pruebas de parser/planner y matriz/casos bajo `tests/fixtures/sas/grid/`. No editar los componentes Talend generados ni el frontend/API.
 
-1. **Establecer la línea base.** Ejecutar la suite Python y anotar comandos, resultado y cualquier fallo preexistente. No atribuir a este trabajo fallos ajenos.
-2. **Elegir un escenario vertical.** Usar uno de los fixtures ya mantenidos, por ejemplo `tests/fixtures/sas/p0_clientes_activos.sas` o el lote de `tests/fixtures/sas/real/ts-sas-legacy-analytics/`. Cubrir importación → análisis → generación de planes → lectura del plan → exportación Markdown/JSON/CSV.
-3. **Verificar contenido, no solo HTTP 200.** La prueba debe comprobar que el plan corresponde al programa esperado, que los pasos conservan `evidence.file` y `evidence.line`, que hay estado/pendientes coherentes, que el JSON valida contra `JobPlan`/schema y que los archivos esperados de exportación se producen.
-4. **Arreglar solo una brecha reproducida.** Si el recorrido descubre un defecto, corregirlo en la capa responsable, añadir regresión y mantener los límites de importador/API. No ampliar a una reescritura del parser.
-5. **Decidir el formato de entrada.** La web actual sube ZIP; la API de ruta local acepta rutas del servidor. Revisar con el equipo si usuarios necesitan `.sas`/`.sh` sueltos. Si no existe caso de uso confirmado, documentar que ZIP es suficiente y no añadir formatos. Si se acuerda hacerlo, reutilizar `import_source` y cubrir límites, extensión, errores y entradas múltiples.
-6. **Actualizar estado al final.** Cambiar `docs/progress.md` solo con resultados comprobados y quitar o corregir afirmaciones que ya no describan el estado real.
+### Trabajo hasta aceptación
 
-### Pruebas y entrega
+1. **Definir la matriz de soporte con evidencia.** Inventariar variantes presentes en fixtures/corpus y ejemplos objetivo de `sasgsub`, invocaciones `sas`, opciones como `-grid`, `-queue`, `-name`, `-wait`, `-set`, `-sysin`, ejecución batch, referencias a scripts, dependencias, y planificadores externos identificados (por ejemplo LSF `bsub`/`bjobs` o Control-M cuando aparezcan). No marcar algo “soportado” solo por nombrarlo en documentación: debe haber un caso de entrada y un resultado comprobable.
+2. **Registrar el catálogo de Grid con estructura verificable.** Para cada patrón: identificador, comando/directiva y formas admitidas, descripción, opciones y valores parseados, sistema/versión si se conoce, fuente/cita o fixture de origen, línea de entrada, patrón equivalente/no equivalente en Talend, requisitos previos, limitaciones y estado (`supported`, `partial` o `unsupported`). Especificar cómo se incorporan variantes nuevas sin alterar silenciosamente el significado.
+3. **No mezclar catálogos.** Las semánticas SAS/Grid viven en el catálogo Grid; los componentes y propiedades destino permanecen en el catálogo Talend. Las reglas de mapping referencian el identificador de destino existente, no copian definiciones de componentes.
+4. **Añadir escenarios representativos.** Cubrir casos positivos, espacios/comillas, orden distinto de argumentos, valor ausente/ambiguo, opción desconocida y referencia a archivo dependiente. Para cada elemento marcado soportado, verificar datos parseados, evidencia de origen y recomendación/pendiente esperado.
+5. **Cubrir el salto a la acción Talend.** Para cada patrón soportado, escribir instrucciones concretas y orden de ejecución (qué crear, qué conectar/configurar, qué valor trasladar, qué confirmar). Si no hay equivalencia razonable, indicar que el usuario debe recrear/confirmar la orquestación y no sugerir un componente ficticio.
+6. **Publicar límites y conteos.** Reportar cantidades por estado y cómo se calculan (entradas del catálogo, casos de fixture, ocurrencias u otra unidad). No usar un porcentaje ambiguo de cobertura.
 
-- Focalizadas: `uv run pytest tests/integration tests/unit/test_ingestion.py`.
-- Suite completa antes de integrar: `uv run pytest`.
-- Calidad: `uv run ruff check`.
-- PR con: escenario reproducido, archivos afectados, comportamiento esperado/real, prueba añadida y resultado de comandos.
+### Pruebas y criterios de Joseph
 
-**Terminado cuando:** el escenario vertical tiene prueba automatizada que inspecciona contenido del plan y exportación; cualquier defecto corregido tiene regresión; la decisión sobre cargas ZIP/individuales queda escrita. No se exige que el plan traduzca automáticamente lo que correctamente marca como pendiente.
+- Ejecutar: `uv run pytest tests/unit/test_parser.py tests/unit/test_planner.py tests/unit/test_policy_and_fixtures.py tests/unit/test_talend_catalog.py` y `uv run ruff check`.
+- Cada entrada declarada `supported` de la matriz tiene al menos un test de parseo/análisis y uno de recomendación/plan; casos `partial`/`unsupported` tienen test que comprueba el estado y el motivo.
+- Validar que todo mapping usa componente/propiedad existentes en el catálogo Talend y que evidencia incluye ruta y línea reales.
+- **100% de este frente:** matriz acordada versionada; todos los patrones dentro de la matriz tienen resultado probado; límites/versiones/fuentes documentados; ninguna recomendación afirma más de lo comprobado.
 
-## Joseph — cobertura SAS, macros y reglas de conversión
+## Andres — ingesta, contrato, análisis e integración backend
 
-**Meta:** cerrar dos brechas SAS demostrables y de prioridad alta, con conversión prudente y pruebas derivadas del corpus existente.
+**Meta:** recibir el ZIP del proyecto, analizar archivos SAS/Grid relacionados y entregar por API un plan completo, ordenado y legible por la web, con el catálogo Grid y mappings como entradas de datos comprobables.
 
-**Rama sugerida:** `feature/sas-coverage`.
+**Propietario backend/contrato:** `apps/api/`, `src/sas_grid_migrator/ingestion/`, `src/sas_grid_migrator/grid_analysis/`, `src/sas_grid_migrator/intermediate_representation/`, `src/sas_grid_migrator/migration_planner/` excepto `expressions.py`, modelos/schema con coordinación, `tests/integration/`, `tests/unit/test_ingestion.py` y `docs/progress.md`. No modificar las reglas de Joseph, el catálogo Talend de Byron ni `apps/web/`.
 
-**Rutas que puede cambiar:** `rules/sas/`, `rules/mappings/`, `src/sas_grid_migrator/macro_resolver/`, `src/sas_grid_migrator/migration_planner/expressions.py`, `tests/unit/test_parser.py`, `tests/unit/test_planner.py`, `tests/unit/test_policy_and_fixtures.py` y nuevos tests focalizados de reglas/macros/expresiones. Estas pruebas quedan bajo Joseph para evitar conflictos con la integración de Andres.
+### Trabajo hasta aceptación
 
-**No cambiar sin acuerdo:** modelos/esquemas de plan, API, importador, frontend ni `rules/talend/components.json`/catálogo generado. Las propiedades de reglas deben apuntar a nombres existentes; si el catálogo parece incorrecto, reportar la evidencia a Andres en vez de parchearlo localmente.
+1. **Especificar el input y sus fallos.** Documentar estructura de ZIP admitida, extensiones procesadas, límites actuales de tamaño/seguridad, nombres/rutas duplicadas, encoding, archivo corrupto, ZIP vacío y referencias a archivos fuera del proyecto. No relajar validaciones de extracción segura.
+2. **Construir el inventario de proyecto.** Confirmar que los archivos SAS, scripts shell y referencias Grid se relacionan por ruta/identificador; conservar archivos que no se pueden resolver como pendientes con ruta y motivo, no descartarlos sin aviso.
+3. **Consumir la matriz de Joseph.** El analizador backend debe producir resultado determinista por línea/patrón, con estado, datos interpretados, evidencia original, relación con job/programa y recomendación/razón. Rechazar esquema inválido con error legible; probar versión de catálogo y compatibilidad.
+4. **Generar una guía ejecutable por persona.** El plan organiza pasos por job/programa y dependencias; cada paso incluye instrucción, resultado esperado, posición, evidencia, referencias de catálogo, valores sugeridos, decisiones manuales, prerequisitos y estado inicial. Validar el JSON contra modelo y schema y mantener compatibilidad con consumidores.
+5. **Exponer flujo completo por API.** Probar carga del ZIP → proyecto/importación → análisis → plan(es) → lectura de detalle → actualización de estado/progreso → exportación. Asegurar errores útiles para ZIP no válido, proyecto sin fuentes, archivo con sintaxis no soportada y catálogo incompatible.
+6. **Acordar progreso persistente.** Definir si estado de cada paso vive en backend y se conserva tras recargar/salir, o si el primer release lo persiste solo dentro del proyecto/session. La elección debe quedar consistente entre API, esquema, web y exportación; no prometer persistencia si no existe.
+7. **Probar determinismo y regresiones.** Un mismo ZIP y versiones de catálogos iguales producen los mismos pasos/orden; un cambio en catalog version o contenido queda identificable. No requerir acceso a Talend ni a sistemas productivos para correr pruebas.
 
-### Tareas detalladas
+### Pruebas y criterios de Andres
 
-1. **Crear una lista de brechas antes de editar.** Revisar frecuencias de `docs/sas-coverage.md`, casos de `tests/fixtures/sas/real/` y reglas presentes en `rules/sas/constructs.json` y `rules/mappings/talend-components.json`. Para cada candidata anotar construcción SAS, archivo/fragmento de evidencia, comportamiento actual, resultado esperado y prueba afectada.
-2. **Escoger exactamente dos primeros casos.** Priorizar por frecuencia/impacto y factibilidad; `%sysfunc`, `%include`, `proc sql`, `merge` o `proc format` son candidatas, no tareas obligatorias si ya están cubiertas. Evitar asumir que hace falta un nuevo `rules/sas/catalog.json`: primero demostrar qué información no expresa el esquema actual de construcciones/reglas.
-3. **Definir el comportamiento seguro.** Para cada caso especificar cuándo se traduce, qué propiedades/componentes sugiere, qué evidencia conserva, qué debe confirmar una persona y qué entradas quedan sin resolver. En semántica ambigua, producir pendiente/no traducible con motivo; no inventar Java ni parámetros Talend.
-4. **Implementar en la capa responsable.** Clasificación en `rules/sas/constructs.json`; correspondencia en `rules/mappings/talend-components.json`; expansión estática solo en `macro_resolver`; expresiones solo en `migration_planner/expressions.py`. Mantener separados los cambios por caso cuando sea posible.
-5. **Añadir pruebas pequeñas y representativas.** Cada regla debe tener test positivo y al menos un límite/error relevante. Para expresiones, comprobar tanto la traducción como el rechazo explícito de formas no soportadas. Usar fixtures mínimos nuevos o existentes; nunca depender de datos de cliente no versionados.
-6. **Comprobar compatibilidad del catálogo.** Correr el test de coherencia de mappings/catalog y verificar que cada nombre de componente/propiedad realmente pertenece al catálogo aplicable. `in_catalog` no equivale a `verified` por Talend Studio.
-7. **Informar cobertura con precisión.** No afirmar “90 %” hasta definir el corpus y el denominador (ocurrencias, construcciones únicas o pruebas). En el PR reportar qué casos se cubrieron y cuáles permanecen pendientes.
+- Ejecutar tests focalizados de `tests/integration/` y `tests/unit/test_ingestion.py`; suite completa `uv run pytest`; lint `uv run ruff check`.
+- Tener pruebas de contrato/API con upload ZIP real de fixture y aserciones de contenido, evidencia, orden de pasos, estados, actualización de progreso y exportación; no limitarse a HTTP 200.
+- Añadir pruebas de seguridad para ZIP malicioso/traversal/tamaño según límites existentes y regresiones de errores.
+- **100% de este frente:** un fixture representativo multiarchivo llega por la API hasta una guía validada/exportada; errores y datos desconocidos son explícitos; progreso se conserva según decisión acordada; sin regresiones en suite.
 
-### Pruebas y entrega
+## Byron — catálogo Talend trazable y experiencia guiada web
 
-- Ejecutar los tests focalizados que correspondan: `uv run pytest tests/unit/test_talend_catalog.py tests/unit/test_parser.py tests/unit/test_planner.py tests/unit/test_policy_and_fixtures.py` (omitir rutas inexistentes solo si se renombra/organiza la suite en un PR acordado).
-- Suite completa y lint antes de pedir integración: `uv run pytest` y `uv run ruff check`.
-- PR con una tabla por cada uno de los dos casos: evidencia, antes/después, regla/código, pruebas, limitaciones y pendientes deliberados.
+**Meta:** mostrar un catálogo de destino con referencias oficiales verificables y hacer que una persona siga la guía generada después de subir un proyecto, con estados y decisiones claros.
 
-**Terminado cuando:** hay dos mejoras comprobables, pruebas de resultado y de límite, nombres compatibles con catálogo y explicación de qué sigue sin traducirse. No se requiere cobertura universal de macros/expresiones.
+**Propietario catálogo/UI:** `rules/talend/components.json`, su generador/ingesta de catálogo (identificar ruta real antes de tocarla), `docs/reference/talend/`, `apps/web/` y tests web/E2E. No modificar API, modelos, catálogo Grid o mappings de Joseph.
 
-## Byron — web, recorrido de usuario y validación Talend
+### Trabajo hasta aceptación
 
-**Meta:** confirmar que una persona puede seguir la guía web actual y distinguir pasos propuestos, pendientes y verificados; corregir problemas de frontend reproducibles y validar planes si hay Talend Studio disponible.
+1. **Auditar origen y versión del catálogo actual.** Para cada componente actualmente recomendado, contrastar nombre, familia, propósito y propiedades esenciales con documentación oficial Qlik/Talend de la versión objetivo o el entorno disponible. Guardar en el dato al menos versión/familia, URL oficial consultada, fecha/estado de verificación y limitaciones. El catálogo comunitario puede servir de índice semilla; no presentarlo como fuente oficial.
+2. **Precisar el alcance oficial.** Definir versión de Talend objetivo y el conjunto de componentes requeridos por los mappings soportados. Completar el conjunto requerido antes de ampliar a todos los componentes existentes. Componente sin página oficial o discrepancia no confirmada queda `unverified`/`needs_review`; no inventar parámetros ni redistribuir contenido propietario de Qlik.
+3. **Hacerlo explorable.** En la web ofrecer búsqueda/filtro en componentes usados por la guía; ficha con función, familia/versión, propiedades relevantes, estado de verificación y enlace oficial. Mostrar diferencia entre candidato de catálogo y verificación real en Studio.
+4. **Implementar el modo guiado.** Tras cargar ZIP: indicar resultado de importación y proyectos; listar jobs/programas; permitir abrir guía ordenada; presentar claramente “haz esto en Talend”, campo/componente/valor sugerido, evidencia SAS clicable, fuente oficial, dependencias y decisión pendiente. No obligar a deducir pasos de JSON crudo.
+5. **Permitir progreso utilizable.** Marcar paso pendiente/en progreso/completado/bloqueado, pedir confirmación en pasos inciertos, guardar/recuperar estado usando el mecanismo acordado con Andres y dejar visible por qué un paso está bloqueado. Añadir retorno a paso anterior y navegación entre jobs sin perder estado.
+6. **Exportar el trabajo.** Exponer descarga de guía Markdown/JSON (y los formatos existentes que sean útiles) incluyendo referencias, estados y pendientes. No generar un artefacto nativo Talend `.item` salvo que se diseñe y valide aparte.
+7. **Validar UI con datos reales/fakes representativos.** Automatizar el recorrido upload → resumen → job → guía → marcar estado → recargar/verificar → exportar. Comprobar vacíos, error de upload, análisis en progreso, API error, casos no soportados, teclado/labels y layout móvil básico.
+8. **Validar con Talend cuando se disponga de Studio.** Ejecutar los pasos para casos representativos en proyecto de prueba, registrar versión, evidencia y resultado. Si Studio no está disponible, completar catálogo enlazado y E2E automatizado, pero mantener “validado en Studio” como pendiente y no declarar equivalencia real al 100%.
 
-**Rama sugerida:** `feature/web-validation`.
+### Pruebas y criterios de Byron
 
-**Rutas que puede cambiar:** `apps/web/`, pruebas web, `.claude/scripts/e2e_web.mjs` si es necesario, y reportes nuevos en `docs/validation/`.
+- Ejecutar `cd apps/web && bun test` y `cd apps/web && bun run build`.
+- Ejecutar smoke E2E con backend/web activos: `node .claude/scripts/e2e_web.mjs <urlWeb> <rutaFixtures> <dirCapturas>`; ampliar el runner si no cubre upload ZIP, guía/progreso y exportación.
+- Cada componente usado por una recomendación soportada tiene referencia oficial accesible y estado de procedencia visible; propiedades mostradas están cotejadas o marcadas como no verificadas.
+- **100% de este frente:** usuario termina el flujo de carga y guía en la UI sin inspeccionar internals; progreso y exportación funcionan; catálogo destino tiene trazabilidad oficial para todo componente requerido; resultado Studio se declara solo si se probó.
 
-**No cambiar sin acuerdo:** API/backend, reglas SAS/mappings, modelos/esquema y catálogo Talend generado. Reportar discrepancias de datos a Joseph (mapeos) o Andres (contrato/API) con el ejemplo exacto.
+## Entrega, dependencias y coordinación
 
-### Tareas detalladas
+### Propiedad para evitar conflictos
 
-1. **Ejecutar la prueba web existente.** Revisar `apps/web/package.json`, las pruebas en `apps/web/src/` y el runner `.claude/scripts/e2e_web.mjs`. El runner existente navega proyectos, importación por ruta, resumen, programas, dependencias, planes, una decisión de estado, exportación y catálogo; no asume carga ZIP si esa parte no está cubierta por el recorrido.
-2. **Completar el flujo que usa el usuario.** Comprobar creación de proyecto, importación ZIP desde navegador, inventario, análisis, generación de planes, detalle con evidencia/pending, decisión por paso y exportación. Añadir un test para cualquier ruta importante que falte y evitar duplicar pruebas API pertenecientes a Andres.
-3. **Corregir únicamente defectos reproducibles de UI.** Comprobar estados de carga/error, errores de subida, enlaces/volver, mensajes de pendientes y diferencias entre `in_catalog` y `verified`. Mantener navegación accesible y errores entendibles. No rediseñar la aplicación ni introducir otra forma de representar planes.
-4. **Hacer la prueba manual de Talend si hay entorno.** Seleccionar hasta tres planes distintos (por ejemplo, uno dominado por SQL, uno DATA step/`merge` y uno con macro/Grid). Para cada uno, anotar programa/plan, pasos intentados, componente y propiedades contrastados, resultado, ambigüedades y captura/evidencia permitida. No editar un Job de producción ni afirmar validación si solo se consultó el catálogo.
-5. **Si Studio no está disponible, no bloquear el frente.** Registrar la falta de entorno y el impacto, ejecutar la prueba automatizada del recorrido web, y dejar una lista priorizada de los casos que se deben contrastar cuando exista Studio.
-6. **Gestionar los hallazgos por el dueño.** Discrepancia de componente/regla → Joseph; campo que falta en JSON o respuesta API → Andres. Abrir issue/PR con fixture, ruta, resultado esperado/real y severidad. Byron no cambia esos archivos en su rama.
+- **Joseph:** datos/reglas SAS Grid, mappings y sus tests (`rules/sas/grid_catalog.json`, `rules/sas/constructs.json`, `rules/mappings/talend-components.json`, `tests/unit/test_parser.py`, `tests/unit/test_planner.py`, `tests/unit/test_policy_and_fixtures.py`).
+- **Andres:** pipeline/backend, contrato e integración (`apps/api/`, `src/sas_grid_migrator/`, `schemas/`, `tests/integration/`, `tests/unit/test_ingestion.py`).
+- **Byron:** componentes/fuentes Talend y web (`rules/talend/components.json`, generador de catálogo, `docs/reference/talend/`, `apps/web/`, pruebas web/E2E).
+- Si una tarea requiere ruta ajena, abrir PR/issue y acordar el cambio; no copiar cambios de otra rama. Revisar generadores antes de editar archivos generados.
 
-### Pruebas y entrega
+### Secuencia obligatoria
 
-- Unit tests web: `cd apps/web && bun test`.
-- Tipos/build: `cd apps/web && bun run build`.
-- Smoke E2E existente requiere servidor y Chromium; uso documentado en el propio script: `node .claude/scripts/e2e_web.mjs <urlWeb> <rutaFixtures> <dirCapturas>`. Guardar capturas fuera de artefactos versionados salvo que sean evidencia necesaria y aprobada.
-- PR con pruebas ejecutadas, pasos manuales, defectos encontrados/corregidos y resultados de validación Talend o bloqueo de entorno.
+1. **Contrato de soporte (Andres coordina, Joseph y Byron confirman):** seleccionar versión de Talend, tipos de input y matriz de patrones Grid; definir las etiquetas de procedencia/validación y el contrato de cada paso.
+2. **Trabajo paralelo:** Joseph construye catálogo/mappings y casos; Byron coteja catálogo Talend oficial y avanza UI con fixtures/contrato acordado; Andres implementa ingesta/plan API que consume esa forma de datos.
+3. **Integración por etapas:** primero se valida el JSON del backend contra fixture y contrato; luego la web consume API real; después se corre E2E completo. No integrar tres prototipos con contratos incompatibles al final.
+4. **Validación manual:** si existe Talend Studio, ejecutar matriz representativa en entorno de prueba. Si no existe, documentar claramente el bloqueo; la ausencia de Studio no impide terminar automatización/UI pero sí impide afirmar validación en Studio.
+5. **Cierre:** suite completa, lint/build, auditoría de procedencia y matriz de soporte actualizada en `docs/progress.md`; cada brecha residual convertida en limitación/issue, no escondida bajo “100%”.
 
-**Terminado cuando:** pruebas web/build pasan; el recorrido principal puede seguirse con estados y errores entendibles; existe reporte con validaciones reales o bloqueo explícito y plan de validación pendiente. No se exige que un usuario sin contexto externo resuelva datos de negocio que el SAS no contiene.
+## Checklist final del producto
 
-## Coordinación, ramas y no solapamiento
-
-- Partir de `main` actualizado. Si comparten máquina, usar tres worktrees; si cada persona tiene clon propio, usar una rama por persona. No trabajar en el mismo directorio Git simultáneamente.
-- Ramas: `feature/integration-e2e` (Andres), `feature/sas-coverage` (Joseph), `feature/web-validation` (Byron). Mantener ramas breves; abrir PR hacia `main`, no hacer push directo a `main`.
-- Antes de empezar, cada persona comenta en el canal compartido: rama, fixture/caso elegido y archivos previstos. Si se necesita una ruta fuera de su propiedad, pedir acuerdo antes de editarla.
-- Sincronización 1 (inicio): Andres confirma que el contrato actual basta para los casos elegidos. Si no, se trata como cambio coordinado separado.
-- Sincronización 2 (mitad): Joseph comparte sus dos casos/reglas y evidencia; Andres confirma que encajan en el generador actual; Byron elige planes representativos para su recorrido.
-- Sincronización 3 (integración): Byron presenta hallazgos UI/Talend; Joseph y Andres reciben issues por área; Andres revisa PRs y ejecuta la suite integrada.
-- Cada PR debe explicar intención, pruebas y riesgos, y no incluir cambios de otra rama copiados para resolver conflictos.
-- Fuera de alcance de este sprint: habilitar servicios de sistema/Tailscale, migración de datos, generación de `.item`, ejecución de SAS, conexión a bases productivas o prometer equivalencia completa.
-
-## Cierre del primer sprint
-
-El sprint se cierra cuando:
-
-1. Andres deja un test automatizado de recorrido backend que comprueba contenido del plan y exportación, o un bloqueo reproducible con diagnóstico.
-2. Joseph entrega dos cambios de cobertura SAS con pruebas focalizadas, límites documentados y compatibilidad con catálogo.
-3. Byron entrega pruebas del flujo web/build y un reporte Talend de hasta tres planes, o documenta de forma explícita la falta de Studio y los casos pendientes.
-4. Los tres PRs son revisados; Andres informa qué pruebas integradas corrieron y actualiza `docs/progress.md` solo con hechos comprobados.
-
-Ningún trabajo se considera terminado solo por abrir un PR, escribir una regla, pasar TypeScript o consultar el catálogo: debe cumplir la aceptación de su frente y declarar qué no se pudo verificar.
+- [ ] La versión de Talend objetivo y ZIP/formato de entrada están documentados.
+- [ ] Existe matriz versionada de SAS Grid con fuentes, opciones admitidas, pruebas, equivalencias y casos explícitamente no soportados.
+- [ ] Los mappings solo recomiendan componentes/properties presentes en un catálogo Talend trazable; cada componente requerido enlaza documentación oficial de su versión.
+- [ ] Un proyecto SAS Grid multiarchivo puede cargarse desde la web y no pierde relaciones/rutas de dependencias.
+- [ ] La aplicación crea pasos ordenados por job, cada uno con instrucción, resultado esperado, valores, evidencia archivo/línea, enlaces y decisiones pendientes.
+- [ ] La persona puede navegar, registrar progreso, recargar sin perderlo según la política acordada y exportar la guía completa.
+- [ ] Desconocidos/errores no se interpretan en silencio ni se presentan como traducción verificada.
+- [ ] Pruebas automatizadas cubren backend, catálogo, seguridad de upload, UI y el recorrido completo; `uv run pytest`, `uv run ruff check`, `cd apps/web && bun test`, `cd apps/web && bun run build` pasan.
+- [ ] Validación de Talend Studio está demostrada con versión/evidencia o se deja explícitamente como única limitación de aceptación manual.
