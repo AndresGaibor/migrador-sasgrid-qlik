@@ -77,7 +77,10 @@ def test_uploaded_grid_zip_produces_persistent_exportable_guide(tmp_path, monkey
     plan_json = next(export_dir.glob("*.json"))
     exported_plan = json.loads(plan_json.read_text())
     assert exported_plan["program"] == "sas/daily.sas"
-    assert next(step for step in exported_plan["steps"] if step["id"] == step_id)["status"] == "pendiente"
+    assert (
+        next(step for step in exported_plan["steps"] if step["id"] == step_id)["status"]
+        == "pendiente"
+    )
 
 
 def test_upload_rejects_unsupported_extension(tmp_path, monkeypatch):

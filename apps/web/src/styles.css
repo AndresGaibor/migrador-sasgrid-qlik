@@ -37,6 +37,8 @@ main { max-width: 1200px; margin: 0 auto; padding: 16px 24px 64px; }
 h1 { font-size: 1.5rem; margin: 16px 0 8px; }
 h2 { font-size: 1.15rem; margin: 24px 0 8px; }
 h3 { font-size: 1rem; margin: 0 0 4px; }
+.component-icon { width: 32px; height: 32px; object-fit: contain; vertical-align: middle; margin-right: 6px; }
+.component-heading { display: flex; align-items: center; gap: 8px; }
 table { border-collapse: collapse; width: 100%; background: var(--panel); }
 th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
 th { color: var(--muted); font-weight: 600; font-size: 0.85rem; }

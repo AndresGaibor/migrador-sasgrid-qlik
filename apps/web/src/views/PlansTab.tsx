@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../api";
 import { useAsync } from "../hooks";
+import { ComponentIcon } from "../components/ComponentIcon";
 import { STATUSES, type JobPlan, type Step } from "../types";
 import { Badge, Load, link } from "./common";
 
@@ -116,7 +117,7 @@ function StepCard({ s, onDecide }: { s: Step; onDecide: (s: Step, status: string
     <article className="step">
       <h3>{s.order}. {s.purpose}</h3>
       <p>
-        <ComponentLink name={s.component_candidate} known={s.in_catalog} /> <Badge tone={s.verified ? "ok" : "warn"}>{s.verified ? "verificado" : "sin verificar"}</Badge>{" "}
+        {s.in_catalog && <ComponentIcon name={s.component_candidate.split(" ")[0]} />} <ComponentLink name={s.component_candidate} known={s.in_catalog} /> <Badge tone={s.verified ? "ok" : "warn"}>{s.verified ? "verificado" : "sin verificar"}</Badge>{" "}
         <span className="muted">{s.evidence.file}:{s.evidence.line} · subjob {s.subjob} · confianza {s.confidence}</span>
       </p>
       {s.alternatives.length > 0 && <p className="muted">Alternativas: {s.alternatives.join(", ")}</p>}

@@ -296,6 +296,18 @@ def talend_catalog(q: str = "", family: str | None = None) -> dict:
         "count": len(cat.components),
         "families": {f: len(v) for f, v in cat.data["families"].items()},
         "components": cat.search(q, family)[:300],
+        "official_inventory": {
+            "release": cat.data["official_inventory"]["release"],
+            "source": cat.data["official_inventory"]["source"],
+            "count": len(cat.data["official_inventory"]["components"]),
+            "components": [
+                {"name": name, **meta}
+                for name, meta in sorted(cat.data["official_inventory"]["components"].items())
+                if not q
+                or q.lower() in name.lower()
+                or q.lower() in meta.get("connectivity", "").lower()
+            ],
+        },
     }
 
 

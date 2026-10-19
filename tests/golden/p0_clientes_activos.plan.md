@@ -27,7 +27,7 @@
 
 ### 2. Renombrar columnas
 
-- **Acción:** add_component · **Componente:** `tMap` (sin verificar)
+- **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar)
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `op_5_read_1`
@@ -38,7 +38,7 @@
 
 ### 3. Filtrar filas (sentencia WHERE): estado = 'A' and saldo > 0
 
-- **Acción:** add_component · **Componente:** `tFilterRow` (sin verificar) · alternativas: `tMap`
+- **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:7`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfilterrow)
 - **Conexiones:** Main desde `op_5_rename_1`
@@ -53,7 +53,7 @@
 
 ### 4. Calcular columnas (asignaciones y condicionales)
 
-- **Acción:** add_component · **Componente:** `tMap` (sin verificar) · alternativas: `tJavaRow`
+- **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJavaRow`
 - **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `op_7_filter_1`
@@ -73,7 +73,7 @@
 
 ### 5. Conservar/descartar columnas
 
-- **Acción:** add_component · **Componente:** `tFilterColumns` (sin verificar) · alternativas: `tMap`
+- **Acción:** add_component · **Componente:** `tFilterColumns` ![Icono Talend](/talend-icons/tFilterColumns_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfiltercolumns)
 - **Conexiones:** Main desde `op_5_compute_1`
@@ -83,7 +83,7 @@
 
 ### 6. Conservar/descartar columnas
 
-- **Acción:** add_component · **Componente:** `tFilterColumns` (sin verificar) · alternativas: `tMap`
+- **Acción:** add_component · **Componente:** `tFilterColumns` ![Icono Talend](/talend-icons/tFilterColumns_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfiltercolumns)
 - **Conexiones:** Main desde `op_5_select_columns_1`
@@ -126,7 +126,7 @@
 
 ### 9. Ordenar por cliente_id
 
-- **Acción:** add_component · **Componente:** `tSortRow` (sin verificar)
+- **Acción:** add_component · **Componente:** `tSortRow` ![Icono Talend](/talend-icons/tSortRow_icon32.png) (sin verificar)
 - **Subjob:** `s15` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsortrow)
 - **Conexiones:** Main desde `op_15_read_1`
@@ -137,7 +137,7 @@
 
 ### 10. Eliminar duplicados
 
-- **Acción:** add_component · **Componente:** `tUniqRow` (sin verificar)
+- **Acción:** add_component · **Componente:** `tUniqRow` ![Icono Talend](/talend-icons/tUniqRow_icon32.png) (sin verificar)
 - **Subjob:** `s15` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tuniqrow)
 - **Conexiones:** Main desde `op_15_sort_1`

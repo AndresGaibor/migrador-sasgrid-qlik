@@ -3,24 +3,40 @@
 import csv
 import io
 import re
+import shutil
 from pathlib import Path
 
 from sas_grid_migrator.dependency_graph.builder import DependencyReport
 from sas_grid_migrator.migration_planner.models import JobPlan, PlanSet, PlanStep
 
-CHECKLIST = Path(__file__).resolve().parents[3] / "templates" / "validation-checklist.md"
+ROOT = Path(__file__).resolve().parents[3]
+CHECKLIST = ROOT / "templates" / "validation-checklist.md"
+TALEND_ICONS = ROOT / "apps" / "web" / "public" / "talend-icons"
+
+
+def _component_icon_file(name: str) -> str | None:
+    component = name.split(" ", 1)[0]
+    if not re.fullmatch(r"t[A-Za-z0-9]+", component):
+        return None
+    for extension in ("png", "svg"):
+        filename = f"{component}_icon32.{extension}"
+        if (TALEND_ICONS / filename).is_file():
+            return filename
+    return None
 
 
 def safe_name(program: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "__", program)
 
 
-def _step_md(s: PlanStep) -> list[str]:
+def _step_md(s: PlanStep, icon_base: str = "/talend-icons") -> list[str]:
     ver = "verificado" if s.verified else "sin verificar"
+    icon = _component_icon_file(s.component_candidate)
+    icon_md = f" ![Icono Talend]({icon_base.rstrip('/')}/{icon})" if icon else ""
     out = [
         f"### {s.order}. {s.purpose}",
         "",
-        f"- **Acción:** {s.action} · **Componente:** `{s.component_candidate}` ({ver})"
+        f"- **Acción:** {s.action} · **Componente:** `{s.component_candidate}`{icon_md} ({ver})"
         + (
             f" · alternativas: {', '.join(f'`{a}`' for a in s.alternatives)}"
             if s.alternatives
@@ -86,7 +102,7 @@ def _step_md(s: PlanStep) -> list[str]:
     return out
 
 
-def render_plan_md(plan: JobPlan) -> str:
+def render_plan_md(plan: JobPlan, icon_base: str = "/talend-icons") -> str:
     n_steps = len(plan.steps) + sum(len(c.steps) for c in plan.children)
     out = [
         f"# Job `{plan.job_name}`",
@@ -127,11 +143,11 @@ def render_plan_md(plan: JobPlan) -> str:
         out.append("")
     out += ["## Pasos", ""]
     for s in plan.steps:
-        out += _step_md(s)
+        out += _step_md(s, icon_base)
     for c in plan.children:
         out += [f"## Job hijo / joblet para `%{c.name}`({', '.join(c.params)})", ""]
         for s in c.steps:
-            out += _step_md(s)
+            out += _step_md(s, icon_base)
     if plan.unresolved:
         out += ["## Sin resolver", ""] + [f"- {u}" for u in plan.unresolved[:50]]
         if len(plan.unresolved) > 50:
@@ -220,10 +236,21 @@ def steps_csv(ps: PlanSet) -> str:
 
 def write_exports(ps: PlanSet, out_dir: Path, deps: DependencyReport | None = None) -> list[Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
+    icon_files = {
+        icon
+        for p in ps.plans
+        for s in p.steps + [s for child in p.children for s in child.steps]
+        if (icon := _component_icon_file(s.component_candidate))
+    }
+    if icon_files:
+        icon_dir = out_dir / "assets" / "talend-icons"
+        icon_dir.mkdir(parents=True, exist_ok=True)
+        for icon in sorted(icon_files | {"LICENSE", "NOTICE.md"}):
+            shutil.copyfile(TALEND_ICONS / icon, icon_dir / icon)
     written = []
     for p in ps.plans:
         base = out_dir / safe_name(p.program)
-        (base.with_suffix(".md")).write_text(render_plan_md(p))
+        (base.with_suffix(".md")).write_text(render_plan_md(p, "assets/talend-icons"))
         (base.with_suffix(".json")).write_text(p.model_dump_json(indent=2))
         written += [base.with_suffix(".md"), base.with_suffix(".json")]
     for name, content in (("index.md", render_index_md(ps, deps)), ("steps.csv", steps_csv(ps))):

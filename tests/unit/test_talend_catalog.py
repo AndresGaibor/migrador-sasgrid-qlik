@@ -9,6 +9,11 @@ RULES = json.loads((ROOT / "rules" / "mappings" / "talend-components.json").read
 
 def test_catalog_shape():
     cat = load_catalog()
+    inventory = cat.data["official_inventory"]
+    assert inventory["release"] == "R2026-01"
+    assert len(inventory["components"]) == 693
+    assert "tMilvusInput" in inventory["components"]
+    assert "tMilvusInput" not in cat.components  # inventory oficial ≠ esquema de parámetros
     assert len(cat.components) > 500
     f = cat.get("tFilterRow")
     assert f and "Processing" in f["families"]
@@ -80,6 +85,9 @@ def test_api_catalog(monkeypatch, tmp_path):
     c = TestClient(app)
     lst = c.get("/api/talend/catalog", params={"q": "oracleinput"}).json()
     assert lst["count"] > 500 and any(x["name"] == "tOracleInput" for x in lst["components"])
+    inventory = c.get("/api/talend/catalog", params={"q": "milvus"}).json()["official_inventory"]
+    assert inventory["release"] == "R2026-01"
+    assert any(x["name"] == "tMilvusInput" for x in inventory["components"])
     one = c.get("/api/talend/catalog/tFilterRow").json()
     assert one["name"] == "tFilterRow" and one["parameters"] and "variants" in one
     assert c.get("/api/talend/catalog/..%2F..%2Fetc%2Fpasswd").status_code == 404

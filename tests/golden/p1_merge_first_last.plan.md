@@ -8,7 +8,7 @@
 
 ### 1. Definir formatos como tabla de lookup
 
-- **Acción:** add_component · **Componente:** `tFixedFlowInput` (sin verificar) · alternativas: `tMap (lookup)`, `Rutina Java`
+- **Acción:** add_component · **Componente:** `tFixedFlowInput` ![Icono Talend](/talend-icons/tFixedFlowInput_icon32.png) (sin verificar) · alternativas: `tMap (lookup)`, `Rutina Java`
 - **Subjob:** `s2` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p1_merge_first_last.sas:2`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput)
 - **Propiedades:**
@@ -34,7 +34,7 @@
 
 ### 3. Ordenar por cliente_id, fecha_pago
 
-- **Acción:** add_component · **Componente:** `tSortRow` (sin verificar)
+- **Acción:** add_component · **Componente:** `tSortRow` ![Icono Talend](/talend-icons/tSortRow_icon32.png) (sin verificar)
 - **Subjob:** `s6` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsortrow)
 - **Conexiones:** Main desde `op_6_read_1`
@@ -76,7 +76,7 @@
 
 ### 6. Ordenar por cliente_id
 
-- **Acción:** add_component · **Componente:** `tSortRow` (sin verificar)
+- **Acción:** add_component · **Componente:** `tSortRow` ![Icono Talend](/talend-icons/tSortRow_icon32.png) (sin verificar)
 - **Subjob:** `s7` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:7`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsortrow)
 - **Conexiones:** Main desde `op_7_read_1`
@@ -132,7 +132,7 @@
 
 ### 10. Unir (merge_by): work.clientes, work.pagos
 
-- **Acción:** add_component · **Componente:** `tMap` (sin verificar) · alternativas: `tJoin`
+- **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJoin`
 - **Subjob:** `s9` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p1_merge_first_last.sas:9`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `op_9_read_1`, Lookup desde `op_9_read_2`
@@ -148,7 +148,7 @@
 
 ### 11. Calcular columnas (asignaciones y condicionales)
 
-- **Acción:** add_component · **Componente:** `tMap` (sin verificar) · alternativas: `tJavaRow`
+- **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJavaRow`
 - **Subjob:** `s9` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p1_merge_first_last.sas:9`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
 - **Conexiones:** Main desde `op_9_join_1`

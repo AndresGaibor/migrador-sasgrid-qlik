@@ -38,7 +38,7 @@
 
 ### 3. Comando del sistema operativo
 
-- **Acción:** add_component · **Componente:** `tSystem` (sin verificar)
+- **Acción:** add_component · **Componente:** `tSystem` ![Icono Talend](/talend-icons/tSystem_icon32.png) (sin verificar)
 - **Subjob:** `s7` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:7`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsystem)
 - **Conexiones:** OnSubjobOk desde `op_4_dynamic_code_1`
@@ -50,7 +50,7 @@
 
 ### 4. Comando del sistema operativo
 
-- **Acción:** add_component · **Componente:** `tSystem` (sin verificar)
+- **Acción:** add_component · **Componente:** `tSystem` ![Icono Talend](/talend-icons/tSystem_icon32.png) (sin verificar)
 - **Subjob:** `s8` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:8`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsystem)
 - **Conexiones:** OnSubjobOk desde `op_7_os_command_1`
@@ -62,7 +62,7 @@
 
 ### 5. Invocar macro %bucle
 
-- **Acción:** add_component · **Componente:** `tRunJob` (sin verificar) · alternativas: `Joblet`
+- **Acción:** add_component · **Componente:** `tRunJob` ![Icono Talend](/talend-icons/tRunJob_icon32.png) (sin verificar) · alternativas: `Joblet`
 - **Subjob:** `s17` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p2_codigo_dinamico.sas:17`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/trunjob)
 - **Conexiones:** OnSubjobOk desde `op_8_os_command_1`

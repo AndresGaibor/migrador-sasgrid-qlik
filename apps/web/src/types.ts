@@ -77,7 +77,17 @@ export type JobPlan = {
   unresolved: string[];
 };
 export type CatalogItem = { name: string; description: string; families: string[]; parameters: number };
-export type CatalogList = { count: number; families: Record<string, number>; components: CatalogItem[] };
+export type CatalogList = {
+  count: number;
+  families: Record<string, number>;
+  components: CatalogItem[];
+  official_inventory: {
+    release: string;
+    source: string;
+    count: number;
+    components: { name: string; connectivity?: string; available_from?: string; note?: string }[];
+  };
+};
 export type CatalogParam = {
   name: string;
   label?: string;
