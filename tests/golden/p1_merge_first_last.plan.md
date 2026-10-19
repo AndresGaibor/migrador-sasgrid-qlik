@@ -1,6 +1,6 @@
 # Job `job_p1_merge_first_last`
 
-- **Programa SAS:** `p1_merge_first_last.sas` (sha256 `e59f0d643755`)
+- **Programa SAS:** `p1_merge_first_last.sas` (sha256 `8642d7b05dfe`)
 - **Estado:** needs_review · **Pasos:** 13 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
@@ -10,7 +10,7 @@
 
 - **Acción:** add_component · **Componente:** `tFixedFlowInput` ![Icono Talend](/talend-icons/tFixedFlowInput_icon32.png) (sin verificar) · alternativas: `tMap (lookup)`, `Rutina Java`
 - **Subjob:** `s2` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p1_merge_first_last.sas:2`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput/tfixedflowinput-standard-properties)
 - **Propiedades:**
   - `VALUES` (Values) = _por configurar_ — regla mappings · nombre oficial
 - **Pendientes:**
@@ -36,7 +36,7 @@
 
 - **Acción:** add_component · **Componente:** `tSortRow` ![Icono Talend](/talend-icons/tSortRow_icon32.png) (sin verificar)
 - **Subjob:** `s6` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:6`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsortrow)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties)
 - **Conexiones:** Main desde `op_6_read_1`
 - **Propiedades:**
   - `CRITERIA` (Criteria) = `cliente_id, fecha_pago` — SAS p1_merge_first_last.sas:6 · nombre oficial
@@ -78,7 +78,7 @@
 
 - **Acción:** add_component · **Componente:** `tSortRow` ![Icono Talend](/talend-icons/tSortRow_icon32.png) (sin verificar)
 - **Subjob:** `s7` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:7`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsortrow)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties)
 - **Conexiones:** Main desde `op_7_read_1`
 - **Propiedades:**
   - `CRITERIA` (Criteria) = `cliente_id` — SAS p1_merge_first_last.sas:7 · nombre oficial
@@ -134,7 +134,7 @@
 
 - **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJoin`
 - **Subjob:** `s9` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p1_merge_first_last.sas:9`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `op_9_read_1`, Lookup desde `op_9_read_2`
 - **Propiedades:**
   - `Join model` (Editor del componente (no es un parámetro plano)) = `Left Outer Join` — SAS p1_merge_first_last.sas:9
@@ -150,7 +150,7 @@
 
 - **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJavaRow`
 - **Subjob:** `s9` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p1_merge_first_last.sas:9`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `op_9_join_1`
 - **Propiedades:**
   - `Expressions` (Editor del componente (no es un parámetro plano)) = `3 asignaciones, 3 condicionales` — SAS p1_merge_first_last.sas:9

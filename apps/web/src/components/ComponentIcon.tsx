@@ -8,7 +8,8 @@ export function ComponentIcon({ name }: Props) {
     <img
       className="component-icon"
       src={`/talend-icons/${encodeURIComponent(name)}_icon32.${extension}`}
-      alt="Icono del componente Talend"
+      alt=""
+      aria-hidden="true"
       width={32}
       height={32}
       loading="lazy"

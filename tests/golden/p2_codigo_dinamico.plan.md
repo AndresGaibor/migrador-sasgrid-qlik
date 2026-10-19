@@ -1,6 +1,6 @@
 # Job `job_p2_codigo_dinamico`
 
-- **Programa SAS:** `p2_codigo_dinamico.sas` (sha256 `d7a2b64f8e9e`)
+- **Programa SAS:** `p2_codigo_dinamico.sas` (sha256 `2f491b9a85c4`)
 - **Estado:** needs_review · **Pasos:** 6 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
@@ -40,7 +40,7 @@
 
 - **Acción:** add_component · **Componente:** `tSystem` ![Icono Talend](/talend-icons/tSystem_icon32.png) (sin verificar)
 - **Subjob:** `s7` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:7`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsystem)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/system/tsystem)
 - **Conexiones:** OnSubjobOk desde `op_4_dynamic_code_1`
 - **Propiedades:**
   - `COMMAND` (Command) = `x 'cp /data/out/reporte.csv /archivo/historico/'` — SAS p2_codigo_dinamico.sas:7 · nombre oficial
@@ -52,7 +52,7 @@
 
 - **Acción:** add_component · **Componente:** `tSystem` ![Icono Talend](/talend-icons/tSystem_icon32.png) (sin verificar)
 - **Subjob:** `s8` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:8`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsystem)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/system/tsystem)
 - **Conexiones:** OnSubjobOk desde `op_7_os_command_1`
 - **Propiedades:**
   - `COMMAND` (Command) = `systask command "gzip /data/out/reporte.csv" wait` — SAS p2_codigo_dinamico.sas:8 · nombre oficial
@@ -64,7 +64,7 @@
 
 - **Acción:** add_component · **Componente:** `tRunJob` ![Icono Talend](/talend-icons/tRunJob_icon32.png) (sin verificar) · alternativas: `Joblet`
 - **Subjob:** `s17` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p2_codigo_dinamico.sas:17`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/trunjob)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/system/trunjob-standard-properties)
 - **Conexiones:** OnSubjobOk desde `op_8_os_command_1`
 - **Propiedades:**
   - `PROCESS` (Job) = `bucle` — SAS p2_codigo_dinamico.sas:17 · nombre oficial

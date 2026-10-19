@@ -1,6 +1,6 @@
 # Job `job_p0_clientes_activos`
 
-- **Programa SAS:** `p0_clientes_activos.sas` (sha256 `21ee224bdf60`)
+- **Programa SAS:** `p0_clientes_activos.sas` (sha256 `2ba7aecba508`)
 - **Estado:** needs_review · **Pasos:** 11 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
@@ -29,7 +29,7 @@
 
 - **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar)
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `op_5_read_1`
 - **Propiedades:**
   - `Output columns` (Editor del componente (no es un parámetro plano)) = `id → cliente_id` — SAS p0_clientes_activos.sas:5
@@ -40,7 +40,7 @@
 
 - **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:7`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfilterrow)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties)
 - **Conexiones:** Main desde `op_5_rename_1`
 - **Propiedades:**
   - `LOGICAL_OP` (Logical operator used to combine conditions) = `&&` — SAS p0_clientes_activos.sas:7 · nombre oficial · opciones: OR, AND
@@ -55,7 +55,7 @@
 
 - **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJavaRow`
 - **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p0_clientes_activos.sas:5`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `op_7_filter_1`
 - **Propiedades:**
   - `Expressions` (Editor del componente (no es un parámetro plano)) = `0 asignaciones, 3 condicionales` — SAS p0_clientes_activos.sas:5
@@ -75,7 +75,7 @@
 
 - **Acción:** add_component · **Componente:** `tFilterColumns` ![Icono Talend](/talend-icons/tFilterColumns_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfiltercolumns)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties)
 - **Conexiones:** Main desde `op_5_compute_1`
 - **Propiedades:**
   - `SCHEMA` (Schema) = `drop: estado` — SAS p0_clientes_activos.sas:5 · nombre oficial
@@ -85,7 +85,7 @@
 
 - **Acción:** add_component · **Componente:** `tFilterColumns` ![Icono Talend](/talend-icons/tFilterColumns_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfiltercolumns)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties)
 - **Conexiones:** Main desde `op_5_select_columns_1`
 - **Propiedades:**
   - `SCHEMA` (Schema) = `keep: cliente_id, nombre, saldo, segmento` — SAS p0_clientes_activos.sas:5 · nombre oficial
@@ -128,7 +128,7 @@
 
 - **Acción:** add_component · **Componente:** `tSortRow` ![Icono Talend](/talend-icons/tSortRow_icon32.png) (sin verificar)
 - **Subjob:** `s15` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tsortrow)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties)
 - **Conexiones:** Main desde `op_15_read_1`
 - **Propiedades:**
   - `CRITERIA` (Criteria) = `cliente_id` — SAS p0_clientes_activos.sas:15 · nombre oficial
@@ -139,7 +139,7 @@
 
 - **Acción:** add_component · **Componente:** `tUniqRow` ![Icono Talend](/talend-icons/tUniqRow_icon32.png) (sin verificar)
 - **Subjob:** `s15` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tuniqrow)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/deduplication/tuniqrow-standard-properties)
 - **Conexiones:** Main desde `op_15_sort_1`
 - **Propiedades:**
   - `UNIQUE_KEY` (Unique key) = `cliente_id` — SAS p0_clientes_activos.sas:15 · nombre oficial

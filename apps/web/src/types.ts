@@ -18,7 +18,7 @@ export type Finding = {
   priority: "P0" | "P1" | "P2" | null;
   evidence: { file: string; line: number };
 };
-export type Program = { file: string; findings: Finding[]; stats: { statements: number; unrecognized: number } };
+export type Program = { file: string; findings: Finding[]; stats: { statements: number; unrecognized: number }; nodes?: import("./guided").SourceNode[] };
 export type DatasetInfo = { id: string; role: string; producers: string[]; consumers: string[] };
 export type DataEdge = { source: string; target: string; datasets: string[]; kind: string };
 export type GridTask = {
@@ -81,6 +81,7 @@ export type Step = {
   in_catalog?: boolean | null;
   doc_url?: string | null;
   variants?: string[];
+  requires_semantic_validation?: boolean;
 };
 export type JobPlan = {
   program: string;

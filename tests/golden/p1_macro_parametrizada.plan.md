@@ -1,6 +1,6 @@
 # Job `job_p1_macro_parametrizada`
 
-- **Programa SAS:** `p1_macro_parametrizada.sas` (sha256 `2b04d3a17bfa`)
+- **Programa SAS:** `p1_macro_parametrizada.sas` (sha256 `527e5bc7c423`)
 - **Estado:** needs_review · **Pasos:** 5 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
@@ -10,7 +10,7 @@
 
 - **Acción:** add_component · **Componente:** `tRunJob` ![Icono Talend](/talend-icons/tRunJob_icon32.png) (sin verificar) · alternativas: `Joblet`
 - **Subjob:** `s13` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:13`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/trunjob)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/system/trunjob-standard-properties)
 - **Propiedades:**
   - `PROCESS` (Job) = `extraer_mes` — SAS p1_macro_parametrizada.sas:13 · nombre oficial
   - `CONTEXTPARAMS` (Context Param) = `tabla=ventas, desde=1, hasta=12` — SAS p1_macro_parametrizada.sas:13 · nombre oficial
@@ -38,7 +38,7 @@
 
 - **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `m:extraer_mes:s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfilterrow)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties)
 - **Conexiones:** Main desde `m:extraer_mes:op_6_read_1`
 - **Propiedades:**
   - `LOGICAL_OP` (Logical operator used to combine conditions) = _por configurar_ — regla mappings · nombre oficial · opciones: OR, AND
@@ -55,7 +55,7 @@
 
 - **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar)
 - **Subjob:** `m:extraer_mes:s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `m:extraer_mes:op_6_filter_1`
 - **Propiedades:**
   - `Output columns` (Editor del componente (no es un parámetro plano)) = `*` — SAS p1_macro_parametrizada.sas:6

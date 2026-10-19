@@ -4,9 +4,9 @@ export type Node = { id: string; x: number; y: number };
 export type Link = { from: Node; to: Node; label: string };
 
 export const W = 190;
-export const H = 28;
+export const H = 62;
 const GAP_X = 70;
-const GAP_Y = 14;
+const GAP_Y = 26;
 
 /** Una columna por capa de procesamiento; solo aristas de datos entre nodos visibles. */
 export function layout(layers: string[][], edges: DataEdge[]) {
