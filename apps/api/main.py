@@ -84,24 +84,33 @@ def import_batch(project_id: str, body: NewImport) -> Manifest:
 
 @app.post("/api/projects/{project_id}/uploads", status_code=201)
 async def upload_zip(project_id: str, file: UploadFile) -> Manifest:
-    """Importa un ZIP subido desde el navegador (mismas validaciones que una ruta local)."""
+    """Importa un ZIP de proyecto o un único archivo SAS subido desde el navegador."""
     import tempfile
+    from pathlib import PurePosixPath
 
     s = store()
     _require(s, project_id)
     limit = s.settings.max_total_bytes
     s.settings.data_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=s.settings.data_dir) as tmp:
-        zip_path = Path(tmp) / "upload.zip"
+        name = PurePosixPath((file.filename or "").replace("\\", "/")).name
+        suffix = PurePosixPath(name).suffix.lower()
+        if suffix not in {".zip", ".sas"}:
+            raise HTTPException(422, "solo se permiten archivos .zip o .sas")
+        is_sas = suffix == ".sas"
+        source = Path(tmp) / "single" if is_sas else Path(tmp) / "upload.zip"
+        if is_sas:
+            source.mkdir()
+            source = source / name
         size = 0
-        with zip_path.open("wb") as out:
+        with source.open("wb") as out:
             while chunk := await file.read(1024 * 1024):
                 size += len(chunk)
                 if size > limit:
                     raise HTTPException(413, "archivo demasiado grande")
                 out.write(chunk)
         try:
-            return s.import_batch(project_id, zip_path)
+            return s.import_batch(project_id, source.parent if is_sas else source)
         except ImportError_ as e:
             raise HTTPException(422, str(e)) from e
 
