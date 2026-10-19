@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "../components/Icon";
+import { Dialog } from "../components/Dialog";
 import { api } from "../api";
 import { useAsync } from "../hooks";
 import { ComponentIcon } from "../components/ComponentIcon";
@@ -12,7 +13,6 @@ import { catalogAudit } from "../catalog-explorer";
 import { decodeProgress, encodeProgress, GUIDE_PROGRESS, isUncertainStep, storageStatus, type GuideProgress } from "../guide-progress";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -296,31 +296,25 @@ function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step
       {progress === "blocked" && <div className="guide-block-reason"><p><strong>Motivo del bloqueo:</strong> {blockReason || "Falta indicar el motivo."}</p><Button type="button" variant="link" size="xs" onClick={() => setDialog("blocked")}>Editar motivo</Button></div>}
       {previous && <Button type="button" variant="link" size="xs" className="guide-previous-step" onClick={() => jumpToStep(previous.id)}>← Volver al paso anterior · {previous.order}. {previous.component_candidate}</Button>}
       {err && <p className="error" role="alert">{err}</p>}
-      {dialog === "blocked" && <Dialog open onOpenChange={(open) => { if (!open) setDialog(null); }}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>¿Qué impide continuar?</DialogTitle></DialogHeader>
-          <p>Indica el motivo para que tú o tu equipo sepan qué falta resolver.</p>
-          <label>Motivo del bloqueo<Textarea value={blockReason} onChange={(e) => setBlockReason(e.target.value)} rows={3} autoFocus /></label>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialog(null)}>Cancelar</Button>
-            <Button disabled={!blockReason.trim()} onClick={() => void save("blocked")}>Guardar bloqueo</Button>
-          </DialogFooter>
-        </DialogContent>
+      {dialog === "blocked" && <Dialog title="¿Qué impide continuar?" onClose={() => setDialog(null)}>
+        <p>Indica el motivo para que tú o tu equipo sepan qué falta resolver.</p>
+        <label>Motivo del bloqueo<Textarea value={blockReason} onChange={(e) => setBlockReason(e.target.value)} rows={3} autoFocus /></label>
+        <div className="dialog-actions">
+          <Button variant="outline" onClick={() => setDialog(null)}>Cancelar</Button>
+          <Button disabled={!blockReason.trim()} onClick={() => void save("blocked")}>Guardar bloqueo</Button>
+        </div>
       </Dialog>}
-      {dialog === "confirm" && <Dialog open onOpenChange={(open) => { if (!open) setDialog(null); }}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Confirma este paso incierto</DialogTitle></DialogHeader>
+      {dialog === "confirm" && <Dialog title="Confirma este paso incierto" onClose={() => setDialog(null)}>
           <p>Este paso tiene información pendiente o una recomendación que aún no se ha verificado. Revísalo en Talend Studio antes de completarlo.</p>
           <ul>{s.pending.map((item, index) => <li key={index}>{item}</li>)}</ul>
           <div className="guide-confirm flex">
             <Checkbox id={`confirm-${s.id}`} checked={confirmed} onCheckedChange={(v) => setConfirmed(v === true)} />
             <label htmlFor={`confirm-${s.id}`}>Confirmo que revisé este paso en Talend Studio.</label>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialog(null)}>Volver a revisar</Button>
-            <Button disabled={!confirmed} onClick={() => void save("completed")}>Confirmar y completar</Button>
-          </DialogFooter>
-        </DialogContent>
+        <div className="dialog-actions">
+          <Button variant="outline" onClick={() => setDialog(null)}>Volver a revisar</Button>
+          <Button disabled={!confirmed} onClick={() => void save("completed")}>Confirmar y completar</Button>
+        </div>
       </Dialog>}
     </article>
   );
