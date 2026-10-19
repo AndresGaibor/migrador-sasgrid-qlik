@@ -78,6 +78,10 @@
 [data-slot="button"][data-variant="link"] { color: var(--accent); text-decoration: none; }
 [data-slot="button"][data-variant="link"]:hover { text-decoration: underline; }
 [data-slot="dialog-content"] { background: #fff; }
+/* La «X» de Radix no es un botón de acción: sin el verde de styles.css. */
+[data-slot="dialog-close"] { background: transparent; border: 0; min-height: 0; padding: 3px; color: var(--muted); }
+[data-slot="dialog-close"]:hover { background: #edf1ee; color: var(--accent); }
+[data-slot="label"] { align-items: flex-start; }
 
 /* Grafo de dependencias (SVG), con los colores del tema. */
 .graph { overflow: auto; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); }

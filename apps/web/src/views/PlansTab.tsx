@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -301,7 +300,7 @@ function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step
         <DialogContent>
           <DialogHeader><DialogTitle>¿Qué impide continuar?</DialogTitle></DialogHeader>
           <p>Indica el motivo para que tú o tu equipo sepan qué falta resolver.</p>
-          <Label>Motivo del bloqueo<Textarea value={blockReason} onChange={(e) => setBlockReason(e.target.value)} rows={3} autoFocus /></Label>
+          <label>Motivo del bloqueo<Textarea value={blockReason} onChange={(e) => setBlockReason(e.target.value)} rows={3} autoFocus /></label>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialog(null)}>Cancelar</Button>
             <Button disabled={!blockReason.trim()} onClick={() => void save("blocked")}>Guardar bloqueo</Button>
@@ -313,9 +312,9 @@ function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step
           <DialogHeader><DialogTitle>Confirma este paso incierto</DialogTitle></DialogHeader>
           <p>Este paso tiene información pendiente o una recomendación que aún no se ha verificado. Revísalo en Talend Studio antes de completarlo.</p>
           <ul>{s.pending.map((item, index) => <li key={index}>{item}</li>)}</ul>
-          <div className="flex items-start gap-2">
+          <div className="guide-confirm flex">
             <Checkbox id={`confirm-${s.id}`} checked={confirmed} onCheckedChange={(v) => setConfirmed(v === true)} />
-            <Label htmlFor={`confirm-${s.id}`} className="font-normal">Confirmo que revisé este paso en Talend Studio.</Label>
+            <label htmlFor={`confirm-${s.id}`}>Confirmo que revisé este paso en Talend Studio.</label>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialog(null)}>Volver a revisar</Button>
