@@ -19,7 +19,7 @@ export function App() {
       <header className="app-header">
         <a href="#/" className="brand" aria-label="Migrador, ir al inicio"><span className="brand-symbol"><Icon name="flow" size={25} /></span><span>Migrador<span className="brand-caption">SAS Grid → Talend</span></span></a>
         <div className="header-context">Espacio de migración</div>
-        <div className="header-actions"><span className="workspace-label">Mi espacio de trabajo</span><button className="icon-button" onClick={() => setHelp(true)} aria-label="Abrir guía de ayuda" title="Guía de ayuda"><Icon name="help" /></button><span className="workspace-avatar" aria-hidden="true">M</span></div>
+        <div className="header-actions"><button className="icon-button" onClick={() => setHelp(true)} aria-label="Abrir guía de ayuda" title="Guía de ayuda"><Icon name="help" /></button></div>
       </header>
       <aside className="sidebar">
         <div className="nav-caption">ESPACIO DE TRABAJO</div>
@@ -28,7 +28,7 @@ export function App() {
           <a href="#/catalogo" aria-label="Catálogo Talend" title="Catálogo Talend" aria-current={catalog ? "page" : undefined}><Icon name="book" /><span>Catálogo Talend</span></a>
           <a href="#/settings" aria-label="Configuración" title="Configuración" aria-current={settings ? "page" : undefined}><Icon name="settings" /><span>Configuración</span></a>
         </nav>
-        <div className="sidebar-bottom"><div className="sidebar-tip"><span className="tip-icon"><Icon name="help" /></span><strong>Te acompañamos</strong><p>De tus archivos SAS a un plan de migración, paso a paso.</p><button className="text-button" onClick={() => setHelp(true)}>Ver guía rápida <Icon name="arrow" size={16} /></button></div><span className="sidebar-footer">SAS Grid · Talend Studio</span></div>
+        <div className="sidebar-bottom"><span className="sidebar-footer">SAS Grid · Talend Studio</span></div>
       </aside>
       <main id="main-content" tabIndex={-1}>
         {catalog ? (
@@ -40,7 +40,7 @@ export function App() {
         ) : (
           <ProjectsView go={go} />
         )}
-        <footer className="page-footer"><Icon name="flow" size={16} /> Tu migración, con una ruta clara.</footer>
+        <footer className="page-footer"><span className="muted">Análisis y plan de migración · SAS Grid → Talend</span></footer>
       </main>
       {help && <Dialog title="Tu primera migración, paso a paso" onClose={() => setHelp(false)}>
         <p className="muted">Cada proyecto reúne tus archivos y los resultados de su análisis.</p>

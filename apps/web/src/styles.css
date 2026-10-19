@@ -14,6 +14,8 @@ button:hover, .button:hover { background: var(--accent-hover); border-color: var
 button:disabled { opacity: .55; cursor: not-allowed; }
 button.secondary, .button.secondary { background: #fff; color: var(--fg); border-color: #cdd3d6; }
 button.secondary:hover, .button.secondary:hover { background: #f1f4f2; border-color: #99a89f; }
+button.danger-button { background: #a9342d; border-color: #a9342d; }
+button.danger-button:hover { background: #8d2924; border-color: #8d2924; }
 .icon { flex-shrink: 0; vertical-align: middle; }
 button.icon-button { min-height: 34px; min-width: 34px; padding: 7px; background: transparent; color: var(--muted); border-color: transparent; }
 button.icon-button:hover { background: #edf1ee; color: var(--accent); }
@@ -212,6 +214,14 @@ details[open] > summary { margin-bottom: 16px; }
 .catalog-state-card p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
 .catalog-audit-panel { margin-top: 18px; }
 .catalog-audit-panel .section-heading { margin-bottom: 15px; }
+.catalog-table { min-width: 1110px; table-layout: fixed; }
+.catalog-table th:nth-child(1) { width: 160px; }
+.catalog-table th:nth-child(2) { width: 320px; }
+.catalog-table th:nth-child(3) { width: 185px; }
+.catalog-table th:nth-child(4) { width: 140px; }
+.catalog-table th:nth-child(5) { width: 155px; }
+.catalog-table th:nth-child(6) { width: 150px; }
+.catalog-table td:first-child a { white-space: nowrap; }
 .catalog-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 25px; margin: 0; }
 .catalog-facts dt { color: var(--muted); font-size: 11px; }
 .catalog-facts dd { margin: 3px 0 0; font-weight: 500; overflow-wrap: anywhere; }
@@ -289,4 +299,7 @@ textarea { width: 100%; resize: vertical; }
 .do-check { color: #8a4b00; }
 .step-group > summary { cursor: pointer; padding: 4px 0; }
 .step-group[open] > summary { margin-bottom: 10px; }
-.guide-job-meta progress { width: 120px; height: 6px; accent-color: var(--accent); }
+.guide-job-meta progress { width: 120px; height: 6px; appearance: none; border: 0; border-radius: 3px; background: #e4eae7; overflow: hidden; }
+.guide-job-meta progress::-webkit-progress-bar { background: #e4eae7; }
+.guide-job-meta progress::-webkit-progress-value { background: var(--accent); }
+.guide-job-meta progress::-moz-progress-bar { background: var(--accent); }

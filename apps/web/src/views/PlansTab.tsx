@@ -76,7 +76,7 @@ function PlanList({ id }: { id: string }) {
             const ordered = groups.flatMap((g) => g.rows);
             const next = ordered.find((r) => r.done < r.steps);
             let n = 0;
-            if (rows.length === 0) return <div className="empty-state"><span className="empty-icon">🧭</span><h3>Primero analiza tus programas</h3><p>Cuando termine el análisis, aquí aparecerá una guía para cada job.</p><a className="button" href={link(id, "resumen")}>Ir al resumen <Icon name="arrow" size={17} /></a></div>;
+            if (rows.length === 0) return <div className="empty-state"><span className="empty-icon"><Icon name="flow" size={34} /></span><h3>Primero analiza tus programas</h3><p>Cuando termine el análisis, aquí aparecerá una guía para cada job.</p><a className="button" href={link(id, "resumen")}>Ir al resumen <Icon name="arrow" size={17} /></a></div>;
             return (
               <>
                 {next && <div className="guide-intro"><div><strong>{next.done === 0 && next === ordered[0] ? "Empieza aquí" : "Continúa aquí"}</strong><p>{next.job_name}</p></div><a className="button" href={link(id, "planes", next.program)}>{next.done === 0 && next === ordered[0] ? "Empezar" : "Continuar"} <Icon name="arrow" size={17} /></a></div>}
@@ -136,12 +136,12 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
   return (
     <>
       {navigationWarning && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>No pudimos guardar el último cambio. Permaneces en esta guía; vuelve a guardar el estado o la nota antes de cambiar de job.</span></div>}
-      <div className="guide-job-navigation"><a aria-disabled={saving} href={saving ? undefined : link(id, "planes")} onClick={(event) => navigateAfterSave(event, link(id, "planes"))}>{saving ? "Guardando progreso…" : "← Todas las guías"}</a><div><a className={previousJob && !saving ? "button secondary" : "button secondary disabled-link"} aria-disabled={!previousJob || saving} href={previousJob && !saving ? link(id, "planes", previousJob.program) : undefined} onClick={(event) => previousJob && navigateAfterSave(event, link(id, "planes", previousJob.program))}>← Job anterior</a><a className={nextJob && !saving ? "button secondary" : "button secondary disabled-link"} aria-disabled={!nextJob || saving} href={nextJob && !saving ? link(id, "planes", nextJob.program) : undefined} onClick={(event) => nextJob && navigateAfterSave(event, link(id, "planes", nextJob.program))}>Siguiente job →</a></div></div>
+      <div className="guide-job-navigation"><a className="button secondary" aria-disabled={saving} href={saving ? undefined : link(id, "planes")} onClick={(event) => navigateAfterSave(event, link(id, "planes"))}>{saving ? "Guardando progreso…" : "Todas las guías"}</a><div><a className={previousJob && !saving ? "button secondary" : "button secondary disabled-link"} aria-disabled={!previousJob || saving} href={previousJob && !saving ? link(id, "planes", previousJob.program) : undefined} onClick={(event) => previousJob && navigateAfterSave(event, link(id, "planes", previousJob.program))}>Job anterior</a><a className={nextJob && !saving ? "button secondary" : "button secondary disabled-link"} aria-disabled={!nextJob || saving} href={nextJob && !saving ? link(id, "planes", nextJob.program) : undefined} onClick={(event) => nextJob && navigateAfterSave(event, link(id, "planes", nextJob.program))}>Siguiente job</a></div></div>
       <Load q={{ ...q, data: plan }}>
         {(p) => (
           <>
             <h1>{p.job_name}</h1>
-            <p className="subtitle">Hazlo en este orden, de arriba abajo. No hace falta interpretar nada: cada paso dice qué arrastrar, qué escribir y dónde.</p>
+            <p className="subtitle">Pasos en orden. Cada uno indica el componente, los valores y dónde se configuran en Talend Studio.</p>
             <p><strong>Programa SAS de origen:</strong> <a href={link(id, "programas", p.program)}><code>{p.program}</code></a></p>
             {(p.libraries_needed.length > 0 || p.context_variables.length > 0) && (
               <div className="panel">
@@ -154,7 +154,7 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
               </div>
             )}
             {ownGrid.length > 0 && <GridRecommendations id={id} items={ownGrid} />}
-            <h2>{ownGrid.some((g) => PARENT_PATTERN.test(g.pattern_id)) ? "Después: el resto del programa" : "Construye el Job paso a paso"} <Badge>{p.steps.length}</Badge></h2>
+            <h2>{ownGrid.some((g) => PARENT_PATTERN.test(g.pattern_id)) ? "Después: el resto del programa" : "Construye el Job paso a paso"} <Badge>{p.steps.length === 1 ? "1 paso" : `${p.steps.length} pasos`}</Badge></h2>
             <StepGroups id={id} steps={p.steps} onDecide={decide} />
             {p.children.map((c) => (
               <section key={c.name}>
@@ -163,10 +163,7 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
               </section>
             ))}
             {p.validation_cases.length > 0 && (
-              <>
-                <h2>Casos de validación</h2>
-                <ul>{p.validation_cases.map((v) => <li key={v.id}><code>{v.id}</code> ({v.kind}): {v.description}</li>)}</ul>
-              </>
+              <details><summary>Casos de validación ({p.validation_cases.length})</summary><ul>{p.validation_cases.map((v) => <li key={v.id}>{v.description} <span className="muted">· {v.id}</span></li>)}</ul></details>
             )}
             {p.unresolved.length > 0 && (
               <details><summary>Sin resolver ({p.unresolved.length})</summary><ul>{p.unresolved.map((u, i) => <li key={i}>{u}</li>)}</ul></details>
@@ -227,11 +224,13 @@ function StepGroups({ id, steps, onDecide }: { id: string; steps: Step[]; onDeci
         const writes = g.filter((x) => x.purpose.startsWith("Escribir ")).map((x) => x.purpose.slice(9).replace(/ \(reemplaza\)/, ""));
         const title = reads.length || writes.length ? `${reads.join(" + ") || "datos"} → ${writes.join(" + ") || "resultado"}` : g[0].purpose;
         const done = g.filter(isDone).length;
+        const cards = <>{g.length > 1 && <p className="muted">Estos {g.length} pasos van en el mismo lienzo, uno detrás de otro. Conéctalos como indica cada paso.</p>}{g.map((st) => <StepCard key={st.id} id={id} s={st} allSteps={ordered} previous={ordered[ordered.indexOf(st) - 1]} onDecide={onDecide} />)}</>;
+        // Con un solo bloque el desplegable sólo repite el título del paso: se muestran los pasos directamente.
+        if (groups.length === 1) return <div key={g[0].id}>{cards}</div>;
         return (
           <details className="panel step-group" key={g[0].id} open={gi === firstOpen}>
-            <summary><b>Bloque {gi + 1} de {groups.length}</b> · {title} <span className="muted">({done} de {g.length} hechos)</span></summary>
-            {g.length > 1 && <p className="muted">Estos {g.length} pasos van en el mismo lienzo, uno detrás de otro. Conéctalos como indica cada paso.</p>}
-            {g.map((st) => <StepCard key={st.id} id={id} s={st} allSteps={ordered} previous={ordered[ordered.indexOf(st) - 1]} onDecide={onDecide} />)}
+            <summary><b>Bloque {gi + 1} · {title}</b> <Badge tone={done === g.length ? "ok" : undefined}>{done === g.length ? "Terminado" : `${done} de ${g.length}`}</Badge></summary>
+            {cards}
           </details>
         );
       })}
@@ -265,22 +264,22 @@ function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step
   const officialUrl = s.doc_url ?? catalogAudit.recommended_components[catalogName]?.official_url;
   return (
     <article className="step guide-step" id={`step-${s.id}`}>
-      <div className="guide-step-heading"><span className="guide-step-number">{s.order}</span><div><span className="eyebrow">PASO {s.order} · HAZ ESTO EN TALEND STUDIO</span><h3>{s.purpose}</h3></div></div>
+      <div className="guide-step-heading"><span className="guide-step-number">{s.order}</span><div className="step-head"><h3>{s.purpose}</h3><span className="step-component">Componente: <code>{s.component_candidate}</code></span></div></div>
       <ol className="do-list">
         {stepDoes(s, allSteps).map((d, i) => (
           <li key={i} className={d.check ? "do-check" : undefined}>
             <b>{d.text}</b>
-            {d.value && <pre className="do-value">{d.value}</pre>}
+            {d.rows ? <div className="do-table-wrap"><table className="do-table">{d.columns && <thead><tr>{d.columns.map((c) => <th key={c}>{c}</th>)}</tr></thead>}<tbody>{d.rows.map((r, ri) => <tr key={ri}>{r.map((cell, ci) => <td key={ci}>{cell}</td>)}</tr>)}</tbody></table></div> : d.value && <pre className="do-value">{d.value}</pre>}
             {d.where && <div className="muted">Dónde: {d.where}</div>}
           </li>
         ))}
       </ol>
-      <div className="guide-links">{s.evidence?.file && <a href={`${link(id, "programas", s.evidence.file)}?line=${s.evidence.line}`}>🔎 Ver el SAS original · {s.evidence.file.split("/").pop()}:{s.evidence.line}</a>}{officialUrl ? <a href={officialUrl} target="_blank" rel="noreferrer">📘 Documentación oficial ↗</a> : null}</div>
-      <details><summary>Detalles técnicos</summary><p className="muted">Subjob: {s.subjob} · confianza: {s.confidence} · {s.verified ? "cotejado con Talend MCP" : "sin cotejar con Talend MCP"}{s.alternatives.length > 0 && ` · alternativas: ${s.alternatives.join(", ")}`}</p></details>
+      <div className="guide-links">{s.evidence?.file && <a href={`${link(id, "programas", s.evidence.file)}?line=${s.evidence.line}`}><Icon name="search" size={15} /> Ver el SAS original · {s.evidence.file.split("/").pop()}:{s.evidence.line}</a>}{officialUrl ? <a href={officialUrl} target="_blank" rel="noreferrer"><Icon name="book" size={15} /> Documentación oficial</a> : null}</div>
+      <details><summary>Trazabilidad</summary><p className="muted">Subjob: {s.subjob} · confianza: {s.confidence} · {s.verified ? "cotejado con Talend MCP" : "sin cotejar con Talend MCP"}{s.alternatives.length > 0 && ` · alternativas: ${s.alternatives.join(", ")}`}</p></details>
       {s.assumptions.length > 0 && <p className="muted">Supuestos: {s.assumptions.join("; ")}</p>}
       <div className="row">
         <label>
-          ¿Ya lo hiciste?
+          Estado del paso
           <Select value={progress} onValueChange={(v) => chooseProgress(v as GuideProgress)}>
             <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
             <SelectContent>

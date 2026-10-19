@@ -1,6 +1,6 @@
 import type { Step } from "./types";
 
-export type Do = { text: string; value?: string; where?: string; check?: boolean };
+export type Do = { text: string; value?: string; columns?: string[]; rows?: string[][]; where?: string; check?: boolean };
 
 const WIRE: Record<string, string> = {
   OnSubjobOk: "Trigger → On Subjob Ok",
@@ -47,7 +47,7 @@ function datasetSteps(s: Step, all: Step[], comp: string): Do[] | null {
   if (isRead) {
     out.push({ text: "En «Field Separator» escribe:", value: '","' }, { text: "En «Header» escribe:", value: "1" });
     const cols = (s.schema_columns ?? []).filter((c) => c.name);
-    out.push({ text: "Pulsa «Edit schema» y añade una columna por cada campo del dataset (nombre y tipo).", value: cols.length ? cols.map((c) => `${c.name} : ${c.talend_type ?? "String"}`).join("\n") : undefined, where: "Si otro Job de esta lista genera este archivo, copia el esquema de su componente de salida" });
+    out.push(cols.length ? { text: "Pulsa «Edit schema» y añade una columna por cada campo del dataset:", columns: ["Columna", "Tipo"], rows: cols.map((c) => [c.name, c.talend_type ?? "String"]), where: "Si otro Job de esta lista genera este archivo, copia el esquema de su componente de salida" } : { text: "Pulsa «Edit schema» y añade una columna por cada campo del dataset.", where: "Si otro Job de esta lista genera este archivo, copia el esquema de su componente de salida" });
   } else {
     out.push({ text: s.operation_type === "append" ? "Marca «Append» (este paso añade filas al final, no reemplaza)." : "Deja «Append» desmarcado (SAS reemplaza el dataset completo)." });
     out.push({ text: "Marca «Include Header» y pulsa «Sync columns».", where: "Pestaña Component → Basic settings (hereda las columnas del componente anterior)" });
@@ -84,13 +84,15 @@ export function stepDoes(s: Step, all: Step[]): Do[] {
       continue;
     }
     if (comp === "tFixedFlowInput" && label === "Values" && raw.includes(" | ")) {
-      out.push({ text: `Marca «Use Inline Table» y añade una fila por cada línea (${raw.split("\n").length} filas; columnas separadas por « | »):`, value: raw, where: "Pestaña Component → Basic settings → Mode: Use Inline Table" });
+      const heads = (s.schema_columns ?? []).filter((c) => c.name).map((c) => c.name);
+      const rows = raw.split("\n").map((line) => line.split(" | ").map((cell) => cell.trim()));
+      out.push({ text: `Marca «Use Inline Table» y copia estas ${rows.length} filas:`, columns: heads.length ? heads : undefined, rows, where: "Pestaña Component → Basic settings → Mode: Use Inline Table" });
       continue;
     }
     out.push(p.value == null ? { text: `Campo «${label}»: no hay valor sugerido; complétalo según el SAS.`, where: "Pestaña Component → Basic settings" } : { text: `En el campo «${label}» escribe:`, value: toContext(raw), where: "Pestaña Component → Basic settings" });
   }
   const cols = (s.schema_columns ?? []).filter((c) => c.name);
-  if (cols.length) out.push({ text: "Pulsa «Edit schema» y añade estas columnas (nombre : tipo):", value: cols.map((c) => `${c.name} : ${c.talend_type ?? "String"}`).join("\n") });
+  if (cols.length) out.push({ text: "Pulsa «Edit schema» y añade estas columnas:", columns: ["Columna", "Tipo"], rows: cols.map((c) => [c.name, c.talend_type ?? "String"]) });
   for (const e of s.expressions) {
     out.push(e.talend ? { text: `Donde el SAS hace «${e.sas}», escribe:`, value: e.talend, where: "En el campo de expresión del componente" } : { text: `Sin traducción automática para «${e.sas}»: escribe su equivalente en Java a mano.` });
   }

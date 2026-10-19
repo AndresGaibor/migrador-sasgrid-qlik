@@ -37,7 +37,9 @@ _READS = {"read", "read_file", "inline_data"}
 
 
 _FMT_NAME = re.compile(r"^\s*value\s+\$?(\w+)", re.IGNORECASE)
-_FMT_ROW = re.compile(r"^\s*('(?:[^']|'')*'|\"[^\"]*\"|[^=\s][^=]*?)\s*=\s*('(?:[^']|'')*'|\"[^\"]*\")\s*$")
+_FMT_ROW = re.compile(
+    r"^\s*('(?:[^']|'')*'|\"[^\"]*\"|[^=\s][^=]*?)\s*=\s*('(?:[^']|'')*'|\"[^\"]*\")\s*$"
+)
 
 
 def _format_rows(statements: list[str]) -> list[tuple[str, str, str]]:

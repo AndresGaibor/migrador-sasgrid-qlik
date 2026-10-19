@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { api } from "../api";
 import { useAsync } from "../hooks";
 import { ComponentIcon } from "../components/ComponentIcon";
+import { Icon } from "../components/Icon";
 import type { CatalogComponent, CatalogItem, CatalogParam } from "../types";
 import {
   catalogAudit,
@@ -52,7 +53,7 @@ function CatalogList() {
       <div className="eyebrow">BIBLIOTECA DE RECURSOS</div>
       <h1>Catálogo de componentes Talend</h1>
       <p className="subtitle">Busca una pieza por nombre, función o familia. Revisa su referencia documental y comprueba si está validada en Studio antes de usarla.</p>
-      <p className="muted">Los esquemas son candidatos derivados de las definiciones abiertas de Talend Open Studio. El inventario oficial de Qlik aparece a continuación; la documentación se descarga con <code>tools/fetch_talend_docs.py</code>.</p>
+      <p className="muted">Las referencias se basan en definiciones públicas de Talend Open Studio. La disponibilidad y las opciones pueden variar según la versión; consulta la documentación oficial antes de configurar el Job.</p>
       <div className="catalog-filters">
         <label className="catalog-search">
           Buscar componente
@@ -106,7 +107,7 @@ function CatalogResults({ items, count }: { items: DisplayItem[]; count: number 
       {items.length === 0 ? (
         <div className="empty-state"><h2>No encontramos componentes</h2><p>Prueba otro nombre, familia o estado documental.</p></div>
       ) : (
-        <div className="table-wrap"><table>
+        <div className="table-wrap"><table className="catalog-table">
           <thead><tr><th>Componente</th><th>Función</th><th>Familia / versión</th><th>Uso en guía</th><th>Catálogo candidato</th><th>Verificación Studio</th></tr></thead>
           <tbody>{items.map((item) => <CatalogRow key={item.name} item={item} />)}</tbody>
         </table></div>
@@ -175,12 +176,12 @@ function ComponentBody({
       <p className="subtitle">{audit?.official_purpose ?? component?.description ?? "Función oficial pendiente de confirmar."}</p>
       <div className="catalog-state-grid" aria-label="Estados del componente">
         <section className="catalog-state-card">
-          <span className="catalog-state-icon" aria-hidden="true">📚</span>
+          <span className="catalog-state-icon" aria-hidden="true"><Icon name="book" size={22} /></span>
           <div><strong>Candidato del catálogo</strong><p>{audit?.catalog_entry_present ? "El nombre aparece en el índice comunitario usado como semilla." : guideItem ? "Está citado por las reglas de la guía, pero no tiene entrada en el índice comunitario." : "Este componente no forma parte del alcance auditado de la guía."}</p></div>
           <Badge tone={audit?.catalog_entry_present ? "ok" : "warn"}>{audit?.catalog_entry_present ? "Disponible" : "Pendiente"}</Badge>
         </section>
         <section className="catalog-state-card">
-          <span className="catalog-state-icon" aria-hidden="true">🧪</span>
+          <span className="catalog-state-icon" aria-hidden="true"><Icon name="check" size={22} /></span>
           <div><strong>Verificación en Talend Studio</strong><p>No se ha comprobado en un Job real. La versión y edición instaladas no están disponibles en este entorno.</p></div>
           <Badge tone="warn">Sin verificar</Badge>
         </section>

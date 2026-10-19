@@ -121,7 +121,9 @@ def import_source(
             skipped.append(Skipped(path=raw, reason=reason or "ruta insegura"))
             continue
         # "._x" son metadatos AppleDouble que macOS añade al comprimir, no código
-        if any(part in EXCLUDED_DIRS for part in rel.split("/")) or PurePosixPath(rel).name.startswith("._"):
+        if any(part in EXCLUDED_DIRS for part in rel.split("/")) or PurePosixPath(
+            rel
+        ).name.startswith("._"):
             skipped.append(Skipped(path=rel, reason="directorio excluido"))
             continue
         total += len(data)
