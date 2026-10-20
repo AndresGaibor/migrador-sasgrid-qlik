@@ -228,6 +228,48 @@ def test_api_catalog_exposes_only_current_studio_8_components():
     assert c.get("/api/talend/catalog/tNoExiste").status_code == 404
 
 
+def test_archived_catalog_is_separate_and_never_runtime_verified():
+    from apps.api.main import app
+    from fastapi.testclient import TestClient
+
+    archive = json.loads(
+        (ROOT / "rules" / "archive" / "talend" / "studio8-default-install-exclusions.json").read_text()
+    )
+    client = TestClient(app)
+    response = client.get("/api/talend/catalog/archived")
+    assert response.status_code == 200
+    listing = response.json()
+    names = [item["name"] for item in listing["components"]]
+    assert listing["target"] == "Talend Studio 8.0 R2026-09"
+    assert listing["count"] == len(archive["components"]) == 277
+    assert names == sorted(names, key=str.casefold)
+    assert set(names).isdisjoint(CURRENT_COMPONENTS)
+    assert {
+        status: sum(item["status"] == status for item in listing["components"])
+        for status in archive["counts"]
+    } == archive["counts"]
+
+    optional = next(item for item in archive["components"] if item["status"] == "optional_install")
+    optional_name = optional["name"]
+    search = client.get("/api/talend/catalog/archived", params={"q": optional_name.casefold()}).json()
+    assert [item["name"] for item in search["components"]] == [optional_name]
+    detail = client.get(f"/api/talend/catalog/archived/{optional_name}").json()
+    assert detail["status"] == "optional_install"
+    assert detail["runtime_verified"] is False
+    assert detail["source_url"] == optional["source_url"]
+    assert client.get("/api/talend/catalog", params={"q": optional_name}).json()["components"] == []
+    assert client.get(f"/api/talend/catalog/{optional_name}").status_code == 404
+
+    removed = next(
+        item for item in archive["components"] if item["status"] == "removed_from_target_release"
+    )
+    removed_detail = client.get(f"/api/talend/catalog/archived/{removed['name']}").json()
+    assert removed_detail["status"] == "removed_from_target_release"
+    assert removed_detail["source_url"] is None
+    assert removed_detail["runtime_verified"] is False
+    assert client.get("/api/talend/catalog/archived/not-archived").status_code == 404
+
+
 def test_variants_only_for_technology_families():
     cat = load_catalog()
     assert cat.variants_of("tFilterRow") == []  # Processing: «Row» no es un rol de base de datos
