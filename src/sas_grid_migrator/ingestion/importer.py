@@ -5,8 +5,8 @@ Los archivos aceptados se copian a `dest` (snapshot reproducible) y se registran
 
 import hashlib
 import os
-import shutil
 import stat
+import tempfile
 import zipfile
 from collections.abc import Iterator
 from pathlib import Path, PurePosixPath
@@ -110,38 +110,52 @@ def import_source(
         raise ImportError_(
             "la fuente está dentro de la copia del proyecto; se borraría al reimportar"
         )
-    shutil.rmtree(dest, ignore_errors=True)
-    dest.mkdir(parents=True)
+    dest.parent.mkdir(parents=True, exist_ok=True)
     files: list[SourceFile] = []
     skipped: list[Skipped] = []
     total = 0
-    for raw, data, reason in _entries(src, limits, dest):
-        rel = safe_relpath(raw)
-        if data is None or rel is None:
-            skipped.append(Skipped(path=raw, reason=reason or "ruta insegura"))
-            continue
-        # "._x" son metadatos AppleDouble que macOS añade al comprimir, no código
-        if any(part in EXCLUDED_DIRS for part in rel.split("/")) or PurePosixPath(
-            rel
-        ).name.startswith("._"):
-            skipped.append(Skipped(path=rel, reason="directorio excluido"))
-            continue
-        total += len(data)
-        if len(files) + 1 > limits.max_files:
-            raise ImportError_(f"más de {limits.max_files} archivos")
-        if total > limits.max_total_bytes:
-            raise ImportError_(f"más de {limits.max_total_bytes} bytes en total")
-        kind = KIND_BY_SUFFIX.get(PurePosixPath(rel).suffix.lower(), FileKind.OTHER)
-        target = dest / rel
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(data)
-        files.append(
-            SourceFile(
-                path=rel,
-                sha256=hashlib.sha256(data).hexdigest(),
-                size=len(data),
-                kind=kind,
-                encoding=detect_encoding(data) if kind in TEXT_KINDS else None,
+    with tempfile.TemporaryDirectory(dir=dest.parent) as tmp:
+        staged = Path(tmp) / "snapshot"
+        staged.mkdir()
+        for raw, data, reason in _entries(src, limits, staged):
+            rel = safe_relpath(raw)
+            if data is None or rel is None:
+                skipped.append(Skipped(path=raw, reason=reason or "ruta insegura"))
+                continue
+            # "._x" son metadatos AppleDouble que macOS añade al comprimir, no código
+            if PurePosixPath(rel).name.startswith("._"):
+                skipped.append(
+                    Skipped(path=rel, reason="metadatos auxiliares de macOS; no son código fuente")
+                )
+                continue
+            if any(part in EXCLUDED_DIRS for part in rel.split("/")):
+                skipped.append(Skipped(path=rel, reason="directorio excluido"))
+                continue
+            total += len(data)
+            if len(files) + 1 > limits.max_files:
+                raise ImportError_(f"más de {limits.max_files} archivos")
+            if total > limits.max_total_bytes:
+                raise ImportError_(f"más de {limits.max_total_bytes} bytes en total")
+            kind = KIND_BY_SUFFIX.get(PurePosixPath(rel).suffix.lower(), FileKind.OTHER)
+            target = staged / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+            files.append(
+                SourceFile(
+                    path=rel,
+                    sha256=hashlib.sha256(data).hexdigest(),
+                    size=len(data),
+                    kind=kind,
+                    encoding=detect_encoding(data) if kind in TEXT_KINDS else None,
+                )
             )
-        )
+        backup = Path(tmp) / "previous"
+        if dest.exists() or dest.is_symlink():
+            dest.rename(backup)
+        try:
+            staged.rename(dest)
+        except OSError:
+            if backup.exists():
+                backup.rename(dest)
+            raise
     return sorted(files, key=lambda f: f.path), skipped

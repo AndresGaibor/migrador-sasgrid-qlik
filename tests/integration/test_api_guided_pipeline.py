@@ -118,8 +118,12 @@ def test_uploaded_single_sas_file_produces_plan(tmp_path, monkeypatch):
     )
     assert uploaded.status_code == 201, uploaded.text
     assert [item["path"] for item in uploaded.json()["files"]] == ["daily.sas"]
-    analysis = client.post(f"/api/projects/{project_id}/analyses")
+    summary_url = f"/api/projects/{project_id}/analyses"
+    assert client.get(summary_url).status_code == 200
+    assert client.get(summary_url).json() is None
+    analysis = client.post(summary_url)
     assert analysis.status_code == 201, analysis.text
+    assert client.get(summary_url).json() == analysis.json()
     generated = client.post(f"/api/projects/{project_id}/plans")
     assert generated.status_code == 201, generated.text
     plan = client.get(f"/api/projects/{project_id}/plans/daily.sas")

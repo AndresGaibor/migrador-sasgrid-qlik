@@ -1,6 +1,5 @@
 import type { JobPlan, Step } from "./types";
 import { orderSteps } from "./guided.ts";
-import { catalogAudit } from "./catalog-explorer.ts";
 import { decodeProgress, type GuideProgress } from "./guide-progress.ts";
 
 const progressLabels: Record<GuideProgress, string> = {
@@ -11,8 +10,7 @@ const progressLabels: Record<GuideProgress, string> = {
 };
 
 function officialUrl(step: Step): string | null {
-  const name = step.component_candidate.split(" ")[0];
-  return step.doc_url ?? catalogAudit.recommended_components[name]?.official_url ?? null;
+  return step.doc_url ?? null;
 }
 
 function evidenceHref(projectId: string, step: Step): string {

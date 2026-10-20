@@ -1,4 +1,5 @@
 import { api } from "../api";
+import { Icon } from "../components/Icon";
 import { useAsync } from "../hooks";
 import { Badge, Load, link, prioTone } from "./common";
 import { sourceLines } from "../guided";
@@ -14,7 +15,7 @@ function ProgramList({ id }: { id: string }) {
       <h1>Tus programas SAS</h1>
       <p className="subtitle">Selecciona un programa para revisar los aspectos que requieren atención. «Hallazgos» indica cuántos puntos identificó el análisis.</p>
       <Load q={q}>
-        {(rows) => (
+        {(rows) => rows.length ? (
           <table>
             <thead><tr><th>Archivo</th><th>Sentencias</th><th>Hallazgos</th></tr></thead>
             <tbody>
@@ -27,6 +28,8 @@ function ProgramList({ id }: { id: string }) {
               ))}
             </tbody>
           </table>
+        ) : (
+          <div className="empty-state"><span className="empty-icon"><Icon name="file" size={30} /></span><h3>No se analizaron programas SAS</h3><p>El análisis no encontró archivos .sas. Revisa qué archivos se importaron o carga otro paquete.</p><div className="next-actions"><a className="button secondary" href={link(id, "inventario")}>Revisar mis archivos</a><a className="button" href={link(id, "importar")}><Icon name="upload" size={18} /> Cargar otros archivos</a></div></div>
         )}
       </Load>
       {q.error?.includes("analizado") && <p><a className="button" href={link(id, "resumen")}>Ir al resumen y analizar</a></p>}

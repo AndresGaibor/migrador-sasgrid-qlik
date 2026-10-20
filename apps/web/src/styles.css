@@ -251,10 +251,9 @@ details[open] > summary { margin-bottom: 16px; }
 .guide-intro > span { font-size: 23px; }
 .guide-intro div { flex: 1; }
 .guide-intro p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
-.guide-step { scroll-margin-top: 20px; border-left: 4px solid #13834a; }
-.guide-step-heading { display: flex; align-items: flex-start; gap: 12px; }
-.guide-step-heading h3 { margin: 2px 0 10px; }
-.guide-step-number { display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 50%; background: #078442; color: white; font-size: 15px; font-weight: 700; }
+.guide-step { scroll-margin-top: 20px; margin: 18px 0 30px; }
+.guide-step-heading { display: flex; align-items: flex-start; }
+.guide-step-heading h3 { margin: 0 0 10px; }
 .eyebrow { color: #087840; font-size: 10px; font-weight: 700; letter-spacing: .08em; }
 .guide-component { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
 .guide-component > span:first-child { color: var(--muted); font-size: 12px; }
@@ -294,9 +293,25 @@ textarea { width: 100%; resize: vertical; }
 .export-guide p { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
 .export-guide small { color: var(--muted); font-size: 11px; }
 @media (max-width: 650px) { .export-guide { align-items: stretch; flex-direction: column; } .export-guide .export-downloads button { flex: 1; } }
-.do-list { margin: 8px 0 12px; padding-left: 22px; display: grid; gap: 12px; }
+.guide-actions-heading { margin: 14px 0 8px; font-size: 14px; }
+.do-list { margin: 8px 0 12px; padding: 0; display: grid; gap: 10px; list-style: none; }
+.guide-action-step { display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: start; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 7px; background: #fff; }
+.guide-action-number { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 4px; background: #e8f3eb; color: #087840; font-size: 13px; font-weight: 700; }
+.guide-action-content { min-width: 0; }
+.guide-action-content > b { display: block; line-height: 1.45; }
+.guide-action-content .do-table-wrap { margin-top: 8px; }
+.guide-action-content .do-value { margin-top: 8px; }
+.do-location { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; margin-top: 7px; padding: 7px 10px; border-left: 2px solid #c7d4cb; background: #f2f5f3; color: #4d5b52; font-size: 12px; line-height: 1.45; }
+.do-location-label { color: var(--muted); font-weight: 600; }
 .do-value { margin: 4px 0; padding: 8px 10px; background: #f3f6f4; border: 1px solid #cfd9d3; border-radius: 6px; font-family: ui-monospace, monospace; white-space: pre-wrap; user-select: all; }
 .do-check { color: #8a4b00; }
+.guide-step-tracking { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.guide-step-tracking-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; }
+.guide-step-tracking-heading h4 { margin: 0; font-size: 14px; }
+.guide-step-tracking-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+.guide-step-tracking .row { margin-top: 12px; }
+.guide-step-tracking label { display: grid; gap: 6px; font-size: 12px; font-weight: 600; }
+.guide-step-tracking .error { margin: 8px 0 0; }
 .step-group > summary { cursor: pointer; padding: 4px 0; }
 .step-group[open] > summary { margin-bottom: 10px; }
 .guide-job-meta progress { width: 120px; height: 6px; appearance: none; border: 0; border-radius: 3px; background: #e4eae7; overflow: hidden; }

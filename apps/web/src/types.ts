@@ -98,16 +98,32 @@ export type JobPlan = {
   orchestration: { grid_tasks: string[]; grid_recommendations: GridRecommendation[]; schedules: string[]; upstream: string[]; downstream: string[] };
   unresolved: string[];
 };
-export type CatalogItem = { name: string; description: string; families: string[]; parameters: number };
+export type TalendLicenseProfile = { code: string; label: string };
+export type CatalogItem = {
+  name: string;
+  description: string;
+  families: string[];
+  documentation_status: string;
+  lifecycle_status: string;
+  frameworks: string[];
+  license_profile: TalendLicenseProfile;
+  search_terms?: string[];
+};
 export type CatalogList = {
   count: number;
+  result_count: number;
+  has_more: boolean;
   families: Record<string, number>;
   components: CatalogItem[];
-  official_inventory: {
-    release: string;
+  official_component_names: string[];
+  official_documentation_inventory: {
+    target: string;
+    snapshot_version: string;
     source: string;
+    license_profile: TalendLicenseProfile;
     count: number;
-    components: { name: string; connectivity?: string; available_from?: string; note?: string }[];
+    documented: number;
+    exception: number;
   };
 };
 export type CatalogParam = {
@@ -130,4 +146,31 @@ export type CatalogComponent = CatalogItem & {
   imports?: { module?: string; mvn?: string; required_if?: string }[];
   variants: string[];
   doc_markdown: string | null;
+  official_availability?: {
+    source: string;
+    snapshot_version: string;
+    license_profile: TalendLicenseProfile;
+    records: {
+      family: string;
+      framework_code: string;
+      documentation_route: string;
+      license_branding_codes: string[];
+      license_branding_labels: string[];
+    }[];
+    frameworks: { code: string; label: string }[];
+  } | null;
+  official_documentation?: {
+    target: string;
+    framework_codes: string[];
+    lifecycle_status: string;
+    status: string;
+    issues?: string[];
+    routes?: {
+      route: string;
+      status: string;
+      pages: { url: string; title?: string; status: string }[];
+    }[];
+    configuration_pages: { url: string; title?: string; status: string }[];
+    configuration_sections: { url: string; heading: string }[];
+  } | null;
 };

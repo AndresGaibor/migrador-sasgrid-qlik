@@ -38,14 +38,6 @@
       "input": "tGreenplumInput",
       "output": "tGreenplumOutput"
     },
-    "hadoop": {
-      "input": "tHiveInput",
-      "output": "tHiveOutput"
-    },
-    "impala": {
-      "input": "tImpalaInput",
-      "output": "tImpalaOutput"
-    },
     "netezza": {
       "input": "tNetezzaInput",
       "output": "tNetezzaOutput"
@@ -244,12 +236,12 @@
       ]
     },
     "dedupe": {
-      "component": "tUniqRow",
+      "component": "por_determinar",
       "alternatives": [],
-      "properties": [
-        "UNIQUE_KEY"
+      "properties": [],
+      "required": [
+        "Definir la clave y la lógica para conservar la fila correcta por grupo; confirmar una opción disponible en la instalación actual."
       ],
-      "required": [],
       "tests": [
         {
           "kind": "duplicates",
@@ -425,10 +417,11 @@
         "Rutina Java"
       ],
       "properties": [
-        "VALUES"
+        "USE_INTABLE",
+        "INTABLE"
       ],
       "required": [
-        "Decidir cómo representar el formato (tabla de lookup o expresión)"
+        "Confirmar cómo aplicar el formato: los rangos y OTHER necesitan lógica equivalente, no solo una tabla de filas"
       ],
       "tests": [
         {
@@ -633,10 +626,6 @@
   "generic_components": [
     "tDBInput",
     "tDBOutput",
-    "tDBRow",
-    "tHiveInput",
-    "tHiveOutput",
-    "tImpalaInput",
-    "tImpalaOutput"
+    "tDBRow"
   ]
 }

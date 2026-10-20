@@ -122,9 +122,9 @@ def validate_grid_mappings(rules: MappingRules, catalog: GridCatalog) -> None:
             raise ValueError(f"Grid status differs between catalog and mapping: {pattern_id}")
         if rule.component and not talend.has(rule.component):
             raise ValueError(f"Grid mapping references unknown Talend component: {pattern_id}")
+        run_job = talend.get("tRunJob") or {}
         if rule.connection and not any(
-            connector["type"] == rule.connection
-            for connector in talend.get("tRunJob")["connectors"]
+            connector["type"] == rule.connection for connector in run_job.get("connectors", [])
         ):
             raise ValueError(f"Grid mapping references unknown Talend connection: {pattern_id}")
 
@@ -245,9 +245,12 @@ class _Planner:
         if op.type == "format_definition":
             rows = _format_rows(d.get("statements", []))
             if rows:
-                for c in ("FORMAT", "CODE", "LABEL"):
-                    col(c)
-                props["VALUES"] = "\n".join(" | ".join(r) for r in rows)
+                cols.extend(
+                    SchemaColumn(name=c, talend_type="String", origin=origin)
+                    for c in ("FORMAT", "CODE", "LABEL")
+                )
+                props["USE_INTABLE"] = "true"
+                props["INTABLE"] = "\n".join(" | ".join(r) for r in rows)
         elif op.type in ("read", "write", "append"):
             ds = (op.inputs or op.outputs or [""])[0]
             props["TABLE"] = ds.split(".")[-1] if ds else None
@@ -570,6 +573,60 @@ def _connect(steps: list[PlanStep], prev_subjob_last: str | None) -> None:
         last = group[-1].id
 
 
+def _context_variables(ir: ProgramIR, steps: list[PlanStep]) -> list[ContextVariable]:
+    variables = {
+        name: ContextVariable(
+            name=name, sas_value=value, suggested=f"context.{name}", origin="%LET de primer nivel"
+        )
+        for name, value in ir.parameters.items()
+    }
+    for step in steps:
+        for expression in step.expressions:
+            for name in re.findall(r"context\.(\w+)", expression.talend or ""):
+                variables.setdefault(
+                    name,
+                    ContextVariable(
+                        name=name,
+                        suggested=f"context.{name}",
+                        origin=f"&{name} en {step.evidence.file}:{step.evidence.line}",
+                    ),
+                )
+        for prop in step.properties:
+            for name in re.findall(r"&(\w+)", prop.value or ""):
+                variables.setdefault(
+                    name,
+                    ContextVariable(
+                        name=name,
+                        suggested=f"context.{name}",
+                        origin=f"&{name} en {step.evidence.file}:{step.evidence.line}",
+                    ),
+                )
+    return sorted(variables.values(), key=lambda variable: variable.name.lower())
+
+
+def _needed_libraries(
+    used_libraries: set[str], libraries: dict[str, LibraryRef], rules: MappingRules
+) -> list[LibraryNeeded]:
+    needed = []
+    for name in sorted(used_libraries):
+        ref = libraries.get(name)
+        engine = (ref.engine or "").lower() if ref else ""
+        connection = (
+            rules.engines[engine]["input"].replace("Input", "Connection")
+            if engine in rules.engines
+            else "por_determinar (metadatos de archivo o base de datos)"
+        )
+        needed.append(
+            LibraryNeeded(
+                sas_name=ref.name if ref else name,
+                engine=ref.engine if ref else None,
+                path=ref.path if ref else None,
+                suggested_connection=connection,
+            )
+        )
+    return needed
+
+
 def plan_program(
     ir: ProgramIR,
     project_id: str,
@@ -596,50 +653,8 @@ def plan_program(
         _connect(ms, None)
         children.append(ChildJob(name=m.name, params=m.params, steps=ms))
     all_steps = steps + [s for c in children for s in c.steps]
-    ctx = {
-        k: ContextVariable(
-            name=k, sas_value=v, suggested=f"context.{k}", origin="%LET de primer nivel"
-        )
-        for k, v in ir.parameters.items()
-    }
-    for s in all_steps:
-        for e in s.expressions:
-            for name in re.findall(r"context\.(\w+)", e.talend or ""):
-                ctx.setdefault(
-                    name,
-                    ContextVariable(
-                        name=name,
-                        suggested=f"context.{name}",
-                        origin=f"&{name} en {s.evidence.file}:{s.evidence.line}",
-                    ),
-                )
-        for p in s.properties:
-            for name in re.findall(r"&(\w+)", p.value or ""):
-                ctx.setdefault(
-                    name,
-                    ContextVariable(
-                        name=name,
-                        suggested=f"context.{name}",
-                        origin=f"&{name} en {s.evidence.file}:{s.evidence.line}",
-                    ),
-                )
-    needed = []
-    for lib in sorted(pl.used_libs):
-        ref = libs.get(lib)
-        eng = (ref.engine or "").lower() if ref else ""
-        conn = (
-            rules.engines[eng]["input"].replace("Input", "Connection")
-            if eng in rules.engines
-            else "por_determinar (metadatos de archivo o base de datos)"
-        )
-        needed.append(
-            LibraryNeeded(
-                sas_name=ref.name if ref else lib,
-                engine=ref.engine if ref else None,
-                path=ref.path if ref else None,
-                suggested_connection=conn,
-            )
-        )
+    context_variables = _context_variables(ir, all_steps)
+    needed = _needed_libraries(pl.used_libs, libs, rules)
     pending = any(s.pending or s.confidence == "low" for s in all_steps)
     return JobPlan(
         project_id=project_id,
@@ -651,7 +666,7 @@ def plan_program(
         steps=steps,
         children=children,
         validation_cases=pl.cases,
-        context_variables=sorted(ctx.values(), key=lambda c: c.name.lower()),
+        context_variables=context_variables,
         libraries_needed=needed,
         orchestration=orchestration or Orchestration(),
         unresolved=unresolved or [],

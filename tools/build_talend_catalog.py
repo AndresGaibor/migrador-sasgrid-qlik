@@ -16,10 +16,8 @@ import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-DOC_URL = "https://help.qlik.com/talend/en-US/components/8.0/{}"
-AUDIT_FILE = Path(__file__).resolve().parents[1] / "rules" / "talend" / "catalog-audit.json"
-OFFICIAL_INVENTORY_FILE = (
-    Path(__file__).resolve().parents[1] / "rules" / "talend" / "components.json"
+CURRENT_GUIDE_INDEX_FILE = (
+    Path(__file__).resolve().parents[1] / "rules" / "talend" / "component-documentation-index.json"
 )
 # sufijos de rol, del más largo al más corto, para agrupar variantes por tecnología
 ROLES = [
@@ -84,7 +82,7 @@ def _param(el: ET.Element, labels: dict[str, str], advanced: bool) -> dict:
     }
     d = el.find("DEFAULT")
     if d is not None and (d.text or "").strip():
-        p["default"] = d.text.strip()[:200]
+        p["default"] = (d.text or "").strip()[:200]
     items = _items(el, labels, name)
     if items:
         p["items"] = items
@@ -116,7 +114,6 @@ def parse_component(xml: Path, props: dict[str, str]) -> dict | None:
         "status": h.get("STATUS") if h is not None else None,
         "version": h.get("VERSION") if h is not None else None,
         "startable": (h.get("STARTABLE") == "true") if h is not None else None,
-        "doc_url": DOC_URL.format(name.lower()),
     }
     comp["connectors"] = [
         {
@@ -155,9 +152,26 @@ def split_variant(name: str) -> tuple[str, str] | None:
     return None
 
 
-def build(src: Path, audit_file: Path = AUDIT_FILE) -> dict:
+def build(src: Path) -> dict:
+    try:
+        guide_index = json.loads(CURRENT_GUIDE_INDEX_FILE.read_text(encoding="utf-8"))
+        if guide_index.get("documentation_target") != "Talend Studio 8.0 R2026-09":
+            raise ValueError("guide index is not for Talend Studio 8.0 R2026-09")
+        if guide_index.get("license_profile", {}).get("code") != "TP_ALL":
+            raise ValueError("guide index is not for the Talend Data Fabric profile")
+        current_names = {
+            item["name"]
+            for item in guide_index["components"]
+            if item.get("lifecycle_status") == "current"
+        }
+    except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+        raise RuntimeError("Current Talend Studio 8 guide index is missing or invalid") from exc
     comps = {}
-    for d in sorted(p for p in src.iterdir() if p.is_dir() and p.name.startswith("t")):
+    for d in sorted(
+        p
+        for p in src.iterdir()
+        if p.is_dir() and p.name in current_names and p.name.startswith("t")
+    ):
         xml = d / f"{d.name}_java.xml"
         if xml.exists():
             c = parse_component(xml, read_props(d / f"{d.name}_messages.properties"))
@@ -179,37 +193,13 @@ def build(src: Path, audit_file: Path = AUDIT_FILE) -> dict:
     # un rol solo es útil si hay más de una tecnología
     variants = {r: t for r, t in variants.items() if len(t) > 1}
     catalog = {
-        "source": "https://github.com/Talaxie/tdi-studio-se (Apache-2.0), components/*/*_java.xml",
-        "doc_base": DOC_URL.format("<componente en minúsculas>"),
+        "license_profile": guide_index["license_profile"],
+        "source": "Talaxie Open Studio XML metadata (internal only; names filtered to current Studio 8 R2026-09)",
         "count": len(comps),
         "families": {k: sorted(v) for k, v in sorted(families.items())},
         "variants": variants,
         "components": comps,
     }
-    if OFFICIAL_INVENTORY_FILE.exists():
-        try:
-            existing_catalog = json.loads(OFFICIAL_INVENTORY_FILE.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
-            raise ValueError(f"Invalid catalog at {OFFICIAL_INVENTORY_FILE}") from exc
-        if not isinstance(existing_catalog, dict):
-            raise ValueError(f"Invalid catalog at {OFFICIAL_INVENTORY_FILE}")
-        if existing_catalog.get("official_inventory"):
-            catalog["official_inventory"] = existing_catalog["official_inventory"]
-    if audit_file.exists():
-        audit = json.loads(audit_file.read_text(encoding="utf-8"))
-        for name, record in audit.get("recommended_components", {}).items():
-            if name not in comps:
-                continue
-            url = record.get("official_url")
-            if url and record.get("official_reference_scope") in (
-                "component_page",
-                "standard_properties",
-            ):
-                comps[name]["doc_url"] = url
-            else:
-                # No exponer la URL genérica generada por nombre como si estuviera verificada.
-                comps[name].pop("doc_url", None)
-        catalog["official_audit"] = audit
     return catalog
 
 
@@ -217,9 +207,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("components_dir", type=Path)
     ap.add_argument("--out", type=Path, default=Path("rules/talend/components.json"))
-    ap.add_argument("--audit", type=Path, default=AUDIT_FILE)
     a = ap.parse_args()
-    cat = build(a.components_dir, a.audit)
+    cat = build(a.components_dir)
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(cat, ensure_ascii=False, indent=1, sort_keys=False) + "\n")
     print(

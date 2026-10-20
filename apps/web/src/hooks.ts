@@ -11,7 +11,7 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]): Async<T> {
     set((s) => ({ ...s, loading: true }));
     fn()
       .then((data) => live && set({ data, loading: false }))
-      .catch((e: Error) => live && set({ error: e.message, loading: false }));
+      .catch((e: Error) => live && set((s) => ({ ...s, error: e.message, loading: false })));
     return () => {
       live = false;
     };
@@ -19,8 +19,14 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]): Async<T> {
   return { ...state, reload: useCallback(() => setTick((t) => t + 1), []) };
 }
 
+export function decodeHash(hash: string): string {
+  const raw = hash.slice(1);
+  if (!raw) return "/";
+  try { return decodeURIComponent(raw); } catch { return raw; }
+}
+
 export function useHash(): [string, (h: string) => void] {
-  const read = () => decodeURIComponent(location.hash.slice(1)) || "/";
+  const read = () => decodeHash(location.hash);
   const [h, setH] = useState(read);
   useEffect(() => {
     const on = () => setH(read());

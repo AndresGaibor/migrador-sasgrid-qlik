@@ -1,0 +1,3497 @@
+{
+  "schema_version": 1,
+  "documentation_target": "Talend Studio 8.0 R2026-09",
+  "availability_snapshot_version": "8.0.1.20261015_1208-patch",
+  "license_profile": {
+    "code": "TP_ALL",
+    "label": "Talend Data Fabric"
+  },
+  "source": "https://help.qlik.com/talend/en-US/studio-components-availability/8.0/",
+  "counts": {
+    "optional_install": 268,
+    "removed_from_target_release": 9
+  },
+  "components": [
+    {
+      "name": "tAddCRCRow",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/identification/taddcrcrow"
+    },
+    {
+      "name": "tAddressRowCloud",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Address"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/address-standardization/taddressrowcloud"
+    },
+    {
+      "name": "tALSModel",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Recommendation"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/talsmodel"
+    },
+    {
+      "name": "tAmazonDocumentDBConnection",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Amazon/AmazonDocumentDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/amazon-documentdb/tamazondocumentdbconnection"
+    },
+    {
+      "name": "tAmazonDocumentDBInput",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Amazon/AmazonDocumentDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/amazon-documentdb/tamazondocumentdbinput"
+    },
+    {
+      "name": "tAmazonDocumentDBOutput",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Amazon/AmazonDocumentDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/amazon-documentdb/tamazondocumentdboutput"
+    },
+    {
+      "name": "tApacheKuduInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/ApacheKudu"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/kudu/tapachekuduinput"
+    },
+    {
+      "name": "tApacheKuduOutput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/ApacheKudu"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/kudu/tapachekuduoutput"
+    },
+    {
+      "name": "tAzureAdlsGen2Connection",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Azure"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/azure-data-lake-storage-gen2/tazureadlsgen2connection"
+    },
+    {
+      "name": "tBatchAddressRowCloud",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Address"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/address-standardization/tbatchaddressrowcloud"
+    },
+    {
+      "name": "tBoxConnection",
+      "status": "removed_from_target_release",
+      "families": [
+        "Deprecated"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "La documentación oficial indica que fue retirado de Talend Studio 8.0.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tboxconnection"
+    },
+    {
+      "name": "tBoxCopy",
+      "status": "removed_from_target_release",
+      "families": [
+        "Deprecated"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "La documentación oficial indica que fue retirado de Talend Studio 8.0.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tboxcopy"
+    },
+    {
+      "name": "tBoxDelete",
+      "status": "removed_from_target_release",
+      "families": [
+        "Deprecated"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "La documentación oficial indica que fue retirado de Talend Studio 8.0.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tboxdelete"
+    },
+    {
+      "name": "tBoxGet",
+      "status": "removed_from_target_release",
+      "families": [
+        "Deprecated"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "La documentación oficial indica que fue retirado de Talend Studio 8.0.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tboxget"
+    },
+    {
+      "name": "tBoxList",
+      "status": "removed_from_target_release",
+      "families": [
+        "Deprecated"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "La documentación oficial indica que fue retirado de Talend Studio 8.0.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tboxlist"
+    },
+    {
+      "name": "tBoxPut",
+      "status": "removed_from_target_release",
+      "families": [
+        "Deprecated"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "La documentación oficial indica que fue retirado de Talend Studio 8.0.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tboxput"
+    },
+    {
+      "name": "tCassandraBulkExec",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Cassandra",
+        "Databases NoSQL/Cassandra"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cassandra/tcassandrabulkexec"
+    },
+    {
+      "name": "tCassandraClose",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Cassandra",
+        "Databases NoSQL/Cassandra"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cassandra/tcassandraclose"
+    },
+    {
+      "name": "tCassandraConnection",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Cassandra",
+        "Databases NoSQL/Cassandra"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cassandra/tcassandraconnection"
+    },
+    {
+      "name": "tCassandraInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Cassandra",
+        "Databases NoSQL/Cassandra",
+        "Databases/Cassandra"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cassandra/tcassandrainput"
+    },
+    {
+      "name": "tCassandraOutput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Cassandra",
+        "Databases NoSQL/Cassandra",
+        "Databases/Cassandra"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cassandra/tcassandraoutput"
+    },
+    {
+      "name": "tCassandraOutputBulk",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Cassandra",
+        "Databases NoSQL/Cassandra"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cassandra/tcassandraoutputbulk"
+    },
+    {
+      "name": "tCassandraOutputBulkExec",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Cassandra",
+        "Databases NoSQL/Cassandra"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cassandra/tcassandraoutputbulkexec"
+    },
+    {
+      "name": "tCassandraRow",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Cassandra",
+        "Databases NoSQL/Cassandra"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cassandra/tcassandrarow"
+    },
+    {
+      "name": "tChangeFileEncoding",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality",
+        "File/Management"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tchangefileencoding"
+    },
+    {
+      "name": "tChunking",
+      "status": "optional_install",
+      "families": [
+        "AI/Chunk"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/ai/tchunking"
+    },
+    {
+      "name": "tCollector",
+      "status": "optional_install",
+      "families": [
+        "Orchestration"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/tcollector"
+    },
+    {
+      "name": "tCosmosDBBulkLoad",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Azure/Cosmos DB",
+        "Databases/DB Specifics/Cosmos DB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cosmosdb/tcosmosdbbulkload"
+    },
+    {
+      "name": "tCosmosDBConnection",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Azure/Cosmos DB",
+        "Databases/DB Specifics/Cosmos DB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cosmosdb/tcosmosdbconnection"
+    },
+    {
+      "name": "tCosmosDBInput",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Azure/Cosmos DB",
+        "Databases/DB Specifics/Cosmos DB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cosmosdb/tcosmosdbinput"
+    },
+    {
+      "name": "tCosmosDBOutput",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Azure/Cosmos DB",
+        "Databases/DB Specifics/Cosmos DB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cosmosdb/tcosmosdboutput"
+    },
+    {
+      "name": "tCosmosDBRow",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Azure/Cosmos DB",
+        "Databases/DB Specifics/Cosmos DB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cosmosdb/tcosmosdbrow"
+    },
+    {
+      "name": "tCyberarkCCPInput",
+      "status": "optional_install",
+      "families": [
+        "Internet/Vault/CyberarkCCP"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cyberark/tcyberarkccpinput"
+    },
+    {
+      "name": "tCyberarkInput",
+      "status": "optional_install",
+      "families": [
+        "Internet/Vault/Cyberark"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/cyberark/tcyberarkinput"
+    },
+    {
+      "name": "tDataDecrypt",
+      "status": "optional_install",
+      "families": [
+        "Data_Privacy"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-privacy/tdatadecrypt"
+    },
+    {
+      "name": "tDataEncrypt",
+      "status": "optional_install",
+      "families": [
+        "Data_Privacy"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-privacy/tdataencrypt"
+    },
+    {
+      "name": "tDataMasking",
+      "status": "optional_install",
+      "families": [
+        "Data_Privacy"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-privacy/tdatamasking"
+    },
+    {
+      "name": "tDataPrepRun",
+      "status": "optional_install",
+      "families": [
+        "Business/DataPrepRun",
+        "Talend Data Preparation"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-preparation/tdatapreprun"
+    },
+    {
+      "name": "tDataprepRun",
+      "status": "optional_install",
+      "families": [
+        "Talend Data Preparation",
+        "Talend Data Preparation On-Premises"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-preparation/tdatapreprun"
+    },
+    {
+      "name": "tDatasetInput",
+      "status": "optional_install",
+      "families": [
+        "Talend Data Preparation"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-preparation/tdatasetinput"
+    },
+    {
+      "name": "tDatasetOutput",
+      "status": "optional_install",
+      "families": [
+        "Talend Data Preparation"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-preparation/tdatasetoutput"
+    },
+    {
+      "name": "tDataShuffling",
+      "status": "optional_install",
+      "families": [
+        "Data_Privacy"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-privacy/tdatashuffling"
+    },
+    {
+      "name": "tDataUnmasking",
+      "status": "optional_install",
+      "families": [
+        "Data_Privacy"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-privacy/tdataunmasking"
+    },
+    {
+      "name": "tDBFSConnection",
+      "status": "optional_install",
+      "families": [
+        "Big Data/DBFS"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/databricks/tdbfsconnection"
+    },
+    {
+      "name": "tDBFSGet",
+      "status": "optional_install",
+      "families": [
+        "Big Data/DBFS"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/databricks/tdbfsget"
+    },
+    {
+      "name": "tDBFSPut",
+      "status": "optional_install",
+      "families": [
+        "Big Data/DBFS"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/databricks/tdbfsput"
+    },
+    {
+      "name": "tDecisionTreeModel",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Classification"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/tdecisiontreemodel"
+    },
+    {
+      "name": "tDepartitioner",
+      "status": "optional_install",
+      "families": [
+        "Orchestration"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/tdepartitioner"
+    },
+    {
+      "name": "tDqReportRun",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/reporting/tdqreportrun"
+    },
+    {
+      "name": "tDQRules",
+      "status": "optional_install",
+      "families": [
+        "Data Quality/DataQualityRules"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tdqrules"
+    },
+    {
+      "name": "tDSDelete",
+      "status": "optional_install",
+      "families": [
+        "Business/Data Stewardship"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tdsdelete"
+    },
+    {
+      "name": "tDSInput",
+      "status": "optional_install",
+      "families": [
+        "Business/Data Stewardship"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tdsinput"
+    },
+    {
+      "name": "tDSOutput",
+      "status": "optional_install",
+      "families": [
+        "Business/Data Stewardship"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tdsoutput"
+    },
+    {
+      "name": "tDSQL4Json",
+      "status": "optional_install",
+      "families": [
+        "Processing/DSQL"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-mapping/tdsql4json"
+    },
+    {
+      "name": "tDuplicateRow",
+      "status": "optional_install",
+      "families": [
+        "Data_Privacy",
+        "Data_Quality/Matching"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-privacy/tduplicaterow"
+    },
+    {
+      "name": "tDynamoDBConfiguration",
+      "status": "optional_install",
+      "families": [
+        "Databases/DynamoDB",
+        "Storage"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/amazon-dynamodb/tdynamodbconfiguration"
+    },
+    {
+      "name": "tDynamoDBInput",
+      "status": "optional_install",
+      "families": [
+        "Databases/DynamoDB"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/amazon-dynamodb/tdynamodbinput"
+    },
+    {
+      "name": "tdynamoDBInput",
+      "status": "optional_install",
+      "families": [
+        "Databases/dynamoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/amazon-dynamodb/tdynamodbinput"
+    },
+    {
+      "name": "tDynamoDBOutput",
+      "status": "optional_install",
+      "families": [
+        "Databases/DynamoDB"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/amazon-dynamodb/tdynamodboutput"
+    },
+    {
+      "name": "tdynamoDBOutput",
+      "status": "optional_install",
+      "families": [
+        "Databases/dynamoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/amazon-dynamodb/tdynamodboutput"
+    },
+    {
+      "name": "tELTHiveInput",
+      "status": "optional_install",
+      "families": [
+        "ELT/Map/Hive"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/elt-hive/telthiveinput"
+    },
+    {
+      "name": "tELTHiveMap",
+      "status": "optional_install",
+      "families": [
+        "ELT/Map/Hive"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/elt-hive/telthivemap"
+    },
+    {
+      "name": "tELTHiveOutput",
+      "status": "optional_install",
+      "families": [
+        "ELT/Map/Hive"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/elt-hive/telthiveoutput"
+    },
+    {
+      "name": "tESBConsumer",
+      "status": "optional_install",
+      "families": [
+        "ESB/Web Services"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/esb-soap/tesbconsumer"
+    },
+    {
+      "name": "tExtractRegexFields",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching",
+        "Processing/Fields"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-extraction/textractregexfields"
+    },
+    {
+      "name": "tFileFetch",
+      "status": "removed_from_target_release",
+      "families": [
+        "Deprecated"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "La documentación oficial indica que fue retirado de Talend Studio 8.0.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/internet/tfilefetch"
+    },
+    {
+      "name": "tFindRegexlibExpressions",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/pattern-validation/tfindregexlibexpressions"
+    },
+    {
+      "name": "tFirstnameMatch",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Standardization"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/name-standardization/tfirstnamematch"
+    },
+    {
+      "name": "tFuzzyMatch",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/fuzzy-matching/tfuzzymatch"
+    },
+    {
+      "name": "tFuzzyUniqRow",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/fuzzy-matching/tfuzzyuniqrow"
+    },
+    {
+      "name": "tGenKey",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/identification/tgenkey"
+    },
+    {
+      "name": "tGoogleAddressRow",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Address"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/google-address-standardization/tgoogleaddressrow"
+    },
+    {
+      "name": "tGoogleGeocoder",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Address"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/google-address-standardization/tgooglegeocoder"
+    },
+    {
+      "name": "tGoogleMapLookup",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Address"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/google-address-standardization/tgooglemaplookup"
+    },
+    {
+      "name": "tGradientBoostedTreeModel",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Classification"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/tgradientboostedtreemodel"
+    },
+    {
+      "name": "tHBaseClose",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HBase",
+        "Databases NoSQL/HBase"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hbase/thbaseclose"
+    },
+    {
+      "name": "tHBaseConfiguration",
+      "status": "optional_install",
+      "families": [
+        "Databases/HBase",
+        "Storage"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hbase/thbaseconfiguration"
+    },
+    {
+      "name": "tHBaseConnection",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HBase",
+        "Databases NoSQL/HBase",
+        "ELT/Connections"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hbase/thbaseconnection"
+    },
+    {
+      "name": "tHBaseDeleteRows",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HBase",
+        "Databases NoSQL/HBase",
+        "Databases/HBase"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hbase/thbasedeleterows"
+    },
+    {
+      "name": "tHBaseInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HBase",
+        "Databases NoSQL/HBase",
+        "Databases/HBase"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hbase/thbaseinput"
+    },
+    {
+      "name": "tHBaseNamespace",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HBase",
+        "Databases NoSQL/HBase"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hbase/thbasenamespace"
+    },
+    {
+      "name": "tHBaseOutput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HBase",
+        "Databases NoSQL/HBase",
+        "Databases/HBase"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hbase/thbaseoutput"
+    },
+    {
+      "name": "tHBaseTable",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HBase",
+        "Databases NoSQL/HBase"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hbase/thbasetable"
+    },
+    {
+      "name": "tHCatalogInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HCatalog"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/thcataloginput"
+    },
+    {
+      "name": "tHCatalogLoad",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HCatalog"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/thcatalogload"
+    },
+    {
+      "name": "tHCatalogOperation",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HCatalog"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/thcatalogoperation"
+    },
+    {
+      "name": "tHCatalogOutput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HCatalog"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/thcatalogoutput"
+    },
+    {
+      "name": "tHDFSCompare",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfscompare"
+    },
+    {
+      "name": "tHDFSConnection",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsconnection"
+    },
+    {
+      "name": "tHDFSCopy",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfscopy"
+    },
+    {
+      "name": "tHDFSDelete",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsdelete"
+    },
+    {
+      "name": "tHDFSExist",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsexist"
+    },
+    {
+      "name": "tHDFSGet",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsget"
+    },
+    {
+      "name": "tHDFSInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsinput"
+    },
+    {
+      "name": "tHDFSList",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfslist"
+    },
+    {
+      "name": "tHDFSOutput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsoutput"
+    },
+    {
+      "name": "tHDFSOutputRaw",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsoutputraw"
+    },
+    {
+      "name": "tHDFSProperties",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsproperties"
+    },
+    {
+      "name": "tHDFSPut",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsput"
+    },
+    {
+      "name": "tHDFSRename",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsrename"
+    },
+    {
+      "name": "tHDFSRowCount",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HDFS",
+        "File/Hadoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsrowcount"
+    },
+    {
+      "name": "tHiveClose",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Hive",
+        "Databases/DB Specifics/Hive"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveclose"
+    },
+    {
+      "name": "tHiveConfiguration",
+      "status": "optional_install",
+      "families": [
+        "Databases/Hive"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveconfiguration"
+    },
+    {
+      "name": "tHiveConnection",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Hive",
+        "Databases/DB Specifics/Hive",
+        "ELT/Connections"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveconnection"
+    },
+    {
+      "name": "tHiveCreateTable",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Hive",
+        "Databases/DB Specifics/Hive"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thivecreatetable"
+    },
+    {
+      "name": "tHiveInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Hive",
+        "Databases/DB Specifics/Hive",
+        "Databases/Hive"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveinput"
+    },
+    {
+      "name": "tHiveLoad",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Hive",
+        "Databases/DB Specifics/Hive"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveload"
+    },
+    {
+      "name": "tHiveOutput",
+      "status": "optional_install",
+      "families": [
+        "Databases/Hive"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiveoutput"
+    },
+    {
+      "name": "tHiveRow",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Hive",
+        "Databases/DB Specifics/Hive"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thiverow"
+    },
+    {
+      "name": "tHiveWarehouseConfiguration",
+      "status": "optional_install",
+      "families": [
+        "Databases/Hive"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thivewarehouseconfiguration"
+    },
+    {
+      "name": "tHiveWarehouseInput",
+      "status": "optional_install",
+      "families": [
+        "Databases/Hive"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thivewarehouseinput"
+    },
+    {
+      "name": "tHiveWarehouseOutput",
+      "status": "optional_install",
+      "families": [
+        "Databases/Hive"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/hive/thivewarehouseoutput"
+    },
+    {
+      "name": "tHttpRequest",
+      "status": "removed_from_target_release",
+      "families": [
+        "Deprecated"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "La documentación oficial indica que fue retirado de Talend Studio 8.0.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/http/thttprequest"
+    },
+    {
+      "name": "tIcebergCatalog",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Iceberg",
+        "Databases/Iceberg"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/iceberg/ticebergcatalog"
+    },
+    {
+      "name": "tIcebergInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Iceberg",
+        "Databases/Iceberg"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/iceberg/ticeberginput"
+    },
+    {
+      "name": "tIcebergOutput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Iceberg",
+        "Databases/Iceberg"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/iceberg/ticebergoutput"
+    },
+    {
+      "name": "tIcebergSql",
+      "status": "optional_install",
+      "families": [
+        "Databases/Iceberg"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/iceberg/ticebergsql"
+    },
+    {
+      "name": "tIcebergTable",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Iceberg",
+        "Databases/Iceberg"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/iceberg/ticebergtable"
+    },
+    {
+      "name": "tImpalaClose",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Impala"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/impala/timpalaclose"
+    },
+    {
+      "name": "tImpalaConnection",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Impala"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/impala/timpalaconnection"
+    },
+    {
+      "name": "tImpalaCreateTable",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Impala"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/impala/timpalacreatetable"
+    },
+    {
+      "name": "tImpalaInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Impala"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/impala/timpalainput"
+    },
+    {
+      "name": "tImpalaLoad",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Impala"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/impala/timpalaload"
+    },
+    {
+      "name": "tImpalaOutput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Impala"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/impala/timpalaoutput"
+    },
+    {
+      "name": "tImpalaRow",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Impala"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/impala/timpalarow"
+    },
+    {
+      "name": "tIntervalMatch",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/standardization/tintervalmatch"
+    },
+    {
+      "name": "tJapaneseNumberNormalize",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/text-standardization/tjapanesenumbernormalize"
+    },
+    {
+      "name": "tJapaneseTokenize",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/text-standardization/tjapanesetokenize"
+    },
+    {
+      "name": "tJapaneseTransliterate",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/text-standardization/tjapanesetransliterate"
+    },
+    {
+      "name": "tJSONValidator",
+      "status": "optional_install",
+      "families": [
+        "Data Quality/JSON"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/json/tjsonvalidator"
+    },
+    {
+      "name": "tKafkaCommit",
+      "status": "optional_install",
+      "families": [
+        "Internet/Kafka"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/kafka/tkafkacommit-c"
+    },
+    {
+      "name": "tKafkaConnection",
+      "status": "optional_install",
+      "families": [
+        "Internet/Kafka"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/kafka/tkafkaconnection"
+    },
+    {
+      "name": "tKafkaCreateTopic",
+      "status": "optional_install",
+      "families": [
+        "Internet/Kafka"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/kafka/tkafkacreatetopic"
+    },
+    {
+      "name": "tKafkaInput",
+      "status": "optional_install",
+      "families": [
+        "Internet/Kafka"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/kafka/tkafkainput"
+    },
+    {
+      "name": "tKafkaOutput",
+      "status": "optional_install",
+      "families": [
+        "Internet/Kafka"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/kafka/tkafkaoutput"
+    },
+    {
+      "name": "tKMeansModel",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Clustering"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/tkmeansmodel"
+    },
+    {
+      "name": "tLastRegexlibExpressions",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/pattern-validation/tlastregexlibexpressions"
+    },
+    {
+      "name": "tLinearRegressionModel",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Regression"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/tlinearregressionmodel"
+    },
+    {
+      "name": "tLogisticRegressionModel",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Classification"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/tlogisticregressionmodel"
+    },
+    {
+      "name": "tLoqateAddressRow",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Address/Loqate"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/loqate-address-standardization/tloqateaddressrow"
+    },
+    {
+      "name": "tMapRDBClose",
+      "status": "optional_install",
+      "families": [
+        "Big Data/HBase",
+        "Databases NoSQL/HBase"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/maprdb/tmaprdbclose"
+    },
+    {
+      "name": "tMapRDBConfiguration",
+      "status": "optional_install",
+      "families": [
+        "Databases/MapRDB",
+        "Storage"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/maprdb/tmaprdbconfiguration"
+    },
+    {
+      "name": "tMapRDBConnection",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MapRDB",
+        "Databases NoSQL/MapRDB",
+        "ELT/Connections"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/maprdb/tmaprdbconnection"
+    },
+    {
+      "name": "tMapRDBInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MapRDB",
+        "Databases NoSQL/MapRDB",
+        "Databases/MapRDB"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/maprdb/tmaprdbinput"
+    },
+    {
+      "name": "tMapRDBOutput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MapRDB",
+        "Databases NoSQL/MapRDB",
+        "Databases/MapRDB"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/maprdb/tmaprdboutput"
+    },
+    {
+      "name": "tMapROjaiInput",
+      "status": "optional_install",
+      "families": [
+        "Databases NoSQL/MapRDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/maprdb/tmaprojaiinput"
+    },
+    {
+      "name": "tMapROjaiOutput",
+      "status": "optional_install",
+      "families": [
+        "Databases NoSQL/MapRDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/maprdb/tmaprojaioutput"
+    },
+    {
+      "name": "tMarketoBulkExec",
+      "status": "optional_install",
+      "families": [
+        "Business/Marketo",
+        "Cloud/Marketo"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marketo/tmarketobulkexec"
+    },
+    {
+      "name": "tMarketoCampaign",
+      "status": "optional_install",
+      "families": [
+        "Business/Marketo",
+        "Cloud/Marketo"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marketo/tmarketocampaign"
+    },
+    {
+      "name": "tMarketoConnection",
+      "status": "optional_install",
+      "families": [
+        "Business/Marketo",
+        "Cloud/Marketo"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marketo/tmarketoconnection"
+    },
+    {
+      "name": "tMarketoInput",
+      "status": "optional_install",
+      "families": [
+        "Business/Marketo",
+        "Cloud/Marketo"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marketo/tmarketoinput"
+    },
+    {
+      "name": "tMarketoListOperation",
+      "status": "optional_install",
+      "families": [
+        "Business/Marketo",
+        "Cloud/Marketo"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marketo/tmarketolistoperation"
+    },
+    {
+      "name": "tMarketoOutput",
+      "status": "optional_install",
+      "families": [
+        "Business/Marketo",
+        "Cloud/Marketo"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marketo/tmarketooutput"
+    },
+    {
+      "name": "tMarkLogicBulkLoad",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MarkLogic",
+        "Databases NoSQL/MarkLogic"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marklogic/tmarklogicbulkload"
+    },
+    {
+      "name": "tMarkLogicClose",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MarkLogic",
+        "Databases NoSQL/MarkLogic"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marklogic/tmarklogicclose"
+    },
+    {
+      "name": "tMarkLogicConnection",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MarkLogic",
+        "Databases NoSQL/MarkLogic"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marklogic/tmarklogicconnection"
+    },
+    {
+      "name": "tMarkLogicInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MarkLogic",
+        "Databases NoSQL/MarkLogic"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marklogic/tmarklogicinput"
+    },
+    {
+      "name": "tMarkLogicOutput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MarkLogic",
+        "Databases NoSQL/MarkLogic"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/marklogic/tmarklogicoutput"
+    },
+    {
+      "name": "tMatchGroup",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-matching/tmatchgroup"
+    },
+    {
+      "name": "tMatchModel",
+      "status": "optional_install",
+      "families": [
+        "Data Quality/Matching"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/matching-with-machine-learning/tmatchmodel"
+    },
+    {
+      "name": "tMatchPairing",
+      "status": "optional_install",
+      "families": [
+        "Data Quality/Matching"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/matching-with-machine-learning/tmatchpairing"
+    },
+    {
+      "name": "tMatchPredict",
+      "status": "optional_install",
+      "families": [
+        "Data Quality/Matching"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/matching-with-machine-learning/tmatchpredict"
+    },
+    {
+      "name": "tMelissaDataAddress",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Address/MelissaData"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/melissa-data-address-standardization/tmelissadataaddress"
+    },
+    {
+      "name": "tMessagingClose",
+      "status": "optional_install",
+      "families": [
+        "Internet/Messaging"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/jms/tmessagingclose"
+    },
+    {
+      "name": "tMessagingCommit",
+      "status": "optional_install",
+      "families": [
+        "Internet/Messaging"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/jms/tmessagingcommit"
+    },
+    {
+      "name": "tMessagingConnection",
+      "status": "optional_install",
+      "families": [
+        "Internet/Messaging"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/jms/tmessagingconnection"
+    },
+    {
+      "name": "tMessagingInput",
+      "status": "optional_install",
+      "families": [
+        "Internet/Messaging"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/jms/tmessaginginput"
+    },
+    {
+      "name": "tMessagingOutput",
+      "status": "optional_install",
+      "families": [
+        "Internet/Messaging"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/jms/tmessagingoutput"
+    },
+    {
+      "name": "tMessagingRollback",
+      "status": "optional_install",
+      "families": [
+        "Internet/Messaging"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/jms/tmessagingrollback"
+    },
+    {
+      "name": "tMilvusConnection",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/VectorDB/Milvus"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/milvus/tmilvusconnection"
+    },
+    {
+      "name": "tMilvusInput",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/VectorDB/Milvus"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/milvus/tmilvusinput"
+    },
+    {
+      "name": "tModelEncoder",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/tmodelencoder"
+    },
+    {
+      "name": "tMongoDBBulkLoad",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodbbulkload"
+    },
+    {
+      "name": "tMongoDBClose",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodbclose"
+    },
+    {
+      "name": "tMongoDBConnection",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodbconnection"
+    },
+    {
+      "name": "tMongoDBGridFSDelete",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodbgridfsdelete"
+    },
+    {
+      "name": "tMongoDBGridFSGet",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodbgridfsget"
+    },
+    {
+      "name": "tMongoDBGridFSList",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodbgridfslist"
+    },
+    {
+      "name": "tMongoDBGridFSProperties",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodbgridfsproperties"
+    },
+    {
+      "name": "tMongoDBGridFSPut",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodbgridfsput"
+    },
+    {
+      "name": "tMongoDBInput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB",
+        "Databases/MongoDB"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodbinput"
+    },
+    {
+      "name": "tMongoDBOutput",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB",
+        "Databases/MongoDB"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodboutput"
+    },
+    {
+      "name": "tMongoDBRow",
+      "status": "optional_install",
+      "families": [
+        "Big Data/MongoDB",
+        "Databases NoSQL/MongoDB"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mongodb/tmongodbrow"
+    },
+    {
+      "name": "tMSSqlInvalidRows",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching",
+        "Databases/DB Specifics/MS_SQL_Server"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/microsoft-sql-server-validation/tmssqlinvalidrows"
+    },
+    {
+      "name": "tMSSqlValidRows",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching",
+        "Databases/DB Specifics/MS_SQL_Server"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/microsoft-sql-server-validation/tmssqlvalidrows"
+    },
+    {
+      "name": "tMultiPatternCheck",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/pattern-validation/tmultipatterncheck"
+    },
+    {
+      "name": "tMySQLInvalidRows",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching",
+        "Databases/DB Specifics/MySQL"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mysql/tmysqlinvalidrows"
+    },
+    {
+      "name": "tMySQLValidRows",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching",
+        "Databases/DB Specifics/MySQL"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/mysql/tmysqlvalidrows"
+    },
+    {
+      "name": "tNaiveBayesModel",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Classification"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/tnaivebayesmodel"
+    },
+    {
+      "name": "tNeo4jv4ImportTool",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Neo4jv4Import",
+        "Databases NoSQL/Neo4jv4Import"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/neo4j/tneo4jv4importtool"
+    },
+    {
+      "name": "tNeo4jv4Row",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Neo4jv4",
+        "Databases NoSQL/Neo4jv4"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/neo4j/tneo4jv4row"
+    },
+    {
+      "name": "tNetSuiteV2019Connection",
+      "status": "optional_install",
+      "families": [
+        "Business/NetSuite"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tnetsuitev2019connection"
+    },
+    {
+      "name": "tNetSuiteV2019Input",
+      "status": "optional_install",
+      "families": [
+        "Business/NetSuite"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tnetsuitev2019input"
+    },
+    {
+      "name": "tNetSuiteV2019Output",
+      "status": "optional_install",
+      "families": [
+        "Business/NetSuite"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tnetsuitev2019output"
+    },
+    {
+      "name": "tOracleInvalidRows",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching",
+        "Databases/DB Specifics/Oracle"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toracleinvalidrows"
+    },
+    {
+      "name": "tOracleValidRows",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching",
+        "Databases/DB Specifics/Oracle"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toraclevalidrows"
+    },
+    {
+      "name": "tPartitioner",
+      "status": "optional_install",
+      "families": [
+        "Orchestration"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/tpartitioner"
+    },
+    {
+      "name": "tPatternCheck",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/pattern-validation/tpatterncheck"
+    },
+    {
+      "name": "tPatternExtract",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-extraction/tpatternextract"
+    },
+    {
+      "name": "tPatternMasking",
+      "status": "optional_install",
+      "families": [
+        "Data_Privacy"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-privacy/tpatternmasking"
+    },
+    {
+      "name": "tPatternUnmasking",
+      "status": "optional_install",
+      "families": [
+        "Data_Privacy"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-privacy/tpatternunmasking"
+    },
+    {
+      "name": "tPersonator",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Address/MelissaData"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/melissa-data-address-standardization/tpersonator"
+    },
+    {
+      "name": "tPineconeClient",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/VectorDB/Pinecone"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/ai/tpineconeclient"
+    },
+    {
+      "name": "tPostgresqlInvalidRows",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching",
+        "Databases/DB Specifics/PostgreSQL"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/postgresql/tpostgresqlinvalidrows"
+    },
+    {
+      "name": "tPostgresqlValidRows",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching/Pattern matching",
+        "Databases/DB Specifics/PostgreSQL"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/postgresql/tpostgresqlvalidrows"
+    },
+    {
+      "name": "tPredict",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Classification",
+        "Machine Learning/Clustering",
+        "Machine Learning/Regression"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/tpredict"
+    },
+    {
+      "name": "tQASAddressRow",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Address/Experian QAS"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/qas-address-standardization/tqasaddressrow"
+    },
+    {
+      "name": "tQASBatchAddressRow",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Address/Experian QAS"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/qas-address-standardization/tqasbatchaddressrow"
+    },
+    {
+      "name": "tRabbitMQAck",
+      "status": "optional_install",
+      "families": [
+        "Internet/RabbitMQ"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/rabbitmq/trabbitmqack"
+    },
+    {
+      "name": "tRabbitMQClose",
+      "status": "optional_install",
+      "families": [
+        "Internet/RabbitMQ"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/rabbitmq/trabbitmqclose"
+    },
+    {
+      "name": "tRabbitMQConnection",
+      "status": "optional_install",
+      "families": [
+        "Internet/RabbitMQ"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/rabbitmq/trabbitmqconnection"
+    },
+    {
+      "name": "tRabbitMQInput",
+      "status": "optional_install",
+      "families": [
+        "Internet/RabbitMQ"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/rabbitmq/trabbitmqinput"
+    },
+    {
+      "name": "tRabbitMQOutput",
+      "status": "optional_install",
+      "families": [
+        "Internet/RabbitMQ"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/rabbitmq/trabbitmqoutput"
+    },
+    {
+      "name": "tRandomForestModel",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Classification"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/trandomforestmodel"
+    },
+    {
+      "name": "tRecollector",
+      "status": "optional_install",
+      "families": [
+        "Orchestration"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trecollector"
+    },
+    {
+      "name": "tRecommend",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Recommendation"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/trecommend"
+    },
+    {
+      "name": "tRecordMatching",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Matching"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/data-matching/trecordmatching"
+    },
+    {
+      "name": "tReplaceList",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/standardization/treplacelist"
+    },
+    {
+      "name": "tReservoirSampling",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/sampling/treservoirsampling"
+    },
+    {
+      "name": "tREST",
+      "status": "removed_from_target_release",
+      "families": [
+        "Deprecated"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "La documentación oficial indica que fue retirado de Talend Studio 8.0.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/rest/trest"
+    },
+    {
+      "name": "tRESTClient",
+      "status": "optional_install",
+      "families": [
+        "ESB/REST"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/esb-rest/trestclient"
+    },
+    {
+      "name": "tRuleSurvivorship",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Survivorship"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/deduplication/trulesurvivorship"
+    },
+    {
+      "name": "tSalesforceBulkExec",
+      "status": "optional_install",
+      "families": [
+        "Business/Salesforce"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforcebulkexec"
+    },
+    {
+      "name": "tSalesforceConnection",
+      "status": "optional_install",
+      "families": [
+        "Business/Salesforce"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforceconnection"
+    },
+    {
+      "name": "tSalesforceGetDeleted",
+      "status": "optional_install",
+      "families": [
+        "Business/Salesforce"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforcegetdeleted"
+    },
+    {
+      "name": "tSalesforceGetServerTimestamp",
+      "status": "optional_install",
+      "families": [
+        "Business/Salesforce"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforcegetservertimestamp"
+    },
+    {
+      "name": "tSalesforceGetUpdated",
+      "status": "optional_install",
+      "families": [
+        "Business/Salesforce"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforcegetupdated"
+    },
+    {
+      "name": "tSalesforceInput",
+      "status": "optional_install",
+      "families": [
+        "Business/Salesforce"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforceinput"
+    },
+    {
+      "name": "tSalesforceMarketingConnection",
+      "status": "optional_install",
+      "families": [
+        "Business/SalesforceMarketing",
+        "Cloud/SalesforceMarketing"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforcemarketingconnection"
+    },
+    {
+      "name": "tSalesforceMarketingInput",
+      "status": "optional_install",
+      "families": [
+        "Business/SalesforceMarketing",
+        "Cloud/SalesforceMarketing"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforcemarketinginput"
+    },
+    {
+      "name": "tSalesforceMarketingOutput",
+      "status": "optional_install",
+      "families": [
+        "Business/SalesforceMarketing",
+        "Cloud/SalesforceMarketing"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforcemarketingoutput"
+    },
+    {
+      "name": "tSalesforceOutput",
+      "status": "optional_install",
+      "families": [
+        "Business/Salesforce"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforceoutput"
+    },
+    {
+      "name": "tSalesforceOutputBulk",
+      "status": "optional_install",
+      "families": [
+        "Business/Salesforce"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforceoutputbulk"
+    },
+    {
+      "name": "tSalesforceOutputBulkExec",
+      "status": "optional_install",
+      "families": [
+        "Business/Salesforce"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/salesforce/tsalesforceoutputbulkexec"
+    },
+    {
+      "name": "tSAPHanaBulkExec",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/SAP Hana"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/sap/tsaphanabulkexec"
+    },
+    {
+      "name": "tSAPHanaClose",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/SAP Hana"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/sap/tsaphanaclose"
+    },
+    {
+      "name": "tSAPHanaCommit",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/SAP Hana"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/sap/tsaphanacommit"
+    },
+    {
+      "name": "tSAPHanaConnection",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/SAP Hana",
+        "ELT/Connections"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/sap/tsaphanaconnection"
+    },
+    {
+      "name": "tSAPHanaInput",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/SAP Hana"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/sap/tsaphanainput"
+    },
+    {
+      "name": "tSAPHanaOutput",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/SAP Hana"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/sap/tsaphanaoutput"
+    },
+    {
+      "name": "tSAPHanaRollback",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/SAP Hana"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/sap/tsaphanarollback"
+    },
+    {
+      "name": "tSAPHanaRow",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/SAP Hana"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/sap/tsaphanarow"
+    },
+    {
+      "name": "tSAPHanaUnload",
+      "status": "optional_install",
+      "families": [
+        "Databases/DB Specifics/SAP Hana"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/sap/tsaphanaunload"
+    },
+    {
+      "name": "tSchemaComplianceCheck",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/validation/tschemacompliancecheck"
+    },
+    {
+      "name": "tSnowflakeBulkExec",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Snowflake"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakebulkexec"
+    },
+    {
+      "name": "tSnowflakeClose",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Snowflake"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakeclose"
+    },
+    {
+      "name": "tSnowflakeCommit",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Snowflake"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakecommit"
+    },
+    {
+      "name": "tSnowflakeConfiguration",
+      "status": "optional_install",
+      "families": [
+        "Databases/Snowflake",
+        "Storage"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakeconfiguration"
+    },
+    {
+      "name": "tSnowflakeConnection",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Snowflake"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakeconnection"
+    },
+    {
+      "name": "tSnowflakeInput",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Snowflake",
+        "Databases/Snowflake"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakeinput"
+    },
+    {
+      "name": "tSnowflakeOutput",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Snowflake",
+        "Databases/Snowflake"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakeoutput"
+    },
+    {
+      "name": "tSnowflakeOutputBulk",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Snowflake"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakeoutputbulk"
+    },
+    {
+      "name": "tSnowflakeOutputBulkExec",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Snowflake"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakeoutputbulkexec"
+    },
+    {
+      "name": "tSnowflakeRollback",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Snowflake"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakerollback"
+    },
+    {
+      "name": "tSnowflakeRow",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Snowflake"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/snowflake/tsnowflakerow"
+    },
+    {
+      "name": "tSplunkEventCollector",
+      "status": "optional_install",
+      "families": [
+        "Business Intelligence/Splunk"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/splunk/tsplunkeventcollector"
+    },
+    {
+      "name": "tSqoopExport",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Sqoop",
+        "File/Sqoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tsqoopexport"
+    },
+    {
+      "name": "tSqoopImport",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Sqoop",
+        "File/Sqoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tsqoopimport"
+    },
+    {
+      "name": "tSqoopImportAllTables",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Sqoop",
+        "File/Sqoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tsqoopimportalltables"
+    },
+    {
+      "name": "tSqoopMerge",
+      "status": "optional_install",
+      "families": [
+        "Big Data/Sqoop",
+        "File/Sqoop"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tsqoopmerge"
+    },
+    {
+      "name": "tStandardizePhoneNumber",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Standardization"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/phone-number-standardization/tstandardizephonenumber"
+    },
+    {
+      "name": "tStandardizeRow",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Standardization"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/standardization/tstandardizerow"
+    },
+    {
+      "name": "tStem",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/text-standardization/tstem"
+    },
+    {
+      "name": "tSurviveFields",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Survivorship",
+        "Processing"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/deduplication/tsurvivefields"
+    },
+    {
+      "name": "tSVMModel",
+      "status": "optional_install",
+      "families": [
+        "Machine Learning/Classification"
+      ],
+      "framework_codes": [
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/machine-learning/tsvmmodel"
+    },
+    {
+      "name": "tSynonymOutput",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Standardization"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/synonym-index/tsynonymoutput"
+    },
+    {
+      "name": "tSynonymSearch",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Standardization"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/synonym-index/tsynonymsearch"
+    },
+    {
+      "name": "tTableauInput",
+      "status": "optional_install",
+      "families": [
+        "Business Intelligence/Tableau"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tableau/ttableauinput"
+    },
+    {
+      "name": "tTableauOutput",
+      "status": "optional_install",
+      "families": [
+        "Business Intelligence/Tableau"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/tableau/ttableauoutput"
+    },
+    {
+      "name": "tThresholdViolationAlert",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/reporting/tthresholdviolationalert"
+    },
+    {
+      "name": "tTransliterate",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality/Standardization"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/text-standardization/ttransliterate"
+    },
+    {
+      "name": "tUniqRow",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality",
+        "Processing"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/deduplication/tuniqrow"
+    },
+    {
+      "name": "tVerifyEmail",
+      "status": "optional_install",
+      "families": [
+        "Data_Quality"
+      ],
+      "framework_codes": [
+        "DI",
+        "SPARK"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/email-validation/tverifyemail"
+    },
+    {
+      "name": "tWorkdayInput",
+      "status": "optional_install",
+      "families": [
+        "Business/Workday",
+        "Cloud/Workday"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/workday/tworkdayinput"
+    },
+    {
+      "name": "tWorkdayOutput",
+      "status": "optional_install",
+      "families": [
+        "Business/Workday",
+        "Cloud/Workday"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/workday/tworkdayoutput"
+    },
+    {
+      "name": "tZendeskInput",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Zendesk"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/zendesk/tzendeskinput"
+    },
+    {
+      "name": "tZendeskOutput",
+      "status": "optional_install",
+      "families": [
+        "Cloud/Zendesk"
+      ],
+      "framework_codes": [
+        "DI"
+      ],
+      "reason": "No se distribuye por defecto; requiere instalación desde Feature Manager.",
+      "source_url": "https://help.qlik.com/talend/en-US/components/8.0/zendesk/tzendeskoutput"
+    }
+  ]
+}

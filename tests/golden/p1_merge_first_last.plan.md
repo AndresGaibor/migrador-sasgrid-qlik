@@ -12,9 +12,10 @@
 - **Subjob:** `s2` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p1_merge_first_last.sas:2`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput/tfixedflowinput-standard-properties)
 - **Propiedades:**
-  - `VALUES` (Values) = _por configurar_ — regla mappings · nombre oficial
+  - `USE_INTABLE` (Use Inline Table) = _por configurar_ — regla mappings · nombre oficial
+  - `INTABLE` (Inline Table) = _por configurar_ — regla mappings · nombre oficial
 - **Pendientes:**
-  - Decidir cómo representar el formato (tabla de lookup o expresión)
+  - Confirmar cómo aplicar el formato: los rangos y OTHER necesitan lógica equivalente, no solo una tabla de filas
 - **Pruebas:** `vc_op_2_format_definition_1_schema`
 
 ### 2. Leer work.pagos

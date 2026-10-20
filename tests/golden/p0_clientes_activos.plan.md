@@ -137,13 +137,14 @@
 
 ### 10. Eliminar duplicados
 
-- **Acción:** add_component · **Componente:** `tUniqRow` ![Icono Talend](/talend-icons/tUniqRow_icon32.png) (sin verificar)
-- **Subjob:** `s15` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/deduplication/tuniqrow-standard-properties)
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar)
+- **Subjob:** `s15` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
 - **Conexiones:** Main desde `op_15_sort_1`
 - **Propiedades:**
-  - `UNIQUE_KEY` (Unique key) = `cliente_id` — SAS p0_clientes_activos.sas:15 · nombre oficial
+  - `UNIQUE_KEY` = `cliente_id` — SAS p0_clientes_activos.sas:15
 - **Esquema:** `cliente_id` _(tipos por determinar)_
+- **Pendientes:**
+  - Definir la clave y la lógica para conservar la fila correcta por grupo; confirmar una opción disponible en la instalación actual.
 - **Pruebas:** `vc_op_15_dedupe_1_duplicates`
 
 ### 11. Escribir stg.clientes_activos_ord

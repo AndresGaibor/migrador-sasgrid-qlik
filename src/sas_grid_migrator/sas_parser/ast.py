@@ -61,7 +61,7 @@ class MacroCall(BaseModel):
 
 
 class StepStmt(BaseModel):
-    """Sentencia de un paso con su línea y palabra clave (texto recortado a 600 caracteres)."""
+    """Sentencia de un paso; se recorta a 600 caracteres salvo en PROC FORMAT."""
 
     line: int
     kw: str

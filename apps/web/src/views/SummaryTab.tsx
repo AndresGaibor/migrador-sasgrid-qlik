@@ -7,12 +7,14 @@ import { Badge, Load, link, prioTone } from "./common";
 
 export function SummaryTab({ id }: { id: string }) {
   const inventory = useAsync(() => api.inventory(id), [id]);
-  const [s, setS] = useState<Summary>();
+  const savedAnalysis = useAsync(() => api.analysis(id), [id]);
+  const [latestAnalysis, setLatestAnalysis] = useState<Summary>();
+  const s = latestAnalysis ?? savedAnalysis.data ?? undefined;
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string>();
   const run = async () => {
     setBusy(true); setErr(undefined);
-    try { setS(await api.analyze(id)); }
+    try { setLatestAnalysis(await api.analyze(id)); }
     catch (x) { setErr((x as Error).message); }
     finally { setBusy(false); }
   };
@@ -25,6 +27,8 @@ export function SummaryTab({ id }: { id: string }) {
       {busy && <p role="status" className="loading-state"><span className="spinner" /> Estamos revisando tus programas. Puedes esperar en esta pantalla.</p>}
     </section>}</Load>
     {err && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{err}</span></div>}
+    {savedAnalysis.loading && savedAnalysis.data === undefined && <p className="loading-state" role="status"><span className="spinner" /> Comprobando si ya hay un análisis guardado…</p>}
+    {savedAnalysis.error && <div className="notice error-notice" role="alert"><Icon name="warning" /><div><span>No pudimos comprobar si ya hay un análisis guardado.</span> <button className="secondary" onClick={savedAnalysis.reload}>Volver a intentar</button></div></div>}
     {s ? <>
       <div className="notice" role="status"><Icon name="check" /><span><strong>Análisis completado.</strong> Ya puedes explorar tus programas y generar el plan de migración.</span></div>
       <div className="metrics"><div className="metric"><strong>{s.programs}</strong><span>Programas analizados</span></div><div className="metric"><strong>{s.statements}</strong><span>Instrucciones encontradas</span></div><div className="metric"><strong>{s.unrecognized}</strong><span>Instrucciones sin reconocer</span></div><div className="metric"><strong>{s.macro_fragments}</strong><span>Fragmentos de macros</span></div></div>
@@ -32,6 +36,6 @@ export function SummaryTab({ id }: { id: string }) {
       <h2>Resultado por tipo de instrucción</h2><p className="muted">Prioridades de revisión: P0 = cobertura básica · P1 = revisión adicional · P2 = requiere decisión manual.</p>
       <p>{Object.entries(s.findings_by_priority).map(([p, n]) => <Badge key={p} tone={prioTone(p)}>{p}: {n} hallazgos</Badge>)}</p>
       <table><thead><tr><th>Tipo de instrucción</th><th>Prioridad</th><th className="num">Cantidad</th></tr></thead><tbody>{s.coverage.map((c) => <tr key={c.tag}><td>{c.tag}</td><td><Badge tone={prioTone(c.priority)}>{c.priority}</Badge></td><td className="num">{c.count}</td></tr>)}</tbody></table>
-    </> : <div className="notice"><Icon name="info" /><span><strong>¿Qué obtendrás?</strong> Un inventario de programas, un mapa de sus conexiones y una base para preparar tu plan. Si ya analizaste este proyecto, consulta los resultados en las pestañas de arriba.</span></div>}
+    </> : !savedAnalysis.loading && !savedAnalysis.error && <div className="notice"><Icon name="info" /><span><strong>¿Qué obtendrás?</strong> Un inventario de programas, un mapa de sus conexiones y una base para preparar tu plan de migración.</span></div>}
   </>;
 }

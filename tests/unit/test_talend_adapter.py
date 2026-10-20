@@ -1,7 +1,6 @@
 import asyncio
 from pathlib import Path
 
-import apps.api.main as api_mod
 import pytest
 from apps.api.main import app as api
 from fastapi.testclient import TestClient
@@ -105,7 +104,9 @@ def test_verify_plans_is_conservative(tmp_path):
 def test_api_talend(tmp_path, monkeypatch):
     monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
     fake = TalendAdapter(Fake({"talend_inspect_job": JOB, "talend_list_jobs": TalendError("off")}))
-    monkeypatch.setattr(api_mod, "_talend", lambda: fake)
+    from apps.api import common
+
+    monkeypatch.setattr(common, "talend", lambda: fake)
     c = TestClient(api)
     assert c.get("/api/integrations/talend/health").json()["available"] is False
     r = c.post("/api/integrations/talend/inspect", json={"job_path": "/w/j.item"})

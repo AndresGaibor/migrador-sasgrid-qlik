@@ -11,7 +11,7 @@ export function App() {
   const [hash, go] = useHash();
   const [help, setHelp] = useState(false);
   const m = hash.match(/^\/p\/([^/]+)(?:\/([^/]+))?(?:\/(.+))?$/);
-  const catalog = hash.startsWith("/catalogo");
+  const catalog = hash === "/catalogo" || hash.startsWith("/catalogo/");
   const settings = hash === "/settings";
   return (
     <>
@@ -24,7 +24,7 @@ export function App() {
       <aside className="sidebar">
         <div className="nav-caption">ESPACIO DE TRABAJO</div>
         <nav aria-label="Navegación principal">
-          <a href="#/" aria-label="Mis proyectos" title="Mis proyectos" aria-current={!catalog && !settings ? "page" : undefined}><Icon name="grid" /><span>Mis proyectos</span></a>
+          <a href="#/" aria-label="Mis proyectos" title="Mis proyectos" aria-current={!catalog && !settings && (m || hash === "/") ? "page" : undefined}><Icon name="grid" /><span>Mis proyectos</span></a>
           <a href="#/catalogo" aria-label="Catálogo Talend" title="Catálogo Talend" aria-current={catalog ? "page" : undefined}><Icon name="book" /><span>Catálogo Talend</span></a>
           <a href="#/settings" aria-label="Configuración" title="Configuración" aria-current={settings ? "page" : undefined}><Icon name="settings" /><span>Configuración</span></a>
         </nav>
@@ -37,8 +37,10 @@ export function App() {
           <SettingsView />
         ) : m ? (
           <ProjectView key={m[1]} id={m[1]} tab={m[2] ?? "resumen"} rest={m[3]} go={go} />
-        ) : (
+        ) : hash === "/" ? (
           <ProjectsView go={go} />
+        ) : (
+          <div className="empty-state"><span className="empty-icon"><Icon name="warning" size={30} /></span><h3>No encontramos esta página</h3><p>El enlace puede estar incompleto o haber cambiado. Vuelve a tus proyectos para continuar.</p><a className="button" href="#/">Volver a mis proyectos</a></div>
         )}
         <footer className="page-footer"><span className="muted">Análisis y plan de migración · SAS Grid → Talend</span></footer>
       </main>

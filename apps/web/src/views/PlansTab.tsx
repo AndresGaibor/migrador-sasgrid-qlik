@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "../components/Icon";
-import { Dialog } from "../components/Dialog";
 import { api } from "../api";
 import { useAsync } from "../hooks";
 import { ComponentIcon } from "../components/ComponentIcon";
@@ -8,14 +7,11 @@ import type { GridRecommendation, JobPlan, PlanRow, Step } from "../types";
 import { Badge, Load, link } from "./common";
 import { orderSteps } from "../guided";
 import { buildGridGuides } from "../grid-guide";
-import { stepDoes, toContext } from "../step-guide";
-import { catalogAudit } from "../catalog-explorer";
-import { decodeProgress, encodeProgress, GUIDE_PROGRESS, isUncertainStep, storageStatus, type GuideProgress } from "../guide-progress";
+import { PlanPreparation } from "./plans/PlanPreparation";
+import { decodeProgress, encodeProgress, isUncertainStep, storageStatus, type GuideProgress } from "../guide-progress";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { StepDecisionDialogs, StepInstructions, StepProgressEditor } from "./plans/PlanStepParts";
+import { PlanListContent } from "./plans/PlanListContent";
 
 export function PlansTab({ id, file }: { id: string; file?: string }) {
   return file ? <PlanDetail id={id} file={decodeURI(file)} /> : <PlanList id={id} />;
@@ -66,32 +62,10 @@ function PlanList({ id }: { id: string }) {
       <div className="panel"><Button onClick={gen} disabled={busy}><Icon name="play" size={16} />{busy ? "Preparando guías…" : q.data?.length ? "Volver a preparar las guías" : "Preparar guías de migración"}</Button><p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>Lo que ya marcaste como hecho se conserva.</p></div>
       {err && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{err}</span></div>}
       {q.error?.includes("generados") ? (
-        <div className="notice"><Icon name="info" /><span>Todavía no hay planes en este proyecto. Pulsa «Generar planes de migración» para empezar.</span></div>
+        <div className="notice"><Icon name="info" /><span>Todavía no hay guías preparadas para este proyecto. Usa «Preparar guías de migración» para empezar.</span></div>
       ) : (
         <Load q={q}>
-          {(all) => {
-            const rows = real(all);
-            const groups = buildOrder(rows, parentFiles(grid.data));
-            const empty = rows.filter((r) => r.steps === 0);
-            const ordered = groups.flatMap((g) => g.rows);
-            const next = ordered.find((r) => r.done < r.steps);
-            let n = 0;
-            if (rows.length === 0) return <div className="empty-state"><span className="empty-icon"><Icon name="flow" size={34} /></span><h3>Primero analiza tus programas</h3><p>Cuando termine el análisis, aquí aparecerá una guía para cada job.</p><a className="button" href={link(id, "resumen")}>Ir al resumen <Icon name="arrow" size={17} /></a></div>;
-            return (
-              <>
-                {next && <div className="guide-intro"><div><strong>{next.done === 0 && next === ordered[0] ? "Empieza aquí" : "Continúa aquí"}</strong><p>{next.job_name}</p></div><a className="button" href={link(id, "planes", next.program)}>{next.done === 0 && next === ordered[0] ? "Empezar" : "Continuar"} <Icon name="arrow" size={17} /></a></div>}
-                {groups.map((g) => (
-                  <section key={g.title}>
-                    <h2>{g.title}</h2><p className="muted">{g.hint}</p>
-                    <div className="guide-job-list">{g.rows.map((r) => (
-                      <article className="guide-job" key={r.program}><div className="guide-job-main"><h3>{++n}. {r.job_name}</h3><div className="guide-job-meta">{r.done >= r.steps ? <Badge tone="ok">Terminado</Badge> : <span>{r.done} de {r.steps} pasos hechos</span>}<progress max={r.steps} value={r.done} /></div></div><a className="button" href={link(id, "planes", r.program)}>Abrir <Icon name="arrow" size={17} /></a></article>
-                    ))}</div>
-                  </section>
-                ))}
-                {empty.length > 0 && <details><summary>{empty.length} programa{empty.length === 1 ? "" : "s"} sin nada que construir</summary><ul>{empty.map((r) => <li key={r.program}><code>{r.program}</code></li>)}</ul></details>}
-              </>
-            );
-          }}
+          {(all) => { const rows = real(all); return <PlanListContent id={id} rows={rows} groups={buildOrder(rows, parentFiles(grid.data))} />; }}
         </Load>
       )}
     </>
@@ -141,20 +115,11 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
         {(p) => (
           <>
             <h1>{p.job_name}</h1>
-            <p className="subtitle">Pasos en orden. Cada uno indica el componente, los valores y dónde se configuran en Talend Studio.</p>
+            <p className="subtitle">Sigue las tarjetas en orden para configurar cada componente; el estado muestra el avance general del componente.</p>
             <p><strong>Programa SAS de origen:</strong> <a href={link(id, "programas", p.program)}><code>{p.program}</code></a></p>
-            {(p.libraries_needed.length > 0 || p.context_variables.length > 0) && (
-              <div className="panel">
-                <h2>Antes de empezar (una sola vez)</h2>
-                <ol className="do-list">
-                  <li><b>Crea el Job.</b><div className="muted">Dónde: Repository → Job Designs → clic derecho → Create Job → Name:</div><pre className="do-value">{p.job_name}</pre></li>
-                  {p.libraries_needed.map((l) => <li key={l.sas_name}><b>{l.engine ? `Crea la conexión «${l.sas_name}».` : `«${l.sas_name}» son archivos: guárdalos como CSV (no hace falta conexión).`}</b>{l.engine ? <div className="muted">Dónde: Repository → Metadata → clic derecho en el tipo de conexión → Create. Tipo sugerido: {l.suggested_connection}. Motor SAS: {l.engine}. {l.path ? `Ruta o servicio en SAS: ${l.path}. ` : ""}Pide las credenciales al equipo; no se copian del SAS.</div> : <div className="muted">Se usa la variable de contexto que creas más abajo.</div>}</li>)}
-                  {(p.context_variables.length > 0 || p.libraries_needed.some((l) => !l.engine && l.path)) && <li><b>Crea estas variables de contexto.</b><div className="muted">Dónde: pestaña Contexts del Job → «+» por cada una. Tipo: String.</div><pre className="do-value">{[...p.libraries_needed.filter((l) => !l.engine && l.path).map((l) => `context.${l.sas_name.toUpperCase()}_DIR = ${l.path}   (carpeta donde guardarás los CSV de esta librería)`), ...p.context_variables.map((c) => `${toContext("&" + c.name)}${c.sas_value ? ` = ${c.sas_value}` : "   (el valor te lo da el equipo)"}`)].join("\n")}</pre></li>}
-                </ol>
-              </div>
-            )}
+            <PlanPreparation plan={p} />
             {ownGrid.length > 0 && <GridRecommendations id={id} items={ownGrid} />}
-            <h2>{ownGrid.some((g) => PARENT_PATTERN.test(g.pattern_id)) ? "Después: el resto del programa" : "Construye el Job paso a paso"} <Badge>{p.steps.length === 1 ? "1 paso" : `${p.steps.length} pasos`}</Badge></h2>
+            <h2>{ownGrid.some((g) => PARENT_PATTERN.test(g.pattern_id)) ? "Después: el resto del programa" : "Construye el Job"}</h2>
             <StepGroups id={id} steps={p.steps} onDecide={decide} />
             {p.children.map((c) => (
               <section key={c.name}>
@@ -244,7 +209,7 @@ function jumpToStep(stepId: string) {
   el?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step; allSteps: Step[]; previous?: Step; onDecide: (s: Step, progress: GuideProgress, note: string, blockReason: string) => Promise<void> }) {
+function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step; allSteps: Step[]; previous?: Step; onDecide: Decide }) {
   const saved = decodeProgress(s.status, s.note);
   const [progress, setProgress] = useState<GuideProgress>(saved.state);
   const [note, setNote] = useState(saved.note);
@@ -253,68 +218,17 @@ function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step
   const [confirmed, setConfirmed] = useState(false);
   const [err, setErr] = useState<string>();
   useEffect(() => { const current = decodeProgress(s.status, s.note); setProgress(current.state); setNote(current.note); setBlockReason(current.blockReason); }, [s.status, s.note]);
-  const uncertain = isUncertainStep(s);
   const save = (next: GuideProgress) => onDecide(s, next, note, blockReason).then(() => { setProgress(next); setDialog(null); setConfirmed(false); setErr(undefined); }).catch((e: Error) => setErr(e.message));
   const chooseProgress = (value: GuideProgress) => {
     if (value === "blocked") { setDialog("blocked"); return; }
-    if (value === "completed" && uncertain) { setConfirmed(false); setDialog("confirm"); return; }
+    if (value === "completed" && isUncertainStep(s)) { setConfirmed(false); setDialog("confirm"); return; }
     void save(value);
   };
-  const catalogName = s.component_candidate.split(" ")[0];
-  const officialUrl = s.doc_url ?? catalogAudit.recommended_components[catalogName]?.official_url;
-  return (
-    <article className="step guide-step" id={`step-${s.id}`}>
-      <div className="guide-step-heading"><span className="guide-step-number">{s.order}</span><div className="step-head"><h3>{s.purpose}</h3><span className="step-component">Componente: <code>{s.component_candidate}</code></span></div></div>
-      <ol className="do-list">
-        {stepDoes(s, allSteps).map((d, i) => (
-          <li key={i} className={d.check ? "do-check" : undefined}>
-            <b>{d.text}</b>
-            {d.rows ? <div className="do-table-wrap"><table className="do-table">{d.columns && <thead><tr>{d.columns.map((c) => <th key={c}>{c}</th>)}</tr></thead>}<tbody>{d.rows.map((r, ri) => <tr key={ri}>{r.map((cell, ci) => <td key={ci}>{cell}</td>)}</tr>)}</tbody></table></div> : d.value && <pre className="do-value">{d.value}</pre>}
-            {d.where && <div className="muted">Dónde: {d.where}</div>}
-          </li>
-        ))}
-      </ol>
-      <div className="guide-links">{s.evidence?.file && <a href={`${link(id, "programas", s.evidence.file)}?line=${s.evidence.line}`}><Icon name="search" size={15} /> Ver el SAS original · {s.evidence.file.split("/").pop()}:{s.evidence.line}</a>}{officialUrl ? <a href={officialUrl} target="_blank" rel="noreferrer"><Icon name="book" size={15} /> Documentación oficial</a> : null}</div>
-      <details><summary>Trazabilidad</summary><p className="muted">Subjob: {s.subjob} · confianza: {s.confidence} · {s.verified ? "cotejado con Talend MCP" : "sin cotejar con Talend MCP"}{s.alternatives.length > 0 && ` · alternativas: ${s.alternatives.join(", ")}`}</p></details>
-      {s.assumptions.length > 0 && <p className="muted">Supuestos: {s.assumptions.join("; ")}</p>}
-      <div className="row">
-        <label>
-          Estado del paso
-          <Select value={progress} onValueChange={(v) => chooseProgress(v as GuideProgress)}>
-            <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {GUIDE_PROGRESS.map((x) => <SelectItem key={x} value={x}>{{ pending: "Pendiente", in_progress: "En progreso", completed: "Completado", blocked: "Bloqueado" }[x]}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </label>
-        <label className="grow">
-          Nota de trabajo
-          <Input value={note} onChange={(e) => setNote(e.target.value)} onBlur={() => note !== saved.note && void save(progress)} />
-        </label>
-      </div>
-      {progress === "blocked" && <div className="guide-block-reason"><p><strong>Motivo del bloqueo:</strong> {blockReason || "Falta indicar el motivo."}</p><Button type="button" variant="link" size="xs" onClick={() => setDialog("blocked")}>Editar motivo</Button></div>}
-      {previous && <Button type="button" variant="link" size="xs" className="guide-previous-step" onClick={() => jumpToStep(previous.id)}>← Volver al paso anterior · {previous.order}. {previous.component_candidate}</Button>}
-      {err && <p className="error" role="alert">{err}</p>}
-      {dialog === "blocked" && <Dialog title="¿Qué impide continuar?" onClose={() => setDialog(null)}>
-        <p>Indica el motivo para que tú o tu equipo sepan qué falta resolver.</p>
-        <label>Motivo del bloqueo<Textarea value={blockReason} onChange={(e) => setBlockReason(e.target.value)} rows={3} autoFocus /></label>
-        <div className="dialog-actions">
-          <Button variant="outline" onClick={() => setDialog(null)}>Cancelar</Button>
-          <Button disabled={!blockReason.trim()} onClick={() => void save("blocked")}>Guardar bloqueo</Button>
-        </div>
-      </Dialog>}
-      {dialog === "confirm" && <Dialog title="Confirma este paso incierto" onClose={() => setDialog(null)}>
-          <p>Este paso tiene información pendiente o una recomendación que aún no se ha verificado. Revísalo en Talend Studio antes de completarlo.</p>
-          <ul>{s.pending.map((item, index) => <li key={index}>{item}</li>)}</ul>
-          <div className="guide-confirm flex">
-            <Checkbox id={`confirm-${s.id}`} checked={confirmed} onCheckedChange={(v) => setConfirmed(v === true)} />
-            <label htmlFor={`confirm-${s.id}`}>Confirmo que revisé este paso en Talend Studio.</label>
-          </div>
-        <div className="dialog-actions">
-          <Button variant="outline" onClick={() => setDialog(null)}>Volver a revisar</Button>
-          <Button disabled={!confirmed} onClick={() => void save("completed")}>Confirmar y completar</Button>
-        </div>
-      </Dialog>}
-    </article>
-  );
+  const officialUrl = s.doc_url;
+  return <article className="guide-step" id={`step-${s.id}`}>
+    <div className="guide-step-heading"><div className="step-head"><h3>{s.purpose}</h3><span className="step-component">Componente: <code>{s.component_candidate}</code></span></div></div>
+    <StepInstructions id={id} step={s} allSteps={allSteps} officialUrl={officialUrl} />
+    <StepProgressEditor progress={progress} note={note} blockReason={blockReason} previous={previous} error={err} onProgress={chooseProgress} onNoteChange={setNote} onNoteBlur={() => note !== saved.note && void save(progress)} onEditBlock={() => setDialog("blocked")} onJumpPrevious={(step) => jumpToStep(step.id)} />
+    <StepDecisionDialogs step={s} dialog={dialog} setDialog={setDialog} confirmed={confirmed} setConfirmed={setConfirmed} blockReason={blockReason} setBlockReason={setBlockReason} onSave={(state) => void save(state)} />
+  </article>;
 }

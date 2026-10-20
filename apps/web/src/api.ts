@@ -6,8 +6,17 @@ export class ApiError extends Error {
   }
 }
 
+const fetchApi = async (path: string, init?: RequestInit) => {
+  try {
+    return await fetch(path, init);
+  } catch (e) {
+    if (e instanceof TypeError) throw new ApiError(0, "No se pudo completar la solicitud. Comprueba tu conexión e inténtalo de nuevo.");
+    throw e;
+  }
+};
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetchApi(`/api${path}`, {
     ...init,
     headers: { "Content-Type": "application/json", ...init?.headers },
   });
@@ -20,7 +29,7 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 
 const post = <T>(path: string, body?: unknown) =>
   req<T>(path, { method: "POST", body: body === undefined ? undefined : JSON.stringify(body) });
-const enc = encodeURI;
+const enc = (path: string) => path.split("/").map(encodeURIComponent).join("/");
 
 export const api = {
   projects: () => req<Project[]>("/projects"),
@@ -29,7 +38,7 @@ export const api = {
   upload: async (id: string, file: File) => {
     const body = new FormData();
     body.append("file", file);
-    const res = await fetch(`/api/projects/${id}/uploads`, { method: "POST", body });
+    const res = await fetchApi(`/api/projects/${id}/uploads`, { method: "POST", body });
     if (!res.ok) {
       const b = await res.json().catch(() => ({}));
       throw new ApiError(res.status, b.detail ?? res.statusText);
@@ -38,6 +47,7 @@ export const api = {
   },
   inventory: (id: string) => req<Manifest>(`/projects/${id}/inventory`),
   analyze: (id: string) => post<Summary>(`/projects/${id}/analyses`),
+  analysis: (id: string) => req<Summary | null>(`/projects/${id}/analyses`),
   programs: (id: string) => req<ProgramRow[]>(`/projects/${id}/programs`),
   program: (id: string, file: string) => req<Program>(`/projects/${id}/programs/${enc(file)}`),
   sourceEvidence: (id: string, file: string, line: number) =>
@@ -57,5 +67,6 @@ export const api = {
   catalog: (q: string, family: string) =>
     req<CatalogList>(`/talend/catalog?q=${encodeURIComponent(q)}${family ? `&family=${encodeURIComponent(family)}` : ""}`),
   component: (name: string) => req<CatalogComponent>(`/talend/catalog/${encodeURIComponent(name)}`),
+  studioConfiguration: () => req<{ target: string; source: string; markdown: string }>("/talend/studio-configuration"),
   talendHealth: () => req<{ available: boolean; jobs?: number; error?: string }>("/integrations/talend/health"),
 };

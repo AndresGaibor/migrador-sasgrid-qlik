@@ -4,8 +4,9 @@ import { Icon } from "../components/Icon";
 
 export function Load<T>({ q, children }: { q: Async<T>; children: (d: T) => ReactNode }) {
   if (q.loading && !q.data) return <div className="loading-state" role="status"><span className="spinner" /> Cargando información…</div>;
-  if (q.error) return <div className="notice error-notice" role="alert"><Icon name="warning" /><div><strong>No pudimos cargar esta información</strong><p>{q.error === "Failed to fetch" ? "No se pudo conectar con el servicio. Comprueba que esté en funcionamiento e inténtalo de nuevo." : q.error}</p><button className="secondary" onClick={q.reload}>Volver a intentar</button></div></div>;
-  return q.data ? <>{children(q.data)}</> : null;
+  const error = q.error && <div className="notice error-notice" role="alert"><Icon name="warning" /><div><strong>{q.data ? "No se pudo actualizar la información" : "No pudimos cargar esta información"}</strong>{q.data && <p>Se muestran los datos anteriores.</p>}<p>{q.error === "Failed to fetch" ? "No se pudo conectar con el servicio. Comprueba que esté en funcionamiento e inténtalo de nuevo." : q.error}</p><button className="secondary" onClick={q.reload}>Volver a intentar</button></div></div>;
+  if (!q.data) return error;
+  return <>{error}{children(q.data)}</>;
 }
 
 export function Badge({ children, tone = "neutral" }: { children: ReactNode; tone?: string }) {

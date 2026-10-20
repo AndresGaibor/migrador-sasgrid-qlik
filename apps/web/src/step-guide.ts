@@ -16,7 +16,7 @@ export const toContext = (v: string) => v.replace(/&(\w+)\.?/g, "context.$1");
 const looksLikePath = (v: string) => /[\\/]|\.sas\b/i.test(v);
 
 // Pendientes que esta guía ya resuelve con una instrucción concreta: no se muestran como «decisión».
-const RESOLVED = /^(Formato físico|Esquema y tipos de columnas|Sistema y tabla|Confirmar la acción sobre la tabla|Librería |Tabla base destino|Job o joblet hijo|Crear\/identificar el Job hijo|Confirmar si el programa incluido|Decidir cómo representar el formato)/;
+const RESOLVED = /^(Formato físico|Esquema y tipos de columnas|Sistema y tabla|Confirmar la acción sobre la tabla|Librería |Tabla base destino|Job o joblet hijo|Crear\/identificar el Job hijo|Confirmar si el programa incluido)/;
 const DATASET = /^(Leer|Escribir|Añadir filas a) +([\w&]+)\.(\S+)/;
 
 // Dataset SAS → archivo CSV en la carpeta de su librería (variable de contexto <LIB>_DIR); WORK → tHash*.
@@ -32,7 +32,7 @@ function datasetSteps(s: Step, all: Step[], comp: string): Do[] | null {
   const out: Do[] = [];
   if (lib.toLowerCase() === "work") {
     const writer = all.filter((x) => x.order < s.order && /^Escribir +work\./i.test(x.purpose) && x.purpose.toLowerCase().includes(name)).pop();
-    out.push({ text: `Arrastra el componente ${isRead ? "tHashInput" : "tHashOutput"} al lienzo.`, where: `Palette → escribe «${isRead ? "tHashInput" : "tHashOutput"}» → arrástralo` });
+    out.push({ text: `Arrastra el componente ${isRead ? "tHashInput" : "tHashOutput"} al lienzo.`, where: `Palette (panel derecho) → buscar «${isRead ? "tHashInput" : "tHashOutput"}»` });
     out.push({ text: "Ponle este nombre:", value: s.purpose, where: "Clic en el componente → Component → View → Label format" });
     if (isRead) out.push({ text: "En «Component list» elige el componente que guardó estos datos:", value: writer?.purpose ?? "(el paso que escribe este dataset temporal)", where: "Pestaña Component → Basic settings" });
     else out.push({ text: "Deja «Append» desmarcado y pulsa «Sync columns».", where: "Pestaña Component → Basic settings (hereda las columnas del componente anterior)" });
@@ -41,7 +41,7 @@ function datasetSteps(s: Step, all: Step[], comp: string): Do[] | null {
   const dirVar = `context.${lib.toUpperCase()}_DIR`;
   const path = `${dirVar} + "/" + ${tableExpr} + ".csv"`;
   const comp2 = isRead ? "tFileInputDelimited" : "tFileOutputDelimited";
-  out.push({ text: `Arrastra el componente ${comp2} al lienzo.`, where: `Palette → escribe «${comp2}» → arrástralo` });
+  out.push({ text: `Arrastra el componente ${comp2} al lienzo.`, where: `Palette (panel derecho) → buscar «${comp2}»` });
   out.push({ text: "Ponle este nombre:", value: s.purpose, where: "Clic en el componente → Component → View → Label format" });
   out.push({ text: isRead ? "En «File name/Stream» escribe:" : "En «File Name» escribe:", value: path, where: "Pestaña Component → Basic settings" });
   if (isRead) {
@@ -63,12 +63,16 @@ export function stepDoes(s: Step, all: Step[]): Do[] {
   if (ds) return finish(s, all, out);
   out.push(
     known
-      ? { text: `Arrastra el componente ${comp} al lienzo.`, where: `Palette (panel derecho) → escribe «${comp}» en el buscador → arrástralo` }
+      ? { text: `Arrastra el componente ${comp} al lienzo.`, where: `Palette (panel derecho) → buscar «${comp}»` }
       : { text: "Elige el componente a mano: la herramienta no pudo decidirlo.", where: `Alternativas: ${s.alternatives.join(", ") || "ver documentación"}` },
   );
   const jobProp = comp === "tRunJob" ? s.properties.find((p) => (p.label || p.name) === "Job" && p.value) : undefined;
   const jobName = jobProp ? "job_" + slug(((jobProp.value ?? "").replace(/["']/g, "").split("/").pop() ?? "").replace(/\.[^.]+$/, "").replace(/^job_/, "")) : undefined;
   out.push({ text: "Ponle este nombre:", value: jobName ?? s.purpose, where: "Clic en el componente → pestaña Component → View → Label format" });
+  const cols = (s.schema_columns ?? []).filter((c) => c.name);
+  const schemaStep = cols.length ? { text: "Antes de cargar valores, pulsa «Edit schema» y añade estas columnas:", columns: ["Columna", "Tipo"], rows: cols.map((c) => [c.name, c.talend_type ?? "String"]) } : null;
+  // Talend necesita el esquema definido antes de cargar las filas inline.
+  if (comp === "tFixedFlowInput" && schemaStep) out.push(schemaStep);
   for (const p of s.properties) {
     const label = p.label || p.name;
     const raw = p.value ?? "";
@@ -83,16 +87,21 @@ export function stepDoes(s: Step, all: Step[]): Do[] {
       }
       continue;
     }
-    if (comp === "tFixedFlowInput" && label === "Values" && raw.includes(" | ")) {
-      const heads = (s.schema_columns ?? []).filter((c) => c.name).map((c) => c.name);
-      const rows = raw.split("\n").map((line) => line.split(" | ").map((cell) => cell.trim()));
-      out.push({ text: `Marca «Use Inline Table» y copia estas ${rows.length} filas:`, columns: heads.length ? heads : undefined, rows, where: "Pestaña Component → Basic settings → Mode: Use Inline Table" });
+    if (comp === "tFixedFlowInput" && label === "Use Inline Table") continue;
+    if (comp === "tFixedFlowInput" && (label === "Inline Table" || label === "Values") && raw.includes(" | ")) {
+      const schema = (s.schema_columns ?? []).filter((c) => c.name);
+      const heads = schema.map((c) => c.name);
+      const stringSchema = heads.length > 0 && schema.every((c) => !c.talend_type || c.talend_type.toLowerCase() === "string");
+      const rows = raw.split("\n").map((line) => line.split(" | ").map((cell) => {
+        const value = cell.trim();
+        return stringSchema ? JSON.stringify(value) : value;
+      }));
+      out.push({ text: `Marca «Use Inline Table» y copia estas ${rows.length} filas (valores String entre comillas dobles):`, columns: heads.length ? heads : undefined, rows, where: "Pestaña Component → Basic settings → Mode: Use Inline Table" });
       continue;
     }
     out.push(p.value == null ? { text: `Campo «${label}»: no hay valor sugerido; complétalo según el SAS.`, where: "Pestaña Component → Basic settings" } : { text: `En el campo «${label}» escribe:`, value: toContext(raw), where: "Pestaña Component → Basic settings" });
   }
-  const cols = (s.schema_columns ?? []).filter((c) => c.name);
-  if (cols.length) out.push({ text: "Pulsa «Edit schema» y añade estas columnas:", columns: ["Columna", "Tipo"], rows: cols.map((c) => [c.name, c.talend_type ?? "String"]) });
+  if (schemaStep && comp !== "tFixedFlowInput") out.push(schemaStep);
   for (const e of s.expressions) {
     out.push(e.talend ? { text: `Donde el SAS hace «${e.sas}», escribe:`, value: e.talend, where: "En el campo de expresión del componente" } : { text: `Sin traducción automática para «${e.sas}»: escribe su equivalente en Java a mano.` });
   }
