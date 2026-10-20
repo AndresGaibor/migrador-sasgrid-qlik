@@ -1,0 +1,78 @@
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/sap/tsapodatainput · versión 8.0 -->
+# tSAPODataInput
+
+Last updated: 9/30/2026
+
+Retrieves data from an OData web service. With this component, you can send
+parameters in URLs and bodies to query the information you need from the OData web
+service.
+
+## tSAPODataInput Standard properties
+
+These properties are used to configure
+tSAPODataInput running in the Standard Job
+framework.
+
+The Standard
+tSAPODataInput component belongs to the Business family.
+
+The component in this framework is available in all
+subscription-based Talend
+products.
+
+This component is available only when you have installed the 8.0.1-R2025-06 Talend Studio monthly
+update or a later one delivered by Talend. For
+more information, check with your administrator.
+
+## Basic settings
+
+| Properties | Description |
+| --- | --- |
+| Property type | Either Built-in or Repository .  * Built-in: No property data stored   centrally. * Repository: Select the repository   file in which the properties are stored. The fields that follow are   completed automatically using the data retrieved. |
+| OData version | Select the version of the OData protocol you want to use. |
+| Root URL | Type in the URL address identifying the base URL of the SAP OData service you want to access, that is to say the host and port of the SAP server. |
+| Username and Password | Enter the credentials used as basic authentication to access the server. Information noteTip: To enter a password, a token, or a client secret key, click the [...] button next to the corresponding field to bring out the Enter a new password dialog box, enter the password, the token, or the secret key in the text field, and click OK. Note that you can enter either a JSON string in the pure password mode or a Java expression in the Java mode. You can toggle between the two modes by clicking switch to Java mode or switch to pure password mode on the top of the text field. |
+| Path | Enter the catalog service path.  Example:  Root URL = http://<server>:<port> and Path = `/sap/opu/odata4/IWFND/config/default/iwfnd/CATALOGSERVICE` |
+| Guess catalog service path | Click this button to retrieve the default path of the SAP OData catalog service. For more information, see [Catalog service](https://help.sap.com/doc/saphelp_nw74/7.4.16/en-US/7c/a326519eff236ee10000000a445394/content.htm?no_cache=true). |
+| OData V4 parameters (optional) | Specify the extra parameters needed to fine-tune your request to the service:  * Search by API group ID: Use this field to filter   the list on the API group identifiers by adding an asterisk (\*) at the   beginning or end of the value. * Search by API description: Use this field to   filter the list on the API descriptions by adding an asterisk (\*) at the   beginning or end of the value. * API group ID: Select the identifier of the group   you want to retrieve. This list is populated based on the two previous   parameters.   For more information, see [The Groups and related API](https://help.sap.com/docs/SAP_JAM_COLLABORATION/9981b6fb8453459d8103a04d674ebe0f/cc2bb683ad4a445b95e296be924ea3f0.html). |
+| OData V2 parameters (optional) | Specify the extra parameters needed to fine-tune your request to the service:  * Search by service ID: Use this field to filter on   the service identifiers by adding an asterisk (\*) at the beginning or end   of the value. * Search by service description: Use this field to   filter the list on the service descriptions by adding an asterisk (\*) at   the beginning or end of the value. * Search by service type: Use this field to filter   the list on the service types by adding an asterisk (\*) at the beginning   or end of the value. * Search by service version: Use this field to   filter the list on the service versions by adding an asterisk (\*) at the   beginning or end of the value. * Search by service author: Use this field to filter   the list on the service authors by adding an asterisk (\*) at the   beginning or end of the value. |
+| Service URL | Select a service URL from the list. Values are either based on the selected API group (for OData v4) or generated using the filter parameters (for OData v2). |
+| Entity set | Enter or select the specific entity set you want to retrieve from the service. For more information, see [Addressing Entities](https://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part2-url-conventions/odata-v4.0-errata03-os-part2-url-conventions-complete.html#_Toc453752340). Information noteTip: To visualize all available entity sets, click the [...] button next to the corresponding field to bring out the Retrieve values dialog box, and click Run in background. A new dialog box opens with all the retrieved entity sets you can select. Note that you can also provide a Custom value by selecting the Use custom value checkbox.  This option impacts the schema of the output flow of this component. It is recommended to update the schema by clicking the Guess schema button after setting the key/value pairs in the table under this option. |
+| Specify entity key | Select this checkbox to enter the key used to uniquely identify a specific entity set. For more information, see [Addressing Entities](https://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part2-url-conventions/odata-v4.0-errata03-os-part2-url-conventions-complete.html#_Toc453752340). This option impacts the schema of the output flow of this component. It is recommended to update the schema by clicking the Guess schema button after setting the key/value pairs in the table under this option. |
+| Use $filter | Select this checkbox to enter a query that will filter the collection of resources that are addressed by the request URL. For more information, see [System Query Option $filter](https://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part2-url-conventions/odata-v4.0-errata03-os-part2-url-conventions-complete.html#_Filter_System_Query). If both the Use $filter and Use $search options are applied to the same request, the results include only the entities that match both criteria.  This option impacts the schema of the output flow of this component. It is recommended to update the schema by clicking the Guess schema button after setting the key/value pairs in the table under this option. |
+| Use $search | Select this checkbox to enter a query that will be applied to the request URL and will return all matching entities in the collection. For more information, see [System Query Option $search](https://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part2-url-conventions/odata-v4.0-errata03-os-part2-url-conventions-complete.html#_Toc453752364). If both the Use $filter and Use $search options are applied to the same request, the results include only the entities that match both criteria.  This option impacts the schema of the output flow of this component. It is recommended to update the schema by clicking the Guess schema button after setting the key/value pairs in the table under this option. |
+| Use $select | Select this checkbox to enter a query that will be applied to the request URL and will return a specific set of properties for each entity or complex type. For more information, see [System Query Option $select](https://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part2-url-conventions/odata-v4.0-errata03-os-part2-url-conventions-complete.html#_Toc453752360). If both the Use $select and Use $expand options are applied to the same request, the results include only the entities that match the $select criteria, so in that case you should include the $expand criteria in the $select query in order to return all expected properties.  This option impacts the schema of the output flow of this component. It is recommended to update the schema by clicking the Guess schema button after setting the key/value pairs in the table under this option. |
+| Use $expand | Select this checkbox to enter a query that will be applied to the request URL and will return the related expanded resources to be included in line with retrieved resources. For more information, see [System Query Option $expand](https://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part2-url-conventions/odata-v4.0-errata03-os-part2-url-conventions-complete.html#_Toc453752359). If both the Use $select and Use $expand options are applied to the same request, the results include only the entities that match the $select criteria, so in that case you should include the $expand criteria in the $select query in order to return all expected properties.  This option impacts the schema of the output flow of this component. It is recommended to update the schema by clicking the Guess schema button after setting the key/value pairs in the table under this option. |
+| Return type | Select one of the options depending on how you want to parse the data returned by the server.  * Record: Parses the response body and generates   records (one entity per row). * Raw: Returns the full response body in a   body column as is. |
+| Schema and Edit Schema | A schema is a row description, it defines the number of fields to be processed and passed on to the next component. The schema is either Built-in or stored remotely in the Repository.  * Built-in: You create and store the schema locally   for this component only. For more information about a component schema in   its Basic settings tab, see [Basic settings tab](/talend/r/en-US/8.0/studio-user-guide/basic-settings-tab). * Repository: You have already   created the schema and stored it in the Repository. You can reuse it in various projects and Job   designs. For more information about a component schema in its   Basic settings tab, see [Basic settings tab](/talend/r/en-US/8.0/studio-user-guide/basic-settings-tab).   Click Edit schema to make changes to the schema. If the current schema is of the Repository type, three options are available:   * View schema: choose this   option to view the schema only. * Change to built-in property:   choose this option to change the schema to Built-in for local changes. * Update repository connection:   choose this option to change the schema stored in the repository and decide whether   to propagate the changes to all the Jobs upon completion.  If you just want to   propagate the changes to the current Job, you can select No upon completion and choose this schema metadata   again in the Repository Content   window. |
+| Guess schema | Click this button to retrieve the schema according to your settings. When retrieving data from OData, you can specify the format and content of the data retrieved using the schema, the Guess schema button, the Entity set option, the, Specify entity key option, the $filter/search/select/expand option, and the Return type option. |
+
+## Advanced settings
+
+| Properties | Description |
+| --- | --- |
+| tStatCatcher Statistics | Select this checkbox to gather the Job processing metadata at a Job level and at each component level. |
+| Connection timeout (ms) | Set the timeout period (in milliseconds) for the connector to establish a connection to the server. An error occurs if an attempt to establish a connection fails. |
+| Receive timeout (ms) | Set the timeout period (in milliseconds) for receiving response data. An error occurs if no data is received when the read timeout period expires. |
+| Use a proxy | Select this option to use an HTTP or a SOCKS proxy.  * Proxy type: Select the type of proxy you want to use:   HTTP or SOCKS. The HTTP   proxy support basic authentication. * Proxy host and Proxy port:   Enter the address and port of the proxy. * Proxy login and Proxy   password: Enter the credentials needed to authenticate to the   proxy. These two fields are available when HTTP is   selected from the Proxy type drop-down list. |
+| Use $skip | Select this checkbox to specify the number of items in the queried collection that are to be skipped and not included in the result. For more information, see [System Query Option $top and $skip](https://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part2-url-conventions/odata-v4.0-errata03-os-part2-url-conventions-complete.html#_Top_and_Skip). If both the Use $skip and Use $top options are applied to the same request, the results include only the entities that match both criteria.  This option impacts the schema of the output flow of this component. It is recommended to update the schema by clicking the Guess schema button after setting the key/value pairs in the table under this option. |
+| Use $top | Select this checkbox to specify the number of first items in the queried collection that are to be included in the result. For more information, see [System Query Option $top and $skip](https://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part2-url-conventions/odata-v4.0-errata03-os-part2-url-conventions-complete.html#_Top_and_Skip). If both the Use $skip and Use $top options are applied to the same request, the results include only the entities that match both criteria.  This option impacts the schema of the output flow of this component. It is recommended to update the schema by clicking the Guess schema button after setting the key/value pairs in the table under this option. |
+| Use $orderBy | Select this checkbox to enter a query that will be applied to the request URL and will return the related resources in a particular order. For more information, see [System Query Option $orderby](https://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part2-url-conventions/odata-v4.0-errata03-os-part2-url-conventions-complete.html#_OrderBy_System_Query). This option impacts the schema of the output flow of this component. It is recommended to update the schema by clicking the Guess schema button after setting the key/value pairs in the table under this option. |
+
+## Global Variables
+
+| Variables | Description |
+| --- | --- |
+| ERROR\_MESSAGE | ERROR\_MESSAGE: the error message generated by the component when an error occurs. This is an After variable and it returns a string. This variable functions only if the Die on error checkbox is cleared, if the component has this checkbox. |
+| NB\_LINE | NB\_LINE: the number of rows read by an input component or transferred to an output component. This is an After variable and it returns an integer. |
+
+## Usage
+
+| Usage guidance | Description |
+| --- | --- |
+| **Usage rule** | This component is usually used as a start component of a Job or subJob and it always needs an output link. |
+| **Limitations** | * You cannot currently use header parameters in the tSAPOData components.   Specifically, there are no dedicated fields for specifying SAP parameters   such as sap-client (SAP Client ID) and   sap-language (SAP Language) within these   components. * For OData v4: the current implementation of this component requires   the service to support the $count feature. * For OData v2:   + The @odata.count return value is identical to the current     NB\_Line variable.   + Pagination using $skip and     $top is supported only when the     request does not include a specified key.   + The Edm.DateTime type is a valid type in OData     v2. However, this component uses the Olingo 4 library which is     designed for OData v4 and does not support this type. As a     result, this type is not supported in the current implementation     of this component. Use Edm.DateTimeOffset     instead. |
+
+**Related tasks**  
+
+* [Inserting and updating records in an SAP OData dataset](tfixedflowinput-tmap-tsapodatainput-tlogrow-tsapodataoutput-inserting-and-updating-records-in-sapodata-dataset-standard-component)

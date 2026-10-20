@@ -1,0 +1,310 @@
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/chart/tbarchart · versión 8.0 -->
+# tBarChart
+
+Last updated: 9/30/2026
+
+Generates a bar chart from the input data to ease technical analysis.
+
+tBarChart reads data from an input
+flow and transforms the data into a bar chart in a PNG image file.
+
+## tBarChart Standard properties
+
+These properties are used to configure tBarChart running in the Standard Job framework.
+
+The Standard
+tBarChart component belongs to the Business Intelligence family.
+
+The component in this framework is available in all Talend
+products.
+
+## Basic settings
+
+| Properties | Description |
+| --- | --- |
+| Schema and Edit schema | * A schema is a row description. It defines the number of fields   (columns) to be processed and passed on to the next component. When you create a Spark   Job, avoid the reserved word `line` when naming the   fields.  Click Edit   schema to make changes to the schema. If the current schema is of the Repository type, three options are available:    + View schema: choose this     option to view the schema only.   + Change to built-in property:     choose this option to change the schema to Built-in for local changes.   + Update repository connection:     choose this option to change the schema stored in the repository and decide whether     to propagate the changes to all the Jobs upon completion.  If you just want to     propagate the changes to the current Job, you can select No upon completion and choose this schema metadata     again in the Repository Content     window. Information noteNote: The schema of tBarChart   contains three read-only columns named series (string), category (string), and value (integer) respectively, in a fixed order.   The data in any extra columns will be only passed to the next   component, if any, without being presented in the bar   chart. * Built-in: The schema is created   and stored locally for this component only. For more information about a component schema in its Basic settings tab, see [Basic settings tab](/talend/r/en-US/8.0/studio-user-guide/basic-settings-tab). * Repository: The schema already   exists and is stored in the Repository, hence can be reused. For more information about a component schema in its Basic settings tab, see [Basic settings tab](/talend/r/en-US/8.0/studio-user-guide/basic-settings-tab). |
+| Sync columns | Click to synchronize the output file schema with the input file schema. The Sync function only displays once the Row connection is linked with the output component. |
+| Generated image path | Name and path of the output image file. |
+| Chart title | Enter the title of the bar chart to be generated. |
+| Include legend | Select this check box if you want the bar chart to include a legend, indicating all series in different colors. |
+| 3Dimensions | Select this check box to create an image with 3D effect. By default, this check box is selected and the bars representing the series of each category will be stacked one over another. If this check box is cleared, a 2D image will be created, with the bars displayed one besides another along the category axis. |
+| Image width and Image height | Enter the width and height of the image file, in pixels. |
+| Category axis name and Value axis name | Enter the category axis name and value axis name. |
+| Foreground alpha | Enter an integer in the range of *0* to *100* to define the transparency of the image. The smaller the number you enter, the more transparent the image will be. |
+| Plot orientation | Select the plot orientation of the bar chart: VERTICAL or HORIZONTAL. |
+
+## Advanced settings
+
+| Properties | Description |
+| --- | --- |
+| tStat Catcher Statistics | Select this check box to collect log data at the component level. |
+| Enable parallel execution | Select this check box to perform high-speed data processing, by treating multiple data flows simultaneously. Note that this feature depends on the database or the application ability to handle multiple inserts in parallel as well as the number of CPU affected. In the Number of parallel executions field, either:  * Enter the number of parallel executions desired. * Press Ctrl+Space and select   the appropriate context variable from the list. For further information about context   variables, see [Using contexts and variables](/talend/r/en-US/8.0/studio-user-guide/contexts-and-variables).  * The Action on   table field is not available with the   parallelization function. Therefore, you must use a tCreateTable component if you   want to create a table. * When parallel execution is enabled, it is not   possible to use global variables to retrieve return values in a   subJob. |
+
+## Global Variables
+
+| Variables | Description |
+| --- | --- |
+| Global Variables | NB\_LINE: the number of rows read by an input component or transferred to an output component. This is an After variable and it returns an integer.  ERROR\_MESSAGE: the error message generated by the component when an error occurs. This is an After variable and it returns a string. This variable functions only if the Die on error checkbox is cleared, if the component has this checkbox.  A Flow variable functions during the execution of a component while an After variable functions after the execution of the component.  To fill up a field or expression with a variable, press Ctrl+Space to access the variable list and choose the variable to use from it.  For more information about variables, see [Using contexts and variables](/talend/r/en-US/8.0/studio-user-guide/contexts-and-variables). |
+
+## Usage
+
+| Usage guidance | Description |
+| --- | --- |
+| **Usage rule** | This component is mainly used as Output component. It requires an Input component and Row main link as input. |
+
+**Related concepts**  
+
+* [Creating a bar chart from the input data](tbarchart-tmap-tfileoutputdelimited-tpostjob-creating-bar-chart-from-input-data-standard-component-this)
+
+
+---
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-creating-bar-chart-from-input-data-standard-component-this -->
+# Creating a bar chart from the input data
+
+Last updated: 9/30/2026
+
+This scenario describes a Job that reads source data from a CSV file and transforms
+the data into a bar chart showing a comparison of several large cities. The input file
+is shown below:
+
+```
+City;Population(x1000);LandArea(km2);PopulationDensity(people/km2)
+Beijing;10233;1418;7620
+Moscow;10452;1081;9644
+Seoul;10422;605;17215
+Tokyo;8731;617;14151
+Jakarta;8490;664;12738
+New York;8310;789;10452
+```
+
+Because the input file has a different structure than the one required by the
+tBarChart component, this use case uses the
+tMap component to adapt the source data to the
+three-column schema of tBarChart so that a temporary
+CSV file can be created as the input to the tBarChart
+component.
+
+Information noteNote:
+
+You will usually use the tMap
+component to adjust the input schema in accordance with the schema structure of the
+tBarChart component. For more information about
+how to use the tMap component, see [Mapping data flows](/talend/r/en-US/8.0/studio-user-guide/map-editor-interfaces) and [tMap](/talend/en-US/components/8.0/tmap/tmap).
+
+To ensure correct generation of the temporary input file, a pre-treatment subJob is
+used to delete the temporary file in case it already exists before the main Job is
+executed; as this temporary file serves this specific Job only, a post-treatment subJob
+is used to deleted it after the main Job is executed.
+
+### In this section
+
+* [Dropping and linking components](/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-dropping-and-linking-components-standard-component-drop)
+* [Reading the source data](/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-reading-source-data-standard-component)
+* [Adapting the source data to the tBarChart schema](/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-adapting-source-data-to-tbarchart-schema-standard-component)
+* [Generating the temporary input file](/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-generating-temporary-input-file-standard-component)
+* [Configuring bar chart generation](/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-configuring-bar-chart-generation-standard-component)
+* [Deleting the temporary file](/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-deleting-temporary-file-standard-component-as)
+* [Executing the Job](/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-executing-job-standard-component-press)
+
+**Related reference**  
+
+* [tBarChart](tbarchart "Generates a bar chart from the input data to ease technical analysis.")
+
+**Related information**  
+
+* [tMap](/talend/en-US/components/8.0/tmap/tmap)
+* [tFileOutputDelimited](/talend/en-US/components/8.0/delimited/tfileoutputdelimited)
+* [tFileInputDelimited](/talend/en-US/components/8.0/delimited/tfileinputdelimited)
+* [tFileDelete](/talend/en-US/components/8.0/tfiledelete/tfiledelete)
+* [tPrejob](/talend/en-US/components/8.0/orchestration/tprejob)
+* [tPostjob](/talend/en-US/components/8.0/orchestration/tpostjob)
+
+
+---
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-adapting-source-data-to-tbarchart-schema-standard-component -->
+# Adapting the source data to the tBarChart schema
+
+Last updated: 9/30/2026
+
+## Procedure
+
+1. Double-click the tMap to open the
+   Map Editor.
+
+   You can see an input table on the input panel, *row1* in this example, and three empty output tables, named
+   *Population*, *Area*, and *Density* on the
+   output panel.
+2. Use the Schema editor to add three
+   columns to each output table: *series* (string),
+   *category* (string), and *value*
+   (integer).
+3. In the relevant Expression field of the
+   output tables, enter the text to be presented in the legend area of the bar
+   chart, "Population (x1000 people)", "Land area
+   (km2)", and "Population density (people/km2)"
+   respectively in this example.
+4. Drop the *City* column of the input table onto the
+   *category* column of each output table.
+5. Drop the *Population* column of the input table onto
+   the *value* column of the *Population*
+   table.
+6. Drop the *Area* column of the input table onto the
+   *value* column of the *Area*
+   table.
+7. Drop the *Density* column of the input table onto the
+   *value* column of the *Density*
+   table.
+8. Click OK to save the mappings and close
+   the Map Editor and propagate the output
+   schemas to the output components.
+
+
+---
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-configuring-bar-chart-generation-standard-component -->
+# Configuring bar chart generation
+
+Last updated: 9/30/2026
+
+## Procedure
+
+1. Double-click the second tFileInputDelimited component, which is labeled *Temp\_Input*, to display its Basic settings view.
+2. Fill in the File name field with the path
+   to the temporary input file generated by the tFileOutputDelimited components. In this use case, the
+   temporary input file to the tBarChart is
+   *Temp.csv*.
+3. Double-click the tBarChart component to
+   display its Basic settings view.
+4. In the Generated image path field, define
+   the file path of the image file to be generated.
+5. In the Chart title field, define a title
+   for the bar chart.
+6. Define the category and series axis names.
+7. Define the size and transparency degree of the image if needed. In this
+   use case, we simply use the default settings.
+8. Click Edit schema to open the schema
+   dialog box.
+9. Copy all the columns from the output schema to the input schema by
+   clicking the left-pointing double arrow button. Then, click OK to close the schema dialog box.
+
+
+---
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-deleting-temporary-file-standard-component-as -->
+# Deleting the temporary file
+
+Last updated: 9/30/2026
+
+## About this task
+
+As the tPrejob and tPostjob components simply trigger the connected subJobs and do not
+have any settings to define, all you need to do is to define the properties of the
+two tFileDelete components.
+
+## Procedure
+
+1. Double-click the first tFileDelete
+   component to display its Basic settings
+   view.
+2. Fill in the File name field with the path
+   to the temporary input file.
+
+   If the Fail on error check box is
+   selected while the pre-treatment subJob fails because of errors such as
+   the file to delete does not exist, this failure will prevent the main
+   subJob from being launched. In this situation, you can clear the
+   Fail on error check box to avoid
+   this interruption.
+3. Specify the same file path in the other tFileDelete component.
+
+
+---
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-dropping-and-linking-components-standard-component-drop -->
+# Dropping and linking components
+
+Last updated: 9/30/2026
+
+## Procedure
+
+1. Drop the following components from the Palette to the design workspace: a tPrejob, a tPostjob, two
+   tFileDelete components, two tFileInputDelimited components, a tMap, three tFileOutputDelimited components, and a tBarChart.
+2. Connect the tPrejob component to one
+   tFileDelete component using a Trigger > On Component
+   Ok connection, and connect the tPostjob component to the other tFileDelete component using the same type of connection.
+3. Connect the first tFileInputDelimited to
+   the tMap component using a Row > Main
+   connection.
+4. Connect the tMap component to the first
+   tFileOutputDelimited component using a
+   Row > Main connection, and name the connection *Population*.
+5. Repeat the step above to connect the tMap
+   component to the other two tFileOutputDelimited components using Row > Main connections, and
+   name the connections *Area* and *Density* respectively.
+6. Connect the section tFileInputDelimited
+   to the tBarChart component using a
+   Row > Main connection.
+7. Connect the first tFileInputDelimited
+   component to the second tFileInputDelimited
+   component using a Trigger > On Subjob Ok connection.
+8. Relabel the components to best describe their functionality.
+
+## Results
+
+
+---
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-executing-job-standard-component-press -->
+# Executing the Job
+
+Last updated: 9/30/2026
+
+## Procedure
+
+1. Press Ctrl+S to save your Job.
+2. Press F6 to launch it. 
+
+   A bar chart is generated, showing a graphical comparison of the specified
+   large cities.
+
+
+---
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-generating-temporary-input-file-standard-component -->
+# Generating the temporary input file
+
+Last updated: 9/30/2026
+
+## Procedure
+
+1. Double-click the first tFileOutputDelimited component to display its Basic settings view.
+2. In the File Name field, define a
+   temporary CSV file to send the mapped data flows to. In this use case, we
+   name this file *Temp.csv*. This file will be used as the
+   input to the tBarChart component.
+3. Select the Append check box.
+4. Repeat the steps above to define the properties of the other two tFileOutputDelimited components, using exactly
+   the same settings as in the first tFileOutputDelimited component.
+
+   Information noteNote:
+
+   Note that the order of output flows from the tMap component is not necessarily the actual order of
+   writing data to the target file. To ensure the target file is correctly
+   generated, delete the file by the same name if it already exists before
+   Job execution and select the Append
+   check box in all the tFileOutputDelimited components in this step.
+
+
+---
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/chart/tbarchart-tmap-tfileoutputdelimited-tpostjob-reading-source-data-standard-component -->
+# Reading the source data
+
+Last updated: 9/30/2026
+
+## Procedure
+
+1. Double-click the first tFileInputDelimited component, which is labeled *Large\_Cities*, to display its Basic settings view.
+2. Fill in the File name field by browsing
+   to the input file.
+3. In the Header field, specify the number
+   of header rows. In this use case, you have only one header row.
+4. Click Edit schema to describe the data
+   structure of the input file. In this use case, the input schema is made of
+   four columns: *City*, *Population*,
+   *Area*, and *Density*. Upon
+   defining the column names and data types, click OK to close the schema dialog box.

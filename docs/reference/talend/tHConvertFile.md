@@ -1,0 +1,46 @@
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/data-mapping/thconvertfile · versión 8.0 -->
+# tHConvertFile
+
+Last updated: 9/30/2026
+
+Uses Talend Data Mapper structures to perform a conversion from one representation to
+another, as a Spark Batch execution.
+
+tHConvertFile converts data from one
+representation to another in a Spark environment.
+
+## tHConvertFile properties for Apache Spark Batch
+
+These properties are used to configure tHConvertFile running in the Spark Batch Job framework.
+
+The Spark Batch
+tHConvertFile component belongs to the Processing family.
+
+This component is available in Talend Platform
+products with Big Data and in Talend Data Fabric.
+
+## Basic settings
+
+| Properties | Description |
+| --- | --- |
+| Storage | To connect to an HDFS installation, select the Define a storage configuration component check box and then select the name of the component to use from those available in the drop-down list.  This option requires you to have previously configured the connection to the HDFS installation to be used, as described in the documentation for the tHDFSConfiguration component.  If you leave the Define a storage configuration component check box unselected, you can only convert files locally. |
+| Configure Component | To configure the component, click the [...] button and, in the Component Configuration window, perform the following actions.   1. Click the Select button next to the Record structure field and then,    in the Select a Structure    dialog box that opens, select the structure you want to use when    converting your file and then click OK.  This structure must have been previously created    in *Talend Data Mapper*. 2. Select the Input    Representation to use from the drop-down    list.  Supported input formats are Avro, COBOL, EDI,    Flat, IDocs, JSON and XML. 3. Select the Output    Representation to use from the drop-down list.    The choices available for the Output representation depend on    what you choose for the Input representation.  Supported output formats are Avro, Flat, JSON and    XML. 4. Click Next. 5. Tell the component where each new record begins.    In order for you to be able to do so, you need to fully    understand the structure of your data.  Exactly how you do this varies depending on the    input representation being used, and you will be presented with    one of the following options.     1. Select an appropriate record delimiter       for your data. Note that you must specify this value       without quotes.       * Separator         lets you specify a separator indicator, such as *\n*, to identify a new         line.  Supported indicators are *\n* for a Unix-type new line,         *\r\n* for Windows and *\r* for Mac, and *\t* for tab characters.       * Start/End         with lets you specify the initial         characters that indicate a new record, such as *<root*, or the characters         that indicate where a record ends. This can also         be a regular expression.  Start with         also supports new lines, *\n*         for a Unix-type new line, *\r\n* for Windows and *\r* for Mac, and *\t* for         tab characters.       * Sample File: To test the         signature with a sample file, click the         [...] button, browse to the         file you want to use as a sample, click         Open, and then click         Run to test your         sample. Testing the signature lets you check         that the total number of records and their minimum         and maximum length corresponds to what you expect         based on your knowledge of the data. This step         assumes you have a local subset of your data to         use as a sample.       * Click Finish.    2. If your input       representation is COBOL or Flat with positional and/or       binary encoding properties, define the signature for the       input record structure:       * Input Record         root corresponds to the root element         in your input record.       * Minimum Record         Size corresponds to the size in bytes         of the smallest record. If you set this value too         low, you may encounter performance issues, since         the component will perform more checks than         necessary when looking for a new record.       * Maximum Record         Size corresponds to the size in bytes         of the largest record, and is used to determine         how much memory is allocated to read the         input.       * Maximum Block Size         (BLKSIZE) correspond to the size in         bytes of the largest block in Variable Blocked         files. If you do not have the exact value, you can         enter `32760`, which is the         maximum BLKSIZE. With the Variable Blocked         signature, each block is extracted as the Spark         record. Each map execution processes an entire         block and not an individual Cobol record, as with         other Cobol signatures.       * Sample from         Workspace or Sample from File         System: To test the signature with a         sample file, click the [...] button, and then         browse to the file you want to use as a sample. Testing the signature lets you         check that the total number of records and their         minimum and maximum length corresponds to what you         expect based on your knowledge of the data. This         step assumes you have a local subset of your data         to use as a sample.       * Footer         Size corresponds to the size in bytes         of the footer, if any. At runtime, the footer will         be ignored rather than being mistakenly included         in the last record. Leave this field empty if         there is no footer.       * Click the         Next button to open the Signature         Parameters window, select the fields         that define the signature of your record input         structure (that is, to identify where a new record         begins), update the Operation and         Value columns as appropriate, and         then click Next.       * In the Record Signature         Test window that opens, check that your         Records are correctly delineated by scrolling         through them with the Back and Next buttons and performing a visual         check, and then click Finish. |
+| Input | Click the [...] button to define the path to where the input file is stored.  You can also enter the path manually, between quotes. |
+| Output | Click the [...] button to define the path to where the output file will be stored.  You can also enter the path manually, between quotes. |
+| Action | From the drop-down list, select:  * Create if you want   the conversion process to create a new file. * Overwrite if you want   the conversion process to overwrite an existing file. |
+| Open Structure Editor | Click the [...] button to open the structure for editing in the Structure Editor of *Talend Data Mapper*.  For more information, see [Hierarchical output structure editor](/talend/r/en-US/8.0/data-mapper-user-guide/hierarchical-output-structure-editor). |
+| Merge result to single file | By default, the tHConvertFile creates several part files. Select this check box to merge these files into a single file.  The following options are used to manage the source and the target files:  * Merge File   Path: enter the path to the file which will   contain the merged content from all parts. * Remove source   dir: select this check box to remove the source   files after the merge. * Override target file: select   this check box to override the file already existing in the   target location. This option does not override the folder. * Include   Header: select this check box to add the CSV   header to the beginning of the merged file. This option is only   used for CSV outputs. For other representations, it has no   effect on the target file.  Information noteWarning: Using this option with an Avro output creates an invalid Avro file. Since each part starts with an Avro Schema header, the merged file would have more than one Avro Schema, which is invalid. |
+
+## Advanced settings
+
+| Properties | Description |
+| --- | --- |
+| Die on error | Select the checkbox to stop the execution of the Job when an error occurs.  Clear the checkbox to skip any error and continue the Job execution process. |
+| Use old Eclipse runtime (deprecated) | Select this check box to include the old Eclipse runtime in your Job. Information noteNote: This option is available only if you have installed the R2024-03 Talend Studio monthly update or a later one delivered by Talend. For more information, check with your administrator.  Information noteNote: From Talend Studio 8.0 R2025-04 onwards, the Use old Eclipse runtime (deprecated) parameter has been removed. |
+
+## Usage
+
+| Usage guidance | Description |
+| --- | --- |
+| Usage rule | This component is used with a tHDFSConfiguration component which defines the connection to the HDFS storage, or as a standalone component for converting local files only. |
+| Usage with Talend Runtime | If you want to deploy a Job or Route containing a data mapping component with Talend Runtime, you first need to install the Talend Data Mapper feature. For more information, see [Using Talend Data Mapper with Talend Runtime](/talend/r/en-US/8.0/data-mapper-user-guide/using-talend-data-mapper-with-talend-runtime). |

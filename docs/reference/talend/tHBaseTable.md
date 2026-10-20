@@ -1,0 +1,58 @@
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/hbase/thbasetable · versión 8.0 -->
+# tHBaseTable
+
+Last updated: 9/30/2026
+
+Creates or deletes HBase tables.
+
+This component is not shipped with your Talend Studio by
+default. You need to install it using the Feature Manager. For more information, see [Installing features using the Feature Manager](/talend/r/en-US/8.0/studio-user-guide/install-features-to-talend-studio).
+
+## tHBaseTable Standard properties
+
+These properties are used to configure tHBaseTable running in the Standard Job framework.
+
+The Standard
+tHBaseTable component belongs to the Big Data
+and the Databases NoSQL families.
+
+The component in this framework is available in all Talend products
+with Big Data and in Talend Data Fabric.
+
+## Basic settings
+
+| Properties | Description |
+| --- | --- |
+| Property type | Either Built-In or Repository.  Built-In: No property data stored centrally.  Repository: Select the repository file where the properties are stored. |
+| Use an existing connection | Select this check box and in the Component List drop-down list, select the desired connection component to reuse the connection details you already defined. |
+| HBase version | Select the HBase version of the distribution you are using. |
+| Hadoop version | Select the Hadoop version of the distribution you are using. |
+| Zookeeper quorum | Type in the name or the URL of the ZooKeeper service you use to coordinate the transaction between your Talend Studio and your database. Note that when you configure the ZooKeeper, you might need to explicitly set the *zookeeper.znode.parent* property to define the path to the root Znode that contains all the Znodes created and used by your database; then select the Set Zookeeper znode parent check box to define this property. |
+| Zookeeper client port | Type in the number of the client listening port of the ZooKeeper service you are using. |
+| Use Kerberos authentication | If the database to be used is running with Kerberos security, select this checkbox, then, enter the principal names in the HBase Master principal and HBase Region Server principal fields. You should be able to find the information in the *hbase-site.xml* file of the cluster to be used.  If you need to use a Kerberos keytab file to log in, select Use a keytab to authenticate. A keytab file contains pairs of Kerberos principals and encrypted keys. You need to enter the principal to be used in the Principal field and the access path to the keytab file itself in the Keytab field. This keytab file must be stored in the machine in which your Job actually runs, for example, on a Talend JobServer.  Note that the user that executes a keytab-enabled Job is not necessarily the one a principal designates but must have the right to read the keytab file being used. For example, the username you are using to execute a Job is *user1* and the principal to be used is *guest*; in this situation, ensure that *user1* has the right to read the keytab file to be used. |
+| Specify namespace | Select this check box if you want to specify a namespace, and enter the name of the namespace you want to create in the Namespace parameter. |
+| Table name | Type in the name of the HBase table you need create. |
+| Action on table | Select the action you need to take for creating an HBase table:  * Create table: creates a table. * Drop and create table: removes a table and   creates a new one. * Create table if it does not exist: creates a   table only if no table already exists. * Drop and create table if it exists: removes a   table only if it already exists, and creates a new one. * Drop table: removes a table. |
+| Family parameters | Type in the names and, when needs be, the custom performance options of the column families to be created. These options are all attributes defined by the HBase data model. For more information about a column family, see [Column families](http://hbase.apache.org/0.94/book/columnfamily.html) from Apache documentation. |
+| Split regions keys | Enter the name of one or more region keys, separated by a comma, to split the regions manually. |
+
+## Advanced settings
+
+| Properties | Description |
+| --- | --- |
+| Use batch mode | Select this check box to activate the batch mode for data processing. |
+| Batch size | Specify the number of records to be processed in each batch.  This field is available only when the Use batch mode check box is selected. |
+| Properties | If you need to use custom configuration for your database, complete this table with the property or properties to be customized. Then at runtime, the customized property or properties will override the corresponding ones used by Talend Studio.  For example, you need to define the value of the *dfs.replication* property as *1* for the database configuration. Then you need to add one row to this table using the plus button and type in the name and the value of this property in this row.  Information noteNote: This table is not available when you are using an existing connection by selecting the Using an existing connection check box in the Basic settings view. |
+| tStatCatcher Statistics | Select this check box to collect log data at the component level. |
+
+## Global Variables
+
+| Variables | Description |
+| --- | --- |
+| Global Variables | NB\_LINE: the number of rows read by an input component or transferred to an output component. This is an After variable and it returns an integer.  ERROR\_MESSAGE: the error message generated by the component when an error occurs. This is an After variable and it returns a string. This variable functions only if the Die on error checkbox is cleared, if the component has this checkbox.  A Flow variable functions during the execution of a component while an After variable functions after the execution of the component.  To fill up a field or expression with a variable, press Ctrl+Space to access the variable list and choose the variable to use from it.  For more information about variables, see [Using contexts and variables](/talend/r/en-US/8.0/studio-user-guide/contexts-and-variables). |
+
+## Usage
+
+| Usage guidance | Description |
+| --- | --- |
+| **Usage rule** | This component can be used as a standalone component. |
