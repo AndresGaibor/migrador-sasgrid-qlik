@@ -18,6 +18,12 @@ class TalendError(RuntimeError):
 
 class Caller(Protocol):
     async def call(self, tool: str, args: dict[str, Any]) -> dict[str, Any]: ...
+
+
+class CallerWithTools(Protocol):
+    """Caller capaz de listar las tools publicadas (para comprobar contratos)."""
+
+    async def list_tools(self) -> list[dict[str, Any]]: ...
     async def describe_tool(self, tool: str) -> dict[str, Any] | None: ...
 
 
@@ -64,6 +70,27 @@ class McpCaller:
             except ValueError as e:
                 raise TalendError("respuesta de talend-mcp no es JSON") from e
         return data
+
+    async def list_tools(self) -> list[dict[str, Any]]:
+        """Tools publicadas por el servidor MCP (read-only)."""
+        from mcp import Client
+
+        try:
+            async with Client(self.url) as client:
+                result = await client.list_tools(read_timeout_seconds=self.timeout)
+        except Exception as e:
+            cause = e
+            while isinstance(cause, BaseExceptionGroup) and cause.exceptions:
+                cause = cause.exceptions[0]
+            raise TalendError(f"talend-mcp no disponible: {type(cause).__name__}: {cause}") from e
+        tools: list[dict[str, Any]] = []
+        for tool in getattr(result, "tools", []) or []:
+            dump = getattr(tool, "model_dump", None)
+            if callable(dump):
+                tools.append(dump(by_alias=True, exclude_none=True))
+            elif isinstance(tool, dict):
+                tools.append(tool)
+        return tools
 
 
 class ComponentRef(BaseModel):
