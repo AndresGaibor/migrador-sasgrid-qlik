@@ -58,7 +58,7 @@ export function SettingsView() {
               tone={h.mcp_available ? "ok" : "bad"}
               title="Servidor MCP"
               detail={h.mcp_available
-                ? `Responde en ${h.mcp_url ?? "la URL configurada"}${h.jobs != null ? ` · ${h.jobs} procesos en el proyecto` : ""}.`
+                ? `Responde en ${h.mcp_url ?? "la URL configurada"}${h.tools != null ? ` · ${h.tools} tools publicadas` : ""}${h.jobs != null ? ` · ${h.jobs} procesos en el proyecto` : ""}.`
                 : `No responde en ${h.mcp_url ?? "la URL configurada"}. Arrántalo con «bun run start:server» en la carpeta de talend-mcp.`}
             />
             <Stage
@@ -69,9 +69,11 @@ export function SettingsView() {
                 : "Sin conexión. Abre Talend Studio con el plugin del bridge instalado para inspeccionar y escribir Jobs."}
             />
             <Stage
-              tone={h.write_enabled ? "ok" : "warn"}
+              tone={h.write_tool === false ? "bad" : h.write_enabled ? "ok" : "warn"}
               title="Escritura de Jobs"
-              detail={h.write_enabled
+              detail={h.write_tool === false
+                ? "El MCP no publica talend_job_apply_custom_spec. Actualiza talend-mcp antes de crear Jobs."
+                : h.write_enabled
                 ? `Activada. Los Jobs nuevos se crean en «${h.apply_folder}».`
                 : "Desactivada en Configuración o por TALEND_MCP_READONLY=true; la API solo puede leer."}
             />

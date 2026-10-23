@@ -33,3 +33,9 @@ test("the write permission is a switch persisted through the API", () => {
   assert.match(source, /checked=\{h\.write_enabled\}/);
   assert.match(source, /toggleWrite/);
 });
+
+test("the published tool inventory drives the diagnostics", () => {
+  assert.match(source, /h\.tools/);
+  assert.match(source, /h\.write_tool === false/);
+  assert.match(source, /talend_job_apply_custom_spec/);
+});

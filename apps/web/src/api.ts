@@ -98,6 +98,8 @@ export const api = {
     bridge_mode?: string;
     unsafe_actions?: boolean;
     write_enabled: boolean;
+    tools?: number | null;
+    write_tool?: boolean | null;
     apply_folder: string;
     mcp_url?: string;
     timeout_seconds?: number;

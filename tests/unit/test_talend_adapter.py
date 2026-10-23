@@ -7,7 +7,7 @@ from apps.api.main import app as api
 from fastapi.testclient import TestClient
 
 from sas_grid_migrator.migration_planner.service import generate_plans
-from sas_grid_migrator.talend_adapter.adapter import TalendAdapter, TalendError
+from sas_grid_migrator.talend_adapter.adapter import SPEC_TOOL, TalendAdapter, TalendError
 from sas_grid_migrator.talend_adapter.policy import ToolNotAllowed
 from sas_grid_migrator.talend_adapter.verification import Catalog, verify_plans
 from tests.unit.test_planner import project
@@ -28,6 +28,30 @@ class Fake:
 
     async def describe_tool(self, tool):
         return {"properties": {"childJobs": {}, "instructions": {}, "replaceManagedTodoContexts": {}, "components": {"items": {"properties": {"draftOnly": {}, "draftReason": {}, "tables": {}}}}}}
+
+
+SPEC_SCHEMA = {
+    "properties": {
+        "childJobs": {},
+        "instructions": {},
+        "replaceManagedTodoContexts": {},
+        "components": {"items": {"properties": {"draftOnly": {}, "draftReason": {}, "tables": {}}}},
+    }
+}
+
+
+class ListingFake(Fake):
+    """Caller que expone el inventario de tools y no acepta describe_tool."""
+
+    def __init__(self, responses, tools):
+        super().__init__(responses)
+        self.tools = tools
+
+    async def list_tools(self):
+        return self.tools
+
+    async def describe_tool(self, tool):
+        raise AssertionError("list_tools es el camino esperado; describe_tool no debe usarse")
 
 
 JOB = {
@@ -95,7 +119,65 @@ def test_health_unavailable_does_not_raise():
         "jobs": 1,
         "spec_supported": True,
         "spec_error": None,
+        "tools": None,
+        "write_tool": None,
     }
+
+
+def test_spec_status_validates_the_contract_from_the_published_listing():
+    listing = [
+        {"name": "talend_jobs_list", "inputSchema": {}},
+        {"name": SPEC_TOOL, "inputSchema": SPEC_SCHEMA},
+    ]
+    ad = TalendAdapter(ListingFake({}, listing))
+
+    status = run(ad.custom_spec_status())
+
+    assert status == {
+        "spec_supported": True,
+        "spec_error": None,
+        "tools": 2,
+        "write_tool": True,
+    }
+
+
+def test_spec_status_reports_when_the_write_tool_is_not_published():
+    ad = TalendAdapter(ListingFake({}, [{"name": "talend_jobs_list", "inputSchema": {}}]))
+
+    status = run(ad.custom_spec_status())
+
+    assert status["spec_supported"] is False
+    assert status["write_tool"] is False
+    assert SPEC_TOOL in status["spec_error"]
+
+
+def test_spec_status_reports_missing_contract_fields_from_the_listing():
+    outdated = {SPEC_TOOL: {}}
+    listing = [{"name": name, "inputSchema": {}} for name in outdated]
+    ad = TalendAdapter(ListingFake({}, listing))
+
+    status = run(ad.custom_spec_status())
+
+    assert status["spec_supported"] is False
+    assert status["write_tool"] is True
+    assert "faltan" in status["spec_error"] and "childJobs" in status["spec_error"]
+
+
+def test_health_reports_the_published_tool_inventory():
+    adapter = TalendAdapter(ListingFake(
+        {
+            "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
+            "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readWrite", "unsafeActions": False}},
+        },
+        [{"name": SPEC_TOOL, "inputSchema": SPEC_SCHEMA}],
+    ))
+
+    health = run(adapter.health_check())
+
+    assert health["available"] is True
+    assert health["tools"] == 1
+    assert health["write_tool"] is True
+    assert health["spec_supported"] is True
 
 
 def test_health_reports_bridge_offline_even_when_mcp_server_is_reachable():

@@ -27,6 +27,10 @@ class CallerWithTools(Protocol):
     async def describe_tool(self, tool: str) -> dict[str, Any] | None: ...
 
 
+#: Tool de escritura que el portal invoca para crear un Job.
+SPEC_TOOL = "talend_job_apply_custom_spec"
+
+
 class McpCaller:
     """Llama a talend-mcp por HTTP (`http://127.0.0.1:3927/mcp`). Una sesión por llamada."""
 
@@ -180,18 +184,59 @@ class TalendAdapter:
             **config,
         }
 
+    async def _published_tools(self) -> list[dict[str, Any]] | None:
+        """Inventario de tools publicadas; `None` si el caller no sabe listarlas."""
+        lister = getattr(self.caller, "list_tools", None)
+        return await lister() if callable(lister) else None
+
     async def custom_spec_status(self) -> dict[str, Any]:
+        """Contrato de la tool de escritura más el inventario publicado por el MCP.
+
+        `tools` y `write_tool` son `None` cuando el caller no puede listar las tools.
+        """
         try:
-            schema = await self.caller.describe_tool("talend_job_apply_custom_spec")
+            tools = await self._published_tools()
         except TalendError as e:
-            return {"spec_supported": False, "spec_error": str(e)}
-        properties = (schema or {}).get("properties", {})
+            return {
+                "spec_supported": False,
+                "spec_error": str(e),
+                "tools": None,
+                "write_tool": None,
+            }
+        status: dict[str, Any] = {
+            "spec_supported": False,
+            "spec_error": None,
+            "tools": len(tools) if tools is not None else None,
+            "write_tool": None,
+        }
+        if tools is not None:
+            tool = next((item for item in tools if item.get("name") == SPEC_TOOL), None)
+            status["write_tool"] = tool is not None
+            if tool is None:
+                status["spec_error"] = (
+                    f"MCP incompatible con la migración: no publica {SPEC_TOOL}. "
+                    "Actualiza el MCP antes de crear Jobs."
+                )
+                return status
+            schema = tool.get("inputSchema") or tool.get("input_schema") or {}
+        else:
+            try:
+                schema = await self.caller.describe_tool(SPEC_TOOL) or {}
+            except TalendError as e:
+                status["spec_error"] = str(e)
+                return status
+        properties = schema.get("properties", {})
         component = properties.get("components", {}).get("items", {}).get("properties", {})
         missing = sorted({"childJobs", "instructions", "replaceManagedTodoContexts"} - properties.keys())
         missing += sorted({"draftOnly", "draftReason", "tables"} - component.keys())
         if missing:
-            return {"spec_supported": False, "spec_error": f"MCP incompatible con la migración: faltan {', '.join(missing)}. Actualiza el MCP antes de crear Jobs."}
-        return {"spec_supported": True, "spec_error": None}
+            status["spec_error"] = (
+                f"MCP incompatible con la migración: faltan {', '.join(missing)}. "
+                "Actualiza el MCP antes de crear Jobs."
+            )
+            return status
+        status["spec_supported"] = True
+        return status
 
     async def list_jobs(self) -> list[str]:
         jobs = (await self._data("talend_jobs_list")).get("jobs", [])
@@ -243,7 +288,7 @@ class TalendAdapter:
         compatibility = await self.custom_spec_status()
         if not compatibility["spec_supported"]:
             raise TalendError(compatibility["spec_error"])
-        return await self._studio_write("talend_job_apply_custom_spec", arguments)
+        return await self._studio_write(SPEC_TOOL, arguments)
 
     async def _studio_write(self, tool: str, args: dict[str, Any]) -> dict[str, Any]:
         assert_allowed(tool)
