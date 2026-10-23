@@ -130,11 +130,22 @@ export type CatalogItem = {
   license_profile: TalendLicenseProfile;
   search_terms?: string[];
 };
+export type TalendApplyVerification = {
+  status: "unavailable" | "inspected";
+  reason: string | null;
+  components_requested: number;
+  components_created: number | null;
+  missing_components: string[];
+  studio_problems: { clean: boolean; items: { severity?: string; message?: string }[] } | null;
+};
 export type TalendApplyResult = {
   status: "applied" | "partially_applied";
   identity: { project_id: string; program: string; source_sha256: string | null; rules_version: string; job_name: string; folder_path: string };
   blocked_steps: { step_id: string; reason: string }[];
   warnings: string[];
+  verification?: TalendApplyVerification;
+  review_required?: boolean;
+  review_warnings?: string[];
   result: { jobName?: string; itemPath?: string; propertiesPath?: string; generatedComponents?: number; reusedComponents?: number; generatedConnections?: number; reusedConnections?: number; totalComponents?: number; generatedContexts?: number; updatedContexts?: number; reusedContexts?: number; removedContexts?: number; reusedExisting?: boolean; bridgeRefreshed?: boolean; bridgeOpened?: boolean; problems?: unknown };
 };
 export type TalendApplyPreview = {
@@ -166,8 +177,34 @@ export type TalendApplyState = {
 export type TalendApplyBatchJob = {
   program: string;
   status: "pending" | "running" | "applied" | "partially_applied" | "failed" | "conflict" | "interrupted";
+  phase: "applying" | "inspecting" | null;
   result: TalendApplyResult | null;
   error: string | null;
+};
+export type TalendApplyBatchSummary = {
+  project_id: string;
+  revision_hash: string;
+  destination_root: string;
+  total_jobs: number;
+  creatable_jobs: number;
+  cycles: string[][];
+  total_components: number;
+  total_connections: number;
+  total_contexts: number;
+  programs: {
+    program: string;
+    job_name: string;
+    folder_path: string;
+    ready_for_creation: boolean;
+    creation_kind: "components" | "context_only";
+    components: number;
+    connections: number;
+    contexts: number;
+    child_jobs: number;
+    blocked_steps: { step_id: string; reason: string }[];
+    pending: string[];
+    draft_components: { unique_name: string; reason: string }[];
+  }[];
 };
 export type TalendApplyBatchState = {
   project_id: string;

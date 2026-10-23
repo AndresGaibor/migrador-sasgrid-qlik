@@ -44,9 +44,13 @@ class FakeTalend:
     def __init__(self, responses: list[dict] | None = None):
         self.responses = list(responses or [])
         self.arguments: list[dict] = []
+        self.last_arguments: dict | None = None
+        self.inspections: list[str] = []
+        self.problems: dict[str, dict] = {}
 
     async def apply_custom_spec(self, arguments: dict) -> dict:
         self.arguments.append(arguments)
+        self.last_arguments = arguments
         if self.responses:
             return self.responses.pop(0)
         return {
@@ -55,6 +59,28 @@ class FakeTalend:
             "jobName": arguments["jobName"],
             "itemPath": f"{arguments['folderPath']}/{arguments['jobName']}_0.1.item",
         }
+
+    async def inspect_job(self, job_path: str):
+        from sas_grid_migrator.talend_adapter.adapter import ComponentRef, JobInspection
+
+        self.inspections.append(job_path)
+        names = [
+            component.get("uniqueName", "")
+            for component in (self.last_arguments or {}).get("components", [])
+        ]
+        return JobInspection(
+            job_path=job_path,
+            components=[
+                ComponentRef(unique_name=name, component="tComponent", parameters=[])
+                for name in names
+                if name
+            ],
+            connections=0,
+            contexts=[],
+        )
+
+    async def job_problems(self, job_name: str) -> dict:
+        return self.problems.get(job_name, {"clean": True, "problems": []})
 
 
 def test_apply_destination_isolated_per_zip_and_matches_preview_and_mcp_payload(
@@ -191,3 +217,70 @@ def test_mcp_target_collision_is_persisted_as_a_conflict(tmp_path, monkeypatch):
     assert state.status_code == 200
     assert state.json()["status"] == "conflict"
     assert state.json()["error"] == "Job already exists at target folder"
+
+
+def test_apply_reports_studio_verification_after_writing(tmp_path, monkeypatch):
+    monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv("TALEND_APPLY_FOLDER", "Process/PruebasWebSAS")
+    monkeypatch.setenv("TALEND_MCP_READONLY", "false")
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _new_project(client)
+        outcome = _apply(client, project_id).json()
+
+    verification = outcome["verification"]
+    assert outcome["status"] == "applied"
+    assert verification["status"] == "inspected"
+    assert verification["components_requested"] >= 1
+    assert verification["components_created"] == verification["components_requested"]
+    assert verification["missing_components"] == []
+    assert verification["studio_problems"] == {"clean": True, "items": []}
+    assert fake.inspections
+
+
+def test_apply_marks_partial_when_studio_misses_requested_components(tmp_path, monkeypatch):
+    class MissingComponents(FakeTalend):
+        async def inspect_job(self, job_path):
+            inspection = await super().inspect_job(job_path)
+            inspection.components = inspection.components[:-1]
+            return inspection
+
+    monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv("TALEND_APPLY_FOLDER", "Process/PruebasWebSAS")
+    monkeypatch.setenv("TALEND_MCP_READONLY", "false")
+    fake = MissingComponents()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _new_project(client)
+        outcome = _apply(client, project_id).json()
+
+    verification = outcome["verification"]
+    assert outcome["status"] == "partially_applied"
+    assert verification["missing_components"]
+    assert any("no contiene" in warning for warning in outcome["warnings"])
+
+
+def test_apply_still_succeeds_when_studio_cannot_be_inspected(tmp_path, monkeypatch):
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+
+    class BlindFake(FakeTalend):
+        async def inspect_job(self, job_path):
+            raise TalendError("talend-mcp no disponible: Bridge caído")
+
+        async def job_problems(self, job_name):
+            raise TalendError("talend-mcp no disponible: Bridge caído")
+
+    monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv("TALEND_APPLY_FOLDER", "Process/PruebasWebSAS")
+    monkeypatch.setenv("TALEND_MCP_READONLY", "false")
+    monkeypatch.setattr(api_module, "_talend", lambda: BlindFake())
+    with TestClient(api_module.app) as client:
+        project_id = _new_project(client)
+        outcome = _apply(client, project_id).json()
+
+    verification = outcome["verification"]
+    assert outcome["status"] == "applied"
+    assert verification["status"] == "unavailable"
+    assert verification["reason"]
+    assert verification["studio_problems"] is None

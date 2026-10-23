@@ -3,14 +3,16 @@ import json
 import os
 import re
 import tempfile
+from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
 from pathlib import Path, PurePosixPath
 from threading import Condition
+from typing import Any
 
 from fastapi import BackgroundTasks, FastAPI, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, StrictBool
 
 from sas_grid_migrator import __version__
 from sas_grid_migrator.config import Settings
@@ -583,10 +585,22 @@ def _nested_child_spec_keys(children: list[dict]) -> set[tuple[str, str]]:
     return keys
 
 
+def _spec_review_warnings(spec) -> list[str]:
+    warnings = []
+    drafts = sum(item.draft_only for item in spec.components)
+    if drafts:
+        warnings.append(f"{drafts} componente(s) en borrador; completa su configuración en Talend Studio.")
+    if spec.instructions.get("pending"):
+        warnings.append("Hay información SAS pendiente de resolver; revisa los contextos TODO del Job.")
+    return warnings
+
+
 def _child_apply_outcome(child: dict, spec) -> dict:
     child_arguments = spec.to_mcp_arguments()
     blocked_steps = [item.model_dump() for item in spec.blocked_steps]
-    warnings = child.get("warnings", [])
+    child_warnings = child.get("warnings", [])
+    warnings = list(child_warnings) if isinstance(child_warnings, list) else []
+    review_warnings = _spec_review_warnings(spec)
     components = child_arguments.get("components", [])
     connections = child_arguments.get("connections", [])
     component_count = child.get("totalComponents")
@@ -608,6 +622,8 @@ def _child_apply_outcome(child: dict, spec) -> dict:
         },
         "blocked_steps": blocked_steps,
         "warnings": warnings if isinstance(warnings, list) else [],
+        "review_required": bool(review_warnings or blocked_steps or warnings),
+        "review_warnings": review_warnings,
         "result": {key: value for key, value in child.items() if key != "childJobs"},
     }
 
@@ -663,7 +679,53 @@ def preview_talend_apply(project_id: str, program: str) -> dict:
     }
 
 
-async def _apply_talend_plan(project_id: str, program: str) -> dict:
+async def _verify_applied_job(spec, result: dict) -> dict:
+    """Inspecciona el Job recién creado y consulta los avisos de Studio.
+
+    `inspected` solo afirma que el MCP pudo leer el Job creado; los avisos de
+    la vista Problemas de Studio se reportan aparte. Nunca se ejecuta el Job.
+    """
+    requested = sorted({item.unique_name for item in spec.components})
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+
+    verification: dict[str, Any] = {
+        "status": "unavailable",
+        "reason": None,
+        "components_requested": len(requested),
+        "components_created": None,
+        "missing_components": [],
+        "studio_problems": None,
+    }
+    item_path = result.get("itemPath") or (result.get("result") or {}).get("itemPath")
+    talend = _talend()
+    if item_path:
+        try:
+            inspection = await talend.inspect_job(str(item_path))
+        except TalendError as e:
+            verification["reason"] = redact(str(e), "mcp-inspect-error.txt")
+        else:
+            created = {item.unique_name for item in inspection.components}
+            verification["status"] = "inspected"
+            verification["components_created"] = len(created)
+            verification["missing_components"] = [name for name in requested if name not in created]
+    try:
+        problems = await talend.job_problems(spec.job_name)
+    except TalendError as e:
+        if verification["status"] == "unavailable":
+            verification["reason"] = redact(str(e), "mcp-problems-error.txt")
+    else:
+        verification["studio_problems"] = {
+            "clean": problems["clean"],
+            "items": problems["problems"][:20],
+        }
+    return verification
+
+
+async def _apply_talend_plan(
+    project_id: str,
+    program: str,
+    on_phase: Callable[[str], Awaitable[None]] | None = None,
+) -> dict:
     from sas_grid_migrator.talend_adapter.adapter import TalendError
 
     plans = _plans(project_id)
@@ -722,7 +784,7 @@ async def _apply_talend_plan(project_id: str, program: str) -> dict:
             if child_previous["status"] == "running":
                 raise HTTPException(409, f"La implementación del Job hijo {related_plan.program} ya está en curso.")
     if not _talend_write_enabled():
-        raise HTTPException(403, "El MCP está en solo lectura. Configura TALEND_MCP_READONLY=false para habilitar la creación.")
+        raise HTTPException(403, "La creación de Jobs está en solo lectura. Actívala en Configuración o fija TALEND_MCP_READONLY=false.")
     if persist_state:
         s.save_talend_apply_state(
             project_id,
@@ -732,6 +794,8 @@ async def _apply_talend_plan(project_id: str, program: str) -> dict:
             identity=identity,
         )
     try:
+        if on_phase is not None:
+            await on_phase("applying")
         result = await _talend().apply_custom_spec(spec.to_mcp_arguments())
     except TalendError as e:
         from sas_grid_migrator.domain.redaction import redact
@@ -756,7 +820,20 @@ async def _apply_talend_plan(project_id: str, program: str) -> dict:
         raise HTTPException(409 if conflict else 502, error) from e
     applied_component_count = result.get("totalComponents")
     applied_connection_count = result.get("connections")
-    warnings = result.get("warnings", [])
+    if on_phase is not None:
+        await on_phase("inspecting")
+    verification = await _verify_applied_job(spec, result)
+    warnings = list(result.get("warnings", []))
+    review_warnings = _spec_review_warnings(spec)
+    missing = verification.get("missing_components") or []
+    if missing:
+        preview_names = ", ".join(missing[:5]) + ("…" if len(missing) > 5 else "")
+        warnings.append(
+            f"El Job creado no contiene {len(missing)} componente(s) solicitado(s): {preview_names}."
+        )
+    studio_problems = verification.get("studio_problems")
+    if studio_problems is not None and not studio_problems["clean"]:
+        warnings.append("Talend Studio reporta problemas de diseño. Revísalos antes de probar o publicar el Job.")
     partial = bool(spec.blocked_steps or warnings)
     if isinstance(applied_component_count, int):
         partial = partial or applied_component_count < len(spec.components)
@@ -767,6 +844,9 @@ async def _apply_talend_plan(project_id: str, program: str) -> dict:
         "identity": identity,
         "blocked_steps": [item.model_dump() for item in spec.blocked_steps],
         "warnings": warnings,
+        "review_required": bool(review_warnings or spec.blocked_steps or warnings or verification["status"] != "inspected"),
+        "review_warnings": review_warnings,
+        "verification": verification,
         "result": result,
     }
     if persist_state:
@@ -781,13 +861,26 @@ async def _apply_talend_plan(project_id: str, program: str) -> dict:
     return outcome
 
 
+class TalendBatchConfirmation(BaseModel):
+    expected_revision: str = Field(pattern=r"^[0-9a-f]{64}$", min_length=64, max_length=64)
+
+
 @app.post("/api/projects/{project_id}/talend-apply-batch", status_code=202)
-async def start_talend_apply_batch(project_id: str, background_tasks: BackgroundTasks) -> dict:
+async def start_talend_apply_batch(
+    project_id: str,
+    background_tasks: BackgroundTasks,
+    body: TalendBatchConfirmation | None = None,
+) -> dict:
     s = store()
     _require(s, project_id)
     if not _talend_write_enabled():
-        raise HTTPException(403, "El MCP está en solo lectura. Configura TALEND_MCP_READONLY=false para habilitar la creación.")
+        raise HTTPException(403, "La creación de Jobs está en solo lectura. Actívala en Configuración o fija TALEND_MCP_READONLY=false.")
+    compatibility = await _talend().custom_spec_status()
+    if not compatibility["spec_supported"]:
+        raise HTTPException(409, compatibility["spec_error"])
     ordered, _specs, revision_hash = _talend_batch_bundle(project_id)
+    if body is not None and body.expected_revision != revision_hash:
+        raise HTTPException(409, "El plan cambió desde la vista previa. Actualiza la revisión antes de crear los Jobs.")
     programs = [plan.program for plan in ordered]
     try:
         snapshot, started = s.begin_talend_apply_batch(project_id, revision_hash, programs)
@@ -822,6 +915,53 @@ def talend_apply_batch_status(project_id: str) -> dict:
     }
 
 
+@app.get("/api/projects/{project_id}/talend-apply-batch/summary")
+def talend_apply_batch_summary(project_id: str) -> dict:
+    """Resumen pre-vuelo del lote: qué se crearía y qué necesita a una persona."""
+    s = store()
+    _require(s, project_id)
+    ordered, specs, revision_hash = _talend_batch_bundle(project_id)
+    programs: list[dict[str, Any]] = []
+    for plan in ordered:
+        spec = specs.get(plan.program)
+        if spec is None:
+            continue
+        draft_components = [
+            {
+                "unique_name": item.unique_name,
+                "reason": item.draft_reason or "Información técnica pendiente; completar en Talend.",
+            }
+            for item in spec.components
+            if item.draft_only
+        ]
+        programs.append({
+            "program": plan.program,
+            "job_name": spec.job_name,
+            "folder_path": spec.folder_path,
+            "ready_for_creation": spec.ready_for_creation,
+            "creation_kind": "components" if spec.components or spec.child_jobs else "context_only",
+            "components": len(spec.components),
+            "connections": len(spec.connections),
+            "contexts": len(spec.contexts),
+            "child_jobs": len(spec.child_jobs),
+            "blocked_steps": [item.model_dump() for item in spec.blocked_steps],
+            "pending": list(spec.instructions.get("pending", [])),
+            "draft_components": draft_components,
+        })
+    return {
+        "project_id": project_id,
+        "revision_hash": revision_hash,
+        "destination_root": _talend_apply_folder(project_id=project_id),
+        "total_jobs": len(programs),
+        "creatable_jobs": sum(item["ready_for_creation"] for item in programs),
+        "cycles": (report.cycles if (report := load_dependencies(s, project_id)) else []),
+        "total_components": sum(item["components"] for item in programs),
+        "total_connections": sum(item["connections"] for item in programs),
+        "total_contexts": sum(item["contexts"] for item in programs),
+        "programs": programs,
+    }
+
+
 async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_programs: list[str]) -> None:
     s = store()
     snapshot = s.get_talend_apply_batch_state(project_id)
@@ -832,6 +972,8 @@ async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_p
         jobs_by_program.get(program, {"program": program, "status": "pending", "result": None, "error": None})
         for program in ordered_programs
     ]
+    for job in jobs:
+        job.setdefault("phase", None)
 
     cycle_warnings: list[str] = []
     try:
@@ -901,9 +1043,15 @@ async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_p
             continue
         job.update(status="running", error=None)
         persist("running", program)
+
+        async def set_phase(phase_name: str, current: dict = job, current_program: str = program) -> None:
+            current["phase"] = phase_name
+            persist("running", current_program)
+
         try:
-            outcome = await _apply_talend_plan(project_id, program)
+            outcome = await _apply_talend_plan(project_id, program, on_phase=set_phase)
         except HTTPException as e:
+            job["phase"] = None
             message = str(e.detail)
             is_conflict = e.status_code == 409 and bool(
                 re.search(
@@ -915,6 +1063,7 @@ async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_p
             job.update(status="conflict" if is_conflict else "failed", result=None, error=message)
             persist("running")
             continue
+        job["phase"] = None
         job.update(status=outcome["status"], result=outcome, error=None)
         result = outcome.get("result")
         if isinstance(result, dict):
@@ -1038,13 +1187,30 @@ class TalendInspect(BaseModel):
 def _talend():
     from sas_grid_migrator.talend_adapter.adapter import TalendAdapter
 
-    return TalendAdapter.from_env()
+    return TalendAdapter.from_env(write_enabled=_talend_write_enabled())
 
 
 def _talend_write_enabled() -> bool:
-    return os.environ.get("TALEND_MCP_READONLY", "false").strip().casefold() in {
+    """El permiso guardado en la base manda; TALEND_MCP_READONLY solo fija el valor inicial."""
+    env_allows = os.environ.get("TALEND_MCP_READONLY", "false").strip().casefold() in {
         "false", "0", "no", "off"
     }
+    return store().talend_write_enabled(default=env_allows)
+
+
+class TalendPermissions(BaseModel):
+    write_enabled: StrictBool
+
+
+@app.get("/api/integrations/talend/permissions")
+def talend_permissions() -> dict:
+    return {"write_enabled": _talend_write_enabled()}
+
+
+@app.patch("/api/integrations/talend/permissions")
+def update_talend_permissions(body: TalendPermissions) -> dict:
+    store().set_talend_write_enabled(body.write_enabled)
+    return {"write_enabled": body.write_enabled}
 
 
 @app.get("/api/integrations/talend/health")

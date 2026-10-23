@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ApiError, api } from "../api";
 import { useAsync } from "../hooks";
 import { Icon } from "../components/Icon";
+import { formatErrorMessage, notifyError, notifySuccess } from "../errors";
 import type { Summary } from "../types";
 import { Badge, Load, link, prioTone } from "./common";
 
@@ -35,22 +36,27 @@ export function SummaryTab({ id, refreshKey = 0 }: { id: string; refreshKey?: nu
   }, [isProcessing, processing.data?.status, processing.reload, persisted.reload]);
   const run = async () => {
     setBusy(true); setErr(undefined);
-    try { setS(await api.analyze(id)); persisted.reload(); }
-    catch (x) { setErr((x as Error).message); }
+    try {
+      const result = await api.analyze(id);
+      setS(result);
+      persisted.reload();
+      notifySuccess("Análisis completado", `${result.programs} programas revisados.`);
+    }
+    catch (x) { setErr(notifyError(x, "No se pudo analizar el proyecto")); }
     finally { setBusy(false); }
   };
   return <>
     <h1>Conoce tu punto de partida</h1>
     <p className="subtitle">Analiza tus programas para descubrir cómo funcionan y qué necesita atención antes de migrar.</p>
     {processing.data && <div className={`project-processing-inline ${isProcessing ? "active" : processing.data.status}`} role="status" aria-live="polite"><span>{isProcessing ? <span className="spinner" /> : <Icon name={processing.data.status === "completed" ? "check" : "info"} size={17} />}</span><div><strong>{processing.data.message}</strong><small>Etapa: {processing.data.stage} · Estado: {processing.data.status}</small></div></div>}
-    {processing.error && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{processing.error}</span></div>}
+    {processing.error && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{formatErrorMessage(processing.error, undefined, processing.errorStatus)}</span></div>}
     <Load q={inventory}>{(m) => <section className="panel">
       <div className="panel-heading"><Icon name={m.files.length ? "chart" : "upload"} size={28} /><div><h2>{m.files.length ? isProcessing ? "El análisis automático está en curso" : "Tu proyecto está listo" : "Empecemos por tus archivos"}</h2><p>{m.files.length ? `${m.files.length} archivos cargados. El portal analiza programas, instrucciones y aspectos por revisar.` : "Carga tus programas SAS para obtener un resumen de tu proyecto."}</p></div></div>
       {m.files.length ? <button onClick={run} disabled={busy || (Boolean(processing.data) && isProcessing)}><Icon name="play" size={16} />{busy ? "Analizando proyecto…" : isProcessing ? "Análisis en curso…" : summary ? "Volver a analizar" : "Analizar proyecto"}</button> : <a className="button" href={link(id, "importar")}><Icon name="upload" size={18} /> Cargar mis archivos <Icon name="arrow" size={16} /></a>}
       {busy && <p role="status" className="loading-state"><span className="spinner" /> Estamos revisando tus programas. Puedes esperar en esta pantalla.</p>}
     </section>}</Load>
     {err && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{err}</span></div>}
-    {persisted.error && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>No se pudo recuperar el análisis guardado: {persisted.error}</span></div>}
+    {persisted.error && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>No se pudo recuperar el análisis guardado: {formatErrorMessage(persisted.error, undefined, persisted.errorStatus)}</span></div>}
     {summary ? <>
       <div className="notice" role="status"><Icon name="check" /><span><strong>Análisis completado.</strong> Ya puedes explorar tus programas y generar el plan de migración.</span></div>
       <div className="metrics"><div className="metric"><strong>{summary.programs}</strong><span>Programas analizados</span></div><div className="metric"><strong>{summary.statements}</strong><span>Instrucciones encontradas</span></div><div className="metric"><strong>{summary.unrecognized}</strong><span>Instrucciones sin reconocer</span></div><div className="metric"><strong>{summary.macro_fragments}</strong><span>Fragmentos de macros</span></div></div>

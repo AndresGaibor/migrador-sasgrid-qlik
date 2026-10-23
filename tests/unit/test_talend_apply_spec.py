@@ -15,6 +15,7 @@ from sas_grid_migrator.migration_planner.models import (
 )
 from sas_grid_migrator.sas_parser.ast import Loc
 from sas_grid_migrator.talend_adapter.apply_spec import build_apply_spec
+from sas_grid_migrator.talend_adapter.adapter import TalendError
 
 
 def step(
@@ -591,6 +592,12 @@ class ApplyAdapterFake:
     async def apply_custom_spec(self, arguments):
         self.calls.append(arguments)
         return self.result
+
+    async def inspect_job(self, job_path):
+        raise TalendError("Inspección no disponible en este adaptador de prueba")
+
+    async def job_problems(self, job_name):
+        raise TalendError("Problemas de Studio no disponibles en este adaptador de prueba")
 
 
 def test_api_applies_ready_and_draft_components_in_one_request(monkeypatch):

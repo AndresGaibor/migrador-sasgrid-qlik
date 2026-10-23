@@ -1,20 +1,61 @@
 import type { GridRecommendation } from "./types";
 
-export type GuideAction = { text: string; fields?: [string, string][]; where?: string };
-export type GridGuide = { key: string; title: string; kind: "build" | "manual"; intro: string; actions: GuideAction[]; component?: string; doc_url?: string | null; sources: GridRecommendation[] };
+export type GuideAction = { text: string; fields?: [string, string][]; where?: string; note?: string; doc_url?: string };
+export type GridGuide = { key: string; title: string; kind: "build" | "cloud" | "manual"; intro: string; actions: GuideAction[]; component?: string; doc_url?: string | null; sources: GridRecommendation[] };
+type ManualGuide = { title: string; intro: string; kind?: "cloud" | "manual"; actions: (string | GuideAction)[] };
 
 const DISPATCH = new Set(["sas_macro_step.include_dispatch", "sas_batch.sysin", "sasgsub.submit"]);
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
 const stem = (f: string) => slug((f.split("/").pop() ?? f).replace(/\.[^.]+$/, ""));
 const str = (v: unknown) => (typeof v === "string" ? v : undefined);
 
-const MANUAL: Record<string, { title: string; intro: string; actions: string[] }> = {
+const MANUAL: Record<string, ManualGuide> = {
   "scheduler.control_m": {
-    title: "Horario de ejecución (Control-M)",
-    intro: "Esto no se configura en Talend Studio. Solo encontramos un comentario en el SAS, no el horario real.",
+    title: "Programar los Jobs en Qlik Talend Cloud (Control-M)",
+    kind: "cloud",
+    intro: "El SAS solo menciona Control-M; no contiene el calendario real. Confírmalo con Operaciones y, si Qlik Talend Cloud será el nuevo planificador, traslada allí la cadena como un Plan.",
     actions: [
-      "Pide a quien administra Control-M la definición del job: horario, calendario y dependencias.",
-      "Programa el Job principal con esos mismos datos en tu planificador (por ejemplo Talend Management Console o Control-M).",
+      {
+        text: "Recupera la definición efectiva del calendario en Control-M.",
+        where: "Pide a Operaciones la ficha o exportación del job antes de programarlo.",
+        note: "Confirma zona horaria, días y festivos, hora, dependencias, reintentos y política de solapamientos.",
+      },
+      {
+        text: "Publica en Qlik Talend Cloud los Jobs que deben ejecutarse.",
+        where: "Talend Studio → Repository → clic derecho en cada Job → Publish to Cloud. Selecciona el Environment y el Space de destino.",
+        note: "Al publicar, Talend Management Console (TMC) crea una Task asociada a cada artefacto.",
+        doc_url: "https://help.qlik.com/talend/en-US/management-console-user-guide/Cloud/publish-jobs",
+      },
+      {
+        text: "Configura y prueba una Task por Job.",
+        where: "Qlik Talend Cloud → Management → Tasks. Elige Environment y Space; abre la Task creada al publicar o crea una con Create new → Task.",
+        note: "Completa parámetros/contexto y el Processor (Cloud, Cloud exclusive, Remote Engine o cluster). Guarda y ejecuta cada Task correctamente una vez antes de añadirla a un Plan.",
+        doc_url: "https://help.qlik.com/talend/en-US/management-console-user-guide/Cloud/creating-job-tasks",
+      },
+      {
+        text: "Crea un Plan para reproducir el orden de dependencias.",
+        where: "Management → Plans → Create new → Plan. Elige Space, nombre y descripción; agrega las Tasks en el orden acordado.",
+        note: "Usa un paso por Job dependiente: formatos y macros, procesos y, al final, Jobs que lanzan a otros.",
+        doc_url: "https://help.qlik.com/talend/en-US/management-console-user-guide/Cloud/creating-plans",
+      },
+      {
+        text: "Configura los pasos para que respeten las dependencias.",
+        where: "En el Plan, selecciona Edit → Steps. Añade cada Task a su paso y mueve los pasos al orden correcto.",
+        note: "Elige If all tasks succeed para que el siguiente paso espere a que termine correctamente el anterior.",
+        doc_url: "https://help.qlik.com/talend/en-US/management-console-user-guide/Cloud/actions-shortcuts-plan-edit-view",
+      },
+      {
+        text: "Programa el Plan con el calendario recuperado de Control-M.",
+        where: "Detalles del Plan → Edit → Schedule → Add trigger. Elige tipo de trigger, zona horaria, fecha inicial, frecuencia y horas; termina con Save and close.",
+        note: "Puedes elegir Once, Daily, Weekly, Monthly o Cron. Verifica festivos y excepciones; los triggers deben separarse al menos cinco minutos.",
+        doc_url: "https://help.qlik.com/talend/en-US/management-console-user-guide/Cloud/scheduling-plans",
+      },
+      {
+        text: "Valida el Plan antes de retirar el calendario de Control-M.",
+        where: "Ejecuta una prueba desde el detalle del Plan y revisa el resultado y los logs en Operations.",
+        note: "Compara la prueba con el resultado de Control-M. No dejes ambos calendarios activos salvo que Operaciones haya definido esa convivencia.",
+        doc_url: "https://help.qlik.com/talend/en-US/management-console-user-guide/Cloud/monitoring-operations-new-view",
+      },
     ],
   },
   "scheduler.lsf": {
@@ -90,7 +131,14 @@ export function buildGridGuides(items: GridRecommendation[]): GridGuide[] {
   const guides = [...byFile].map(([f, l]) => buildGuide(f, l));
   for (const [pid, list] of manual) {
     const m = MANUAL[pid] ?? { title: pid, intro: list[0].instruction, actions: list[0].required };
-    guides.push({ key: pid, kind: "manual", title: m.title, intro: m.intro, actions: m.actions.map((text) => ({ text })), sources: list });
+    guides.push({
+      key: pid,
+      kind: m.kind ?? "manual",
+      title: m.title,
+      intro: m.intro,
+      actions: m.actions.map((action) => typeof action === "string" ? { text: action } : action),
+      sources: list,
+    });
   }
   return guides;
 }

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFile } from "node:fs/promises";
 import { api } from "./api.ts";
 
 test("ZIP upload creates a project in one multipart request", async () => {
@@ -63,4 +64,9 @@ test("project processing and Talend batch APIs use project-scoped routes", async
   assert.equal(requests[4].init.method, undefined);
   assert.equal(requests[5].init.method, "POST");
   assert.equal(requests[6].init.method, undefined);
+});
+
+test("the batch summary endpoint is exposed for the pre-flight confirmation", async () => {
+  const source = await readFile(new URL("./api.ts", import.meta.url), "utf8");
+  assert.match(source, /talendApplyBatchSummary: \(id: string\) => req<TalendApplyBatchSummary>\(`\/projects\/\$\{id\}\/talend-apply-batch\/summary`\)/);
 });
