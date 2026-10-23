@@ -24,7 +24,13 @@ def test_mutating_tools_denied(tool):
 
 
 def test_read_tool_allowed():
-    assert_allowed("talend_list_jobs")
+    assert_allowed("talend_jobs_list")
+
+
+def test_portal_can_only_use_the_single_custom_spec_writer():
+    assert_allowed("talend_job_apply_custom_spec")
+    with pytest.raises(ToolNotAllowed):
+        assert_allowed("talend_job_add_node")
 
 
 def test_every_fixture_declares_priority():

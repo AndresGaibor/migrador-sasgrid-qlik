@@ -77,10 +77,35 @@ def test_policy_blocks_mutating_tools():
 
 
 def test_health_unavailable_does_not_raise():
-    ad = TalendAdapter(Fake({"talend_list_jobs": TalendError("caído")}))
-    assert run(ad.health_check()) == {"available": False, "error": "caído"}
-    ok = TalendAdapter(Fake({"talend_list_jobs": {"ok": True, "data": {"jobs": [{}]}}}))
-    assert run(ok.health_check()) == {"available": True, "jobs": 1}
+    ad = TalendAdapter(Fake({"talend_jobs_list": TalendError("caído")}))
+    assert run(ad.health_check()) == {"available": False, "mcp_available": False, "error": "caído"}
+    ok = TalendAdapter(Fake({
+        "talend_jobs_list": {"ok": True, "data": {"jobs": [{}]}},
+        "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readOnly", "unsafeActions": False}},
+    }))
+    assert run(ok.health_check()) == {
+        "available": True,
+        "mcp_available": True,
+        "bridge_available": True,
+        "bridge_mode": "readOnly",
+        "unsafe_actions": False,
+        "jobs": 1,
+    }
+
+
+def test_health_reports_bridge_offline_even_when_mcp_server_is_reachable():
+    adapter = TalendAdapter(Fake({
+        "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
+        "talend_bridge_ping": {"ok": True, "data": {"ok": False}},
+    }))
+
+    assert run(adapter.health_check()) == {
+        "available": False,
+        "mcp_available": True,
+        "bridge_available": False,
+        "jobs": 0,
+        "error": "Talend Studio Bridge no está disponible.",
+    }
 
 
 def test_verify_plans_is_conservative(tmp_path):
@@ -104,7 +129,7 @@ def test_verify_plans_is_conservative(tmp_path):
 
 def test_api_talend(tmp_path, monkeypatch):
     monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
-    fake = TalendAdapter(Fake({"talend_inspect_job": JOB, "talend_list_jobs": TalendError("off")}))
+    fake = TalendAdapter(Fake({"talend_inspect_job": JOB, "talend_jobs_list": TalendError("off")}))
     monkeypatch.setattr(api_mod, "_talend", lambda: fake)
     c = TestClient(api)
     assert c.get("/api/integrations/talend/health").json()["available"] is False
@@ -116,3 +141,183 @@ def test_api_talend(tmp_path, monkeypatch):
     c.post(f"/api/projects/{pid}/plans")
     v = c.post(f"/api/projects/{pid}/plans/verify", json={"job_paths": ["/w/j.item"]})
     assert v.status_code == 200 and v.json()["catalog_components"] == ["tFilterRow"]
+
+
+def test_apply_custom_spec_delegates_the_complete_plan_to_the_mcp_executor(monkeypatch):
+    monkeypatch.setenv("TALEND_MCP_READONLY", "false")
+    arguments = {
+        "jobName": "DailyJob",
+        "folderPath": "Process/PruebasWebSAS",
+        "components": [
+            {
+                "uniqueName": "tFileInputDelimited_1",
+                "componentName": "tFileInputDelimited",
+                "posX": 160,
+                "posY": 96,
+                "label": "Leer archivo",
+                "parameters": {"FILENAME": "input.csv"},
+                "schema": {"name": "input_schema", "connector": "FLOW", "columns": []},
+            },
+            {
+                "uniqueName": "tLogRow_2",
+                "componentName": "tLogRow",
+                "posX": 460,
+                "posY": 96,
+                "label": "Mostrar filas",
+                "parameters": {},
+            },
+        ],
+        "connections": [
+            {
+                "source": "tFileInputDelimited_1",
+                "target": "tLogRow_2",
+                "label": "row1",
+                "connectorName": "FLOW",
+                "uniqueName": "flow_1_1",
+            }
+        ],
+    }
+    fake = Fake({
+        "talend_job_apply_custom_spec": {
+            "ok": True,
+            "data": {
+                "jobName": "DailyJob",
+                "itemPath": "process/PruebasWebSAS/DailyJob_0.1.item",
+                "generatedComponents": 2,
+                "connections": 1,
+                "studioApi": True,
+            },
+        }
+    })
+    adapter = TalendAdapter(fake)
+
+    result = run(adapter.apply_custom_spec(arguments))
+
+    assert fake.calls == [("talend_job_apply_custom_spec", arguments)]
+    assert result["itemPath"] == "process/PruebasWebSAS/DailyJob_0.1.item"
+    assert result["studioApi"] is True
+    assert result["generatedComponents"] == 2
+
+
+def test_apply_custom_spec_rejects_success_envelope_without_explicit_ok(monkeypatch):
+    monkeypatch.setenv("TALEND_MCP_READONLY", "false")
+    fake = Fake({"talend_job_apply_custom_spec": {"data": {"itemPath": "job.item"}}})
+
+    with pytest.raises(TalendError, match="sin confirmación explícita de éxito"):
+        run(TalendAdapter(fake).apply_custom_spec({"jobName": "DailyJob", "components": []}))
+
+
+def test_apply_custom_spec_creates_context_only_job_and_reports_context_count(monkeypatch):
+    monkeypatch.delenv("TALEND_MCP_READONLY", raising=False)
+    arguments = {
+        "jobName": "DailyJob",
+        "folderPath": "Process/PruebasWebSAS",
+        "components": [],
+        "contexts": [{"name": "range_id", "type": "id_String", "value": "", "comment": "Rango"}],
+    }
+    fake = Fake({
+        "talend_job_apply_custom_spec": {
+            "ok": True,
+            "data": {"generatedComponents": 0, "generatedContexts": 1},
+        }
+    })
+
+    result = run(
+        TalendAdapter(fake).apply_custom_spec(arguments)
+    )
+
+    assert fake.calls == [("talend_job_apply_custom_spec", arguments)]
+    assert result["generatedComponents"] == 0
+    assert result["generatedContexts"] == 1
+
+
+def test_apply_custom_spec_reports_nested_studio_failure_from_mcp_executor(monkeypatch):
+    monkeypatch.delenv("TALEND_MCP_READONLY", raising=False)
+    arguments = {
+        "jobName": "DailyJob",
+        "folderPath": "Process/PruebasWebSAS",
+        "components": [],
+        "contexts": [{"name": "range_id", "type": "id_String", "value": "", "comment": "Rango"}],
+    }
+    fake = Fake({
+        "talend_job_apply_custom_spec": {
+            "ok": True,
+            "data": {
+                "ok": False,
+                "error": {"code": "OPERATION_FAILED", "message": "Studio no guardó el contexto"},
+            },
+        }
+    })
+
+    with pytest.raises(TalendError, match="Studio no guardó el contexto"):
+        run(
+            TalendAdapter(fake).apply_custom_spec(arguments)
+        )
+
+    assert fake.calls == [("talend_job_apply_custom_spec", arguments)]
+
+
+def test_adapter_from_env_reads_mcp_url_and_timeout(monkeypatch):
+    monkeypatch.setenv("TALEND_MCP_URL", "http://127.0.0.1:4927/mcp")
+    monkeypatch.setenv("TALEND_MCP_TIMEOUT_SECONDS", "7.5")
+
+    adapter = TalendAdapter.from_env()
+
+    assert adapter.caller.url == "http://127.0.0.1:4927/mcp"
+    assert adapter.caller.timeout == 7.5
+
+
+
+def test_apply_custom_spec_is_blocked_when_readonly_is_enabled(monkeypatch):
+    monkeypatch.setenv("TALEND_MCP_READONLY", "true")
+    fake = Fake({})
+    adapter = TalendAdapter(fake)
+
+    with pytest.raises(TalendError, match="solo lectura"):
+        run(adapter.apply_custom_spec({"jobName": "DailyJob"}))
+
+    assert fake.calls == []
+
+
+def test_apply_custom_spec_sends_the_complete_instruction_in_one_mcp_call(monkeypatch):
+    monkeypatch.delenv("TALEND_MCP_READONLY", raising=False)
+    arguments = {
+        "jobName": "DailyJob",
+        "folderPath": "Process/PruebasWebSAS",
+        "components": [{"uniqueName": "tMap_1", "componentName": "tMap", "draftOnly": True}],
+        "connections": [],
+        "contexts": [],
+        "instructions": {
+            "source": {"program": "daily.sas", "sha256": "abc"},
+            "steps": [{"id": "append", "evidence": {"line": 7}}],
+            "unresolved": ["schema"],
+        },
+    }
+    fake = Fake({
+        "talend_job_apply_custom_spec": {
+            "ok": True,
+            "data": {"jobName": "DailyJob", "generatedComponents": 1, "warnings": ["schema"]},
+        }
+    })
+
+    result = run(TalendAdapter(fake).apply_custom_spec(arguments))
+
+    assert fake.calls == [("talend_job_apply_custom_spec", arguments)]
+    assert result["generatedComponents"] == 1
+
+
+def test_api_talend_health_reports_write_enabled_from_readonly_setting(monkeypatch):
+    adapter = TalendAdapter(Fake({
+        "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
+        "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readOnly", "unsafeActions": False}},
+    }))
+    monkeypatch.setattr(api_mod, "_talend", lambda: adapter)
+    client = TestClient(api)
+
+    monkeypatch.setenv("TALEND_MCP_READONLY", "true")
+    readonly = client.get("/api/integrations/talend/health").json()
+    monkeypatch.setenv("TALEND_MCP_READONLY", "false")
+    writable = client.get("/api/integrations/talend/health").json()
+
+    assert readonly["write_enabled"] is False
+    assert writable["write_enabled"] is True

@@ -1,7 +1,7 @@
 # Job `job_p2_codigo_dinamico`
 
-- **Programa SAS:** `p2_codigo_dinamico.sas` (sha256 `2f491b9a85c4`)
-- **Estado:** needs_review · **Pasos:** 6 · **Reglas:** v1
+- **Programa SAS:** `p2_codigo_dinamico.sas` (sha256 `d7a2b64f8e9e`)
+- **Instrucciones:** 6 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Variables de contexto
@@ -16,7 +16,7 @@
 ### 1. Leer work.tablas_a_procesar
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
-- **Subjob:** `s2` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p2_codigo_dinamico.sas:2`
+- **Subjob:** `s2` · **Confianza:** high · **Origen SAS:** `p2_codigo_dinamico.sas:2`
 - **Propiedades:**
   - `TABLE` = `tablas_a_procesar` — SAS p2_codigo_dinamico.sas:2
   - `QUERY` = _por configurar_ — regla mappings
@@ -30,7 +30,7 @@
 ### 2. Código generado dinámicamente
 
 - **Acción:** manual_decision · **Componente:** `por_determinar` (sin verificar) · alternativas: `tRunJob con contexto`, `tFlowToIterate + tRunJob`
-- **Subjob:** `s2` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:4`
+- **Subjob:** `s2` · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:4`
 - **Conexiones:** Main desde `op_2_read_1`
 - **Supuestos:** CALL EXECUTE: documentar el código que genera
 - **Pendientes:**
@@ -39,7 +39,7 @@
 ### 3. Comando del sistema operativo
 
 - **Acción:** add_component · **Componente:** `tSystem` ![Icono Talend](/talend-icons/tSystem_icon32.png) (sin verificar)
-- **Subjob:** `s7` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:7`
+- **Subjob:** `s7` · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:7`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/system/tsystem)
 - **Conexiones:** OnSubjobOk desde `op_4_dynamic_code_1`
 - **Propiedades:**
@@ -51,7 +51,7 @@
 ### 4. Comando del sistema operativo
 
 - **Acción:** add_component · **Componente:** `tSystem` ![Icono Talend](/talend-icons/tSystem_icon32.png) (sin verificar)
-- **Subjob:** `s8` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:8`
+- **Subjob:** `s8` · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:8`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/system/tsystem)
 - **Conexiones:** OnSubjobOk desde `op_7_os_command_1`
 - **Propiedades:**
@@ -63,7 +63,7 @@
 ### 5. Invocar macro %bucle
 
 - **Acción:** add_component · **Componente:** `tRunJob` ![Icono Talend](/talend-icons/tRunJob_icon32.png) (sin verificar) · alternativas: `Joblet`
-- **Subjob:** `s17` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p2_codigo_dinamico.sas:17`
+- **Subjob:** `s17` · **Confianza:** high · **Origen SAS:** `p2_codigo_dinamico.sas:17`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/system/trunjob-standard-properties)
 - **Conexiones:** OnSubjobOk desde `op_8_os_command_1`
 - **Propiedades:**
@@ -73,12 +73,12 @@
   - Job o joblet hijo que implementa la macro
   - Crear/identificar el Job hijo para %bucle (definida en p2_codigo_dinamico.sas)
 
-## Job hijo / joblet para `%bucle`()
+## Definición de macro auxiliar `%bucle`()
 
 ### 1. Mantenimiento de datasets
 
 - **Acción:** add_component · **Componente:** `tDBRow` (sin verificar) · alternativas: `ninguno`
-- **Subjob:** `m:bucle:s14` · **Estado:** pendiente · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:14`
+- **Subjob:** `m:bucle:s14` · **Confianza:** low · **Origen SAS:** `p2_codigo_dinamico.sas:14`
 - **Propiedades:**
   - `QUERY` = _por configurar_ — regla mappings
 - **Pendientes:**

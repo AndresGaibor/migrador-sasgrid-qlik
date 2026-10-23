@@ -1,0 +1,52 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+const source = await readFile(new URL("./PlansTab.tsx", import.meta.url), "utf8");
+const hooksSource = await readFile(new URL("../hooks.ts", import.meta.url), "utf8");
+
+test("project plans expose one ZIP-level Talend action and no per-guide write action", () => {
+  assert.match(source, /Implementar todos los flujos del ZIP en Talend/);
+  assert.match(source, /api\.talendApplyBatch\(id\)/);
+  assert.match(source, /no ejecutará los Jobs/i);
+  assert.match(source, /canStartBatch/);
+  assert.match(source, /!health\.data\.write_enabled/);
+  assert.match(source, /disabled=\{!canStartBatch\}/);
+  assert.doesNotMatch(source, /api\.applyTalend\(id, file\)/);
+  assert.doesNotMatch(source, /Implementar flujo directo en Talend/);
+});
+
+test("the ZIP-level operation shows durable progress, current job, and each result grouped by folder", () => {
+  assert.match(source, /api\.talendApplyBatchStatus\(id\)/);
+  assert.match(source, /role="progressbar"/);
+  assert.match(source, /aria-valuenow=/);
+  assert.match(source, /completed_jobs/);
+  assert.match(source, /current_program/);
+  assert.match(source, /ArchivePathTree/);
+  assert.match(source, /talendApplyBatchLabel/);
+  assert.match(source, /job\.error/);
+  assert.match(source, /setInterval\(batch\.reload/);
+  assert.match(source, /result\?\.result\.itemPath/);
+});
+
+test("transient batch polling errors retain the last state and report automatic retries", () => {
+  assert.match(hooksSource, /preserveDataOnError\s*\?\s*\{ \.\.\.s, error: e\.message, loading: false \}/);
+  assert.match(source, /preserveDataOnError: true/);
+  assert.match(source, /setInterval\(batch\.reload, 1200\)/);
+  assert.match(source, /No se pudo actualizar el progreso del lote/);
+  assert.match(source, /Se volverá a intentar automáticamente/);
+});
+
+test("an interrupted active Job is shown as retryable after a server restart", () => {
+  assert.match(source, /interrupted: "Interrumpido; puede reintentarse"/);
+});
+
+test("individual guides show only their batch or legacy result and retain the read-only preview", () => {
+  assert.match(source, /api\.talendApplyPreview\(id, file\)/);
+  assert.match(source, /api\.talendApplyBatchStatus\(id\)/);
+  assert.match(source, /api\.talendApplyStatus\(id, file\)/);
+  assert.doesNotMatch(source, /onClick=\{\(\) => void applyGuide\(\)\}/);
+  assert.doesNotMatch(source, /api\.applyTalend\(/);
+  assert.match(source, /Información técnica pendiente/);
+  assert.match(source, /Talend no ejecutará los Jobs/);
+});

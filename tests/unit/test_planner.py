@@ -7,8 +7,10 @@ from fastapi.testclient import TestClient
 
 from sas_grid_migrator.config import Settings
 from sas_grid_migrator.intermediate_representation.builder import build_ir
+from sas_grid_migrator.intermediate_representation.models import IROperation, MacroIR, ProgramIR
 from sas_grid_migrator.migration_planner.expressions import translate
 from sas_grid_migrator.migration_planner.models import JobPlan
+from sas_grid_migrator.migration_planner.planner import load_mapping_rules, plan_program
 from sas_grid_migrator.migration_planner.service import (
     generate_plans,
     get_plan,
@@ -17,6 +19,7 @@ from sas_grid_migrator.migration_planner.service import (
 )
 from sas_grid_migrator.persistence.store import Store
 from sas_grid_migrator.reporting.exports import render_plan_md, steps_csv, write_exports
+from sas_grid_migrator.sas_parser.ast import Loc
 from sas_grid_migrator.sas_parser.parser import parse_program
 
 FIXTURES = Path(__file__).parent.parent / "fixtures" / "sas"
@@ -63,6 +66,65 @@ def test_plan_steps_have_contract(tmp_path):
     assert any(c.kind == "row_count" for c in plan.validation_cases)
     # ningún componente puede declararse verificado sin talend-mcp
     assert not any(s.verified for p in ps.plans for s in p.steps)
+
+
+def test_plan_flattens_invoked_entry_macro_and_keeps_its_parameters_in_context():
+    include = IROperation(
+        id="op_2_include_1",
+        type="include",
+        step="s2",
+        evidence={"file": "daily.sas", "line": 2, "end_line": 2},
+        details={"path": "/sas/config/autoexec.sas"},
+    )
+    entry_call = IROperation(
+        id="op_20_macro_call_1",
+        type="macro_call",
+        step="s20",
+        evidence={"file": "daily.sas", "line": 20, "end_line": 20},
+        details={"name": "daily", "args": "run_date=&CURR_DT"},
+    )
+    body_filter = IROperation(
+        id="op_8_filter_1",
+        type="filter",
+        step="s8",
+        evidence={"file": "daily.sas", "line": 8, "end_line": 8},
+        inputs=["work.claims"],
+        details={"expression": "amount > 0", "origin": "sentencia WHERE"},
+    )
+    helper_call = IROperation(
+        id="op_12_macro_call_1",
+        type="macro_call",
+        step="s12",
+        evidence={"file": "daily.sas", "line": 12, "end_line": 12},
+        details={"name": "sendmail", "args": ""},
+    )
+    helper_body = IROperation(
+        id="op_30_report_1",
+        type="report",
+        step="s30",
+        evidence={"file": "daily.sas", "line": 30, "end_line": 30},
+        details={"proc": "print"},
+    )
+    ir = ProgramIR(
+        file="daily.sas",
+        operations=[include, entry_call],
+        macros=[
+            MacroIR(name="daily", params=["run_date", "restart_from"], loc=Loc(file="daily.sas", line=3, end_line=19), operations=[body_filter, helper_call]),
+            MacroIR(name="sendmail", params=[], loc=Loc(file="daily.sas", line=25, end_line=31), operations=[helper_body]),
+        ],
+        parameters={"CURR_DT": ""},
+    )
+
+    result = plan_program(ir, "project-1", load_mapping_rules(), {})
+
+    assert [step.operation_id for step in result.steps] == ["op_8_filter_1", "op_12_macro_call_1"]
+    assert all(step.operation_type not in {"include", "macro_call"} or step.operation_id == "op_12_macro_call_1" for step in result.steps)
+    assert result.entry_macro is not None
+    assert result.entry_macro.name == "daily"
+    assert result.entry_macro.params == ["run_date", "restart_from"]
+    assert result.entry_macro.arguments == {"run_date": "&CURR_DT"}
+    assert [macro.name for macro in result.children] == ["sendmail"]
+    assert {item.name for item in result.context_variables} >= {"run_date", "restart_from", "CURR_DT"}
 
 
 def test_grid_recommendations_use_versioned_catalog_and_keep_unsupported_evidence(tmp_path):
@@ -122,10 +184,14 @@ def test_exports(tmp_path):
     store, pid = project(tmp_path)
     ps = generate_plans(store, pid)
     plan = next(p for p in ps.plans if p.program == "p0_resumen_sql.sas")
+    plan.steps[0].status = "descartado"
+    plan.steps[0].note = "No usar este estado manual"
     md = render_plan_md(plan)
     assert "## Pasos" in md and "p0_resumen_sql.sas:" in md and "Checklist" in md
+    assert "descartado" not in md and "No usar este estado manual" not in md
     rows = steps_csv(ps).splitlines()
     assert rows[0].startswith("job,programa,paso_id") and len(rows) > 10
+    assert "estado" not in rows[0] and "descartado" not in "\n".join(rows)
     out_dir = tmp_path / "out"
     files = write_exports(ps, out_dir)
     names = {f.name for f in files}
@@ -137,6 +203,9 @@ def test_exports(tmp_path):
     assert icons and all((out_dir / "assets" / "talend-icons" / icon).is_file() for icon in icons)
     assert (out_dir / "assets" / "talend-icons" / "LICENSE").is_file()
     assert (out_dir / "assets" / "talend-icons" / "NOTICE.md").is_file()
+    exported_plan = json.loads((tmp_path / "out/p0_resumen_sql.json").read_text())
+    assert "job_status" not in exported_plan
+    assert "status" not in exported_plan["steps"][0] and "note" not in exported_plan["steps"][0]
     assert JobPlan.model_validate(json.loads((tmp_path / "out/p0_resumen_sql.json").read_text()))
 
 

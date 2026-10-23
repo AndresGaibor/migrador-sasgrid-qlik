@@ -178,8 +178,8 @@ def test_api_analysis_flow(tmp_path, monkeypatch):
     c = TestClient(api)
     pid = c.post("/api/projects", json={"name": "x"}).json()["id"]
     assert c.get(f"/api/projects/{pid}/programs").status_code == 409
-    c.post(f"/api/projects/{pid}/imports", json={"path": str(FIXTURES / "inc")})
-    c.post(f"/api/projects/{pid}/imports", json={"path": str(FIXTURES)})
+    imported = c.post(f"/api/projects/{pid}/imports", json={"path": str(FIXTURES)})
+    assert imported.status_code == 201
     s = c.post(f"/api/projects/{pid}/analyses").json()
     assert s["programs"] >= 8 and s["unrecognized"] < 5
     assert any(e["tag"] == "proc:sql" and e["priority"] == "P0" for e in s["coverage"])

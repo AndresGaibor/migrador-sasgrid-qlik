@@ -26,6 +26,19 @@ def _component_icon_file(name: str) -> str | None:
     return None
 
 
+def _plan_export_data(plan: JobPlan) -> dict:
+    """Serialize technical guidance without persisted manual workflow state."""
+    data = plan.model_dump(mode="json", exclude={"job_status"})
+    for step in data["steps"]:
+        step.pop("status", None)
+        step.pop("note", None)
+    for child in data["children"]:
+        for step in child["steps"]:
+            step.pop("status", None)
+            step.pop("note", None)
+    return data
+
+
 def safe_name(program: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "__", program)
 
@@ -44,7 +57,7 @@ def _step_md(s: PlanStep, icon_base: str = "/talend-icons") -> list[str]:
             else ""
         ),
         (
-            f"- **Subjob:** `{s.subjob}` · **Estado:** {s.status} · **Confianza:** {s.confidence}"
+            f"- **Subjob:** `{s.subjob}` · **Confianza:** {s.confidence}"
             f" · **Origen SAS:** `{s.evidence.file}:{s.evidence.line}`"
         ),
     ]
@@ -97,8 +110,6 @@ def _step_md(s: PlanStep, icon_base: str = "/talend-icons") -> list[str]:
         out += [f"  - {p}" for p in s.pending]
     if s.tests:
         out.append("- **Pruebas:** " + ", ".join(f"`{t}`" for t in s.tests))
-    if s.note:
-        out.append(f"- **Decisión humana:** {s.note}")
     out.append("")
     return out
 
@@ -132,10 +143,15 @@ def render_plan_md(plan: JobPlan, icon_base: str = "/talend-icons") -> str:
         "",
         f"- **Programa SAS:** `{plan.program}`"
         + (f" (sha256 `{plan.sha256[:12]}`)" if plan.sha256 else ""),
-        f"- **Estado:** {plan.job_status} · **Pasos:** {n_steps} · **Reglas:** v{plan.rules_version}",
+        f"- **Instrucciones:** {n_steps} · **Reglas:** v{plan.rules_version}",
         "- **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.",
         "",
     ]
+    if plan.entry_macro:
+        out += [
+            f"La macro principal `%{plan.entry_macro.name}({', '.join(plan.entry_macro.params)})` está integrada en el Job.",
+            "",
+        ]
     if plan.orchestration.schedules or plan.orchestration.upstream or plan.orchestration.grid_tasks:
         o = plan.orchestration
         out += ["## Orquestación", ""]
@@ -172,7 +188,7 @@ def render_plan_md(plan: JobPlan, icon_base: str = "/talend-icons") -> str:
     for s in plan.steps:
         out += _step_md(s, icon_base)
     for c in plan.children:
-        out += [f"## Job hijo / joblet para `%{c.name}`({', '.join(c.params)})", ""]
+        out += [f"## Definición de macro auxiliar `%{c.name}`({', '.join(c.params)})", ""]
         for s in c.steps:
             out += _step_md(s, icon_base)
     if plan.unresolved:
@@ -210,14 +226,12 @@ def render_index_md(ps: PlanSet, deps: DependencyReport | None = None) -> str:
     out += [
         "## Jobs",
         "",
-        "| Job | Programa | Estado | Pasos | Pendientes |",
-        "| --- | --- | --- | --- | --- |",
+        "| Job | Programa | Instrucciones |",
+        "| --- | --- | ---: |",
     ]
     for p in ps.plans:
         steps = p.steps + [s for c in p.children for s in c.steps]
-        out.append(
-            f"| `{p.job_name}` | `{p.program}` | {p.job_status} | {len(steps)} | {sum(1 for s in steps if s.pending)} |"
-        )
+        out.append(f"| `{p.job_name}` | `{p.program}` | {len(steps)} paso(s) |")
     if ps.grid_recommendations:
         out += ["", "## Recomendaciones Grid del proyecto", ""]
         for item in ps.grid_recommendations:
@@ -237,7 +251,6 @@ def steps_csv(ps: PlanSet) -> str:
             "subjob",
             "componente",
             "verificado",
-            "estado",
             "confianza",
             "linea_sas",
             "proposito",
@@ -255,7 +268,6 @@ def steps_csv(ps: PlanSet) -> str:
                     s.subjob,
                     s.component_candidate,
                     s.verified,
-                    s.status,
                     s.confidence,
                     s.evidence.line,
                     s.purpose,
@@ -282,7 +294,7 @@ def write_exports(ps: PlanSet, out_dir: Path, deps: DependencyReport | None = No
     for p in ps.plans:
         base = out_dir / safe_name(p.program)
         (base.with_suffix(".md")).write_text(render_plan_md(p, "assets/talend-icons"), encoding="utf-8")
-        (base.with_suffix(".json")).write_text(p.model_dump_json(indent=2), encoding="utf-8")
+        (base.with_suffix(".json")).write_text(json.dumps(_plan_export_data(p), ensure_ascii=False, indent=2), encoding="utf-8")
         written += [base.with_suffix(".md"), base.with_suffix(".json")]
     for name, content in (("index.md", render_index_md(ps, deps)), ("steps.csv", steps_csv(ps))):
         (out_dir / name).write_text(content, encoding="utf-8")

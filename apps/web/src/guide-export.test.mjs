@@ -8,28 +8,28 @@ const plan = {
   children: [], validation_cases: [], context_variables: [], libraries_needed: [], unresolved: [], orchestration: { schedules: [], upstream: [], downstream: [], grid_tasks: [] },
 };
 
-test("Markdown and JSON exports include workflow state, evidence, official docs and pending decisions", () => {
+test("Markdown and JSON exports retain technical guidance without manual workflow state", () => {
   const md = guideMarkdown(plan, "project-1");
-  assert.match(md, /Estado de la guía:\*\* Bloqueado/);
-  assert.match(md, /Esper[a]? confirmación/);
+  assert.doesNotMatch(md, /Estado de la guía|Motivo del bloqueo|Nota de trabajo|Esper[a]? confirmación/);
   assert.match(md, /Confirmar el tipo de dato/);
   assert.match(md, /https:\/\/help\.qlik\.com\/tMap/);
   assert.match(md, /ventas\.sas:8/);
   const json = JSON.parse(guideJson(plan, "project-1"));
-  assert.equal(json.steps[0].status, "blocked");
-  assert.equal(json.steps[0].block_reason, "Espera confirmación");
-  assert.equal(json.steps[0].note, "Revisar con el equipo");
+  assert.equal("status" in json.steps[0], false);
+  assert.equal("note" in json.steps[0], false);
+  assert.equal("block_reason" in json.steps[0], false);
   assert.equal(json.steps[0].pending[0], "Confirmar el tipo de dato");
   assert.equal(json.steps[0].references.official.url, "https://help.qlik.com/tMap");
   assert.match(json.steps[0].references.sas.href, /line=8/);
 });
 
-test("CSV and index exports expose state, pending items and block counts", () => {
+test("CSV and index exports expose technical pending items without progress counts", () => {
   const csv = guideCsv([plan], "project-1");
-  assert.match(csv.split("\n")[0], /estado_guia/);
-  assert.match(csv, /Bloqueado/);
+  assert.doesNotMatch(csv.split("\n")[0], /estado_guia|motivo_bloqueo|nota/);
+  assert.doesNotMatch(csv, /Bloqueado|Esper[a]? confirmación/);
   assert.match(csv, /Confirmar el tipo de dato/);
-  assert.match(guideIndexMarkdown([plan]), /1 bloqueado/);
+  assert.doesNotMatch(guideIndexMarkdown([plan]), /Completados|Pendientes|Bloqueados|bloqueado/);
+  assert.match(guideIndexMarkdown([plan]), /1 paso/);
 });
 
 test("CSV quotes uploaded text that could be interpreted as a spreadsheet formula", () => {

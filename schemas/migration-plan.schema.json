@@ -292,7 +292,7 @@
           "type": "string"
         },
         "note": {
-          "default": "Crear la conexi\u00f3n en Talend; no se copian credenciales",
+          "default": "Crear la conexión en Talend; no se copian credenciales",
           "title": "Note",
           "type": "string"
         }
@@ -325,6 +325,36 @@
         "end_line"
       ],
       "title": "Loc",
+      "type": "object"
+    },
+    "MacroEntrypoint": {
+      "description": "Macro principal invocada por el programa; su cuerpo pertenece al Job del archivo.",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "params": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Params",
+          "type": "array"
+        },
+        "arguments": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Arguments",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "MacroEntrypoint",
       "type": "object"
     },
     "Orchestration": {
@@ -799,6 +829,17 @@
       },
       "title": "Steps",
       "type": "array"
+    },
+    "entry_macro": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MacroEntrypoint"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "children": {
       "default": [],

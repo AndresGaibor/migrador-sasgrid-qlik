@@ -1,7 +1,7 @@
 # Job `job_p0_clientes_activos`
 
-- **Programa SAS:** `p0_clientes_activos.sas` (sha256 `2ba7aecba508`)
-- **Estado:** needs_review · **Pasos:** 11 · **Reglas:** v1
+- **Programa SAS:** `p0_clientes_activos.sas` (sha256 `21ee224bdf60`)
+- **Instrucciones:** 11 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Conexiones a crear
@@ -14,7 +14,7 @@
 ### 1. Leer dwh.clientes
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Propiedades:**
   - `TABLE` = `clientes` — SAS p0_clientes_activos.sas:5
   - `QUERY` = _por configurar_ — regla mappings
@@ -28,7 +28,7 @@
 ### 2. Renombrar columnas
 
 - **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar)
-- **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `op_5_read_1`
 - **Propiedades:**
@@ -39,7 +39,7 @@
 ### 3. Filtrar filas (sentencia WHERE): estado = 'A' and saldo > 0
 
 - **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
-- **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:7`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:7`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties)
 - **Conexiones:** Main desde `op_5_rename_1`
 - **Propiedades:**
@@ -54,7 +54,7 @@
 ### 4. Calcular columnas (asignaciones y condicionales)
 
 - **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJavaRow`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** medium · **Origen SAS:** `p0_clientes_activos.sas:5`
+- **Subjob:** `s5` · **Confianza:** medium · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `op_7_filter_1`
 - **Propiedades:**
@@ -74,7 +74,7 @@
 ### 5. Conservar/descartar columnas
 
 - **Acción:** add_component · **Componente:** `tFilterColumns` ![Icono Talend](/talend-icons/tFilterColumns_icon32.png) (sin verificar) · alternativas: `tMap`
-- **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties)
 - **Conexiones:** Main desde `op_5_compute_1`
 - **Propiedades:**
@@ -84,7 +84,7 @@
 ### 6. Conservar/descartar columnas
 
 - **Acción:** add_component · **Componente:** `tFilterColumns` ![Icono Talend](/talend-icons/tFilterColumns_icon32.png) (sin verificar) · alternativas: `tMap`
-- **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties)
 - **Conexiones:** Main desde `op_5_select_columns_1`
 - **Propiedades:**
@@ -95,7 +95,7 @@
 ### 7. Escribir stg.clientes_activos
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:5`
 - **Conexiones:** Main desde `op_5_select_columns_2`
 - **Propiedades:**
   - `TABLE` = `clientes_activos` — SAS p0_clientes_activos.sas:5
@@ -111,7 +111,7 @@
 ### 8. Leer stg.clientes_activos
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
-- **Subjob:** `s15` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
+- **Subjob:** `s15` · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
 - **Conexiones:** OnSubjobOk desde `op_5_write_1`
 - **Propiedades:**
   - `TABLE` = `clientes_activos` — SAS p0_clientes_activos.sas:15
@@ -127,7 +127,7 @@
 ### 9. Ordenar por cliente_id
 
 - **Acción:** add_component · **Componente:** `tSortRow` ![Icono Talend](/talend-icons/tSortRow_icon32.png) (sin verificar)
-- **Subjob:** `s15` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
+- **Subjob:** `s15` · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties)
 - **Conexiones:** Main desde `op_15_read_1`
 - **Propiedades:**
@@ -138,7 +138,7 @@
 ### 10. Eliminar duplicados
 
 - **Acción:** add_component · **Componente:** `tUniqRow` ![Icono Talend](/talend-icons/tUniqRow_icon32.png) (sin verificar)
-- **Subjob:** `s15` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
+- **Subjob:** `s15` · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/deduplication/tuniqrow-standard-properties)
 - **Conexiones:** Main desde `op_15_sort_1`
 - **Propiedades:**
@@ -149,7 +149,7 @@
 ### 11. Escribir stg.clientes_activos_ord
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
-- **Subjob:** `s15` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
+- **Subjob:** `s15` · **Confianza:** high · **Origen SAS:** `p0_clientes_activos.sas:15`
 - **Conexiones:** Main desde `op_15_dedupe_1`
 - **Propiedades:**
   - `TABLE` = `clientes_activos_ord` — SAS p0_clientes_activos.sas:15
