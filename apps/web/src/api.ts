@@ -34,6 +34,8 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 
 const post = <T>(path: string, body?: unknown) =>
   req<T>(path, { method: "POST", body: body === undefined ? undefined : JSON.stringify(body) });
+const patch = <T>(path: string, body: unknown) =>
+  req<T>(path, { method: "PATCH", body: JSON.stringify(body) });
 const enc = (path: string) => path.split("/").map(encodeURIComponent).join("/");
 
 export const api = {
@@ -102,4 +104,7 @@ export const api = {
     jobs?: number;
     error?: string;
   }>("/integrations/talend/health"),
+  talendPermissions: () => req<{ write_enabled: boolean }>("/integrations/talend/permissions"),
+  setTalendWriteEnabled: (enabled: boolean) =>
+    patch<{ write_enabled: boolean }>("/integrations/talend/permissions", { write_enabled: enabled }),
 };

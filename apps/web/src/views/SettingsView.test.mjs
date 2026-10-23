@@ -27,3 +27,9 @@ test("the active connection configuration is visible for debugging", () => {
   assert.match(source, /h\.apply_folder/);
   assert.match(source, /Detalles para el equipo técnico/);
 });
+
+test("the write permission is a switch persisted through the API", () => {
+  assert.match(source, /setTalendWriteEnabled/);
+  assert.match(source, /checked=\{h\.write_enabled\}/);
+  assert.match(source, /toggleWrite/);
+});

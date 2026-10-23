@@ -125,7 +125,7 @@ function PlanList({ id }: { id: string }) {
         {health.error && <p className="error" role="alert">{formatErrorMessage(health.error, undefined, health.errorStatus)}</p>}
         {batchError && <p className="error" role="alert">{batchError}</p>}
         {batch.error && <p className="error" role="alert">No se pudo actualizar el progreso del lote: {formatErrorMessage(batch.error, undefined, batch.errorStatus)} Se volverá a intentar automáticamente.</p>}
-        {health.data?.available && !health.data.write_enabled && <p className="muted">Activa <code>TALEND_MCP_READONLY=false</code> en la API y reiníciala para permitir la creación.</p>}
+        {health.data?.available && !health.data.write_enabled && <p className="muted">Activa la escritura en <a href="#/settings">Configuración</a> (o fija <code>TALEND_MCP_READONLY=false</code> en la API) para permitir la creación.</p>}
         {!health.loading && !health.data?.available && <div className="preflight-unavailable"><p>Abre Talend Studio con el Bridge activo. Puedes continuar con las guías sin conexión.</p><button type="button" className="secondary" onClick={health.reload}>Comprobar conexión</button><a href="#/settings">Diagnóstico MCP</a></div>}
         {batchState && batchState.status !== "not_started" && <div className={`talend-batch-state ${batchState.status}`} role="status" aria-live="polite">
           <div className="talend-batch-state-heading"><strong>{talendApplyBatchLabel(batchState.status)}</strong><span>{batchState.completed_jobs} / {batchState.total_jobs} Jobs resueltos</span></div>

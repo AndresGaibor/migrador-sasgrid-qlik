@@ -322,6 +322,10 @@ details[open] > summary { margin-bottom: 16px; }
 .health-config { display: flex; flex-wrap: wrap; gap: 8px 26px; margin: 10px 0 0; font-size: 12px; }
 .health-config dt { color: var(--muted); font-weight: 650; }
 .health-config dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+.permission-toggle { display: flex; align-items: center; gap: 9px; margin: 2px 0 12px; font-size: 13px; font-weight: 600; }
+.permission-toggle input { width: 16px; height: 16px; accent-color: var(--accent, #1f7a4d); }
+.permission-toggle input:disabled { opacity: .6; }
+.permission-toggle-error { margin: 0 0 12px; font-size: 12px; color: var(--danger, #b42318); }
 button.talend-implement-button { min-height: 54px; padding: 13px 22px; font-size: 16px; font-weight: 750; box-shadow: 0 5px 14px #00873e2b; }
 .talend-apply-confirm { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 13px; border: 1px solid #cfe2d5; border-radius: 8px; background: var(--soft-green); }
 .talend-apply-confirm p { flex: 1 1 300px; margin: 0; }

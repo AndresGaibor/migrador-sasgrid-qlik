@@ -292,15 +292,24 @@ def test_adapter_from_env_reads_mcp_url_and_timeout(monkeypatch):
 
 
 
-def test_apply_custom_spec_is_blocked_when_readonly_is_enabled(monkeypatch):
-    monkeypatch.setenv("TALEND_MCP_READONLY", "true")
+def test_apply_custom_spec_is_blocked_when_write_permission_is_off():
     fake = Fake({})
-    adapter = TalendAdapter(fake)
+    adapter = TalendAdapter(fake, write_enabled=False)
 
     with pytest.raises(TalendError, match="solo lectura"):
         run(adapter.apply_custom_spec({"jobName": "DailyJob"}))
 
     assert fake.calls == []
+
+
+def test_apply_custom_spec_ignores_readonly_env_when_permission_is_on(monkeypatch):
+    monkeypatch.setenv("TALEND_MCP_READONLY", "true")
+    fake = Fake({"talend_job_apply_custom_spec": {"ok": True, "data": {"jobName": "DailyJob"}}})
+    adapter = TalendAdapter(fake, write_enabled=True)
+
+    run(adapter.apply_custom_spec({"jobName": "DailyJob"}))
+
+    assert fake.calls[0][0] == "talend_job_apply_custom_spec"
 
 
 def test_apply_custom_spec_sends_the_complete_instruction_in_one_mcp_call(monkeypatch):

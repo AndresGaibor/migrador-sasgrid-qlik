@@ -80,10 +80,11 @@ class Store:
         c.execute("pragma foreign_keys = on")
         return c
 
-    def talend_write_enabled(self) -> bool:
+    def talend_write_enabled(self, default: bool = True) -> bool:
+        """Permiso de escritura guardado; `default` solo se usa antes de la primera elección."""
         with closing(self._conn()) as c:
             row = c.execute("select write_enabled from talend_permissions where id=1").fetchone()
-        return bool(row[0]) if row else True
+        return bool(row[0]) if row else default
 
     def set_talend_write_enabled(self, enabled: bool) -> None:
         with closing(self._conn()) as c, c:
