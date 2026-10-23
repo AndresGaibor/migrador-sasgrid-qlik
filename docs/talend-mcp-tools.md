@@ -29,6 +29,10 @@ TALEND_APPLY_FOLDER=Process/PruebasWebSAS
 
 El MCP configura su propio host y puerto con `TALEND_MCP_HOST` y `TALEND_MCP_PORT`. La URL de la API debe coincidir con esos valores. Mantén los procesos en el mismo Windows que Talend Studio para que MCP pueda comunicarse con el Bridge.
 
+### Diagnóstico de la conexión
+
+El MCP expone `GET /healthz` en su puerto para comprobar si el servidor responde sin invocar tools. La vista **Configuración** del portal consulta `GET /api/integrations/talend/health` y muestra el estado por etapas: servidor MCP, Bridge de Studio y escritura de Jobs, junto con la URL, el timeout y la carpeta de aplicación activos. `mcp_available` y `bridge_available` separan los dos fallos habituales (servidor caído frente a Studio cerrado), y el estado general es `Conectado`, `Parcial` (MCP responde pero no hay Bridge) o `Sin conexión`. Los `outputSchema` de las tools deben mantenerse consistentes con lo que devuelven: un cliente MCP con validación estricta rechaza cualquier respuesta que no cumpla el schema publicado.
+
 `TALEND_MCP_READONLY=true` deshabilita la escritura desde el portal. `TALEND_APPLY_FOLDER` debe estar bajo `Process/`. La carpeta destino por ZIP es `<TALEND_APPLY_FOLDER>/<slug-del-ZIP>-<project_id>/<subcarpeta-del-programa>`; así dos ZIP con el mismo nombre se mantienen aislados y cada programa conserva su subcarpeta. La guía muestra la ruta exacta que se enviará al MCP.
 
 `TALEND_MCP_TIMEOUT_SECONDS` limita cuánto espera la API cada respuesta del MCP. El resultado del lote se persiste por proyecto y programa y la vista consulta el estado mientras corre o al recargarse. Los estados del lote son `queued`, `running`, `applied`, `partially_applied`, `failed`, `conflict` e `interrupted`; cada programa conserva además su resultado y error. Una revisión idéntica que ya terminó devuelve el resultado guardado; una colisión no sobrescribe el Job encontrado.

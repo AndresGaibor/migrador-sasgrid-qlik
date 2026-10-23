@@ -18,6 +18,7 @@ class TalendError(RuntimeError):
 
 class Caller(Protocol):
     async def call(self, tool: str, args: dict[str, Any]) -> dict[str, Any]: ...
+    async def describe_tool(self, tool: str) -> dict[str, Any] | None: ...
 
 
 class McpCaller:
@@ -25,6 +26,18 @@ class McpCaller:
 
     def __init__(self, url: str, timeout: float = 30.0):
         self.url, self.timeout = url, timeout
+
+    async def describe_tool(self, tool: str) -> dict[str, Any] | None:
+        assert_allowed(tool)
+        from mcp import Client
+
+        try:
+            async with Client(self.url) as client:
+                result = await client.list_tools()
+                found = next((item for item in result.tools if item.name == tool), None)
+                return found.input_schema if found else None
+        except Exception as e:
+            raise TalendError(f"No se pudo comprobar el contrato MCP: {type(e).__name__}") from e
 
     async def call(self, tool: str, args: dict[str, Any]) -> dict[str, Any]:
         assert_allowed(tool)
@@ -69,14 +82,15 @@ class JobInspection(BaseModel):
 
 
 class TalendAdapter:
-    def __init__(self, caller: Caller):
+    def __init__(self, caller: Caller, *, write_enabled: bool = True):
         self.caller = caller
+        self.write_enabled = write_enabled
 
     @classmethod
-    def from_env(cls) -> "TalendAdapter":
+    def from_env(cls, *, write_enabled: bool = True) -> "TalendAdapter":
         url = os.environ.get("TALEND_MCP_URL", "http://127.0.0.1:3927/mcp")
         timeout = float(os.environ.get("TALEND_MCP_TIMEOUT_SECONDS", "60"))
-        return cls(McpCaller(url, timeout=timeout))
+        return cls(McpCaller(url, timeout=timeout), write_enabled=write_enabled)
 
     async def _data(self, tool: str, args: dict[str, Any] | None = None) -> dict[str, Any]:
         assert_allowed(tool)
@@ -89,11 +103,23 @@ class TalendAdapter:
         data = env.get("data")
         return data if isinstance(data, dict) else {"value": data}
 
+    def _connection_config(self) -> dict[str, Any]:
+        """Configuración activa del cliente, para mostrar en diagnóstico."""
+        config: dict[str, Any] = {}
+        url = getattr(self.caller, "url", None)
+        timeout = getattr(self.caller, "timeout", None)
+        if url:
+            config["mcp_url"] = url
+        if timeout is not None:
+            config["timeout_seconds"] = timeout
+        return config
+
     async def health_check(self) -> dict[str, Any]:
+        config = self._connection_config()
         try:
             data = await self._data("talend_jobs_list")
         except TalendError as e:
-            return {"available": False, "mcp_available": False, "error": str(e)}
+            return {"available": False, "mcp_available": False, "error": str(e), **config}
         jobs = len(data.get("jobs", []))
         try:
             bridge = await self._data("talend_bridge_ping")
@@ -104,6 +130,7 @@ class TalendAdapter:
                 "bridge_available": False,
                 "jobs": jobs,
                 "error": str(e),
+                **config,
             }
         if bridge.get("ok") is not True:
             return {
@@ -111,7 +138,9 @@ class TalendAdapter:
                 "mcp_available": True,
                 "bridge_available": False,
                 "jobs": jobs,
-                "error": "Talend Studio Bridge no está disponible.",
+                "error": "Talend Studio Bridge no está disponible. Instala el plugin en Studio "
+                "(bun run scripts/start.ts --install-bridge) y abre un proyecto.",
+                **config,
             }
         return {
             "available": True,
@@ -120,7 +149,22 @@ class TalendAdapter:
             "bridge_mode": bridge.get("mode"),
             "unsafe_actions": bridge.get("unsafeActions", False),
             "jobs": jobs,
+            **(await self.custom_spec_status()),
+            **config,
         }
+
+    async def custom_spec_status(self) -> dict[str, Any]:
+        try:
+            schema = await self.caller.describe_tool("talend_job_apply_custom_spec")
+        except TalendError as e:
+            return {"spec_supported": False, "spec_error": str(e)}
+        properties = (schema or {}).get("properties", {})
+        component = properties.get("components", {}).get("items", {}).get("properties", {})
+        missing = sorted({"childJobs", "instructions", "replaceManagedTodoContexts"} - properties.keys())
+        missing += sorted({"draftOnly", "draftReason", "tables"} - component.keys())
+        if missing:
+            return {"spec_supported": False, "spec_error": f"MCP incompatible con la migración: faltan {', '.join(missing)}. Actualiza el MCP antes de crear Jobs."}
+        return {"spec_supported": True, "spec_error": None}
 
     async def list_jobs(self) -> list[str]:
         jobs = (await self._data("talend_jobs_list")).get("jobs", [])
@@ -152,15 +196,26 @@ class TalendAdapter:
             contexts=[c.get("name", "") for c in data.get("contexts") or job.get("contexts") or []],
         )
 
+    async def job_problems(self, job_name: str) -> dict[str, Any]:
+        """Avisos de diseño del Job en la vista Problemas de Studio (requiere Bridge)."""
+        data = await self._data("talend_job_problems", {"job": job_name})
+        problems = data.get("problems")
+        return {
+            "clean": bool(data.get("clean", False)),
+            "problems": [item for item in problems if isinstance(item, dict)]
+            if isinstance(problems, list)
+            else [],
+        }
+
     async def apply_custom_spec(self, arguments: dict[str, Any]) -> dict[str, Any]:
         """Envía al MCP la instrucción completa para que Studio aplique el Job."""
-        write_enabled = os.environ.get("TALEND_MCP_READONLY", "false").strip().casefold() in {
-            "false", "0", "no", "off"
-        }
-        if not write_enabled:
+        if not self.write_enabled:
             raise TalendError(
-                "talend-mcp está en modo solo lectura; configura TALEND_MCP_READONLY=false para habilitar creación explícita."
+                "El portal está en modo solo lectura. Habilita la escritura desde Configuración para crear Jobs."
             )
+        compatibility = await self.custom_spec_status()
+        if not compatibility["spec_supported"]:
+            raise TalendError(compatibility["spec_error"])
         return await self._studio_write("talend_job_apply_custom_spec", arguments)
 
     async def _studio_write(self, tool: str, args: dict[str, Any]) -> dict[str, Any]:

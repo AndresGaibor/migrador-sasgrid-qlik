@@ -26,6 +26,9 @@ class Fake:
             raise r
         return r
 
+    async def describe_tool(self, tool):
+        return {"properties": {"childJobs": {}, "instructions": {}, "replaceManagedTodoContexts": {}, "components": {"items": {"properties": {"draftOnly": {}, "draftReason": {}, "tables": {}}}}}}
+
 
 JOB = {
     "ok": True,
@@ -90,6 +93,8 @@ def test_health_unavailable_does_not_raise():
         "bridge_mode": "readOnly",
         "unsafe_actions": False,
         "jobs": 1,
+        "spec_supported": True,
+        "spec_error": None,
     }
 
 
@@ -99,13 +104,32 @@ def test_health_reports_bridge_offline_even_when_mcp_server_is_reachable():
         "talend_bridge_ping": {"ok": True, "data": {"ok": False}},
     }))
 
-    assert run(adapter.health_check()) == {
-        "available": False,
-        "mcp_available": True,
-        "bridge_available": False,
-        "jobs": 0,
-        "error": "Talend Studio Bridge no está disponible.",
-    }
+    health = run(adapter.health_check())
+    assert health["available"] is False
+    assert health["mcp_available"] is True and health["bridge_available"] is False
+    assert health["jobs"] == 0
+    assert health["error"].startswith("Talend Studio Bridge no está disponible.")
+
+
+def test_health_exposes_active_connection_config_for_diagnostics():
+    class ConfiguredFake(Fake):
+        def __init__(self, responses):
+            super().__init__(responses)
+            self.url = "http://127.0.0.1:4927/mcp"
+            self.timeout = 7.5
+
+    ad = TalendAdapter(ConfiguredFake({
+        "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
+        "talend_bridge_ping": {"ok": True, "data": {"ok": False}},
+    }))
+    health = run(ad.health_check())
+    assert health["mcp_url"] == "http://127.0.0.1:4927/mcp"
+    assert health["timeout_seconds"] == 7.5
+    assert "--install-bridge" in health["error"]
+
+    down = TalendAdapter(ConfiguredFake({"talend_jobs_list": TalendError("caído")}))
+    health = run(down.health_check())
+    assert health["available"] is False and health["mcp_url"] == "http://127.0.0.1:4927/mcp"
 
 
 def test_verify_plans_is_conservative(tmp_path):
@@ -321,3 +345,15 @@ def test_api_talend_health_reports_write_enabled_from_readonly_setting(monkeypat
 
     assert readonly["write_enabled"] is False
     assert writable["write_enabled"] is True
+
+
+def test_job_problems_unwraps_clean_flag_and_items():
+    ad = TalendAdapter(Fake({
+        "talend_job_problems": {
+            "ok": True,
+            "data": {"clean": False, "problems": [{"severity": "warn", "message": "sin esquema"}], "extra": 1},
+        },
+    }))
+    result = run(ad.job_problems("job_daily"))
+    assert result == {"clean": False, "problems": [{"severity": "warn", "message": "sin esquema"}]}
+    assert ad.caller.calls == [("talend_job_problems", {"job": "job_daily"})]
