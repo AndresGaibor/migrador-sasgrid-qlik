@@ -7,7 +7,7 @@ from apps.api.main import app as api
 from fastapi.testclient import TestClient
 
 from sas_grid_migrator.migration_planner.service import generate_plans
-from sas_grid_migrator.talend_adapter.adapter import SPEC_TOOL, TalendAdapter, TalendError
+from sas_grid_migrator.talend_adapter.adapter import SPEC_TOOL, McpCaller, TalendAdapter, TalendError
 from sas_grid_migrator.talend_adapter.policy import ToolNotAllowed
 from sas_grid_migrator.talend_adapter.verification import Catalog, verify_plans
 from tests.unit.test_planner import project
@@ -78,6 +78,54 @@ JOB = {
 
 def run(coro):
     return asyncio.run(coro)
+
+
+def test_mcp_caller_uses_the_configured_timeout_to_list_and_describe(monkeypatch):
+    """`Client.list_tools` no acepta `read_timeout_seconds`: ese timeout va en el constructor."""
+    import mcp as mcp_module
+
+    recorded: dict[str, dict] = {}
+
+    class FakeTool:
+        name = "talend_jobs_list"
+
+        def __init__(self):
+            self.input_schema = {"properties": {"talend_jobs_list": {}}}
+
+        def model_dump(self, **_kwargs):
+            return {"name": self.name, "inputSchema": self.input_schema}
+
+    class FakeResult:
+        def __init__(self):
+            self.tools = [FakeTool()]
+
+    class FakeClient:
+        def __init__(self, url, **kwargs):
+            recorded["init"] = {"url": url, **kwargs}
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *_exc):
+            return False
+
+        async def list_tools(self, **kwargs):
+            recorded["list"] = kwargs
+            return FakeResult()
+
+    monkeypatch.setattr(mcp_module, "Client", FakeClient)
+    caller = McpCaller("http://127.0.0.1:3927/mcp", timeout=12.5)
+
+    tools = run(caller.list_tools())
+
+    assert tools == [{"name": "talend_jobs_list", "inputSchema": {"properties": {"talend_jobs_list": {}}}}]
+    assert recorded["init"]["read_timeout_seconds"] == 12.5
+    assert recorded["list"] == {}
+
+    schema = run(caller.describe_tool("talend_jobs_list"))
+
+    assert schema == {"properties": {"talend_jobs_list": {}}}
+    assert recorded["init"]["read_timeout_seconds"] == 12.5
 
 
 def test_inspect_job_parses_and_skips_empty():

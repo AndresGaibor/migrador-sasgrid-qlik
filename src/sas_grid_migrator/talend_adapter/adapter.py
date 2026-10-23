@@ -42,7 +42,7 @@ class McpCaller:
         from mcp import Client
 
         try:
-            async with Client(self.url) as client:
+            async with Client(self.url, read_timeout_seconds=self.timeout) as client:
                 result = await client.list_tools()
                 found = next((item for item in result.tools if item.name == tool), None)
                 return found.input_schema if found else None
@@ -80,8 +80,8 @@ class McpCaller:
         from mcp import Client
 
         try:
-            async with Client(self.url) as client:
-                result = await client.list_tools(read_timeout_seconds=self.timeout)
+            async with Client(self.url, read_timeout_seconds=self.timeout) as client:
+                result = await client.list_tools()
         except Exception as e:
             cause = e
             while isinstance(cause, BaseExceptionGroup) and cause.exceptions:
