@@ -18,6 +18,9 @@ from sas_grid_migrator.domain.models import (
 from sas_grid_migrator.ingestion.importer import import_source
 
 SCHEMA = """
+create table if not exists talend_permissions(
+  id integer primary key check(id=1), write_enabled integer not null check(write_enabled in (0,1))
+);
 create table if not exists projects(
   id text primary key, name text not null, created_at text not null,
   archive_name text, archive_sha256 text, archive_size_bytes integer, uploaded_at text,
@@ -76,6 +79,19 @@ class Store:
         c = sqlite3.connect(self.db)
         c.execute("pragma foreign_keys = on")
         return c
+
+    def talend_write_enabled(self) -> bool:
+        with closing(self._conn()) as c:
+            row = c.execute("select write_enabled from talend_permissions where id=1").fetchone()
+        return bool(row[0]) if row else True
+
+    def set_talend_write_enabled(self, enabled: bool) -> None:
+        with closing(self._conn()) as c, c:
+            c.execute(
+                "insert into talend_permissions(id,write_enabled) values(1,?) "
+                "on conflict(id) do update set write_enabled=excluded.write_enabled",
+                (int(enabled),),
+            )
 
     def source_dir(self, project_id: str) -> Path:
         return self.settings.data_dir / "projects" / project_id / "src"
