@@ -25,3 +25,21 @@ test("translates network failures into a clear Spanish message", async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test("batch creation sends the revision that the user reviewed", async () => {
+  const originalFetch = globalThis.fetch;
+  let requested = "";
+  let body: unknown;
+  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    requested = String(input);
+    body = JSON.parse(String(init?.body));
+    return new Response("{}", { status: 202 });
+  }) as typeof fetch;
+  try {
+    await api.talendApplyBatch("project", "a".repeat(64));
+    expect(requested).toBe("/api/projects/project/talend-apply-batch");
+    expect(body).toEqual({ expected_revision: "a".repeat(64) });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

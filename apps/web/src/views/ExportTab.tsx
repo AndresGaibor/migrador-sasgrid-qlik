@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../api";
 import { Icon } from "../components/Icon";
+import { notifyError, notifySuccess } from "../errors";
 import type { JobPlan } from "../types";
 import { guideCsv, guideIndexMarkdown, guideJson, guideMarkdown } from "../guide-export";
 
@@ -30,10 +31,15 @@ export function ExportTab({ id }: { id: string }) {
   const run = async () => {
     setErr(undefined); setServer(undefined); setPlans(undefined); setBusy(true);
     try {
-      setServer(await api.exportAll(id));
+      const exported = await api.exportAll(id);
+      setServer(exported);
       const rows = await api.plans(id);
-      setPlans(await Promise.all(rows.map((row) => api.plan(id, row.program))));
-    } catch (x) { setErr((x as Error).message); }
+      const guides = await Promise.all(rows.map((row) => api.plan(id, row.program)));
+      setPlans(guides);
+      notifySuccess("Exportación lista", `${exported.files.length} archivos y ${guides.length} guías disponibles.`);
+    } catch (error) {
+      setErr(notifyError(error, "No se pudieron preparar las descargas", "Vuelve a intentarlo. La copia guardada en el servidor puede seguir disponible."));
+    }
     finally { setBusy(false); }
   };
   return <>

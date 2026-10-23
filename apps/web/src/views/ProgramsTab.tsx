@@ -20,7 +20,7 @@ function ProgramList({ id }: { id: string }) {
           entries={rows.map((row) => ({ path: row.file, value: row }))}
           renderEntry={({ path, name, value: row }) => (
             <article className="archive-list-entry" key={path}>
-              <a href={link(id, "programas", path)}><span className="archive-file-name"><span aria-hidden="true">📄</span><code>{name}</code></span></a>
+              <a href={link(id, "programas", path)}><span className="archive-file-name"><Icon name="file" size={15} /><code>{name}</code></span></a>
               <span>{row.statements} sentencias</span>
               <span>{row.findings} hallazgos</span>
             </article>

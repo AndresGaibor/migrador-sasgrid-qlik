@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAsync } from "../hooks";
 import { processingLabel } from "../project-workspace";
+import { formatErrorMessage, notifyError, notifySuccess } from "../errors";
 import type { ProjectProcessing } from "../types";
 import { Icon } from "./Icon";
 
@@ -30,16 +31,19 @@ export function ProjectProcessingStatus({
 
   const processing = state.data;
   const status = processing?.status;
+  const startedAt = processing?.started_at ? formatDate(processing.started_at) : undefined;
+  const updatedAt = processing?.updated_at ? formatDate(processing.updated_at) : undefined;
   const tone = status === "completed" ? "ok" : status === "failed" ? "bad" : status === "interrupted" ? "warn" : status ? "active" : "neutral";
   const retry = async () => {
     setRetrying(true);
     setRetryError(undefined);
     try {
       await api.retryProcessing(projectId);
+      notifySuccess("Análisis en cola", "El proyecto se volverá a procesar en segundo plano.");
       onRetry?.();
       state.reload();
     } catch (error) {
-      setRetryError((error as Error).message);
+      setRetryError(notifyError(error, "No se pudo reintentar el análisis"));
     } finally {
       setRetrying(false);
     }
@@ -49,11 +53,11 @@ export function ProjectProcessingStatus({
     <section className={`project-processing ${tone}`} aria-live="polite" aria-busy={Boolean(status && isActive(status))}>
       <div className="project-processing-icon">{status && isActive(status) ? <span className="spinner" /> : <Icon name={status === "completed" ? "check" : status === "failed" ? "warning" : "clock"} size={19} />}</div>
       <div className="project-processing-copy">
-        <div className="project-processing-title"><strong>{state.loading && !processing ? "Consultando estado del proyecto…" : state.error && !processing ? "Estado no disponible" : processing ? processingLabel(processing) : "Análisis en cola"}</strong><span className={`project-status-pill ${tone}`}>{status ? statusLabel(status) : state.error ? "Sin conexión" : "En cola"}</span></div>
+        <div className="project-processing-title"><strong>{state.loading && !processing ? "Consultando estado del proyecto…" : state.error && !processing ? "Estado no disponible" : processing ? processingLabel(processing) : "Análisis en cola"}</strong>{status && <span className={`project-status-pill ${tone} ${status}`}>{statusLabel(status)}</span>}</div>
         <p>{processing?.message ?? (state.loading ? "Recuperando el último estado guardado." : "El ZIP está registrado y listo para su análisis automático.")}</p>
-        {processing?.error && <p className="project-processing-error">{processing.error}</p>}
-        {(processing?.started_at || processing?.updated_at) && <small>{processing.started_at && <>Inició: {formatDate(processing.started_at)} · </>}Actualizado: {formatDate(processing.updated_at)}</small>}
-        {(state.error || retryError) && <p className="project-processing-error" role="alert">{retryError ?? state.error}</p>}
+        {processing?.error && <p className="project-processing-error">{formatErrorMessage(processing.error)}</p>}
+        {(startedAt || updatedAt) && <small className={`project-processing-timestamps${startedAt === updatedAt ? " same-timestamp" : ""}`}>{startedAt && <span className="project-processing-started">Inició: {startedAt} · </span>}{updatedAt && <>Actualizado: {updatedAt}</>}</small>}
+        {(state.error || retryError) && <p className="project-processing-error" role="alert">{retryError ?? formatErrorMessage(state.error, undefined, state.errorStatus)}</p>}
       </div>
       {(status === "failed" || status === "interrupted") && <button type="button" className="secondary project-retry" onClick={() => void retry()} disabled={retrying}><Icon name="play" size={15} />{retrying ? "Reintentando…" : "Reintentar análisis"}</button>}
     </section>

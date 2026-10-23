@@ -1,4 +1,4 @@
-import type { CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, ProjectUploadResponse, Summary, TalendApplyBatchState, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing } from "./types";
+import type { CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, ProjectUploadResponse, Summary, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -15,15 +15,20 @@ const fetchApi = async (path: string, init?: RequestInit) => {
   }
 };
 
+async function responseError(response: Response): Promise<ApiError> {
+  const body: unknown = await response.json().catch(() => undefined);
+  const detail = body && typeof body === "object" && "detail" in body && typeof body.detail === "string"
+    ? body.detail
+    : "";
+  return new ApiError(response.status, detail);
+}
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetchApi(`/api${path}`, {
     ...init,
     headers: { "Content-Type": "application/json", ...init?.headers },
   });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, body.detail ?? res.statusText);
-  }
+  if (!res.ok) throw await responseError(res);
   return res.json() as Promise<T>;
 }
 
@@ -38,11 +43,8 @@ export const api = {
     const body = new FormData();
     body.append("file", file);
     if (name?.trim()) body.append("name", name.trim());
-    const res = await fetch("/api/projects/uploads", { method: "POST", body });
-    if (!res.ok) {
-      const b = await res.json().catch(() => ({}));
-      throw new ApiError(res.status, b.detail ?? res.statusText);
-    }
+    const res = await fetchApi("/api/projects/uploads", { method: "POST", body });
+    if (!res.ok) throw await responseError(res);
     return (await res.json()) as ProjectUploadResponse;
   },
   importPath: (id: string, path: string) => post<Manifest>(`/projects/${id}/imports`, { path }),
@@ -50,10 +52,7 @@ export const api = {
     const body = new FormData();
     body.append("file", file);
     const res = await fetchApi(`/api/projects/${id}/uploads`, { method: "POST", body });
-    if (!res.ok) {
-      const b = await res.json().catch(() => ({}));
-      throw new ApiError(res.status, b.detail ?? res.statusText);
-    }
+    if (!res.ok) throw await responseError(res);
     return (await res.json()) as Manifest;
   },
   inventory: (id: string) => req<Manifest>(`/projects/${id}/inventory`),
@@ -81,13 +80,26 @@ export const api = {
     post<TalendApplyPreview>(`/projects/${id}/plans/${enc(file)}/talend-apply/preview`),
   talendApplyStatus: (id: string, file: string) =>
     req<TalendApplyState>(`/projects/${id}/plans/${enc(file)}/talend-apply`),
-  talendApplyBatch: (id: string) => post<TalendApplyBatchState>(`/projects/${id}/talend-apply-batch`),
+  talendApplyBatch: (id: string, expectedRevision?: string) => post<TalendApplyBatchState>(`/projects/${id}/talend-apply-batch`, expectedRevision ? { expected_revision: expectedRevision } : undefined),
   talendApplyBatchStatus: (id: string) => req<TalendApplyBatchState>(`/projects/${id}/talend-apply-batch`),
+  talendApplyBatchSummary: (id: string) => req<TalendApplyBatchSummary>(`/projects/${id}/talend-apply-batch/summary`),
   exportAll: (id: string) => post<{ directory: string; files: string[] }>(`/projects/${id}/exports`),
   exportFile: (id: string, name: string) => `/api/projects/${id}/exports/${encodeURIComponent(name)}`,
   catalog: (q: string, family: string) =>
     req<CatalogList>(`/talend/catalog?q=${encodeURIComponent(q)}${family ? `&family=${encodeURIComponent(family)}` : ""}`),
   component: (name: string) => req<CatalogComponent>(`/talend/catalog/${encodeURIComponent(name)}`),
   studioConfiguration: () => req<{ target: string; source: string; markdown: string }>("/talend/studio-configuration"),
-  talendHealth: () => req<{ available: boolean; mcp_available?: boolean; bridge_available?: boolean; write_enabled: boolean; apply_folder: string; jobs?: number; error?: string }>("/integrations/talend/health"),
+  talendHealth: () => req<{
+    available: boolean;
+    mcp_available?: boolean;
+    bridge_available?: boolean;
+    bridge_mode?: string;
+    unsafe_actions?: boolean;
+    write_enabled: boolean;
+    apply_folder: string;
+    mcp_url?: string;
+    timeout_seconds?: number;
+    jobs?: number;
+    error?: string;
+  }>("/integrations/talend/health"),
 };

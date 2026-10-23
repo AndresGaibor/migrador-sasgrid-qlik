@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api } from "../api";
 import { useAsync } from "../hooks";
 import { Icon } from "../components/Icon";
+import { notifyError, notifySuccess } from "../errors";
 import { Badge, Load, link } from "./common";
 import { ReplaceImportDialog, SasFileUpload, ServerPathImport, type ImportSource } from "./import/ImportComponents";
 import { ArchivePathTree } from "../components/ArchivePathTree";
@@ -14,10 +15,12 @@ export function ImportTab({ id, go }: { id: string; go: (h: string) => void }) {
   const runImport = async (source: ImportSource) => {
     setBusy(true); setErr(undefined);
     try {
-      if (typeof source === "string") await api.importPath(id, source);
-      else await api.upload(id, source);
+      const manifest = typeof source === "string"
+        ? await api.importPath(id, source)
+        : await api.upload(id, source);
+      notifySuccess("Archivos cargados", `${manifest.files.length} archivos quedaron disponibles en el inventario.`);
       go(`/p/${id}/inventario`);
-    } catch (x) { setErr((x as Error).message); }
+    } catch (x) { setErr(notifyError(x, "No se pudieron importar los archivos")); }
     finally { setBusy(false); }
   };
   const requestImport = async (source: ImportSource) => {
@@ -27,7 +30,7 @@ export function ImportTab({ id, go }: { id: string; go: (h: string) => void }) {
       const current = await api.inventory(id);
       if (current.files.length) setPending({ source, count: current.files.length });
       else await runImport(source);
-    } catch (x) { setErr((x as Error).message); }
+    } catch (x) { setErr(notifyError(x, "No se pudo preparar la importación")); }
     finally { setBusy(false); }
   };
   const upload = (file: File) => {

@@ -1,57 +1,71 @@
 import { useEffect, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import { Icon } from "../components/Icon";
-import { api } from "../api";
+import { api, ApiError } from "../api";
+import { formatErrorMessage, notifyError, notifySuccess } from "../errors";
 import { useAsync } from "../hooks";
 import { ComponentIcon } from "../components/ComponentIcon";
-import type { GridRecommendation, JobPlan, PlanRow, Step, TalendApplyBatchJob, TalendApplyBatchState, TalendApplyState } from "../types";
+import type { GridRecommendation, JobPlan, PlanRow, Step, TalendApplyBatchJob, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyState } from "../types";
 import { Badge, Load, link } from "./common";
 import { orderSteps } from "../guided";
 import { buildGridGuides } from "../grid-guide";
 import { PlanPreparation } from "./plans/PlanPreparation";
 import { decodeProgress, encodeProgress, isUncertainStep, storageStatus, type GuideProgress } from "../guide-progress";
-import { Button } from "@/components/ui/button";
 import { StepDecisionDialogs, StepInstructions, StepProgressEditor } from "./plans/PlanStepParts";
 import { PlanListContent } from "./plans/PlanListContent";
 import { ArchivePathTree } from "../components/ArchivePathTree";
+import { Dialog } from "../components/Dialog";
+import { TalendPreflight } from "./plans/TalendPreflight";
 
-export function PlansTab({ id, file, projectName, archiveName }: { id: string; file?: string; projectName?: string; archiveName?: string | null }) {
-  return file ? <PlanDetail key={`${id}:${decodeURI(file)}`} id={id} file={decodeURI(file)} /> : <PlanList id={id} projectName={projectName} archiveName={archiveName} />;
+export function PlansTab({ id, file }: { id: string; file?: string }) {
+  return file ? <PlanDetail key={`${id}:${decodeURI(file)}`} id={id} file={decodeURI(file)} /> : <PlanList id={id} />;
 }
 
 // Los ZIP de Mac traen basura «__MACOSX»; se oculta aunque venga de proyectos ya importados.
 const real = (rows: PlanRow[]) => rows.filter((r) => !r.program.includes("__MACOSX/"));
 const PARENT_PATTERN = /include_dispatch|sysin|submit/;
-function parentFiles(grid?: GridRecommendation[]) {
-  return new Set((grid ?? []).filter((g) => PARENT_PATTERN.test(g.pattern_id)).map((g) => g.evidence.file));
-}
-// Orden de construcción: lo que otros usan primero, lo que lanza a los demás al final.
-function visible(rows: PlanRow[], grid?: GridRecommendation[]) {
-  return buildOrder(real(rows), parentFiles(grid)).flatMap((g) => g.rows);
-}
-function buildOrder(rows: PlanRow[], parents: Set<string>) {
-  const todo = rows.filter((r) => r.steps > 0);
-  const groups = [
-    { title: "Primero: piezas base", hint: "Macros y formatos que usan los demás programas. Constrúyelos antes.", rows: todo.filter((r) => /\/(Macro|Formats)\//.test(r.program) && !parents.has(r.program)) },
-    { title: "Después: los procesos", hint: "Un Job por cada programa de negocio.", rows: todo.filter((r) => !/\/(Macro|Formats)\//.test(r.program) && !parents.has(r.program)) },
-    { title: "Al final: los Jobs que lanzan a los demás", hint: "Unen los procesos anteriores en el orden correcto.", rows: todo.filter((r) => parents.has(r.program)) },
-  ];
-  return groups.filter((g) => g.rows.length > 0);
+function useDesktopLayout() {
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 601px)").matches);
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 601px)");
+    const update = () => setIsDesktop(desktop.matches);
+    desktop.addEventListener("change", update);
+    return () => desktop.removeEventListener("change", update);
+  }, []);
+  return isDesktop;
 }
 
-function PlanList({ id, projectName, archiveName }: { id: string; projectName?: string; archiveName?: string | null }) {
+function visible(rows: PlanRow[], programOrder?: string[]) {
+  const todo = real(rows).filter((row) => row.steps > 0);
+  if (!programOrder) return todo;
+  const rank = new Map(programOrder.map((program, index) => [program, index]));
+  return todo.sort((a, b) => (rank.get(a.program) ?? programOrder.length) - (rank.get(b.program) ?? programOrder.length));
+}
+
+function PlanList({ id }: { id: string }) {
   const q = useAsync(() => api.plans(id), [id]);
   const grid = useAsync(() => api.gridRecommendations(id), [id]);
   const health = useAsync(() => api.talendHealth(), [id]);
   const batch = useAsync(() => api.talendApplyBatchStatus(id), [id], { preserveDataOnError: true });
+  const summary = useAsync(() => api.talendApplyBatchSummary(id), [id]);
+  const isDesktop = useDesktopLayout();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string>();
   const [batchBusy, setBatchBusy] = useState(false);
   const [batchError, setBatchError] = useState<string>();
+  const [confirmation, setConfirmation] = useState<TalendApplyBatchSummary>();
   const batchState = batch.data;
   const batchActive = batchState?.status === "queued" || batchState?.status === "running";
   const batchFinished = batchState?.status === "applied" || batchState?.status === "conflict";
-  const canStartBatch = Boolean(q.data?.length && health.data?.available && health.data.write_enabled && !batchBusy && !batchActive && !batchFinished);
+  const canStartBatch = Boolean(q.data?.length && summary.data?.creatable_jobs && !summary.loading && !summary.error && batch.data && !batch.error && health.data?.available && health.data.write_enabled && !health.loading && !busy && !batchBusy && !batchActive && !batchFinished);
+  const gridGuides = grid.data && <GridRecommendations id={id} items={grid.data} isDesktop={isDesktop} staged />;
+  const planContent = q.error?.includes("generados") ? (
+    <div className="notice"><Icon name="info" /><span>Todavía no hay guías preparadas para este proyecto. Usa «Preparar guías de migración» para empezar.</span></div>
+  ) : (
+    <Load q={q}>
+      {(all) => { const rows = real(all); return <PlanListContent id={id} rows={rows} groups={[{ title: summary.data ? "Orden de revisión por dependencias" : "Guías del proyecto", hint: summary.data ? "El mismo orden de dependencias que utiliza la creación en Studio. Los ciclos requieren revisión manual; este listado no programa la ejecución." : "Orden de dependencias no disponible. Puedes revisar las guías; confirma las dependencias antes de ejecutar los Jobs.", rows: visible(rows, summary.data?.programs.map((job) => job.program)) }]} isDesktop={isDesktop} orderVerified={Boolean(summary.data)} />; }}
+    </Load>
+  );
   useEffect(() => {
     if (!batchActive && !batch.error) return;
     const timer = window.setInterval(batch.reload, 1200);
@@ -61,86 +75,111 @@ function PlanList({ id, projectName, archiveName }: { id: string; projectName?: 
     setBusy(true);
     setErr(undefined);
     try {
-      await api.generatePlans(id);
+      const result = await api.generatePlans(id);
+      notifySuccess("Guías preparadas", `${result.plans} guías listas para revisar.`);
       q.reload();
       grid.reload();
+      summary.reload();
     } catch (x) {
-      setErr((x as Error).message);
+      setErr(notifyError(x, "No se pudieron preparar las guías"));
     } finally {
       setBusy(false);
     }
   };
   const implementProject = async () => {
+    if (!confirmation || !canStartBatch) return;
     setBatchBusy(true);
     setBatchError(undefined);
     try {
-      await api.talendApplyBatch(id);
+      await api.talendApplyBatch(id, confirmation.revision_hash);
+      setConfirmation(undefined);
+      notifySuccess("Creación iniciada", "El MCP creará la estructura de los Jobs; no los ejecutará.");
       batch.reload();
     } catch (x) {
-      setBatchError((x as Error).message);
+      setBatchError(notifyError(x, "No se pudo iniciar la creación en Talend Studio"));
+      if (x instanceof ApiError && x.status === 409) {
+        setConfirmation(undefined);
+        summary.reload();
+        batch.reload();
+      }
     } finally {
       setBatchBusy(false);
     }
   };
   return (
     <>
-      <h1>Tu plan de trabajo en Talend Studio</h1>
-      <p className="subtitle">Construye los Jobs de arriba abajo. Al abrir uno, la guía te dice qué arrastrar y qué escribir.</p>
-      <div className="panel"><Button onClick={gen} disabled={busy}><Icon name="play" size={16} />{busy ? "Preparando guías…" : q.data?.length ? "Volver a preparar las guías" : "Preparar guías de migración"}</Button><p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>Lo que ya marcaste como hecho se conserva.</p></div>
+      <div className="migration-heading"><div><h1>Plan de migración</h1><p className="subtitle">Primero crea la estructura, después completa los Jobs y al final programa su ejecución.</p></div>
+      <div className="plan-rebuild-toolbar"><button type="button" className={q.data?.length ? "secondary" : undefined} onClick={gen} disabled={busy || batchActive || batchBusy || Boolean(confirmation)} title="Tu progreso se conserva al volver a preparar las guías"><Icon name="play" size={16} />{busy ? "Preparando guías…" : q.data?.length ? "Actualizar guías" : "Preparar guías de migración"}</button><small>Tu progreso se conserva.</small></div></div>
       {err && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{err}</span></div>}
+      <div className="migration-workspace">
       {q.data?.length ? <section className="talend-batch-panel" aria-labelledby="talend-batch-title">
-        <div className="talend-batch-heading"><div><span className="eyebrow">IMPLEMENTACIÓN DEL PROYECTO</span><h2 id="talend-batch-title">Crear todos los Jobs en Talend</h2><p>Un solo envío comparte con el MCP las instrucciones de todos los programas de este ZIP, en orden de dependencias. Los detalles incompletos permanecen como pendientes en cada Job.</p></div>
-          <span className={`talend-mcp-status ${health.data?.available ? health.data.write_enabled ? "online" : "readonly" : "offline"}`} role="status" aria-live="polite">{health.loading ? "Consultando MCP…" : health.data?.available ? health.data.write_enabled ? "MCP y Bridge listos" : "MCP en solo lectura" : health.data?.mcp_available ? "Bridge sin conexión" : "MCP sin conexión"}</span>
+        <div className="talend-batch-heading"><div><h2 id="talend-batch-title">1. Crea la estructura de los Jobs</h2><p>El MCP crea componentes y conexiones en Talend Studio; no se ejecutan ni se publican en Qlik Talend Cloud.</p></div>
+          <span className={`talend-mcp-status ${health.loading ? "readonly" : health.data?.available ? health.data.write_enabled ? "online" : "readonly" : "offline"}`} role="status" aria-live="polite">{health.loading ? "Consultando MCP…" : health.data?.available ? health.data.write_enabled ? "MCP y Bridge listos" : "MCP en solo lectura" : health.data?.mcp_available ? "Bridge sin conexión" : "MCP sin conexión"}</span>
         </div>
-        <div className="talend-batch-project"><Icon name="folder" size={18} /><span><strong>{archiveName ?? projectName ?? `Proyecto ${id}`}</strong><small>{q.data.length} Jobs · destino raíz <code>{health.data?.apply_folder ?? "Process/PruebasWebSAS"}</code></small></span></div>
-        <button type="button" className="talend-implement-button talend-batch-button" onClick={() => void implementProject()} disabled={!canStartBatch}>
-          <Icon name="flow" size={20} />{batchBusy || batchActive ? "Implementando lote en Talend…" : batchState?.status === "applied" ? "Todos los Jobs implementados" : batchState && ["failed", "partially_applied", "interrupted"].includes(batchState.status) ? "Reintentar Jobs pendientes" : "Implementar todos los flujos del ZIP en Talend"}
+        {summary.loading ? <p className="muted" role="status">Preparando vista previa del proyecto…</p> : summary.data ? <TalendPreflight id={id} summary={summary.data} /> : <div className="preflight-unavailable" role="alert"><p>No se pudo preparar la vista previa: {formatErrorMessage(summary.error, undefined, summary.errorStatus)}</p><button type="button" className="secondary" onClick={summary.reload}>Reintentar vista previa</button></div>}
+        <button type="button" className="talend-implement-button talend-batch-button" onClick={() => { setBatchError(undefined); setConfirmation(summary.data); }} disabled={!canStartBatch}>
+          <Icon name="flow" size={20} />{batchBusy || batchActive ? "Creando Jobs en Talend Studio…" : batchState?.status === "applied" ? "Estructura creada; continúa con las guías" : batchState && ["failed", "partially_applied", "interrupted"].includes(batchState.status) ? "Revisar reintento de Jobs" : "Revisar creación en Studio"}
         </button>
-        {health.data?.error && <p className="error" role="alert">{health.data.error}</p>}
-        {health.error && <p className="error" role="alert">{health.error}</p>}
-        {batchError && <p className="error" role="alert">No se pudo iniciar el lote: {batchError}</p>}
-        {batch.error && <p className="error" role="alert">No se pudo actualizar el progreso del lote: {batch.error}. Se volverá a intentar automáticamente.</p>}
+        <p className="muted talend-batch-followup">Después de crear la estructura, continúa con el paso 2. Para construirla manualmente, empieza directamente por sus guías.</p>
+        {health.data?.error && <p className="error" role="alert">{formatErrorMessage(health.data.error)}</p>}
+        {health.error && <p className="error" role="alert">{formatErrorMessage(health.error, undefined, health.errorStatus)}</p>}
+        {batchError && <p className="error" role="alert">{batchError}</p>}
+        {batch.error && <p className="error" role="alert">No se pudo actualizar el progreso del lote: {formatErrorMessage(batch.error, undefined, batch.errorStatus)} Se volverá a intentar automáticamente.</p>}
         {health.data?.available && !health.data.write_enabled && <p className="muted">Activa <code>TALEND_MCP_READONLY=false</code> en la API y reiníciala para permitir la creación.</p>}
-        {!health.loading && !health.data?.available && <p className="muted">Abre Talend Studio con el Bridge activo y verifica la conexión MCP antes de iniciar.</p>}
+        {!health.loading && !health.data?.available && <div className="preflight-unavailable"><p>Abre Talend Studio con el Bridge activo. Puedes continuar con las guías sin conexión.</p><button type="button" className="secondary" onClick={health.reload}>Comprobar conexión</button><a href="#/settings">Diagnóstico MCP</a></div>}
         {batchState && batchState.status !== "not_started" && <div className={`talend-batch-state ${batchState.status}`} role="status" aria-live="polite">
           <div className="talend-batch-state-heading"><strong>{talendApplyBatchLabel(batchState.status)}</strong><span>{batchState.completed_jobs} / {batchState.total_jobs} Jobs resueltos</span></div>
-          {batchActive && batchState.total_jobs > 0 && <div className="talend-batch-progress" role="progressbar" aria-label="Progreso de implementación del proyecto" aria-valuemin={0} aria-valuemax={batchState.total_jobs} aria-valuenow={batchState.completed_jobs}><span style={{ width: `${Math.round((batchState.completed_jobs / batchState.total_jobs) * 100)}%` }} /></div>}
-          {batchActive && <p>{batchState.current_program ? <>MCP trabajando en <code>{batchState.current_program}</code></> : "El MCP está preparando el primer Job…"} Talend no ejecutará los Jobs.</p>}
-          {batchState.error && <p className="error">{batchState.error}</p>}
+          {batchActive && batchState.total_jobs > 0 && <div className="talend-batch-progress" role="progressbar" aria-label="Progreso de creación de Jobs" aria-valuemin={0} aria-valuemax={batchState.total_jobs} aria-valuenow={batchState.completed_jobs}><span style={{ width: `${Math.round((batchState.completed_jobs / batchState.total_jobs) * 100)}%` }} /></div>}
+          {batchActive && <p>{batchState.current_program ? <>MCP trabajando en <code>{batchState.current_program}</code></> : "El MCP está preparando el primer Job…"} {batchState.current_program === null ? "" : batchState.jobs.find((item) => item.program === batchState.current_program)?.phase === "applying" ? "Fase: creando componentes." : batchState.jobs.find((item) => item.program === batchState.current_program)?.phase === "inspecting" ? "Fase: verificando el Job en Studio." : ""} Talend no ejecutará los Jobs.</p>}
+          {batchState.error && <p className="error" role="alert">{formatErrorMessage(batchState.error)}</p>}
           {batchState.warnings.map((warning, index) => <p className="notice warning" key={`batch-warning-${index}`}>{warning}</p>)}
           {batchState.jobs.length > 0 && <ArchivePathTree entries={batchState.jobs.map((job) => ({ path: job.program, value: job }))} renderEntry={({ path, value: job }) => <BatchJobRow key={path} projectId={id} path={path} job={job} />} />}
           {!batchActive && batchState.jobs.length > 0 && <p className="muted">El lote terminó. Revisa los resultados por programa; esta acción crea los Jobs pero no los ejecuta.</p>}
         </div>}
       </section> : null}
-      {grid.data && <GridRecommendations id={id} items={grid.data} />}
-      {q.error?.includes("generados") ? (
-        <div className="notice"><Icon name="info" /><span>Todavía no hay guías preparadas para este proyecto. Usa «Preparar guías de migración» para empezar.</span></div>
-      ) : (
-        <Load q={q}>
-          {(all) => { const rows = real(all); return <PlanListContent id={id} rows={rows} groups={buildOrder(rows, parentFiles(grid.data))} />; }}
-        </Load>
-      )}
+      <section className="migration-guides" aria-labelledby="migration-guides-title"><h2 id="migration-guides-title">2. Completa y prueba los Jobs</h2><p className="migration-stage-description">Revisa cada Job y marca los pasos terminados. Si usaste MCP, completa los pendientes sin volver a crear lo que ya existe.</p>{planContent}</section>
+      <div className="migration-reference">{gridGuides}</div>
+      </div>
+      {confirmation && <Dialog title="Confirmar creación en Talend Studio" onClose={() => { if (!batchBusy) setConfirmation(undefined); }}>
+        <p>Se creará o reutilizará la estructura de los Jobs en la carpeta de este proyecto. No se ejecutarán ni se publicarán Jobs.</p>
+        <TalendPreflight id={id} summary={confirmation} />
+        {batchError && <p className="error" role="alert">{batchError}</p>}
+        <div className="dialog-actions"><button type="button" className="secondary" disabled={batchBusy} onClick={() => setConfirmation(undefined)}>Cancelar</button><button type="button" disabled={!canStartBatch} onClick={() => void implementProject()}>{batchBusy ? "Iniciando…" : "Crear Jobs en Talend Studio"}</button></div>
+      </Dialog>}
     </>
   );
 }
 
-function BatchJobRow({ projectId, path, job }: { projectId: string; path: string; job: TalendApplyBatchJob }) {
+export function BatchJobRow({ projectId, path, job }: { projectId: string; path: string; job: TalendApplyBatchJob }) {
   const result = job.result;
+  const reviewRequired = Boolean(result?.review_required || result?.review_warnings?.length || result?.warnings.length || result?.blocked_steps.length);
+  const warnings = [...(result?.warnings ?? []), ...(result?.review_warnings ?? [])];
   return <article className={`talend-batch-job ${job.status}`}>
-    <div className="talend-batch-job-heading"><Icon name={job.status === "applied" ? "check" : job.status === "running" ? "flow" : job.status === "pending" ? "info" : "warning"} size={17} /><strong>{result?.identity.job_name ?? path}</strong><span>{talendApplyJobLabel(job.status)}</span></div>
+    <div className="talend-batch-job-heading"><Icon name={reviewRequired ? "warning" : job.status === "applied" ? "check" : job.status === "running" ? "flow" : job.status === "pending" ? "info" : "warning"} size={17} /><strong>{result?.identity.job_name ?? path}</strong><span>{job.status === "applied" && reviewRequired ? "Estructura creada; revisión pendiente" : talendApplyJobLabel(job.status)}</span></div>
     <p className="muted"><code>{path}</code>{result?.result.itemPath && <> · destino <code>{result.result.itemPath}</code></>}</p>
-    {result && <p className="talend-batch-job-metrics">{result.result.generatedComponents ?? 0} componentes · {result.result.generatedConnections ?? 0} conexiones · {result.result.generatedContexts ?? 0} variables de contexto</p>}
-    {job.error && <p className="error" role="alert">{job.error}</p>}
-    {result && (result.warnings.length > 0 || result.blocked_steps.length > 0) && <details><summary>Información técnica pendiente</summary><ul>{result.warnings.map((warning, index) => <li key={`warning-${index}`}>{warning}</li>)}{result.blocked_steps.map((block) => <li key={block.step_id}><strong>{block.step_id === "job" ? "Job" : `Paso ${block.step_id}`}:</strong> {block.reason}</li>)}</ul></details>}
+    {result && <p className="talend-batch-job-metrics">{result.result.totalComponents ?? (result.result.generatedComponents ?? 0) + (result.result.reusedComponents ?? 0)} componentes · {(result.result.generatedConnections ?? 0) + (result.result.reusedConnections ?? 0)} conexiones · {(result.result.generatedContexts ?? 0) + (result.result.updatedContexts ?? 0) + (result.result.reusedContexts ?? 0)} variables de contexto</p>}
+    {job.error && <p className="error" role="alert">{formatErrorMessage(job.error)}</p>}
+    {result?.verification && <p className="talend-batch-job-verification">{result.verification.status === "inspected"
+      ? <>Inspeccionado en Studio: {result.verification.components_created} componentes encontrados; {result.verification.components_requested} solicitados.</>
+      : <>Verificación no disponible: {result.verification.reason ?? "el MCP no pudo inspeccionar el Job."}</>}
+      {result.verification.studio_problems && (result.verification.studio_problems.clean
+        ? <Badge tone="ok">Sin avisos de diseño</Badge>
+        : <Badge tone="warn">Revisar avisos en Studio</Badge>)}
+    </p>}
+    {result?.verification && result.verification.missing_components.length > 0 && <details><summary>Componentes que no aparecen en Studio ({result.verification.missing_components.length})</summary><ul>{result.verification.missing_components.map((name) => <li key={name}><code>{name}</code></li>)}</ul></details>}
+    {result?.verification?.studio_problems && !result.verification.studio_problems.clean && <details><summary>Avisos de la vista Problemas de Studio</summary><ul>{result.verification.studio_problems.items.map((item, index) => <li key={index}>{item.severity ? `[${item.severity}] ` : ""}{item.message ?? JSON.stringify(item)}</li>)}</ul></details>}
+    {result && (warnings.length > 0 || result.blocked_steps.length > 0) && <details><summary>Información técnica pendiente</summary><ul>{warnings.map((warning, index) => <li key={`warning-${index}`}>{warning}</li>)}{result.blocked_steps.map((block) => <li key={block.step_id}><strong>{block.step_id === "job" ? "Job" : `Paso ${block.step_id}`}:</strong> {block.reason}</li>)}</ul></details>}
     <a className="talend-batch-job-link" href={link(projectId, "planes", path)}>Abrir guía</a>
   </article>;
 }
 
 function PlanDetail({ id, file }: { id: string; file: string }) {
+  const isDesktop = useDesktopLayout();
   const q = useAsync(() => api.plan(id, file), [id, file]);
   const jobs = useAsync(() => api.plans(id), [id]);
   const gridQ = useAsync(() => api.gridRecommendations(id), [id]);
-  const ordered = visible(jobs.data ?? [], gridQ.data);
+  const summary = useAsync(() => api.talendApplyBatchSummary(id), [id]);
+  const ordered = visible(jobs.data ?? [], summary.data?.programs.map((job) => job.program));
   const ownGrid = (gridQ.data ?? []).filter((g) => g.evidence.file === file);
   const [override, setOverride] = useState<JobPlan>();
   const [saving, setSaving] = useState(false);
@@ -197,16 +236,16 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
             <h1>{p.job_name}</h1>
             <p className="subtitle">Sigue las tarjetas en orden para configurar cada componente; el estado muestra el avance general del componente.</p>
             <section className="talend-apply-panel" aria-label="Estado de implementación en Talend">
-              <div className="talend-apply-heading"><div><h2>Estado en Talend</h2><p>Los Jobs se crean desde la acción del proyecto; aquí puedes consultar el resultado de este programa.</p></div><span className={`talend-mcp-status ${health.data?.available ? health.data.write_enabled ? "online" : "readonly" : "offline"}`} role="status">{health.loading ? "Consultando MCP…" : health.data?.available ? health.data.write_enabled ? "MCP listo" : "Solo lectura" : "MCP sin conexión"}</span></div>
-              {health.error && <p className="error" role="alert">{health.error}</p>}
-              {preview.error && <p className="error" role="alert">No se pudo preparar el destino: {preview.error}</p>}
+              <div className="talend-apply-heading"><div><h2>Creación en Talend Studio</h2><p>El MCP crea la estructura del Job; no lo ejecuta ni lo publica en Qlik Talend Cloud.</p></div><span className={`talend-mcp-status ${health.data?.available ? health.data.write_enabled ? "online" : "readonly" : "offline"}`} role="status">{health.loading ? "Consultando MCP…" : health.data?.available ? health.data.write_enabled ? "MCP listo" : "Solo lectura" : "MCP sin conexión"}</span></div>
+              {health.error && <p className="error" role="alert">{formatErrorMessage(health.error, undefined, health.errorStatus)}</p>}
+              {preview.error && <p className="error" role="alert">No se pudo preparar el destino: {formatErrorMessage(preview.error, undefined, preview.errorStatus)}</p>}
               {preview.data && <p className="muted">Destino: <code>{preview.data.identity.folder_path}</code> · {preview.data.components?.length ?? 0} componentes · {preview.data.connections?.length ?? 0} conexiones.</p>}
-              {batchJob ? <BatchJobRow projectId={id} path={file} job={batchJob} /> : applyStatus.data && <p className="talend-persisted-status" role="status"><Icon name={isApplyRunning ? "flow" : applyStatus.data.status === "applied" ? "check" : "info"} size={17} /> {applyStatusLabel(applyStatus.data.status)}{applyStatus.data.error && `: ${applyStatus.data.error}`}</p>}
+              {batchJob ? <BatchJobRow projectId={id} path={file} job={batchJob} /> : applyStatus.data && <p className="talend-persisted-status" role="status"><Icon name={isApplyRunning ? "flow" : applyStatus.data.status === "applied" ? "check" : "info"} size={17} /> {applyStatusLabel(applyStatus.data.status)}{applyStatus.data.error && `: ${formatErrorMessage(applyStatus.data.error)}`}</p>}
               {latestResult && <p className="muted">{latestResult.result.generatedComponents ?? 0} componentes · {latestResult.result.generatedConnections ?? 0} conexiones. {latestResult.warnings[0] ?? latestResult.blocked_steps[0]?.reason ?? ""}</p>}
             </section>
             <p><strong>Programa SAS de origen:</strong> <a href={link(id, "programas", p.program)}><code>{p.program}</code></a></p>
             <PlanPreparation plan={p} />
-            {ownGrid.length > 0 && <GridRecommendations id={id} items={ownGrid} />}
+            {ownGrid.length > 0 && <GridRecommendations id={id} items={ownGrid} isDesktop={isDesktop} />}
             <h2>{ownGrid.some((g) => PARENT_PATTERN.test(g.pattern_id)) ? "Después: el resto del programa" : "Construye el Job"}</h2>
             <StepGroups id={id} steps={p.steps} onDecide={decide} />
             {p.children.map((c) => (
@@ -227,25 +266,31 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
     </>
   );
 }
-function GridRecommendations({ id, items }: { id: string; items: GridRecommendation[] }) {
+export function GridRecommendations({ id, items, isDesktop, staged = false }: { id: string; items: GridRecommendation[]; isDesktop: boolean; staged?: boolean }) {
   const guides = buildGridGuides(items);
   return (
-    <section aria-label="Orquestación y planificación">
-      <h2>{guides.some((g) => g.kind === "build") ? "Primero: encadena los programas" : "Aparte: se hace fuera de Talend"}</h2>
+    <section className="orchestration-guides" aria-label="Orquestación y planificación">
+      <h2>{staged ? "3. Conecta los Jobs y programa su ejecución" : "Dependencias y programación"}</h2>
+      <p className="migration-stage-description">{staged ? "Hazlo después de completar y probar los Jobs del paso 2. " : "Primero completa y prueba los Jobs hijos. "}Revisa los Jobs principales que llaman a otros; después configura el calendario en Qlik Talend Cloud.</p>
+      <p className="orchestration-reuse-note"><Icon name="info" size={17} /><span>Si MCP ya creó un Job principal y sus conexiones, verifica esa estructura en Studio; no la crees otra vez. Las instrucciones siguientes también sirven para construirla manualmente.</span></p>
       {guides.map((g, gi) => (
-        <details className="panel" key={g.key} open={gi === 0}>
-          <summary><b>{g.title}</b> <Badge tone={g.kind === "build" ? "ok" : "warn"}>{g.kind === "build" ? "Se hace en Talend Studio" : "Se hace fuera de Talend"}</Badge></summary>
-          <p className="muted">{g.intro} {g.component && <><ComponentIcon name={g.component} /> <ComponentLink name={g.component} known /></>} {g.doc_url && <a href={g.doc_url} target="_blank" rel="noreferrer">Docs oficiales Talend</a>}</p>
-          <ol>
+        <details className="panel plan-orchestration-card" key={g.key} open={!isDesktop && gi === 0}>
+          <summary><span className="orchestration-summary"><b>{g.title}</b><small>{g.actions.length} pasos</small></span> <Badge tone={g.kind === "manual" ? "warn" : "ok"}>{g.kind === "build" ? "Talend Studio" : g.kind === "cloud" ? "Qlik Talend Cloud" : "Validar con Operaciones"}</Badge></summary>
+          <div className="orchestration-intro"><p>{g.intro}</p><div>{g.component && <span className="orchestration-component"><ComponentIcon name={g.component} /> <ComponentLink name={g.component} known /></span>} {g.doc_url && <a href={g.doc_url} target="_blank" rel="noreferrer">Documentación oficial <Icon name="external" size={13} /></a>}</div></div>
+          <ol className="orchestration-steps">
             {g.actions.map((a, n) => (
               <li key={n}>
-                <b>{a.text}</b>
-                {a.where && <div className="muted">Dónde: {a.where}</div>}
-                {a.fields && <ul>{a.fields.map(([k, v]) => <li key={k}>{k}: <code>{v}</code></li>)}</ul>}
+                <div className="orchestration-step-heading"><span className="orchestration-step-number" aria-hidden="true">{n + 1}</span><h3>{a.text.replace(/^Paso \d+: /, "")}</h3></div>
+                <div className="orchestration-step-body">
+                {a.where && <div className="orchestration-location"><strong>Dónde</strong><p>{a.where}</p></div>}
+                {a.fields && <dl className="orchestration-fields">{a.fields.map(([k, v], index) => <div key={`${k}:${index}`}><dt>{k}</dt><dd><code>{v}</code></dd></div>)}</dl>}
+                {a.note && <p className="orchestration-note"><Icon name="info" size={16} /><span>{a.note}</span></p>}
+                {a.doc_url && <p className="guide-official-link"><a href={a.doc_url} target="_blank" rel="noreferrer">Consultar documentación de este paso <Icon name="external" size={13} /></a></p>}
+                </div>
               </li>
             ))}
           </ol>
-          <p className="muted">Origen en el SAS: {g.sources.map((r, n) => <span key={r.id}>{n > 0 && ", "}<a href={api.sourceEvidence(id, r.evidence.file, r.evidence.line)} target="_blank" rel="noreferrer">{r.evidence.file.split("/").pop()}:{r.evidence.line}</a></span>)}</p>
+          <details className="orchestration-sources"><summary>Referencias en el SAS ({g.sources.length})</summary><ul>{g.sources.map((r) => <li key={r.id}><a href={api.sourceEvidence(id, r.evidence.file, r.evidence.line)} target="_blank" rel="noreferrer">{r.evidence.file.split("/").pop()} · línea {r.evidence.line}</a></li>)}</ul></details>
         </details>
       ))}
     </section>
@@ -254,27 +299,27 @@ function GridRecommendations({ id, items }: { id: string; items: GridRecommendat
 
 function applyStatusLabel(status: TalendApplyState["status"]): string {
   const labels: Record<TalendApplyState["status"], string> = {
-    not_started: "Listo para implementar",
-    running: "El MCP está creando el Job",
-    applied: "Implementación completada",
+    not_started: "Listo para crear el Job",
+    running: "El MCP está creando el Job en Talend Studio",
+    applied: "Job creado en Talend Studio",
     partially_applied: "Job creado con información pendiente",
-    failed: "La implementación falló",
+    failed: "No se pudo crear el Job",
     conflict: "Destino con conflicto",
-    interrupted: "Implementación interrumpida",
+    interrupted: "Creación interrumpida",
   };
   return labels[status];
 }
 
 function talendApplyBatchLabel(status: TalendApplyBatchState["status"]): string {
   const labels: Record<TalendApplyBatchState["status"], string> = {
-    not_started: "Listo para implementar",
-    queued: "Lote en cola",
-    running: "El MCP está implementando los Jobs",
-    applied: "Todos los Jobs se implementaron",
-    partially_applied: "Lote terminado con resultados pendientes",
-    failed: "La implementación del lote falló",
+    not_started: "Listo para crear Jobs en Talend Studio",
+    queued: "Creación en cola",
+    running: "El MCP está creando Jobs en Talend Studio",
+    applied: "Jobs creados en Talend Studio",
+    partially_applied: "Jobs creados con información pendiente",
+    failed: "No se pudieron crear los Jobs",
     conflict: "Conflicto de revisión o destino",
-    interrupted: "Lote interrumpido; puedes reintentarlo",
+    interrupted: "Creación interrumpida; puedes reintentar",
   };
   return labels[status];
 }
@@ -282,9 +327,9 @@ function talendApplyBatchLabel(status: TalendApplyBatchState["status"]): string 
 function talendApplyJobLabel(status: TalendApplyBatchJob["status"]): string {
   const labels: Record<TalendApplyBatchJob["status"], string> = {
     pending: "Pendiente",
-    running: "Creando en Talend…",
-    applied: "Creado",
-    partially_applied: "Creado con información pendiente",
+    running: "Creando en Talend Studio…",
+    applied: "Job creado",
+    partially_applied: "Job creado con pendientes",
     failed: "Falló",
     conflict: "Conflicto",
     interrupted: "Interrumpido; puede reintentarse",
@@ -345,7 +390,7 @@ function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step
   const [confirmed, setConfirmed] = useState(false);
   const [err, setErr] = useState<string>();
   useEffect(() => { const current = decodeProgress(s.status, s.note); setProgress(current.state); setNote(current.note); setBlockReason(current.blockReason); }, [s.status, s.note]);
-  const save = (next: GuideProgress) => onDecide(s, next, note, blockReason).then(() => { setProgress(next); setDialog(null); setConfirmed(false); setErr(undefined); }).catch((e: Error) => setErr(e.message));
+  const save = (next: GuideProgress) => onDecide(s, next, note, blockReason).then(() => { setProgress(next); setDialog(null); setConfirmed(false); setErr(undefined); }).catch((error: unknown) => setErr(notifyError(error, "No se pudo guardar el avance")));
   const chooseProgress = (value: GuideProgress) => {
     if (value === "blocked") { setDialog("blocked"); return; }
     if (value === "completed" && isUncertainStep(s)) { setConfirmed(false); setDialog("confirm"); return; }
