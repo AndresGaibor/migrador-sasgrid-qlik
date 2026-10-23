@@ -14,7 +14,7 @@ test("builds a minimal current migration candidate scope", () => {
 
 test("active mapping candidates all exist in the current Studio 8 guide index", () => {
   const names = new Set(currentGuides.components.map((item) => item.name));
-  expect(getGuideCatalogItems().length).toBe(47);
+  expect(getGuideCatalogItems().length).toBe(42);
   expect(getGuideCatalogItems().every((item) => names.has(item.name))).toBe(true);
 });
 

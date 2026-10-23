@@ -3,6 +3,7 @@ import { Icon } from "../components/Icon";
 import { useAsync } from "../hooks";
 import { Badge, Load, link, prioTone } from "./common";
 import { sourceLines } from "../guided";
+import { ArchivePathTree } from "../components/ArchivePathTree";
 
 export function ProgramsTab({ id, file }: { id: string; file?: string }) {
   return file ? <ProgramDetail id={id} file={decodeURI(file)} /> : <ProgramList id={id} />;
@@ -15,20 +16,16 @@ function ProgramList({ id }: { id: string }) {
       <h1>Tus programas SAS</h1>
       <p className="subtitle">Selecciona un programa para revisar los aspectos que requieren atención. «Hallazgos» indica cuántos puntos identificó el análisis.</p>
       <Load q={q}>
-        {(rows) => rows.length ? (
-          <table>
-            <thead><tr><th>Archivo</th><th>Sentencias</th><th>Hallazgos</th></tr></thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.file}>
-                  <td><a href={link(id, "programas", r.file)}>{r.file}</a></td>
-                  <td className="num">{r.statements}</td>
-                  <td className="num">{r.findings}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
+        {(rows) => rows.length ? <ArchivePathTree
+          entries={rows.map((row) => ({ path: row.file, value: row }))}
+          renderEntry={({ path, name, value: row }) => (
+            <article className="archive-list-entry" key={path}>
+              <a href={link(id, "programas", path)}><span className="archive-file-name"><span aria-hidden="true">📄</span><code>{name}</code></span></a>
+              <span>{row.statements} sentencias</span>
+              <span>{row.findings} hallazgos</span>
+            </article>
+          )}
+        /> : (
           <div className="empty-state"><span className="empty-icon"><Icon name="file" size={30} /></span><h3>No se analizaron programas SAS</h3><p>El análisis no encontró archivos .sas. Revisa qué archivos se importaron o carga otro paquete.</p><div className="next-actions"><a className="button secondary" href={link(id, "inventario")}>Revisar mis archivos</a><a className="button" href={link(id, "importar")}><Icon name="upload" size={18} /> Cargar otros archivos</a></div></div>
         )}
       </Load>

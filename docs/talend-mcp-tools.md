@@ -1,24 +1,38 @@
-# Tools de talend-mcp (revisión F0)
+# Integración actual con Talend MCP
 
-Fuente: README de https://github.com/AndresGaibor/talend-mcp (clon superficial revisado 2026-10-17). Servidor para **Qlik Talend Studio**; HTTP en `127.0.0.1:3927/mcp` o stdio. Requiere `TALEND_WORKSPACE`. Los nombres de tools se tomaron del README; los esquemas de entrada/salida reales se verifican en F5 contra el servidor en ejecución (`tools/list`).
+El portal se conecta al MCP local por `TALEND_MCP_URL` (por defecto `http://127.0.0.1:3927/mcp`). La API FastAPI llama al MCP; el navegador no se conecta al MCP directamente.
 
-## Permitidas (solo lectura) — `talend_adapter/policy.py`
+## Tools usadas por el portal
 
-Inspección: `talend_detect_open_job`, `talend_list_jobs`, `talend_read_job`, `talend_read_contexts`, `talend_list_project_contexts`, `talend_list_repository_contexts`, `talend_read_repository_context`, `talend_list_components`, `talend_show_flow`, `talend_analyze_tdboutput`, `talend_read_latest_run_log`, `talend_read_job_errors`, `talend_summarize_open_job`, `talend_inspect_component`, `talend_inspect_job`, `talend_job_info`.
-Previsualización (no escribe): `talend_preview_component_parameter`, `talend_preview_schema_column`.
-Repo: `talend_repo_status`, `talend_repo_sources`.
+- `talend_jobs_list`: comprueba que el servidor MCP responde y devuelve el número de Jobs del workspace.
+- `talend_bridge_ping`: confirma que Talend Studio y el Bridge local están disponibles para aplicar cambios.
+- `talend_job_apply_custom_spec`: recibe la guía estructurada y aplica el Job mediante las operaciones de Studio.
 
-## Bloqueadas en el MVP
+La herramienta de escritura recibe `jobName`, `version`, `defaultContext`, `folderPath`, `description`, `purpose`, `components`, `connections`, `contexts` e `instructions`. Cada componente puede incluir propiedades, tablas, esquema, mapper y una marca de borrador con el motivo pendiente. El MCP valida el componente y sus propiedades contra la paleta y los parámetros que responde Studio.
 
-- Jobs/carpetas: `talend_create_job`, `talend_create_folder`, `talend_rename_job`, `talend_delete_job`, `talend_duplicate_job`, `talend_move_job_to_folder`.
-- Edición: `talend_update_component_parameter`, `talend_update_schema_column`, `talend_duplicate_component`, `talend_add_connection`, `talend_update_context`, `talend_upsert_context`, `talend_delete_context`, `talend_update_job_metadata`, `talend_create_repository_context`, `talend_upsert_repository_context_parameter`, `talend_delete_repository_context`.
-- Repo: `talend_repo_setup`, `talend_repo_pull`, `talend_repo_switch`.
-- Ejecución: `talend_run_job`.
+Una aplicación crea el Job en la carpeta configurada o reabre el Job coincidente y reutiliza sus componentes. Agrega contextos que faltan, conserva un valor de contexto existente cuando la nueva instrucción lo deja vacío y sustituye una conexión solo cuando la guía solicita la misma pareja de componentes con otro conector. Los componentes marcados como borrador reciben las propiedades verificadas por el portal; no se rellenan los datos desconocidos.
 
-## Notas
+## Contextos de migración
 
-- Las tools de edición solo operan en modo workspace local, no repo.
-- `talend_inspect_component` es la vía prevista para verificar nombres de propiedades y esquemas; no hay tool de catálogo global de componentes (solo componentes de un job existente), así que un componente que no aparezca en ningún Job de referencia queda `verified: false`.
-- El servidor además puede levantar un tunnel hacia OpenAI (`bun run start`); usar `bun run start:server` para el adaptador.
+El portal envía valores SAS solo cuando el análisis los conoce. Las variables desconocidas quedan vacías. Los pendientes técnicos se agrupan por paso o por asunto en contextos `migration_todo_<hash>` vacíos; sus comentarios conservan cada detalle de la guía. El hash mantiene un nombre estable entre reintentos. Al reaplicar una guía, el MCP sustituye los marcadores vacíos antiguos que creó el portal y conserva cualquier marcador que alguien ya haya llenado.
 
-- Con el catálogo (`rules/talend/components.json`) ya no hace falta un servidor vivo para conocer los nombres internos de parámetros; talend-mcp se usa solo para contrastar un Job real (`verified`).
+Al re aplicar una guía, un contexto `migration_todo_*` vacío no borra un valor que alguien haya completado en Talend. El MCP devuelve cuántos contextos agregó, actualizó o conservó.
+
+## Configuración local
+
+```dotenv
+TALEND_MCP_URL=http://127.0.0.1:3927/mcp
+TALEND_MCP_TIMEOUT_SECONDS=60
+TALEND_MCP_READONLY=false
+TALEND_APPLY_FOLDER=Process/PruebasWebSAS
+```
+
+El MCP configura su propio host y puerto con `TALEND_MCP_HOST` y `TALEND_MCP_PORT`. La URL de la API debe coincidir con esos valores. Mantén los procesos en el mismo Windows que Talend Studio para que MCP pueda comunicarse con el Bridge.
+
+`TALEND_MCP_READONLY=true` deshabilita la escritura desde el portal. `TALEND_APPLY_FOLDER` debe estar bajo `Process/`. La carpeta destino por ZIP es `<TALEND_APPLY_FOLDER>/<slug-del-ZIP>-<project_id>/<subcarpeta-del-programa>`; así dos ZIP con el mismo nombre se mantienen aislados y cada programa conserva su subcarpeta. La guía muestra la ruta exacta que se enviará al MCP.
+
+`TALEND_MCP_TIMEOUT_SECONDS` limita cuánto espera la API cada respuesta del MCP. El resultado del lote se persiste por proyecto y programa y la vista consulta el estado mientras corre o al recargarse. Los estados del lote son `queued`, `running`, `applied`, `partially_applied`, `failed`, `conflict` e `interrupted`; cada programa conserva además su resultado y error. Una revisión idéntica que ya terminó devuelve el resultado guardado; una colisión no sobrescribe el Job encontrado.
+
+El botón **Implementar todos los flujos del ZIP en Talend** inicia un lote de proyecto. La API ordena las guías por dependencias y hace llamadas secuenciales a `talend_job_apply_custom_spec`; el navegador nunca se conecta directamente al MCP. La vista de proyecto muestra el Job actual, el conteo terminado y los resultados de cada Job agrupados por las carpetas de origen. Un hijo que aparezca confirmado en la respuesta recursiva del MCP se registra en el lote y no se envía otra vez como Job independiente. Al fallar un Job, se conserva el error y se continúa con los siguientes.
+
+Los valores técnicos no resueltos se agregan como contextos `migration_todo_*` con su descripción. El resultado de cada Job puede ser completo o parcial. El lote no compila ni ejecuta los Jobs. La vista individual de una guía permite consultar el destino y resultado, pero la escritura comienza desde el botón único del proyecto.

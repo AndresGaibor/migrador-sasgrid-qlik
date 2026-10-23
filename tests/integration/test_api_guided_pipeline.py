@@ -84,15 +84,16 @@ def test_uploaded_grid_zip_produces_persistent_exportable_guide(tmp_path, monkey
     assert {"index.md", "steps.csv"} <= set(exported.json()["files"])
     download = client.get(f"/api/projects/{project_id}/exports/steps.csv")
     assert download.status_code == 200 and download.text.startswith("job,programa,paso_id")
+    assert "estado" not in download.text.splitlines()[0]
+    assert "Confirmar conexión de origen" not in download.text
     assert client.get(f"/api/projects/{project_id}/exports/../plans.json").status_code == 404
     export_dir = tmp_path / "data" / "projects" / project_id / "exports"
     plan_json = next(export_dir.glob("*.json"))
     exported_plan = json.loads(plan_json.read_text())
     assert exported_plan["program"] == "sas/daily.sas"
-    assert (
-        next(step for step in exported_plan["steps"] if step["id"] == step_id)["status"]
-        == "pendiente"
-    )
+    exported_step = next(step for step in exported_plan["steps"] if step["id"] == step_id)
+    assert "status" not in exported_step and "note" not in exported_step
+    assert "job_status" not in exported_plan
 
 
 def test_upload_rejects_unsupported_extension(tmp_path, monkeypatch):

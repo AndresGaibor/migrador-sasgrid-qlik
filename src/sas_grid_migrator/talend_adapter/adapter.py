@@ -1,7 +1,7 @@
-"""Cliente de solo lectura para talend-mcp. Opcional: el análisis SAS no depende de él.
+"""Cliente del MCP de Talend con allowlist de lectura y creación confirmada.
 
-Toda llamada pasa por `policy.assert_allowed`. Los esquemas de entrada/salida se tomaron del
-código de talend-mcp (revisión 2026-10-17); `inspect_*` reciben `jobPath` (ruta al .item).
+Toda llamada pasa por `policy.assert_allowed`. La escritura usa la tool tipada
+`talend_job_apply_custom_spec`; `inspect_*` reciben `jobPath` (ruta al .item).
 """
 
 import os
@@ -34,7 +34,13 @@ class McpCaller:
             async with Client(self.url) as client:
                 res = await client.call_tool(tool, args, read_timeout_seconds=self.timeout)
         except Exception as e:  # red, sesión o protocolo
-            raise TalendError(f"talend-mcp no disponible: {type(e).__name__}: {e}") from e
+            cause = e
+            while isinstance(cause, BaseExceptionGroup) and cause.exceptions:
+                cause = cause.exceptions[0]
+            raise TalendError(f"talend-mcp no disponible: {type(cause).__name__}: {cause}") from e
+        if getattr(res, "is_error", False):
+            detail = next((c.text for c in res.content if getattr(c, "text", None)), "error MCP")
+            raise TalendError(f"{tool}: {detail}")
         data = getattr(res, "structured_content", None)
         if data is None:
             import json
@@ -68,7 +74,9 @@ class TalendAdapter:
 
     @classmethod
     def from_env(cls) -> "TalendAdapter":
-        return cls(McpCaller(os.environ.get("TALEND_MCP_URL", "http://127.0.0.1:3927/mcp")))
+        url = os.environ.get("TALEND_MCP_URL", "http://127.0.0.1:3927/mcp")
+        timeout = float(os.environ.get("TALEND_MCP_TIMEOUT_SECONDS", "60"))
+        return cls(McpCaller(url, timeout=timeout))
 
     async def _data(self, tool: str, args: dict[str, Any] | None = None) -> dict[str, Any]:
         assert_allowed(tool)
@@ -83,13 +91,40 @@ class TalendAdapter:
 
     async def health_check(self) -> dict[str, Any]:
         try:
-            data = await self._data("talend_list_jobs")
+            data = await self._data("talend_jobs_list")
         except TalendError as e:
-            return {"available": False, "error": str(e)}
-        return {"available": True, "jobs": len(data.get("jobs", []))}
+            return {"available": False, "mcp_available": False, "error": str(e)}
+        jobs = len(data.get("jobs", []))
+        try:
+            bridge = await self._data("talend_bridge_ping")
+        except TalendError as e:
+            return {
+                "available": False,
+                "mcp_available": True,
+                "bridge_available": False,
+                "jobs": jobs,
+                "error": str(e),
+            }
+        if bridge.get("ok") is not True:
+            return {
+                "available": False,
+                "mcp_available": True,
+                "bridge_available": False,
+                "jobs": jobs,
+                "error": "Talend Studio Bridge no está disponible.",
+            }
+        return {
+            "available": True,
+            "mcp_available": True,
+            "bridge_available": True,
+            "bridge_mode": bridge.get("mode"),
+            "unsafe_actions": bridge.get("unsafeActions", False),
+            "jobs": jobs,
+        }
 
-    async def list_jobs(self) -> list[dict[str, Any]]:
-        return (await self._data("talend_list_jobs")).get("jobs", [])
+    async def list_jobs(self) -> list[str]:
+        jobs = (await self._data("talend_jobs_list")).get("jobs", [])
+        return [job for job in jobs if isinstance(job, str)]
 
     async def read_contexts(self, job_name: str) -> list[dict[str, Any]]:
         return (await self._data("talend_read_contexts", {"jobName": job_name})).get("contexts", [])
@@ -116,3 +151,39 @@ class TalendAdapter:
             connections=len(data.get("connections") or job.get("connections") or []),
             contexts=[c.get("name", "") for c in data.get("contexts") or job.get("contexts") or []],
         )
+
+    async def apply_custom_spec(self, arguments: dict[str, Any]) -> dict[str, Any]:
+        """Envía al MCP la instrucción completa para que Studio aplique el Job."""
+        write_enabled = os.environ.get("TALEND_MCP_READONLY", "false").strip().casefold() in {
+            "false", "0", "no", "off"
+        }
+        if not write_enabled:
+            raise TalendError(
+                "talend-mcp está en modo solo lectura; configura TALEND_MCP_READONLY=false para habilitar creación explícita."
+            )
+        return await self._studio_write("talend_job_apply_custom_spec", arguments)
+
+    async def _studio_write(self, tool: str, args: dict[str, Any]) -> dict[str, Any]:
+        assert_allowed(tool)
+        env = await self.caller.call(tool, args)
+        if not isinstance(env, dict) or env.get("ok") is not True:
+            error = env.get("error") if isinstance(env, dict) else None
+            if isinstance(error, dict):
+                message = f"{error.get('code', 'ERROR')} {error.get('message', '')}".strip()
+            else:
+                message = "respuesta sin confirmación explícita de éxito"
+            raise TalendError(f"{tool}: {message}")
+        data = env.get("data")
+        if not isinstance(data, dict):
+            raise TalendError(f"{tool}: respuesta de éxito sin datos de resultado")
+        if data.get("ok") is False:
+            error = data.get("error")
+            if isinstance(error, dict):
+                message = f"{error.get('code', 'ERROR')} {error.get('message', '')}".strip()
+            elif isinstance(error, str):
+                message = error
+            else:
+                message = str(data.get("message") or "Talend Studio rechazó la operación")
+            raise TalendError(f"{tool}: {message}")
+        result = data.get("result")
+        return result if isinstance(result, dict) else data

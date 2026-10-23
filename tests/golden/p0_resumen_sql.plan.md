@@ -1,7 +1,7 @@
 # Job `job_p0_resumen_sql`
 
-- **Programa SAS:** `p0_resumen_sql.sas` (sha256 `45215ef70662`)
-- **Estado:** needs_review · **Pasos:** 9 · **Reglas:** v1
+- **Programa SAS:** `p0_resumen_sql.sas` (sha256 `fb6d9d23beef`)
+- **Instrucciones:** 9 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Variables de contexto
@@ -17,7 +17,7 @@
 ### 1. Leer dwh.ventas
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Propiedades:**
   - `TABLE` = `ventas` — SAS p0_resumen_sql.sas:6
   - `QUERY` = _por configurar_ — regla mappings
@@ -31,7 +31,7 @@
 ### 2. Leer dwh.clientes
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Propiedades:**
   - `TABLE` = `clientes` — SAS p0_resumen_sql.sas:6
   - `QUERY` = _por configurar_ — regla mappings
@@ -45,7 +45,7 @@
 ### 3. Leer dwh.productos
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Propiedades:**
   - `TABLE` = `productos` — SAS p0_resumen_sql.sas:6
   - `QUERY` = _por configurar_ — regla mappings
@@ -59,7 +59,7 @@
 ### 4. Unir (inner join): dwh.ventas, dwh.clientes, dwh.productos
 
 - **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJoin`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `op_6_read_1`, Lookup desde `op_6_read_2`, Lookup desde `op_6_read_3`
 - **Propiedades:**
@@ -76,7 +76,7 @@
 ### 5. Unir (left join): dwh.ventas, dwh.clientes, dwh.productos
 
 - **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJoin`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `op_6_join_1`
 - **Propiedades:**
@@ -93,7 +93,7 @@
 ### 6. Filtrar filas (WHERE): year(v.fecha) = &anio.
 
 - **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties)
 - **Conexiones:** Main desde `op_6_join_2`
 - **Propiedades:**
@@ -110,7 +110,7 @@
 ### 7. Agregar por c.region, p.categoria
 
 - **Acción:** add_component · **Componente:** `tAggregateRow` ![Icono Talend](/talend-icons/tAggregateRow_icon32.png) (sin verificar) · alternativas: `tMap`
-- **Subjob:** `s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties)
 - **Conexiones:** Main desde `op_6_filter_1`
 - **Propiedades:**
@@ -122,7 +122,7 @@
 ### 8. Filtrar filas (HAVING): calculated total_monto > 1000
 
 - **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties)
 - **Conexiones:** Main desde `op_6_aggregate_1`
 - **Propiedades:**
@@ -139,7 +139,7 @@
 ### 9. Escribir work.ventas_resumen (reemplaza)
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
-- **Subjob:** `s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Conexiones:** Main desde `op_6_filter_2`
 - **Propiedades:**
   - `TABLE` = `ventas_resumen` — SAS p0_resumen_sql.sas:6

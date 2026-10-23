@@ -34,6 +34,17 @@ class Skipped(BaseModel):
     reason: str
 
 
+class ProjectProcessing(BaseModel):
+    status: str
+    stage: str
+    started_at: datetime | None = None
+    stage_started_at: datetime | None = None
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    message: str | None = None
+    error: str | None = None
+    retry_count: int = 0
+
+
 class Manifest(BaseModel):
     schema_version: str = SCHEMA_VERSION
     project_id: str
@@ -45,6 +56,12 @@ class Project(BaseModel):
     id: str
     name: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    archive_name: str | None = None
+    archive_sha256: str | None = None
+    archive_size_bytes: int | None = None
+    uploaded_at: datetime | None = None
+    manifest_summary: dict[str, int] | None = None
+    processing: ProjectProcessing | None = None
 
 
 class Evidence(BaseModel):

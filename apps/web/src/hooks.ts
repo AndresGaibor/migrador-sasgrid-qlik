@@ -2,20 +2,27 @@ import { useCallback, useEffect, useState } from "react";
 
 export type Async<T> = { data?: T; error?: string; loading: boolean; reload: () => void };
 
-export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]): Async<T> {
+export function useAsync<T>(
+  fn: () => Promise<T>,
+  deps: unknown[],
+  options: { preserveDataOnError?: boolean } = {},
+): Async<T> {
   const [state, set] = useState<{ data?: T; error?: string; loading: boolean }>({ loading: true });
   const [tick, setTick] = useState(0);
+  const preserveDataOnError = options.preserveDataOnError ?? false;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     let live = true;
     set((s) => ({ ...s, loading: true }));
     fn()
       .then((data) => live && set({ data, loading: false }))
-      .catch((e: Error) => live && set((s) => ({ ...s, error: e.message, loading: false })));
+      .catch((e: Error) => live && set((s) => preserveDataOnError
+        ? { ...s, error: e.message, loading: false }
+        : { error: e.message, loading: false }));
     return () => {
       live = false;
     };
-  }, [...deps, tick]);
+  }, [...deps, tick, preserveDataOnError]);
   return { ...state, reload: useCallback(() => setTick((t) => t + 1), []) };
 }
 

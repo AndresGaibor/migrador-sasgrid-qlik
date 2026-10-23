@@ -2,12 +2,12 @@
 
 ## Principios
 
-- Python analiza y propone. `talend-mcp` inspecciona (solo lectura). El desarrollador construye y valida en Talend Studio.
+- Python analiza y propone. El portal envía la guía vigente al MCP cuando se pulsa la acción explícita por Job. El desarrollador valida y ejecuta el Job en Talend Studio.
 - Análisis estático: nunca se ejecuta código SAS, macros ni scripts importados.
 - El análisis SAS funciona sin `talend-mcp` conectado.
 - Nunca afirmar que un componente o propiedad existe sin verificarlo (`verified: false` por defecto).
 - Modelo intermedio tipado entre parser y planner; las reglas viven en `rules/`, no en condicionales dispersos.
-- Aplicación única modular: sin microservicios, colas, Kubernetes ni BD externa. Persistencia: SQLite + JSON.
+- Aplicación única modular: sin microservicios ni BD externa. Persistencia: SQLite + JSON; el procesamiento automático usa tareas de fondo locales de FastAPI y solo se coordina dentro de una instancia.
 
 ## Pipeline
 
@@ -24,7 +24,15 @@
 
 ## Integración talend-mcp
 
-Repo existente: https://github.com/AndresGaibor/talend-mcp (HTTP :3927 por defecto o stdio). Solo herramientas de inspección (`talend_list_jobs`, `talend_read_job`, `talend_list_components`, `talend_show_flow`, `talend_inspect_component`, `talend_inspect_job`, contextos). Modificación y `talend_run_job` quedan deshabilitadas en el adaptador. Antes de implementar el adaptador, inspeccionar los nombres y esquemas reales del servidor (F0/F5).
+Repo existente: https://github.com/AndresGaibor/talend-mcp (HTTP :3927 por defecto o stdio). El portal consulta salud/catálogo y, tras la acción explícita por Job, envía el plan estructurado mediante `talend_job_apply_custom_spec`. MCP aplica componentes, conexiones y contextos que puede verificar en Studio. El Job no se ejecuta desde esta integración; ejecutar y validar siguen siendo acciones de Studio.
+
+## Proyectos de ZIP
+
+`POST /api/projects/uploads` crea un proyecto aislado por archivo ZIP. Primero valida y extrae en una ruta temporal y registra el snapshot completo; después encola análisis SAS, dependencias y planes por Job. SQLite conserva ZIP, resumen de inventario, estados/etapas, mensajes, marcas de tiempo, errores y reintentos. Las vistas del portal buscan y consultan los datos con `project_id`, recuperan el estado al recargar y filtran el árbol por la ruta relativa del ZIP. Los proyectos anteriores sin archivo registrado conservan el flujo manual y se identifican como legado.
+
+La ejecución usa `SGM_MAX_PIPELINE_CONCURRENCY` y `SGM_MAX_QUEUED_PIPELINES` dentro del proceso local. Si el proceso se reinicia con trabajos activos o huérfanos en cola, el API los marca `interrupted`; el portal ofrece reintento sobre los archivos retenidos. Esto no es una cola durable ni habilita varias réplicas. Para escalar horizontalmente hacen falta un store compartido y workers coordinados mediante una cola durable.
+
+Cada destino Talend combina `TALEND_APPLY_FOLDER`, un slug seguro del ZIP, el id estable del proyecto y la subcarpeta del programa dentro del ZIP. El usuario puede revisar esa ruta en la guía; el API la usa tanto para previsualizar como para aplicar. La operación guarda el estado y el resultado por proyecto/programa, permite reutilizar el resultado de una revisión idéntica y expone los conflictos en lugar de sobrescribir un Job ajeno. La derivación de credenciales, esquemas y valores desconocidos sigue pendiente: el portal incluye esos detalles en contextos del Job y no inventa información.
 
 ## Fuera del MVP
 
@@ -71,7 +79,7 @@ Medido sobre el corpus: 58 programas, 372 datasets, 6 tareas de macro orquestado
 
 ## Decisión F5: adaptador Talend
 
-- `talend_adapter/adapter.py`: `TalendAdapter` sobre un `Caller` (HTTP vía `mcp.Client`); cada llamada pasa por `policy.assert_allowed`. Sin Talend, `health_check` devuelve `available: false` y el resto del sistema funciona.
+- `talend_adapter/adapter.py`: `TalendAdapter` sobre un `Caller` (HTTP vía `mcp.Client`); cada llamada pasa por `policy.assert_allowed`. El MCP puede aplicar una especificación estructurada con `talend_job_apply_custom_spec` solo desde la acción de la guía; el endpoint de ejecución de Jobs no forma parte del flujo. Sin Talend, `health_check` devuelve `available: false` y el resto del sistema funciona.
 - Entradas reales (del código de talend-mcp): `talend_inspect_job{jobPath}`, `talend_inspect_component{jobPath,uniqueName}`, `talend_list_components{jobName}`, `talend_read_contexts{jobName}`. Respuesta: envoltorio `{ok, data|error}`.
 - No existe catálogo global. `verification.py` construye un catálogo desde Jobs de referencia y marca `verified` solo si el componente y todas las propiedades del paso aparecen ahí.
 - Limitación: el clon revisado de talend-mcp no arranca (`Tool duplicada: talend_bridge_select_component`), así que el adaptador se validó contra su código y mocks, no contra un servidor vivo. Además `inspect_component` en ese código devuelve un componente vacío; el adaptador descarta componentes sin `componentName`.
@@ -86,4 +94,4 @@ Medido sobre el corpus: 58 programas, 372 datasets, 6 tareas de macro orquestado
 
 ## API prevista
 
-`POST /api/projects`, `POST /api/projects/{id}/imports`, `POST /api/projects/{id}/analyses`, `GET /api/projects/{id}/inventory`, `GET /api/projects/{id}/dependencies`, `GET /api/projects/{id}/programs` y `GET /api/projects/{id}/programs/{path}` (en lugar de `/api/programs/{id}`: el programa se identifica por proyecto + ruta), `POST|GET /api/projects/{id}/plans`, `GET /api/projects/{id}/plans/{path}[?format=md]`, `PATCH /api/projects/{id}/plans/{path}/steps/{step_id}`, `POST /api/projects/{id}/plans/verify`, `POST /api/projects/{id}/exports`, `GET /api/integrations/talend/health`, `POST /api/integrations/talend/inspect`.
+`POST /api/projects`, `POST /api/projects/uploads`, `GET /api/projects/{id}/processing`, `POST /api/projects/{id}/processing/retry`, `POST|GET /api/projects/{id}/analyses`, `GET /api/projects/{id}/inventory`, `GET /api/projects/{id}/dependencies`, `GET /api/projects/{id}/programs` y `GET /api/projects/{id}/programs/{path}` (el programa se identifica por proyecto + ruta), `POST|GET /api/projects/{id}/plans`, `GET /api/projects/{id}/plans/{path}[?format=md]`, `GET|POST /api/projects/{id}/plans/{path}/talend-apply`, `POST /api/projects/{id}/plans/{path}/talend-apply/preview`, `PATCH /api/projects/{id}/plans/{path}/steps/{step_id}`, `POST /api/projects/{id}/plans/verify`, `POST /api/projects/{id}/exports`, `GET /api/integrations/talend/health`, `POST /api/integrations/talend/inspect`.

@@ -1,4 +1,26 @@
-export type Project = { id: string; name: string; created_at: string };
+export type ProjectProcessingStatus = "queued" | "running" | "completed" | "failed" | "interrupted";
+export type ProjectProcessing = {
+  status: ProjectProcessingStatus;
+  stage: string;
+  started_at: string | null;
+  stage_started_at: string | null;
+  updated_at: string;
+  message: string | null;
+  error: string | null;
+  retry_count: number;
+};
+export type Project = {
+  id: string;
+  name: string;
+  created_at: string;
+  archive_name?: string | null;
+  archive_sha256?: string | null;
+  archive_size_bytes?: number | null;
+  uploaded_at?: string | null;
+  manifest_summary?: { files: number; programs: number; folders: number; skipped: number } | null;
+  processing?: ProjectProcessing | null;
+};
+export type ProjectUploadResponse = { project: Project; processing: ProjectProcessing };
 export type SourceFile = { path: string; sha256: string; size: number; kind: string; encoding: string | null };
 export type Manifest = { files: SourceFile[]; skipped: { path: string; reason: string }[] };
 export type Coverage = { tag: string; priority: string; count: number };
@@ -58,7 +80,6 @@ export type Deps = {
   orchestration: { tasks: GridTask[]; schedules: { file: string; line: number; text: string }[]; order: string[] };
 };
 export type PlanRow = { program: string; job_name: string; job_status: string; steps: number; pending: number; done: number };
-export const STATUSES = ["propuesto", "pendiente", "verificado", "validado_manualmente", "descartado"] as const;
 export type Step = {
   id: string;
   order: number;
@@ -76,10 +97,10 @@ export type Step = {
   assumptions: string[];
   pending: string[];
   tests: string[];
+  status: string;
+  note: string | null;
   evidence: { file: string; line: number };
   confidence: string;
-  status: (typeof STATUSES)[number];
-  note: string | null;
   verified: boolean;
   in_catalog?: boolean | null;
   doc_url?: string | null;
@@ -89,8 +110,8 @@ export type Step = {
 export type JobPlan = {
   program: string;
   job_name: string;
-  job_status: string;
   steps: Step[];
+  entry_macro?: { name: string; params: string[]; arguments: Record<string, string> } | null;
   children: { name: string; params: string[]; steps: Step[] }[];
   validation_cases: { id: string; kind: string; description: string }[];
   context_variables: { name: string; suggested: string; sas_value: string | null }[];
@@ -108,6 +129,60 @@ export type CatalogItem = {
   frameworks: string[];
   license_profile: TalendLicenseProfile;
   search_terms?: string[];
+};
+export type TalendApplyResult = {
+  status: "applied" | "partially_applied";
+  identity: { project_id: string; program: string; source_sha256: string | null; rules_version: string; job_name: string; folder_path: string };
+  blocked_steps: { step_id: string; reason: string }[];
+  warnings: string[];
+  result: { jobName?: string; itemPath?: string; propertiesPath?: string; generatedComponents?: number; reusedComponents?: number; generatedConnections?: number; reusedConnections?: number; totalComponents?: number; generatedContexts?: number; updatedContexts?: number; reusedContexts?: number; removedContexts?: number; reusedExisting?: boolean; bridgeRefreshed?: boolean; bridgeOpened?: boolean; problems?: unknown };
+};
+export type TalendApplyPreview = {
+  ready: boolean;
+  preview_id: string;
+  identity: {
+    project_id: string;
+    program: string;
+    source_sha256: string | null;
+    rules_version: string;
+    job_name: string;
+    folder_path: string;
+  };
+  components?: { name: string; component: string }[];
+  child_jobs?: { jobName: string | null; folderPath: string | null; components: number; connections: number }[];
+  connections?: unknown[];
+  contexts?: { name: string; type: string; value: string | null; purpose: string }[];
+  blocked_steps?: { step_id: string; reason: string }[];
+};
+export type TalendApplyState = {
+  status: "not_started" | "running" | "applied" | "partially_applied" | "failed" | "conflict" | "interrupted";
+  revision_hash?: string;
+  identity: TalendApplyResult["identity"] | null;
+  result: TalendApplyResult | null;
+  error: string | null;
+  started_at: string | null;
+  updated_at: string | null;
+};
+export type TalendApplyBatchJob = {
+  program: string;
+  status: "pending" | "running" | "applied" | "partially_applied" | "failed" | "conflict" | "interrupted";
+  result: TalendApplyResult | null;
+  error: string | null;
+};
+export type TalendApplyBatchState = {
+  project_id: string;
+  revision_hash: string | null;
+  status: "not_started" | "queued" | "running" | "applied" | "partially_applied" | "failed" | "conflict" | "interrupted";
+  programs: string[];
+  jobs: TalendApplyBatchJob[];
+  current_program: string | null;
+  completed_jobs: number;
+  total_jobs: number;
+  error: string | null;
+  warnings: string[];
+  attempt_count: number;
+  started_at: string | null;
+  updated_at: string | null;
 };
 export type CatalogList = {
   count: number;

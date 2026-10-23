@@ -100,6 +100,14 @@ class ChildJob(BaseModel):
     steps: list[PlanStep]
 
 
+class MacroEntrypoint(BaseModel):
+    """Macro principal invocada por el programa; su cuerpo pertenece al Job del archivo."""
+
+    name: str
+    params: list[str] = []
+    arguments: dict[str, str] = {}
+
+
 class GridRecommendation(BaseModel):
     id: str
     pattern_id: str
@@ -133,6 +141,7 @@ class JobPlan(BaseModel):
     job_name: str
     job_status: Literal["proposed", "needs_review"] = "needs_review"
     steps: list[PlanStep] = []
+    entry_macro: MacroEntrypoint | None = None
     children: list[ChildJob] = []
     validation_cases: list[ValidationCase] = []
     context_variables: list[ContextVariable] = []

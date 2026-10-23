@@ -20,6 +20,7 @@ from sas_grid_migrator.migration_planner.models import (
     GridRecommendation,
     JobPlan,
     LibraryNeeded,
+    MacroEntrypoint,
     Orchestration,
     PlanStep,
     Property,
@@ -27,6 +28,7 @@ from sas_grid_migrator.migration_planner.models import (
     ValidationCase,
 )
 from sas_grid_migrator.sas_parser.ast import Loc
+from sas_grid_migrator.sas_parser.parser import split_args
 from sas_grid_migrator.talend_adapter.catalog import load_catalog
 
 _AGG = re.compile(
@@ -163,6 +165,27 @@ def grid_recommendation(
 
 def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", s.lower()).strip("_")
+
+
+def _macro_call_arguments(raw: str, params: list[str]) -> dict[str, str]:
+    """Asocia argumentos SAS posicionales o nombrados con los parámetros del macro."""
+    parameter_names = {name.casefold(): name for name in params}
+    result: dict[str, str] = {}
+    positional = 0
+    for argument in split_args(raw):
+        if not argument:
+            continue
+        key, separator, value = argument.partition("=")
+        normalized_key = key.strip().casefold()
+        if separator and normalized_key in parameter_names:
+            result[parameter_names[normalized_key]] = value.strip().strip("\"'")
+            continue
+        while positional < len(params) and params[positional] in result:
+            positional += 1
+        if positional < len(params):
+            result[params[positional]] = argument.strip().strip("\"'")
+            positional += 1
+    return result
 
 
 class _Planner:
@@ -637,10 +660,43 @@ def plan_program(
 ) -> JobPlan:
     libs = {**libraries, **{x.name.lower(): x for x in ir.libraries}}
     pl = _Planner(rules, libs, ir.file)
-    steps = [pl.step(op, i + 1, "") for i, op in enumerate(ir.operations)]
+    source_macro = Path(ir.file.replace("\\", "/")).stem.casefold()
+    entry_definition = next((macro for macro in ir.macros if macro.name.casefold() == source_macro), None)
+    entry_calls = [
+        operation
+        for operation in ir.operations
+        if operation.type == "macro_call"
+        and str(operation.details.get("name", "")).casefold() == source_macro
+    ]
+    entry_macro = None
+    expanded_operations: list[tuple[IROperation, str]] = []
+    if entry_definition and entry_calls:
+        entry_call = entry_calls[0]
+        entry_macro = MacroEntrypoint(
+            name=entry_definition.name,
+            params=entry_definition.params,
+            arguments=_macro_call_arguments(
+                str(entry_call.details.get("args", "")), entry_definition.params
+            ),
+        )
+        calls_by_id = {operation.id for operation in entry_calls}
+        for operation in ir.operations:
+            if operation.type == "include":
+                continue
+            if operation.id in calls_by_id:
+                suffix = f"{operation.id}:" if len(entry_calls) > 1 else ""
+                prefix = f"m:{entry_definition.name}:{suffix}"
+                expanded_operations.extend((body_operation, prefix) for body_operation in entry_definition.operations)
+            else:
+                expanded_operations.append((operation, ""))
+    else:
+        expanded_operations = [
+            (operation, "") for operation in ir.operations if operation.type != "include"
+        ]
+    steps = [pl.step(operation, index + 1, prefix) for index, (operation, prefix) in enumerate(expanded_operations)]
     written: dict[str, str] = {}
-    for st, op in zip(steps, ir.operations, strict=True):
-        if op.type == "read" and op.inputs[0] in written:
+    for st, (op, _) in zip(steps, expanded_operations, strict=True):
+        if op.type == "read" and op.inputs and op.inputs[0] in written:
             st.assumptions.append(
                 f"Dataset producido antes en este programa ({written[op.inputs[0]]}): puede sustituirse por una conexión directa o un tHashOutput"
             )
@@ -649,11 +705,36 @@ def plan_program(
     _connect(steps, None)
     children = []
     for m in ir.macros:
+        if entry_macro and m.name.casefold() == entry_macro.name.casefold():
+            continue
         ms = [pl.step(op, i + 1, f"m:{m.name}:") for i, op in enumerate(m.operations)]
         _connect(ms, None)
         children.append(ChildJob(name=m.name, params=m.params, steps=ms))
     all_steps = steps + [s for c in children for s in c.steps]
-    context_variables = _context_variables(ir, all_steps)
+    context_by_name = {variable.name: variable for variable in _context_variables(ir, all_steps)}
+    if entry_macro:
+        for parameter in entry_macro.params:
+            argument = entry_macro.arguments.get(parameter)
+            literal = argument if argument and not re.search(r"[&%]", argument) else None
+            context_by_name.setdefault(
+                parameter,
+                ContextVariable(
+                    name=parameter,
+                    sas_value=literal,
+                    suggested=f"context.{parameter}",
+                    origin=f"Parámetro de la macro principal %{entry_macro.name}; argumento SAS: {argument or 'sin asignar'}",
+                ),
+            )
+            for referenced_name in re.findall(r"&([A-Za-z_]\w*)", argument or ""):
+                context_by_name.setdefault(
+                    referenced_name,
+                    ContextVariable(
+                        name=referenced_name,
+                        suggested=f"context.{referenced_name}",
+                        origin=f"Variable SAS referenciada por %{entry_macro.name}({parameter}=...)",
+                    ),
+                )
+    context_variables = sorted(context_by_name.values(), key=lambda variable: variable.name.lower())
     needed = _needed_libraries(pl.used_libs, libs, rules)
     pending = any(s.pending or s.confidence == "low" for s in all_steps)
     return JobPlan(
@@ -664,6 +745,7 @@ def plan_program(
         job_name="job_" + slug(Path(ir.file).stem),
         job_status="needs_review" if pending or unresolved else "proposed",
         steps=steps,
+        entry_macro=entry_macro,
         children=children,
         validation_cases=pl.cases,
         context_variables=context_variables,

@@ -1,7 +1,7 @@
 # Job `job_p1_macro_parametrizada`
 
-- **Programa SAS:** `p1_macro_parametrizada.sas` (sha256 `527e5bc7c423`)
-- **Estado:** needs_review · **Pasos:** 5 · **Reglas:** v1
+- **Programa SAS:** `p1_macro_parametrizada.sas` (sha256 `2b04d3a17bfa`)
+- **Instrucciones:** 5 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Pasos
@@ -9,7 +9,7 @@
 ### 1. Invocar macro %extraer_mes
 
 - **Acción:** add_component · **Componente:** `tRunJob` ![Icono Talend](/talend-icons/tRunJob_icon32.png) (sin verificar) · alternativas: `Joblet`
-- **Subjob:** `s13` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:13`
+- **Subjob:** `s13` · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:13`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties)
 - **Propiedades:**
   - `PROCESS` (Job) = `extraer_mes` — SAS p1_macro_parametrizada.sas:13 · nombre oficial
@@ -18,12 +18,12 @@
   - Job o joblet hijo que implementa la macro
   - Crear/identificar el Job hijo para %extraer_mes (definida en p1_macro_parametrizada.sas)
 
-## Job hijo / joblet para `%extraer_mes`(tabla, desde, hasta)
+## Definición de macro auxiliar `%extraer_mes`(tabla, desde, hasta)
 
 ### 1. Leer dwh.&tabla.
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
-- **Subjob:** `m:extraer_mes:s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
+- **Subjob:** `m:extraer_mes:s5` · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
 - **Propiedades:**
   - `TABLE` = _por configurar_ — regla mappings
   - `QUERY` = _por configurar_ — regla mappings
@@ -37,7 +37,7 @@
 ### 2. Filtrar filas (WHERE): month(fecha) = &m.
 
 - **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
-- **Subjob:** `m:extraer_mes:s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
+- **Subjob:** `m:extraer_mes:s5` · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties)
 - **Conexiones:** Main desde `m:extraer_mes:op_6_read_1`
 - **Propiedades:**
@@ -54,7 +54,7 @@
 ### 3. Seleccionar/calcular columnas
 
 - **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar)
-- **Subjob:** `m:extraer_mes:s5` · **Estado:** propuesto · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
+- **Subjob:** `m:extraer_mes:s5` · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `m:extraer_mes:op_6_filter_1`
 - **Propiedades:**
@@ -65,7 +65,7 @@
 ### 4. Escribir work.&tabla._&mm. (reemplaza)
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
-- **Subjob:** `m:extraer_mes:s5` · **Estado:** pendiente · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
+- **Subjob:** `m:extraer_mes:s5` · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:6`
 - **Conexiones:** Main desde `m:extraer_mes:op_6_project_1`
 - **Propiedades:**
   - `TABLE` = _por configurar_ — regla mappings

@@ -21,8 +21,7 @@ export function storageStatus(state: GuideProgress): string {
   return "pendiente";
 }
 
-// The existing SQLite decision endpoint persists only its legacy status and note fields.
-// Keep the web-only progress label in a readable note header so it survives reloads/regeneration.
+// Persist the web-only progress label in the note field supported by the API.
 export function encodeProgress(state: GuideProgress, note: string, blockReason: string): string | null {
   if (state === "blocked" && !blockReason.trim()) return null;
   const metadata = [`[Estado de guía: ${stateLabels[state]}]`];
@@ -40,7 +39,8 @@ export function decodeProgress(status: string, note: string | null): DecodedProg
     : status === "verificado" || status === "validado_manualmente" ? "completed"
     : status === "descartado" ? "blocked"
     : "pending";
-  const blockReason = note?.match(/^\[Motivo de bloqueo: (.*)\]$/m)?.[1] ?? (status === "descartado" ? "Este paso fue descartado anteriormente; confirma si debe continuar bloqueado." : "");
+  const blockReason = note?.match(/^\[Motivo de bloqueo: (.*)\]$/m)?.[1]
+    ?? (status === "descartado" ? "Este paso fue descartado anteriormente; confirma si debe continuar bloqueado." : "");
   const workNote = note?.match(/^\[Nota de trabajo: ([\s\S]*)\]$/m)?.[1] ?? (savedState ? "" : note ?? "");
   return { state, note: workNote, blockReason };
 }

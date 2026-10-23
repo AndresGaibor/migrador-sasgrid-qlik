@@ -327,6 +327,36 @@
       "title": "Loc",
       "type": "object"
     },
+    "MacroEntrypoint": {
+      "description": "Macro principal invocada por el programa; su cuerpo pertenece al Job del archivo.",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "params": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Params",
+          "type": "array"
+        },
+        "arguments": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Arguments",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "MacroEntrypoint",
+      "type": "object"
+    },
     "Orchestration": {
       "properties": {
         "grid_tasks": {
@@ -799,6 +829,17 @@
       },
       "title": "Steps",
       "type": "array"
+    },
+    "entry_macro": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MacroEntrypoint"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "children": {
       "default": [],
