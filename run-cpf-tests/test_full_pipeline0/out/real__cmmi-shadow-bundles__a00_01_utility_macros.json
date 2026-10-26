@@ -1,0 +1,30 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/cmmi-shadow-bundles/a00_01_utility_macros.sas",
+  "sha256": "3b39cfc0e1bdb9d838518623288acae154ceb8a51f6751b01562861a7ab0e53e",
+  "job_name": "job_a00_01_utility_macros",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "a00_01_utility_macros",
+      "params": [],
+      "steps": []
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro messagebox (real/cmmi-shadow-bundles/a00_01_utility_macros.sas:89) — sin definición en el proyecto"
+  ]
+}

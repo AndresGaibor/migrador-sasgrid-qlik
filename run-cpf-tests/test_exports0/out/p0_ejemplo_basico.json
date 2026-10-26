@@ -1,0 +1,753 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "p0_ejemplo_basico.sas",
+  "sha256": "26582c6a2355c2e40cbb07e37d73ec0c0f63b1f45aa91ef5789838a5c145f6f1",
+  "job_name": "job_p0_ejemplo_basico",
+  "steps": [
+    {
+      "id": "op_4_read_1",
+      "order": 1,
+      "subjob": "s4",
+      "action": "add_component",
+      "operation_id": "op_4_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer sashelp.class",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "class",
+          "origin": "SAS p0_ejemplo_basico.sas:4",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería sashelp es de tipo BASE: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_op_4_read_1_row_count",
+        "vc_op_4_read_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_ejemplo_basico.sas",
+        "line": 4,
+        "end_line": 8
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_6_filter_1",
+      "order": 2,
+      "subjob": "s4",
+      "action": "add_component",
+      "operation_id": "op_6_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (IF subsetting): age >= 13",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": "&&",
+          "origin": "SAS p0_ejemplo_basico.sas:6",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": "age >= 13",
+          "origin": "SAS p0_ejemplo_basico.sas:6",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": "false",
+          "origin": "SAS p0_ejemplo_basico.sas:6",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "age",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_ejemplo_basico.sas:6"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_4_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "age >= 13",
+          "talend": "(input_row.age >= 13)",
+          "line": 6,
+          "requires_semantic_validation": true,
+          "warnings": []
+        }
+      ],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_6_filter_1_row_count",
+        "vc_op_6_filter_1_nulls",
+        "vc_op_6_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "p0_ejemplo_basico.sas",
+        "line": 6,
+        "end_line": 8
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_4_compute_1",
+      "order": 3,
+      "subjob": "s4",
+      "action": "add_component",
+      "operation_id": "op_4_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "1 asignaciones, 0 condicionales",
+          "origin": "SAS p0_ejemplo_basico.sas:4",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "height",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_ejemplo_basico.sas:4"
+        },
+        {
+          "name": "estatura_cm",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_ejemplo_basico.sas:4"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_6_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "height * 2.54",
+          "talend": "(input_row.height * 2.54)",
+          "line": 7,
+          "requires_semantic_validation": true,
+          "warnings": []
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_op_4_compute_1_nulls",
+        "vc_op_4_compute_1_dates",
+        "vc_op_4_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "p0_ejemplo_basico.sas",
+        "line": 4,
+        "end_line": 8
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_4_write_1",
+      "order": 4,
+      "subjob": "s4",
+      "action": "add_component",
+      "operation_id": "op_4_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir work.personas_filtradas",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "personas_filtradas",
+          "origin": "SAS p0_ejemplo_basico.sas:4",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS p0_ejemplo_basico.sas:4",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS p0_ejemplo_basico.sas:4",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_4_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_4_write_1_row_count",
+        "vc_op_4_write_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_ejemplo_basico.sas",
+        "line": 4,
+        "end_line": 8
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_11_read_1",
+      "order": 5,
+      "subjob": "s10",
+      "action": "add_component",
+      "operation_id": "op_11_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer work.personas_filtradas",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "personas_filtradas",
+          "origin": "SAS p0_ejemplo_basico.sas:11",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_4_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (op_4_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_op_11_read_1_row_count",
+        "vc_op_11_read_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_ejemplo_basico.sas",
+        "line": 11,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_11_aggregate_1",
+      "order": 6,
+      "subjob": "s10",
+      "action": "add_component",
+      "operation_id": "op_11_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por sex",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "sex",
+          "origin": "SAS p0_ejemplo_basico.sas:11",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": "personas = count(*); promedio_estatura_cm = avg(estatura_cm)",
+          "origin": "SAS p0_ejemplo_basico.sas:11",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "sex",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_ejemplo_basico.sas:11"
+        },
+        {
+          "name": "personas",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_ejemplo_basico.sas:11"
+        },
+        {
+          "name": "promedio_estatura_cm",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_ejemplo_basico.sas:11"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_11_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_11_aggregate_1_aggregates",
+        "vc_op_11_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "p0_ejemplo_basico.sas",
+        "line": 11,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_11_write_1",
+      "order": 7,
+      "subjob": "s10",
+      "action": "add_component",
+      "operation_id": "op_11_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir work.resumen (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "resumen",
+          "origin": "SAS p0_ejemplo_basico.sas:11",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS p0_ejemplo_basico.sas:11",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS p0_ejemplo_basico.sas:11",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_11_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_11_write_1_row_count",
+        "vc_op_11_write_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_ejemplo_basico.sas",
+        "line": 11,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_op_4_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_4_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_4_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_4_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "op_6_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "op_6_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "op_6_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_4_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "op_4_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_4_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "op_4_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_4_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "op_4_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_4_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_4_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_4_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_4_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_11_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_11_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_11_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_11_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_11_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "op_11_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_11_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "op_11_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_11_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_11_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_11_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_11_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [],
+  "libraries_needed": [
+    {
+      "sas_name": "sashelp",
+      "engine": null,
+      "path": null,
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

@@ -1,0 +1,1005 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "p0_resumen_sql.sas",
+  "sha256": "fb6d9d23beefc3d9bad7cf8e0658e26721648ea297a3e287caf2dd482e6dd998",
+  "job_name": "job_p0_resumen_sql",
+  "steps": [
+    {
+      "id": "op_6_read_1",
+      "order": 1,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_6_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer dwh.ventas",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "ventas",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería dwh es de tipo BASE en /data/dwh: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_op_6_read_1_row_count",
+        "vc_op_6_read_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_resumen_sql.sas",
+        "line": 6,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_6_read_2",
+      "order": 2,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_6_read_2",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer dwh.clientes",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "clientes",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería dwh es de tipo BASE en /data/dwh: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_op_6_read_2_row_count",
+        "vc_op_6_read_2_schema"
+      ],
+      "evidence": {
+        "file": "p0_resumen_sql.sas",
+        "line": 6,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_6_read_3",
+      "order": 3,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_6_read_3",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer dwh.productos",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "productos",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería dwh es de tipo BASE en /data/dwh: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_op_6_read_3_row_count",
+        "vc_op_6_read_3_schema"
+      ],
+      "evidence": {
+        "file": "p0_resumen_sql.sas",
+        "line": 6,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_6_join_1",
+      "order": 4,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_6_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (inner join): dwh.ventas, dwh.clientes, dwh.productos",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Inner Join",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "v.cliente_id = c.id",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "cliente_id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_resumen_sql.sas:6"
+        },
+        {
+          "name": "id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_resumen_sql.sas:6"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_6_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "op_6_read_2",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "op_6_read_3",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on v.cliente_id = c.id",
+          "talend": null,
+          "line": 6,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_op_6_join_1_duplicates",
+        "vc_op_6_join_1_row_count",
+        "vc_op_6_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "p0_resumen_sql.sas",
+        "line": 6,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_6_join_2",
+      "order": 5,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_6_join_2",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (left join): dwh.ventas, dwh.clientes, dwh.productos",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Left Outer Join",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "v.producto_id = p.id",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "producto_id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_resumen_sql.sas:6"
+        },
+        {
+          "name": "id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_resumen_sql.sas:6"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_6_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on v.producto_id = p.id",
+          "talend": null,
+          "line": 6,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_op_6_join_2_duplicates",
+        "vc_op_6_join_2_row_count",
+        "vc_op_6_join_2_nulls"
+      ],
+      "evidence": {
+        "file": "p0_resumen_sql.sas",
+        "line": 6,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_6_filter_1",
+      "order": 6,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_6_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): year(v.fecha) = &anio.",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_6_join_2",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "year(v.fecha) = &anio.",
+          "talend": null,
+          "line": 6,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función year"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_op_6_filter_1_row_count",
+        "vc_op_6_filter_1_nulls",
+        "vc_op_6_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "p0_resumen_sql.sas",
+        "line": 6,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_6_aggregate_1",
+      "order": 7,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_6_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por c.region, p.categoria",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "region, categoria",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": "total_monto = sum(monto); clientes = count(cliente_id)",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "region",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_resumen_sql.sas:6"
+        },
+        {
+          "name": "categoria",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_resumen_sql.sas:6"
+        },
+        {
+          "name": "total_monto",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_resumen_sql.sas:6"
+        },
+        {
+          "name": "clientes",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_resumen_sql.sas:6"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_6_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_6_aggregate_1_aggregates",
+        "vc_op_6_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "p0_resumen_sql.sas",
+        "line": 6,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_6_filter_2",
+      "order": 8,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_6_filter_2",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (HAVING): calculated total_monto > 1000",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_6_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "calculated total_monto > 1000",
+          "talend": null,
+          "line": 6,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Construcción SAS sin traducción automática"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_op_6_filter_2_row_count",
+        "vc_op_6_filter_2_nulls",
+        "vc_op_6_filter_2_empty"
+      ],
+      "evidence": {
+        "file": "p0_resumen_sql.sas",
+        "line": 6,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_6_write_1",
+      "order": 9,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_6_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir work.ventas_resumen (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "ventas_resumen",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS p0_resumen_sql.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_6_filter_2",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_6_write_1_row_count",
+        "vc_op_6_write_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_resumen_sql.sas",
+        "line": 6,
+        "end_line": 16
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_op_6_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_6_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_6_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_6_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_6_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_read_3_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_6_read_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_read_3_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_6_read_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "op_6_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "op_6_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "op_6_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_join_2_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "op_6_join_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_join_2_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "op_6_join_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_join_2_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "op_6_join_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "op_6_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "op_6_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "op_6_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "op_6_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "op_6_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_filter_2_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "op_6_filter_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_filter_2_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "op_6_filter_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_filter_2_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "op_6_filter_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_6_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_6_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "anio",
+      "sas_value": "2025",
+      "suggested": "context.anio",
+      "origin": "%LET de primer nivel"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "dwh",
+      "engine": null,
+      "path": "/data/dwh",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

@@ -1,0 +1,155 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/005_id.sas",
+  "sha256": "82a5afaa25be2ea2dd29bde64e9aadc447ca338005b6722612c1fd00349997f2",
+  "job_name": "job_005_id",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "create_ID",
+      "params": [],
+      "steps": [
+        {
+          "id": "m:create_ID:op_24_macro_call_1",
+          "order": 1,
+          "subjob": "m:create_ID:s24",
+          "action": "add_component",
+          "operation_id": "op_24_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %annual_segment",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "annual_segment",
+              "origin": "SAS real/tmsis-analytic-file/005_id.sas:24",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "fileseg=IDT, dtfile=PRV, collist=collist_s, mnths=PRVDR_ID_FLAG, outtbl=id_pr_&year.",
+              "origin": "SAS real/tmsis-analytic-file/005_id.sas:24",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/005_id.sas",
+            "line": 24,
+            "end_line": 24
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_ID:op_73_macro_call_1",
+          "order": 2,
+          "subjob": "m:create_ID:s73",
+          "action": "add_component",
+          "operation_id": "op_73_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %create_splmlt",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "create_splmlt",
+              "origin": "SAS real/tmsis-analytic-file/005_id.sas:73",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "segname=ID, segfile=id_pr_&year.",
+              "origin": "SAS real/tmsis-analytic-file/005_id.sas:73",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_ID:op_24_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/005_id.sas",
+            "line": 73,
+            "end_line": 73
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "year",
+      "sas_value": null,
+      "suggested": "context.year",
+      "origin": "&year en real/tmsis-analytic-file/005_id.sas:24"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro annual_segment (real/tmsis-analytic-file/005_id.sas:24) — sin definición en el proyecto",
+    "macro create_splmlt (real/tmsis-analytic-file/005_id.sas:73) — sin definición en el proyecto",
+    "macro table_id_cols (real/tmsis-analytic-file/005_id.sas:98) — sin definición en el proyecto",
+    "macro drop_tables (real/tmsis-analytic-file/005_id.sas:112) — sin definición en el proyecto"
+  ]
+}

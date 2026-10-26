@@ -1,0 +1,3074 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+  "sha256": "12debc94f7832f98a5248a6c5e6be0cb8c4be84c38dfc86ad8f33ba880b020b2",
+  "job_name": "job_dsc_create_attrib",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "dsc_create_attrib",
+      "params": [
+        "schemaName",
+        "schemaVersion",
+        "schemaUrl"
+      ],
+      "steps": [
+        {
+          "id": "m:dsc_create_attrib:op_19_macro_call_1",
+          "order": 1,
+          "subjob": "m:dsc_create_attrib:s19",
+          "action": "add_component",
+          "operation_id": "op_19_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %dsc_get_schema",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "dsc_get_schema",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:19",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "schemaUrl=&schemaUrl",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:19",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 19,
+            "end_line": 19
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_26_read_1",
+          "order": 2,
+          "subjob": "m:dsc_create_attrib:s26",
+          "action": "add_component",
+          "operation_id": "op_26_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer schema_details",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "schema_details",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:26",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_create_attrib:op_19_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_26_read_1_row_count",
+            "vc_m:dsc_create_attrib:op_26_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 26,
+            "end_line": 26
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_26_sort_1",
+          "order": 3,
+          "subjob": "m:dsc_create_attrib:s26",
+          "action": "add_component",
+          "operation_id": "op_26_sort_1",
+          "operation_type": "sort",
+          "component_candidate": "tSortRow",
+          "alternatives": [],
+          "purpose": "Ordenar por table_name, column_sequence",
+          "properties": [
+            {
+              "name": "CRITERIA",
+              "value": "table_name, column_sequence",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:26",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Criteria",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "table_name",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:26"
+            },
+            {
+              "name": "column_sequence",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:26"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_26_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_26_sort_1_ordering"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 26,
+            "end_line": 26
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_26_write_1",
+          "order": 4,
+          "subjob": "m:dsc_create_attrib:s26",
+          "action": "add_component",
+          "operation_id": "op_26_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir schema_details",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "schema_details",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:26",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:26",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:26",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_26_sort_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_26_write_1_row_count",
+            "vc_m:dsc_create_attrib:op_26_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 26,
+            "end_line": 26
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_29_read_1",
+          "order": 5,
+          "subjob": "m:dsc_create_attrib:s28",
+          "action": "add_component",
+          "operation_id": "op_29_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer schema_details",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "schema_details",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:29",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_create_attrib:op_26_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_29_read_1_row_count",
+            "vc_m:dsc_create_attrib:op_29_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 29,
+            "end_line": 30
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_29_project_1",
+          "order": 6,
+          "subjob": "m:dsc_create_attrib:s28",
+          "action": "add_component",
+          "operation_id": "op_29_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "distinct table_name",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:29",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_29_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "distinct table_name",
+              "talend": null,
+              "line": 29,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: texto sobrante"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_29_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 29,
+            "end_line": 30
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_29_write_1",
+          "order": 7,
+          "subjob": "m:dsc_create_attrib:s28",
+          "action": "add_component",
+          "operation_id": "op_29_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir schema_Table_names (reemplaza)",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "schema_table_names",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:29",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:29",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:29",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_29_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_29_write_1_row_count",
+            "vc_m:dsc_create_attrib:op_29_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 29,
+            "end_line": 30
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_37_read_1",
+          "order": 8,
+          "subjob": "m:dsc_create_attrib:s37",
+          "action": "add_component",
+          "operation_id": "op_37_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer schema_Table_names",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "schema_table_names",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:37",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_create_attrib:op_29_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_37_read_1_row_count",
+            "vc_m:dsc_create_attrib:op_37_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 37,
+            "end_line": 41
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_37_write_file_1",
+          "order": 9,
+          "subjob": "m:dsc_create_attrib:s37",
+          "action": "add_component",
+          "operation_id": "op_37_write_file_1",
+          "operation_type": "write_file",
+          "component_candidate": "tFileOutputDelimited",
+          "alternatives": [
+            "tFileOutputPositional",
+            "tFileOutputExcel"
+          ],
+          "purpose": "Escribir archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File Name",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "INCLUDEHEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Include Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_37_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta y formato del archivo de salida"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_37_write_file_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 37,
+            "end_line": 41
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileoutputdelimited-standard-properties",
+          "variants": [
+            "tFileOutputARFF",
+            "tFileOutputExcel",
+            "tFileOutputJSON",
+            "tFileOutputLDIF",
+            "tFileOutputPositional",
+            "tFileOutputProperties",
+            "tFileOutputRaw",
+            "tFileOutputXML"
+          ],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_44_read_1",
+          "order": 10,
+          "subjob": "m:dsc_create_attrib:s43",
+          "action": "add_component",
+          "operation_id": "op_44_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer schema_details",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "schema_details",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:44",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_create_attrib:op_37_write_file_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_44_read_1_row_count",
+            "vc_m:dsc_create_attrib:op_44_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 44,
+            "end_line": 44
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_44_project_1",
+          "order": 11,
+          "subjob": "m:dsc_create_attrib:s43",
+          "action": "add_component",
+          "operation_id": "op_44_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "distinct table_name",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:44",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_44_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "distinct table_name",
+              "talend": null,
+              "line": 44,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: texto sobrante"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_44_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 44,
+            "end_line": 44
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_44_set_variable_1",
+          "order": 12,
+          "subjob": "m:dsc_create_attrib:s43",
+          "action": "add_component",
+          "operation_id": "op_44_set_variable_1",
+          "operation_type": "set_variable",
+          "component_candidate": "tSetGlobalVar",
+          "alternatives": [
+            "tJava",
+            "tFlowToIterate"
+          ],
+          "purpose": "Asignar variable desde datos",
+          "properties": [
+            {
+              "name": "VARIABLES",
+              "value": "KEY=Table_List separated by '",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:44",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Variables",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_44_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Origen del valor y alcance de la variable"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 44,
+            "end_line": 44
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_56_read_1",
+          "order": 13,
+          "subjob": "m:dsc_create_attrib:s56",
+          "action": "add_component",
+          "operation_id": "op_56_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer schema_Table_names",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "schema_table_names",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:56",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_create_attrib:op_44_set_variable_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_56_read_1_row_count",
+            "vc_m:dsc_create_attrib:op_56_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 56,
+            "end_line": 73
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_56_filter_1",
+          "order": 14,
+          "subjob": "m:dsc_create_attrib:s56",
+          "action": "add_component",
+          "operation_id": "op_56_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (opción where= del dataset): table_name=\"&&Tbl&TblNum\"",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": "&&",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:56",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": "table_name == \"&&Tbl&TblNum\"",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:56",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "false",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:56",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "table_name",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:56"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_56_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "table_name=\"&&Tbl&TblNum\"",
+              "talend": "input_row.table_name.equals(\"&&Tbl&TblNum\")",
+              "line": 56,
+              "requires_semantic_validation": true,
+              "warnings": []
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_56_filter_1_row_count",
+            "vc_m:dsc_create_attrib:op_56_filter_1_nulls",
+            "vc_m:dsc_create_attrib:op_56_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 56,
+            "end_line": 73
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_56_compute_1",
+          "order": 15,
+          "subjob": "m:dsc_create_attrib:s56",
+          "action": "add_component",
+          "operation_id": "op_56_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "3 asignaciones, 0 condicionales",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:56",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ident0",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:56"
+            },
+            {
+              "name": "martNm",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:56"
+            },
+            {
+              "name": "verNo",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:56"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_56_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "4",
+              "talend": "4",
+              "line": 58,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "symget('schemaName')",
+              "talend": null,
+              "line": 59,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función symget"
+              ]
+            },
+            {
+              "sas": "symget('schemaVersion')",
+              "talend": null,
+              "line": 60,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función symget"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_56_compute_1_nulls",
+            "vc_m:dsc_create_attrib:op_56_compute_1_dates",
+            "vc_m:dsc_create_attrib:op_56_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 56,
+            "end_line": 73
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_56_write_file_1",
+          "order": 16,
+          "subjob": "m:dsc_create_attrib:s56",
+          "action": "add_component",
+          "operation_id": "op_56_write_file_1",
+          "operation_type": "write_file",
+          "component_candidate": "tFileOutputDelimited",
+          "alternatives": [
+            "tFileOutputPositional",
+            "tFileOutputExcel"
+          ],
+          "purpose": "Escribir archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File Name",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "INCLUDEHEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Include Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_56_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta y formato del archivo de salida"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_56_write_file_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 56,
+            "end_line": 73
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileoutputdelimited-standard-properties",
+          "variants": [
+            "tFileOutputARFF",
+            "tFileOutputExcel",
+            "tFileOutputJSON",
+            "tFileOutputLDIF",
+            "tFileOutputPositional",
+            "tFileOutputProperties",
+            "tFileOutputRaw",
+            "tFileOutputXML"
+          ],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_75_read_1",
+          "order": 17,
+          "subjob": "m:dsc_create_attrib:s75",
+          "action": "add_component",
+          "operation_id": "op_75_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer schema_details",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "schema_details",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_create_attrib:op_56_write_file_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_75_read_1_row_count",
+            "vc_m:dsc_create_attrib:op_75_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 75,
+            "end_line": 113
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_75_filter_1",
+          "order": 18,
+          "subjob": "m:dsc_create_attrib:s75",
+          "action": "add_component",
+          "operation_id": "op_75_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (opción where= del dataset): table_name=\"&&Tbl&TblNum\"",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": "&&",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": "table_name == \"&&Tbl&TblNum\"",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "false",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "table_name",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_75_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "table_name=\"&&Tbl&TblNum\"",
+              "talend": "input_row.table_name.equals(\"&&Tbl&TblNum\")",
+              "line": 75,
+              "requires_semantic_validation": true,
+              "warnings": []
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_75_filter_1_row_count",
+            "vc_m:dsc_create_attrib:op_75_filter_1_nulls",
+            "vc_m:dsc_create_attrib:op_75_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 75,
+            "end_line": 113
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_75_compute_1",
+          "order": 19,
+          "subjob": "m:dsc_create_attrib:s75",
+          "action": "add_component",
+          "operation_id": "op_75_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "5 asignaciones, 10 condicionales",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "default_datatype",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75"
+            },
+            {
+              "name": "map_datatype_default",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75"
+            },
+            {
+              "name": "ident1",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75"
+            },
+            {
+              "name": "ident2",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75"
+            },
+            {
+              "name": "numFormat",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:75"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_75_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "'FORMAT=$4000.'",
+              "talend": "\"FORMAT=$4000.\"",
+              "line": 77,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "'FORMAT=$4000.'",
+              "talend": "\"FORMAT=$4000.\"",
+              "line": 78,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "8",
+              "talend": "8",
+              "line": 79,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "12",
+              "talend": "12",
+              "line": 80,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "'NLNUM' || compress(tranwrd(column_type,',','.'),'.','kd')",
+              "talend": null,
+              "line": 97,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función compress"
+              ]
+            },
+            {
+              "sas": "if _n_ = 1 then  put @ident1 'attrib '",
+              "talend": null,
+              "line": 82,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "if( data_type= 'varchar' or data_type= 'char' )then \r\n                put @ident2 column_name 'FORMAT=$' data_length +(-1) '.'",
+              "talend": null,
+              "line": 85,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "else if data_type='timestamp' then\r\n                put @ident2 column_name 'LENGTH=8 FORMAT=DATETIME27.6 INFORMAT=ymddttm.'",
+              "talend": null,
+              "line": 88,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "else if data_type='date' then\r\n    \t\t\tput @ident2 column_name 'LENGTH=8 FORMAT=DATE10. INFORMAT=yymmdd.'",
+              "talend": null,
+              "line": 91,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "else if (data_type='smallint' or data_type='tinyint' or data_type='int' or data_type='bigint' or data_type='decimal') then\r\n\t\t\tdo",
+              "talend": null,
+              "line": 94,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "if index(numFormat,'.')  > 0 then put @ident2 column_name 'LENGTH=8.'",
+              "talend": null,
+              "line": 102,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "else put @ident2 column_name 'LENGTH=8.'",
+              "talend": null,
+              "line": 103,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "else if( data_type = 'map' ) then\r\n                put @ident2 column_name map_datatype_default",
+              "talend": null,
+              "line": 107,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "else\r\n                put @ident2 column_name default_datatype",
+              "talend": null,
+              "line": 109,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "if eof then put @ident2 ';'",
+              "talend": null,
+              "line": 112,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            }
+          ],
+          "assumptions": [
+            "Lógica condicional: revisar orden de evaluación y valores missing"
+          ],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_75_compute_1_nulls",
+            "vc_m:dsc_create_attrib:op_75_compute_1_dates",
+            "vc_m:dsc_create_attrib:op_75_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 75,
+            "end_line": 113
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_75_write_file_1",
+          "order": 20,
+          "subjob": "m:dsc_create_attrib:s75",
+          "action": "add_component",
+          "operation_id": "op_75_write_file_1",
+          "operation_type": "write_file",
+          "component_candidate": "tFileOutputDelimited",
+          "alternatives": [
+            "tFileOutputPositional",
+            "tFileOutputExcel"
+          ],
+          "purpose": "Escribir archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File Name",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "INCLUDEHEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Include Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_75_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta y formato del archivo de salida"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_75_write_file_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 75,
+            "end_line": 113
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileoutputdelimited-standard-properties",
+          "variants": [
+            "tFileOutputARFF",
+            "tFileOutputExcel",
+            "tFileOutputJSON",
+            "tFileOutputLDIF",
+            "tFileOutputPositional",
+            "tFileOutputProperties",
+            "tFileOutputRaw",
+            "tFileOutputXML"
+          ],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_116_read_1",
+          "order": 21,
+          "subjob": "m:dsc_create_attrib:s116",
+          "action": "add_component",
+          "operation_id": "op_116_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer schema_details",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "schema_details",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:116",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_create_attrib:op_75_write_file_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_116_read_1_row_count",
+            "vc_m:dsc_create_attrib:op_116_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 116,
+            "end_line": 126
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_116_filter_1",
+          "order": 22,
+          "subjob": "m:dsc_create_attrib:s116",
+          "action": "add_component",
+          "operation_id": "op_116_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (opción where= del dataset): table_name=\"&&Tbl&TblNum\"",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": "&&",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:116",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": "table_name == \"&&Tbl&TblNum\"",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:116",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "false",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:116",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "table_name",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:116"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_116_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "table_name=\"&&Tbl&TblNum\"",
+              "talend": "input_row.table_name.equals(\"&&Tbl&TblNum\")",
+              "line": 116,
+              "requires_semantic_validation": true,
+              "warnings": []
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_116_filter_1_row_count",
+            "vc_m:dsc_create_attrib:op_116_filter_1_nulls",
+            "vc_m:dsc_create_attrib:op_116_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 116,
+            "end_line": 126
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_116_compute_1",
+          "order": 23,
+          "subjob": "m:dsc_create_attrib:s116",
+          "action": "add_component",
+          "operation_id": "op_116_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "2 asignaciones, 2 condicionales",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:116",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ident1",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:116"
+            },
+            {
+              "name": "ident2",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:116"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_116_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "8",
+              "talend": "8",
+              "line": 118,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "12",
+              "talend": "12",
+              "line": 119,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "if _n_ = 1 then  put @ident1 'input '",
+              "talend": null,
+              "line": 121,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "if eof then put @ident2 ';'",
+              "talend": null,
+              "line": 125,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            }
+          ],
+          "assumptions": [
+            "Lógica condicional: revisar orden de evaluación y valores missing"
+          ],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_116_compute_1_nulls",
+            "vc_m:dsc_create_attrib:op_116_compute_1_dates",
+            "vc_m:dsc_create_attrib:op_116_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 116,
+            "end_line": 126
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_116_write_file_1",
+          "order": 24,
+          "subjob": "m:dsc_create_attrib:s116",
+          "action": "add_component",
+          "operation_id": "op_116_write_file_1",
+          "operation_type": "write_file",
+          "component_candidate": "tFileOutputDelimited",
+          "alternatives": [
+            "tFileOutputPositional",
+            "tFileOutputExcel"
+          ],
+          "purpose": "Escribir archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File Name",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "INCLUDEHEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Include Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_116_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta y formato del archivo de salida"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_116_write_file_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 116,
+            "end_line": 126
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileoutputdelimited-standard-properties",
+          "variants": [
+            "tFileOutputARFF",
+            "tFileOutputExcel",
+            "tFileOutputJSON",
+            "tFileOutputLDIF",
+            "tFileOutputPositional",
+            "tFileOutputProperties",
+            "tFileOutputRaw",
+            "tFileOutputXML"
+          ],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_129_read_1",
+          "order": 25,
+          "subjob": "m:dsc_create_attrib:s129",
+          "action": "add_component",
+          "operation_id": "op_129_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer schema_Table_names",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "schema_table_names",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:129",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_create_attrib:op_116_write_file_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_129_read_1_row_count",
+            "vc_m:dsc_create_attrib:op_129_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 129,
+            "end_line": 138
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_create_attrib:op_129_filter_1",
+          "order": 26,
+          "subjob": "m:dsc_create_attrib:s129",
+          "action": "add_component",
+          "operation_id": "op_129_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (opción where= del dataset): table_name=\"&&Tbl&TblNum\"",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": "&&",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:129",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": "table_name == \"&&Tbl&TblNum\"",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:129",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "false",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:129",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "table_name",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:129"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_129_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "table_name=\"&&Tbl&TblNum\"",
+              "talend": "input_row.table_name.equals(\"&&Tbl&TblNum\")",
+              "line": 129,
+              "requires_semantic_validation": true,
+              "warnings": []
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_129_filter_1_row_count",
+            "vc_m:dsc_create_attrib:op_129_filter_1_nulls",
+            "vc_m:dsc_create_attrib:op_129_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 129,
+            "end_line": 138
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_129_compute_1",
+          "order": 27,
+          "subjob": "m:dsc_create_attrib:s129",
+          "action": "add_component",
+          "operation_id": "op_129_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "1 asignaciones, 0 condicionales",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:129",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ident0",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:129"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_129_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "4",
+              "talend": "4",
+              "line": 131,
+              "requires_semantic_validation": true,
+              "warnings": []
+            }
+          ],
+          "assumptions": [],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_129_compute_1_nulls",
+            "vc_m:dsc_create_attrib:op_129_compute_1_dates",
+            "vc_m:dsc_create_attrib:op_129_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 129,
+            "end_line": 138
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_129_write_file_1",
+          "order": 28,
+          "subjob": "m:dsc_create_attrib:s129",
+          "action": "add_component",
+          "operation_id": "op_129_write_file_1",
+          "operation_type": "write_file",
+          "component_candidate": "tFileOutputDelimited",
+          "alternatives": [
+            "tFileOutputPositional",
+            "tFileOutputExcel"
+          ],
+          "purpose": "Escribir archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File Name",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "INCLUDEHEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Include Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_create_attrib:op_129_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta y formato del archivo de salida"
+          ],
+          "tests": [
+            "vc_m:dsc_create_attrib:op_129_write_file_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 129,
+            "end_line": 138
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileoutputdelimited-standard-properties",
+          "variants": [
+            "tFileOutputARFF",
+            "tFileOutputExcel",
+            "tFileOutputJSON",
+            "tFileOutputLDIF",
+            "tFileOutputPositional",
+            "tFileOutputProperties",
+            "tFileOutputRaw",
+            "tFileOutputXML"
+          ],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_143_macro_call_1",
+          "order": 29,
+          "subjob": "m:dsc_create_attrib:s143",
+          "action": "add_component",
+          "operation_id": "op_143_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %dsc_schema_sync",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "dsc_schema_sync",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:143",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_create_attrib:op_129_write_file_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 143,
+            "end_line": 143
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_create_attrib:op_145_macro_call_1",
+          "order": 30,
+          "subjob": "m:dsc_create_attrib:s145",
+          "action": "add_component",
+          "operation_id": "op_145_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %exit",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "exit",
+              "origin": "SAS real/ci360-download-client/macros/dsc_create_attrib.sas:145",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_create_attrib:op_143_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_create_attrib.sas",
+            "line": 145,
+            "end_line": 146
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "vc_m:dsc_create_attrib:op_26_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_26_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_26_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_create_attrib:op_26_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_26_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:dsc_create_attrib:op_26_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_26_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:dsc_create_attrib:op_26_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_26_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:dsc_create_attrib:op_26_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_29_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_29_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_29_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_create_attrib:op_29_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_29_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:dsc_create_attrib:op_29_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_29_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:dsc_create_attrib:op_29_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_29_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:dsc_create_attrib:op_29_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_37_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_37_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_37_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_create_attrib:op_37_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_37_write_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas",
+      "applies_to": [
+        "m:dsc_create_attrib:op_37_write_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_44_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_44_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_44_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_create_attrib:op_44_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_44_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:dsc_create_attrib:op_44_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_56_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_56_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_56_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_create_attrib:op_56_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_56_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_56_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_56_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_56_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_56_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:dsc_create_attrib:op_56_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_56_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_56_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_56_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_56_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_56_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:dsc_create_attrib:op_56_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_56_write_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas",
+      "applies_to": [
+        "m:dsc_create_attrib:op_56_write_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_75_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_75_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_75_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_create_attrib:op_75_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_75_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_75_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_75_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_75_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_75_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:dsc_create_attrib:op_75_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_75_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_75_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_75_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_75_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_75_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:dsc_create_attrib:op_75_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_75_write_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas",
+      "applies_to": [
+        "m:dsc_create_attrib:op_75_write_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_116_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_116_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_116_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_create_attrib:op_116_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_116_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_116_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_116_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_116_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_116_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:dsc_create_attrib:op_116_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_116_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_116_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_116_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_116_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_116_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:dsc_create_attrib:op_116_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_116_write_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas",
+      "applies_to": [
+        "m:dsc_create_attrib:op_116_write_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_129_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_129_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_129_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_create_attrib:op_129_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_129_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:dsc_create_attrib:op_129_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_129_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_129_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_129_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:dsc_create_attrib:op_129_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_129_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_129_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_129_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:dsc_create_attrib:op_129_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_129_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:dsc_create_attrib:op_129_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_create_attrib:op_129_write_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas",
+      "applies_to": [
+        "m:dsc_create_attrib:op_129_write_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "schemaUrl",
+      "sas_value": null,
+      "suggested": "context.schemaUrl",
+      "origin": "&schemaUrl en real/ci360-download-client/macros/dsc_create_attrib.sas:19"
+    },
+    {
+      "name": "Tbl",
+      "sas_value": null,
+      "suggested": "context.Tbl",
+      "origin": "&Tbl en real/ci360-download-client/macros/dsc_create_attrib.sas:56"
+    },
+    {
+      "name": "TblNum",
+      "sas_value": null,
+      "suggested": "context.TblNum",
+      "origin": "&TblNum en real/ci360-download-client/macros/dsc_create_attrib.sas:56"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro dsc_get_schema (real/ci360-download-client/macros/dsc_create_attrib.sas:19) — sin definición en el proyecto",
+    "macro dsc_schema_sync (real/ci360-download-client/macros/dsc_create_attrib.sas:143) — sin definición en el proyecto",
+    "macro exit (real/ci360-download-client/macros/dsc_create_attrib.sas:145) — sin definición en el proyecto"
+  ]
+}

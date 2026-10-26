@@ -1,3 +1,4 @@
+import pytest
 from apps.api import main as api_module
 from fastapi.testclient import TestClient
 
@@ -14,8 +15,8 @@ from sas_grid_migrator.migration_planner.models import (
     SchemaColumn,
 )
 from sas_grid_migrator.sas_parser.ast import Loc
-from sas_grid_migrator.talend_adapter.apply_spec import build_apply_spec
 from sas_grid_migrator.talend_adapter.adapter import TalendError
+from sas_grid_migrator.talend_adapter.apply_spec import build_apply_spec
 
 
 def step(
@@ -86,6 +87,39 @@ def test_build_apply_spec_maps_verified_steps_to_mcp_custom_job_spec():
     assert result.blocked_steps == []
 
 
+def test_context_file_overrides_known_values_and_adds_per_job_parameters(tmp_path):
+    migration = plan(step("read_1", "tFileInputDelimited"))
+    migration.context_variables = [
+        {"name": "year", "suggested": "context.year", "origin": "SAS", "sas_value": None}
+    ]
+    cpf = tmp_path / "daily.cpf"
+    cpf.write_text("# parámetros del Job\nyear=2026\nsource_path=/data/in.csv\n", encoding="utf-8")
+
+    contexts = build_apply_spec(migration, context_file=cpf).to_mcp_arguments()["contexts"]
+
+    assert {item["name"]: item["value"] for item in contexts}["year"] == "2026"
+    assert {item["name"]: item["value"] for item in contexts}["source_path"] == "/data/in.csv"
+
+
+@pytest.mark.parametrize(
+    ("filename", "content", "message"),
+    [
+        ("missing.cpf", None, "No existe"),
+        ("daily.txt", "x=1", "extensión .cpf"),
+        ("daily.cpf", "x=", "está vacío"),
+        ("daily.cpf", "x=1\nX=2", "duplicado"),
+        ("daily.cpf", "bad line", "Línea 1 inválida"),
+    ],
+)
+def test_context_file_rejects_invalid_files(tmp_path, filename, content, message):
+    path = tmp_path / filename
+    if content is not None:
+        path.write_text(content, encoding="utf-8")
+
+    with pytest.raises(ValueError, match=message):
+        build_apply_spec(plan(), context_file=path)
+
+
 def test_build_apply_spec_marks_unverified_steps_as_drafts_without_blocking_pending_notes():
     result = build_apply_spec(
         plan(
@@ -100,6 +134,18 @@ def test_build_apply_spec_marks_unverified_steps_as_drafts_without_blocking_pend
     ]
     assert result.blocked_steps == []
     assert all(component.draft_only for component in result.components)
+
+
+def test_transforming_tmap_is_a_draft_until_mapper_configuration_is_generated():
+    mapping = step("project_1", "tMap")
+    mapping.operation_type = "project"
+    mapping.expressions = [Expression(sas="amount * 2", talend="row1.amount * 2", line=8, requires_semantic_validation=False)]
+
+    component = build_apply_spec(plan(mapping)).components[0]
+
+    assert component.draft_only is True
+    assert component.mapper is None
+    assert "no genera su configuración de mapper" in component.draft_reason
 
 
 def test_build_apply_spec_keeps_known_downstream_component_connected_to_draft_source():

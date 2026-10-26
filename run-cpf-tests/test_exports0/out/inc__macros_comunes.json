@@ -1,0 +1,230 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "inc/macros_comunes.sas",
+  "sha256": "642b775618646bb7e5708aa049718ae5918ca4d4ed1c99b70fba4ce34bb1fa0c",
+  "job_name": "job_macros_comunes",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "limpiar_texto",
+      "params": [
+        "var"
+      ],
+      "steps": []
+    },
+    {
+      "name": "cargar",
+      "params": [
+        "tabla",
+        "destino"
+      ],
+      "steps": [
+        {
+          "id": "m:cargar:op_7_read_1",
+          "order": 1,
+          "subjob": "m:cargar:s7",
+          "action": "add_component",
+          "operation_id": "op_7_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer dwh.&tabla.",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:cargar:op_7_read_1_row_count",
+            "vc_m:cargar:op_7_read_1_schema"
+          ],
+          "evidence": {
+            "file": "inc/macros_comunes.sas",
+            "line": 7,
+            "end_line": 9
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:cargar:op_7_write_1",
+          "order": 2,
+          "subjob": "m:cargar:s7",
+          "action": "add_component",
+          "operation_id": "op_7_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir &destino..&tabla.",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS inc/macros_comunes.sas:7",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS inc/macros_comunes.sas:7",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:cargar:op_7_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:cargar:op_7_write_1_row_count",
+            "vc_m:cargar:op_7_write_1_schema"
+          ],
+          "evidence": {
+            "file": "inc/macros_comunes.sas",
+            "line": 7,
+            "end_line": 9
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        }
+      ]
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "vc_m:cargar:op_7_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:cargar:op_7_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:cargar:op_7_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:cargar:op_7_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:cargar:op_7_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:cargar:op_7_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:cargar:op_7_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:cargar:op_7_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": [
+      "p0_macro_include.sas"
+    ]
+  },
+  "unresolved": [
+    "dataset_dynamic dwh.&tabla. (inc/macros_comunes.sas:7) — nombre de dataset con macrovariables",
+    "dataset_dynamic &destino..&tabla. (inc/macros_comunes.sas:7) — nombre de dataset con macrovariables"
+  ]
+}

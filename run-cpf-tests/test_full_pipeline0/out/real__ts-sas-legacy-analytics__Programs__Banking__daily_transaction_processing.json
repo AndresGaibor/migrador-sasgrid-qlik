@@ -1,0 +1,3439 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+  "sha256": "872c0d44f0d7041d6d43bbcca2f23f49acbed00f754f702d41a602bf218dea1b",
+  "job_name": "job_daily_transaction_processing",
+  "steps": [
+    {
+      "id": "m:daily_transaction_processing:op_21_macro_call_1",
+      "order": 1,
+      "subjob": "m:daily_transaction_processing:s21",
+      "action": "add_component",
+      "operation_id": "op_21_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %parmv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "parmv",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:21",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "txn_date, _req=1",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:21",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 21,
+        "end_line": 21
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_45_read_1",
+      "order": 2,
+      "subjob": "m:daily_transaction_processing:s45",
+      "action": "add_component",
+      "operation_id": "op_45_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer RAW_BANK.&txn_ds",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "&txn_ds",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_21_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería o sistema de origen no determinable (nombre dinámico)"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_45_read_1_row_count",
+        "vc_m:daily_transaction_processing:op_45_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 45,
+        "end_line": 97
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_45_compute_1",
+      "order": 3,
+      "subjob": "m:daily_transaction_processing:s45",
+      "action": "add_component",
+      "operation_id": "op_45_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "6 asignaciones, 6 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "REJECT_REASON",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_45_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "'Missing TRANSACTION_ID'",
+          "talend": "\"Missing TRANSACTION_ID\"",
+          "line": 54,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "'Missing ACCOUNT_ID'",
+          "talend": "\"Missing ACCOUNT_ID\"",
+          "line": 60,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "'Missing TRANSACTION_AMOUNT'",
+          "talend": "\"Missing TRANSACTION_AMOUNT\"",
+          "line": 66,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "catx(' ', 'Amount exceeds threshold:',\r\n        put(TRANSACTION_AMOUNT, dollar18.2))",
+          "talend": null,
+          "line": 73,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.2))'"
+          ]
+        },
+        {
+          "sas": "catx(' ', 'Invalid transaction type:', TRANSACTION_TYPE)",
+          "talend": null,
+          "line": 82,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función catx"
+          ]
+        },
+        {
+          "sas": "catx(' ', 'Future dated:',\r\n        put(TRANSACTION_DATE, date9.))",
+          "talend": null,
+          "line": 89,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.))'"
+          ]
+        },
+        {
+          "sas": "if missing(TRANSACTION_ID) then do",
+          "talend": null,
+          "line": 53,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if missing(ACCOUNT_ID) then do",
+          "talend": null,
+          "line": 59,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if missing(TRANSACTION_AMOUNT) then do",
+          "talend": null,
+          "line": 65,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if abs(TRANSACTION_AMOUNT) > 10000000 then do",
+          "talend": null,
+          "line": 72,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if TRANSACTION_TYPE not in ('DEP','WDR','TRF','PMT','FEE','INT','ADJ','REV','CHG','REF')\r\n    then do",
+          "talend": null,
+          "line": 80,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if TRANSACTION_DATE > \"&txn_date\"d then do",
+          "talend": null,
+          "line": 88,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_45_compute_1_nulls",
+        "vc_m:daily_transaction_processing:op_45_compute_1_dates",
+        "vc_m:daily_transaction_processing:op_45_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 45,
+        "end_line": 97
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_45_select_columns_1",
+      "order": 4,
+      "subjob": "m:daily_transaction_processing:s45",
+      "action": "add_component",
+      "operation_id": "op_45_select_columns_1",
+      "operation_type": "select_columns",
+      "component_candidate": "tFilterColumns",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Conservar/descartar columnas",
+      "properties": [
+        {
+          "name": "SCHEMA",
+          "value": "drop: REJECT_REASON",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Schema",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_45_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_45_select_columns_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 45,
+        "end_line": 97
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_45_write_1",
+      "order": 5,
+      "subjob": "m:daily_transaction_processing:s45",
+      "action": "add_component",
+      "operation_id": "op_45_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.TXN_VALIDATED",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_validated",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_45_select_columns_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_45_write_1_row_count",
+        "vc_m:daily_transaction_processing:op_45_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 45,
+        "end_line": 97
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_45_write_2",
+      "order": 6,
+      "subjob": "m:daily_transaction_processing:s45",
+      "action": "add_component",
+      "operation_id": "op_45_write_2",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.TXN_REJECTED",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_rejected",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_45_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_45_write_2_row_count",
+        "vc_m:daily_transaction_processing:op_45_write_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 45,
+        "end_line": 97
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_106_read_1",
+      "order": 7,
+      "subjob": "m:daily_transaction_processing:s105",
+      "action": "add_component",
+      "operation_id": "op_106_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.TXN_VALIDATED",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_validated",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_45_write_2",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:daily_transaction_processing:op_45_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_106_read_1_row_count",
+        "vc_m:daily_transaction_processing:op_106_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 106,
+        "end_line": 129
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_106_read_2",
+      "order": 8,
+      "subjob": "m:daily_transaction_processing:s105",
+      "action": "add_component",
+      "operation_id": "op_106_read_2",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer STG_BANK.CUST_ACCOUNTS_DAILY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "cust_accounts_daily",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería stg_bank es de tipo BASE en /data/sas/staging/banking: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_106_read_2_row_count",
+        "vc_m:daily_transaction_processing:op_106_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 106,
+        "end_line": 129
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_106_join_1",
+      "order": 9,
+      "subjob": "m:daily_transaction_processing:s105",
+      "action": "add_component",
+      "operation_id": "op_106_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (left join): work.txn_validated, stg_bank.cust_accounts_daily",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Left Outer Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "t.ACCOUNT_ID = a.ACCOUNT_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_106_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:daily_transaction_processing:op_106_read_2",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on t.ACCOUNT_ID = a.ACCOUNT_ID",
+          "talend": null,
+          "line": 106,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_106_join_1_duplicates",
+        "vc_m:daily_transaction_processing:op_106_join_1_row_count",
+        "vc_m:daily_transaction_processing:op_106_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 106,
+        "end_line": 129
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_106_project_1",
+      "order": 10,
+      "subjob": "m:daily_transaction_processing:s105",
+      "action": "add_component",
+      "operation_id": "op_106_project_1",
+      "operation_type": "project",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Seleccionar/calcular columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "*, ACCOUNT_TYPE, CUSTOMER_ID, CUSTOMER_SEGMENT, REGION_CODE, BRANCH_ID, PRE_TXN_BALANCE, case when t.TRANSACTION_TYPE in ('DEP','INT','REF','REV') then a.CURRENT_BALANCE + t.TRANSACTION_AMOUNT when t.TRANSACTION_TYPE in ('WDR','PMT','FEE','CHG') then a.CURRENT_BALANCE - abs(t.TRANSACTION_AMOUNT) when t.TRANSACTION_TYPE in ('TRF','ADJ') then a.CURRENT_BALANCE + t.TRANSACTION_AMOUNT else a.CURRENT_BALANCE end as POST_TXN_BALANCE format=dollar18.2, RISK_RATING",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expressions",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_TYPE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        },
+        {
+          "name": "CUSTOMER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        },
+        {
+          "name": "CUSTOMER_SEGMENT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        },
+        {
+          "name": "REGION_CODE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        },
+        {
+          "name": "BRANCH_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        },
+        {
+          "name": "PRE_TXN_BALANCE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        },
+        {
+          "name": "RISK_RATING",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_106_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "case when t.TRANSACTION_TYPE in ('DEP','INT','REF','REV') then a.CURRENT_BALANCE + t.TRANSACTION_AMOUNT when t.TRANSACTION_TYPE in ('WDR','PMT','FEE','CHG') then a.CURRENT_BALANCE - abs(t.TRANSACTION_AMOUNT) when t.TRANSACTION_TYPE in ('TRF','ADJ') then a.CURRENT_BALANCE + t.TRANSACTION_AMOUNT else a.CURRENT_BALANCE end as POST_TXN_BALANCE format=dollar18.2",
+          "talend": null,
+          "line": 106,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.2'"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_106_project_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 106,
+        "end_line": 129
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_106_sort_1",
+      "order": 11,
+      "subjob": "m:daily_transaction_processing:s105",
+      "action": "add_component",
+      "operation_id": "op_106_sort_1",
+      "operation_type": "sort",
+      "component_candidate": "tSortRow",
+      "alternatives": [],
+      "purpose": "Ordenar por t.ACCOUNT_ID, t.TRANSACTION_DATE, t.TRANSACTION_ID",
+      "properties": [
+        {
+          "name": "CRITERIA",
+          "value": "t.ACCOUNT_ID, t.TRANSACTION_DATE, t.TRANSACTION_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Criteria",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        },
+        {
+          "name": "TRANSACTION_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        },
+        {
+          "name": "TRANSACTION_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_106_project_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_106_sort_1_ordering"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 106,
+        "end_line": 129
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_106_write_1",
+      "order": 12,
+      "subjob": "m:daily_transaction_processing:s105",
+      "action": "add_component",
+      "operation_id": "op_106_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.TXN_ENRICHED (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_enriched",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:106",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_106_sort_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_106_write_1_row_count",
+        "vc_m:daily_transaction_processing:op_106_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 106,
+        "end_line": 129
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_137_read_1",
+      "order": 13,
+      "subjob": "m:daily_transaction_processing:s137",
+      "action": "add_component",
+      "operation_id": "op_137_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.TXN_ENRICHED",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_enriched",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:137",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_106_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:daily_transaction_processing:op_106_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_137_read_1_row_count",
+        "vc_m:daily_transaction_processing:op_137_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 137,
+        "end_line": 154
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_137_compute_1",
+      "order": 14,
+      "subjob": "m:daily_transaction_processing:s137",
+      "action": "add_component",
+      "operation_id": "op_137_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "0 asignaciones, 4 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:137",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_137_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "if first.ACCOUNT_ID then\r\n      RUNNING_BALANCE = PRE_TXN_BALANCE",
+          "talend": null,
+          "line": 143,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if TRANSACTION_TYPE in ('DEP','INT','REF','REV') then\r\n      RUNNING_BALANCE = RUNNING_BALANCE + TRANSACTION_AMOUNT",
+          "talend": null,
+          "line": 146,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if TRANSACTION_TYPE in ('WDR','PMT','FEE','CHG') then\r\n      RUNNING_BALANCE = RUNNING_BALANCE - abs(TRANSACTION_AMOUNT)",
+          "talend": null,
+          "line": 148,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if TRANSACTION_TYPE in ('TRF','ADJ') then\r\n      RUNNING_BALANCE = RUNNING_BALANCE + TRANSACTION_AMOUNT",
+          "talend": null,
+          "line": 150,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_137_compute_1_nulls",
+        "vc_m:daily_transaction_processing:op_137_compute_1_dates",
+        "vc_m:daily_transaction_processing:op_137_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 137,
+        "end_line": 154
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_137_stateful_1",
+      "order": 15,
+      "subjob": "m:daily_transaction_processing:s137",
+      "action": "manual_decision",
+      "operation_id": "op_137_stateful_1",
+      "operation_type": "stateful",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tSortRow + tAggregateRow",
+        "tJavaRow",
+        "tMap con variables"
+      ],
+      "purpose": "Lógica con estado entre filas (RETAIN/FIRST./LAST./ARRAY/hash)",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_137_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Estado entre filas: no hay traducción directa a un componente; requiere diseño manual"
+      ],
+      "pending": [
+        "Diseño manual de la lógica con estado entre filas (RETAIN/FIRST./LAST.)"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_137_stateful_1_ordering",
+        "vc_m:daily_transaction_processing:op_137_stateful_1_duplicates"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 137,
+        "end_line": 154
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_137_write_1",
+      "order": 16,
+      "subjob": "m:daily_transaction_processing:s137",
+      "action": "add_component",
+      "operation_id": "op_137_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.TXN_WITH_BALANCE",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_with_balance",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:137",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:137",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:137",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_137_stateful_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_137_write_1_row_count",
+        "vc_m:daily_transaction_processing:op_137_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 137,
+        "end_line": 154
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_160_read_1",
+      "order": 17,
+      "subjob": "m:daily_transaction_processing:s159",
+      "action": "add_component",
+      "operation_id": "op_160_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer CURATED.DAILY_TRANSACTIONS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "daily_transactions",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:160",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_137_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería curated es de tipo BASE en /data/sas/curated: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_160_read_1_row_count",
+        "vc_m:daily_transaction_processing:op_160_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 160,
+        "end_line": 169
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_160_filter_1",
+      "order": 18,
+      "subjob": "m:daily_transaction_processing:s159",
+      "action": "add_component",
+      "operation_id": "op_160_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): TRANSACTION_DATE >= intnx('day', \"&txn_date\"d, -90)",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_160_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "TRANSACTION_DATE >= intnx('day', \"&txn_date\"d, -90)",
+          "talend": null,
+          "line": 160,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función intnx"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_160_filter_1_row_count",
+        "vc_m:daily_transaction_processing:op_160_filter_1_nulls",
+        "vc_m:daily_transaction_processing:op_160_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 160,
+        "end_line": 169
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_160_aggregate_1",
+      "order": 19,
+      "subjob": "m:daily_transaction_processing:s159",
+      "action": "add_component",
+      "operation_id": "op_160_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por ACCOUNT_ID",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "ACCOUNT_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:160",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": "AVG_TXN_AMT = mean(abs(TRANSACTION_AMOUNT)); TXN_COUNT = count(*)",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:160",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:160"
+        },
+        {
+          "name": "AVG_TXN_AMT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:160"
+        },
+        {
+          "name": "STD_TXN_AMT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:160"
+        },
+        {
+          "name": "TXN_COUNT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:160"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_160_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_160_aggregate_1_aggregates",
+        "vc_m:daily_transaction_processing:op_160_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 160,
+        "end_line": 169
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_160_write_1",
+      "order": 20,
+      "subjob": "m:daily_transaction_processing:s159",
+      "action": "add_component",
+      "operation_id": "op_160_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.TXN_STATS (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_stats",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:160",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:160",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:160",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_160_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_160_write_1_row_count",
+        "vc_m:daily_transaction_processing:op_160_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 160,
+        "end_line": 169
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_173_read_1",
+      "order": 21,
+      "subjob": "m:daily_transaction_processing:s172",
+      "action": "add_component",
+      "operation_id": "op_173_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.TXN_WITH_BALANCE",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_with_balance",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_160_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:daily_transaction_processing:op_137_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_173_read_1_row_count",
+        "vc_m:daily_transaction_processing:op_173_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 173,
+        "end_line": 196
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_173_read_2",
+      "order": 22,
+      "subjob": "m:daily_transaction_processing:s172",
+      "action": "add_component",
+      "operation_id": "op_173_read_2",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.TXN_STATS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_stats",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:daily_transaction_processing:op_160_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_173_read_2_row_count",
+        "vc_m:daily_transaction_processing:op_173_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 173,
+        "end_line": 196
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_173_join_1",
+      "order": 23,
+      "subjob": "m:daily_transaction_processing:s172",
+      "action": "add_component",
+      "operation_id": "op_173_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (left join): work.txn_with_balance, work.txn_stats",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Left Outer Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "e.ACCOUNT_ID = s.ACCOUNT_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_173_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:daily_transaction_processing:op_173_read_2",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on e.ACCOUNT_ID = s.ACCOUNT_ID",
+          "talend": null,
+          "line": 173,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_173_join_1_duplicates",
+        "vc_m:daily_transaction_processing:op_173_join_1_row_count",
+        "vc_m:daily_transaction_processing:op_173_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 173,
+        "end_line": 196
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_173_project_1",
+      "order": 24,
+      "subjob": "m:daily_transaction_processing:s172",
+      "action": "add_component",
+      "operation_id": "op_173_project_1",
+      "operation_type": "project",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Seleccionar/calcular columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "*, AVG_TXN_AMT, STD_TXN_AMT, Z_SCORE, case when calculated Z_SCORE > 3 then 'HIGH_AMOUNT' when e.RUNNING_BALANCE < 0 then 'OVERDRAFT' when e.TRANSACTION_TYPE = 'WDR' and abs(e.TRANSACTION_AMOUNT) > e.PRE_TXN_BALANCE * 0.9 then 'LARGE_WITHDRAWAL' when missing(e.CUSTOMER_ID) then 'ORPHAN_ACCOUNT' else '' end as ANOMALY_TYPE length=20",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expressions",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "AVG_TXN_AMT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173"
+        },
+        {
+          "name": "STD_TXN_AMT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173"
+        },
+        {
+          "name": "Z_SCORE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_173_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "case when s.STD_TXN_AMT > 0 then (abs(e.TRANSACTION_AMOUNT) - s.AVG_TXN_AMT) / s.STD_TXN_AMT else . end",
+          "talend": null,
+          "line": 173,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: ' . end'"
+          ]
+        },
+        {
+          "sas": "case when calculated Z_SCORE > 3 then 'HIGH_AMOUNT' when e.RUNNING_BALANCE < 0 then 'OVERDRAFT' when e.TRANSACTION_TYPE = 'WDR' and abs(e.TRANSACTION_AMOUNT) > e.PRE_TXN_BALANCE * 0.9 then 'LARGE_WITHDRAWAL' when missing(e.CUSTOMER_ID) then 'ORPHAN_ACCOUNT' else '' end as ANOMALY_TYPE length=20",
+          "talend": null,
+          "line": 173,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Construcción SAS sin traducción automática"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_173_project_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 173,
+        "end_line": 196
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_173_filter_1",
+      "order": 25,
+      "subjob": "m:daily_transaction_processing:s172",
+      "action": "add_component",
+      "operation_id": "op_173_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (HAVING): ANOMALY_TYPE ne ''",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": "&&",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": "ANOMALY_TYPE != ''",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": "false",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ANOMALY_TYPE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_173_project_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "ANOMALY_TYPE ne ''",
+          "talend": "!input_row.ANOMALY_TYPE.equals(\"\")",
+          "line": 173,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Missing numérico: en SAS es menor que cualquier número; en Java un null no compara igual"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_173_filter_1_row_count",
+        "vc_m:daily_transaction_processing:op_173_filter_1_nulls",
+        "vc_m:daily_transaction_processing:op_173_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 173,
+        "end_line": 196
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_173_write_1",
+      "order": 26,
+      "subjob": "m:daily_transaction_processing:s172",
+      "action": "add_component",
+      "operation_id": "op_173_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.TXN_ANOMALIES (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_anomalies",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:173",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_173_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_173_write_1_row_count",
+        "vc_m:daily_transaction_processing:op_173_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 173,
+        "end_line": 196
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_205_macro_call_1",
+      "order": 27,
+      "subjob": "m:daily_transaction_processing:s205",
+      "action": "add_component",
+      "operation_id": "op_205_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %lock",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "lock",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:205",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "CURATED.DAILY_TRANSACTIONS",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:205",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_173_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 205,
+        "end_line": 205
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_207_append_1",
+      "order": 28,
+      "subjob": "m:daily_transaction_processing:s207",
+      "action": "add_component",
+      "operation_id": "op_207_append_1",
+      "operation_type": "append",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tDBOutput"
+      ],
+      "purpose": "Añadir filas a una tabla existente",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_with_balance",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:207",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:207",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "NONE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:207",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_205_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Tabla base destino",
+        "Librería curated es de tipo BASE en /data/sas/curated: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_207_append_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 207,
+        "end_line": 209
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_211_macro_call_1",
+      "order": 29,
+      "subjob": "m:daily_transaction_processing:s211",
+      "action": "add_component",
+      "operation_id": "op_211_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %lock",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "lock",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:211",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "CURATED.DAILY_TRANSACTIONS, unlock",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:211",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_207_append_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 211,
+        "end_line": 211
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:daily_transaction_processing:op_214_append_1",
+      "order": 30,
+      "subjob": "m:daily_transaction_processing:s214",
+      "action": "add_component",
+      "operation_id": "op_214_append_1",
+      "operation_type": "append",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tDBOutput"
+      ],
+      "purpose": "Añadir filas a una tabla existente",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_anomalies",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:214",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:214",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "NONE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:214",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_211_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Tabla base destino",
+        "Librería curated es de tipo BASE en /data/sas/curated: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_214_append_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 214,
+        "end_line": 216
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_222_read_1",
+      "order": 31,
+      "subjob": "m:daily_transaction_processing:s222",
+      "action": "add_component",
+      "operation_id": "op_222_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.TXN_WITH_BALANCE",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "txn_with_balance",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:222",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_214_append_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:daily_transaction_processing:op_137_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_222_read_1_row_count",
+        "vc_m:daily_transaction_processing:op_222_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 222,
+        "end_line": 225
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_222_select_columns_1",
+      "order": 32,
+      "subjob": "m:daily_transaction_processing:s222",
+      "action": "add_component",
+      "operation_id": "op_222_select_columns_1",
+      "operation_type": "select_columns",
+      "component_candidate": "tFilterColumns",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Conservar/descartar columnas",
+      "properties": [
+        {
+          "name": "SCHEMA",
+          "value": "keep: ACCOUNT_ID, TRANSACTION_DATE, TRANSACTION_ID, RUNNING_BALANCE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:222",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Schema",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:222"
+        },
+        {
+          "name": "TRANSACTION_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:222"
+        },
+        {
+          "name": "TRANSACTION_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:222"
+        },
+        {
+          "name": "RUNNING_BALANCE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:222"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_222_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_222_select_columns_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 222,
+        "end_line": 225
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_222_write_1",
+      "order": 33,
+      "subjob": "m:daily_transaction_processing:s222",
+      "action": "add_component",
+      "operation_id": "op_222_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir CURATED.RUNNING_BALANCES",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "running_balances",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:222",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:222",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:222",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:daily_transaction_processing:op_222_select_columns_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería curated es de tipo BASE en /data/sas/curated: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:daily_transaction_processing:op_222_write_1_row_count",
+        "vc_m:daily_transaction_processing:op_222_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 222,
+        "end_line": 225
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:daily_transaction_processing:op_238_macro_call_1",
+      "order": 34,
+      "subjob": "m:daily_transaction_processing:s238",
+      "action": "add_component",
+      "operation_id": "op_238_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %exit",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "exit",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:238",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:daily_transaction_processing:op_222_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "line": 238,
+        "end_line": 240
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": {
+    "name": "daily_transaction_processing",
+    "params": [
+      "txn_date"
+    ],
+    "arguments": {
+      "txn_date": "&CURR_DT"
+    }
+  },
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_m:daily_transaction_processing:op_45_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_45_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_45_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:daily_transaction_processing:op_45_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_45_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:daily_transaction_processing:op_45_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_45_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:daily_transaction_processing:op_45_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_45_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:daily_transaction_processing:op_45_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_45_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:daily_transaction_processing:op_45_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_45_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:daily_transaction_processing:op_45_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_45_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:daily_transaction_processing:op_45_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_45_write_2_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:daily_transaction_processing:op_45_write_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_45_write_2_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:daily_transaction_processing:op_45_write_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_106_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:daily_transaction_processing:op_106_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_137_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_137_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_137_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:daily_transaction_processing:op_137_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_137_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:daily_transaction_processing:op_137_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_137_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:daily_transaction_processing:op_137_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_137_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:daily_transaction_processing:op_137_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_137_stateful_1_ordering",
+      "kind": "ordering",
+      "description": "Resultado depende del orden de entrada: probar con datos desordenados y con claves repetidas",
+      "applies_to": [
+        "m:daily_transaction_processing:op_137_stateful_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_137_stateful_1_duplicates",
+      "kind": "duplicates",
+      "description": "Grupos de una sola fila y de muchas filas",
+      "applies_to": [
+        "m:daily_transaction_processing:op_137_stateful_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_137_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:daily_transaction_processing:op_137_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_137_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:daily_transaction_processing:op_137_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_160_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_160_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_160_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:daily_transaction_processing:op_160_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_160_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_160_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_160_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:daily_transaction_processing:op_160_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_160_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:daily_transaction_processing:op_160_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_160_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_160_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_160_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:daily_transaction_processing:op_160_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_160_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:daily_transaction_processing:op_160_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_160_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:daily_transaction_processing:op_160_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_173_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:daily_transaction_processing:op_173_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_207_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:daily_transaction_processing:op_207_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_214_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:daily_transaction_processing:op_214_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_222_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:daily_transaction_processing:op_222_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_222_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:daily_transaction_processing:op_222_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_222_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:daily_transaction_processing:op_222_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_222_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:daily_transaction_processing:op_222_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:daily_transaction_processing:op_222_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:daily_transaction_processing:op_222_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "CURR_DT",
+      "sas_value": null,
+      "suggested": "context.CURR_DT",
+      "origin": "Variable SAS referenciada por %daily_transaction_processing(txn_date=...)"
+    },
+    {
+      "name": "txn_date",
+      "sas_value": null,
+      "suggested": "context.txn_date",
+      "origin": "Parámetro de la macro principal %daily_transaction_processing; argumento SAS: &CURR_DT"
+    },
+    {
+      "name": "txn_ds",
+      "sas_value": null,
+      "suggested": "context.txn_ds",
+      "origin": "&txn_ds en real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "CURATED",
+      "engine": null,
+      "path": "/data/sas/curated",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "STG_BANK",
+      "engine": null,
+      "path": "/data/sas/staging/banking",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [
+      "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#2"
+    ],
+    "grid_recommendations": [
+      {
+        "id": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:124:sas_macro_step.include_dispatch",
+        "pattern_id": "sas_macro_step.include_dispatch",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Crea un Job hijo para cada programa resuelto y confirma sus parámetros antes de conectar la secuencia.",
+        "reason": "The analyzer resolves tested macro dispatches, but macro defaults and failure behavior require review.",
+        "component_candidate": "tRunJob",
+        "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+        "required": [
+          "Review macro dispatch semantics",
+          "Confirm child Job and context parameters"
+        ],
+        "dependencies": [
+          "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#1"
+        ],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+          "line": 124,
+          "end_line": 124
+        },
+        "details": {
+          "kind": "sas_macro_step",
+          "program": "/opt/sas/custom/programs/Banking/daily_transaction_processing.sas",
+          "resolved_program": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+          "match_status": "resolved",
+          "job_name": null,
+          "queue": null,
+          "waits": true,
+          "params": {
+            "step_num": "2",
+            "step_name": "Daily Transaction Processing",
+            "program": "/opt/sas/custom/programs/Banking/daily_transaction_processing.sas"
+          },
+          "condition": null,
+          "unknown_options": [],
+          "incomplete_options": []
+        }
+      },
+      {
+        "id": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:10:scheduler.control_m",
+        "pattern_id": "scheduler.control_m",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Obtén la definición real de Control-M y recrea calendario y dependencias en el planificador elegido.",
+        "reason": "Only a comment is captured; Control-M calendars, dependencies, and job definitions are not parsed.",
+        "component_candidate": null,
+        "doc_url": null,
+        "required": [
+          "Recreate the authoritative schedule in the chosen scheduler"
+        ],
+        "dependencies": [],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+          "line": 10,
+          "end_line": 10
+        },
+        "details": {
+          "schedule": "Daily 07:30 via Control-M job BANK_DAILY_02"
+        }
+      }
+    ],
+    "schedules": [
+      "Daily 07:30 via Control-M job BANK_DAILY_02"
+    ],
+    "upstream": [
+      "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas"
+    ],
+    "downstream": []
+  },
+  "unresolved": [
+    "include /opt/sas/custom/macros/parmv.sas (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:15) — external",
+    "include /opt/sas/custom/macros/nobs.sas (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:16) — external",
+    "include /opt/sas/custom/macros/lock.sas (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:17) — external",
+    "dataset_dynamic RAW_BANK.&txn_ds (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:45) — nombre de dataset con macrovariables",
+    "macro parmv (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:21) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:42) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:99) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:199) — sin definición en el proyecto",
+    "macro lock (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:205) — sin definición en el proyecto",
+    "macro lock (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:211) — sin definición en el proyecto",
+    "macro exit (real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas:238) — sin definición en el proyecto"
+  ]
+}

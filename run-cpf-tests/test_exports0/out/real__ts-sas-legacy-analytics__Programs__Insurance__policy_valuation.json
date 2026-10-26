@@ -1,0 +1,2902 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+  "sha256": "d732c84ab0e645aceab01a4c06bd0fa55a8bdcb8aba03d85f20af2c12a5a715f",
+  "job_name": "job_policy_valuation",
+  "steps": [
+    {
+      "id": "m:policy_valuation:op_19_macro_call_1",
+      "order": 1,
+      "subjob": "m:policy_valuation:s19",
+      "action": "add_component",
+      "operation_id": "op_19_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %parmv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "parmv",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:19",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "val_date, _req=1",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:19",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 19,
+        "end_line": 19
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_20_macro_call_1",
+      "order": 2,
+      "subjob": "m:policy_valuation:s20",
+      "action": "add_component",
+      "operation_id": "op_20_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %parmv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "parmv",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:20",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "lob, _req=0, _val=ALL AUTO HOME WL TL UL HLTH",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:20",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:policy_valuation:op_19_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 20,
+        "end_line": 20
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_35_read_1",
+      "order": 3,
+      "subjob": "m:policy_valuation:s34",
+      "action": "add_component",
+      "operation_id": "op_35_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer RAW_INS.POLICIES",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "policies",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:policy_valuation:op_20_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería raw_ins es de tipo BASE en /data/sas/raw/insurance: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_35_read_1_row_count",
+        "vc_m:policy_valuation:op_35_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 35,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_35_filter_1",
+      "order": 4,
+      "subjob": "m:policy_valuation:s34",
+      "action": "add_component",
+      "operation_id": "op_35_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): p.STATUS = 'ACTIVE' and p.EFFECTIVE_DATE <= \"&val_date\"d and p.EXPIRATION_DATE >",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_35_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "p.STATUS = 'ACTIVE' and p.EFFECTIVE_DATE <= \"&val_date\"d and p.EXPIRATION_DATE >= \"&val_date\"d %if &lob ne ALL %then %do",
+          "talend": null,
+          "line": 35,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: ' %if &lob ne'"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_35_filter_1_row_count",
+        "vc_m:policy_valuation:op_35_filter_1_nulls",
+        "vc_m:policy_valuation:op_35_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 35,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_35_aggregate_1",
+      "order": 5,
+      "subjob": "m:policy_valuation:s34",
+      "action": "add_component",
+      "operation_id": "op_35_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "POLICY_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "CUSTOMER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "POLICY_TYPE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "EFFECTIVE_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "EXPIRATION_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "ANNUAL_PREMIUM",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "SUM_INSURED",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "DEDUCTIBLE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "RISK_CATEGORY",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "UNDERWRITING_CLASS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "AGENT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "BRANCH_CODE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "POLICY_AGE_MONTHS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "MONTHS_TO_EXPIRY",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "case when p.EXPIRATION_DATE <= intnx('month', \"&val_date\"d, 3) then 'Y' else 'N' end as RENEWAL_DUE_FLAG length=1",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        },
+        {
+          "name": "p.ANNUAL_PREMIUM / 12 * min(12, intck('month', max(p.EFFECTIVE_DATE, intnx('year', \"&val_date\"d, 0, 'B')), min(\"&val_date\"d, p.EXPIRATION_DATE))) as YTD_EARNED_PREMIUM format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_35_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:policy_valuation:op_35_aggregate_1_aggregates",
+        "vc_m:policy_valuation:op_35_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 35,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_35_write_1",
+      "order": 6,
+      "subjob": "m:policy_valuation:s34",
+      "action": "add_component",
+      "operation_id": "op_35_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.INFORCE (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "inforce",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_35_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_35_write_1_row_count",
+        "vc_m:policy_valuation:op_35_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 35,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_67_unsupported_1",
+      "order": 7,
+      "subjob": "m:policy_valuation:s34",
+      "action": "manual_decision",
+      "operation_id": "op_67_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_35_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 67,
+        "end_line": 68
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_69_unsupported_1",
+      "order": 8,
+      "subjob": "m:policy_valuation:s34",
+      "action": "manual_decision",
+      "operation_id": "op_69_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_67_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 69,
+        "end_line": 70
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_79_read_1",
+      "order": 9,
+      "subjob": "m:policy_valuation:s78",
+      "action": "add_component",
+      "operation_id": "op_79_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer RAW_INS.CLAIMS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "claims",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:policy_valuation:op_69_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería raw_ins es de tipo BASE en /data/sas/raw/insurance: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_79_read_1_row_count",
+        "vc_m:policy_valuation:op_79_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 79,
+        "end_line": 96
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_79_filter_1",
+      "order": 10,
+      "subjob": "m:policy_valuation:s78",
+      "action": "add_component",
+      "operation_id": "op_79_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): c.LOSS_DATE >= intnx('month', \"&val_date\"d, -12) and c.LOSS_DATE <= \"&val_date\"d",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_79_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "c.LOSS_DATE >= intnx('month', \"&val_date\"d, -12) and c.LOSS_DATE <= \"&val_date\"d",
+          "talend": null,
+          "line": 79,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función intnx"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_79_filter_1_row_count",
+        "vc_m:policy_valuation:op_79_filter_1_nulls",
+        "vc_m:policy_valuation:op_79_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 79,
+        "end_line": 96
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_79_aggregate_1",
+      "order": 11,
+      "subjob": "m:policy_valuation:s78",
+      "action": "add_component",
+      "operation_id": "op_79_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por c.POLICY_ID",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "POLICY_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": "NUM_CLAIMS = count(CLAIM_ID); DENIED_CLAIMS = sum(CLAIM_STATUS = 'DENY' then 1 else 0 end)",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "POLICY_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79"
+        },
+        {
+          "name": "NUM_CLAIMS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79"
+        },
+        {
+          "name": "sum(c.INCURRED_AMOUNT) as TOTAL_INCURRED format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79"
+        },
+        {
+          "name": "sum(c.PAID_AMOUNT) as TOTAL_PAID format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79"
+        },
+        {
+          "name": "sum(c.RESERVED_AMOUNT) as TOTAL_RESERVED format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79"
+        },
+        {
+          "name": "max(c.LOSS_DATE) as LAST_CLAIM_DATE format=date9.",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79"
+        },
+        {
+          "name": "sum(case when c.CLAIM_STATUS in ('OPEN','INV','ADJ','PEND') then c.RESERVED_AMOUNT else 0 end) as OPEN_RESERVES format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79"
+        },
+        {
+          "name": "DENIED_CLAIMS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_79_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:policy_valuation:op_79_aggregate_1_aggregates",
+        "vc_m:policy_valuation:op_79_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 79,
+        "end_line": 96
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_79_write_1",
+      "order": 12,
+      "subjob": "m:policy_valuation:s78",
+      "action": "add_component",
+      "operation_id": "op_79_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.CLAIMS_EXP (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "claims_exp",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:79",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_79_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_79_write_1_row_count",
+        "vc_m:policy_valuation:op_79_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 79,
+        "end_line": 96
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_103_read_1",
+      "order": 13,
+      "subjob": "m:policy_valuation:s102",
+      "action": "add_component",
+      "operation_id": "op_103_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer RAW_INS.PREMIUMS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "premiums",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:policy_valuation:op_79_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería raw_ins es de tipo BASE en /data/sas/raw/insurance: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_103_read_1_row_count",
+        "vc_m:policy_valuation:op_103_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 103,
+        "end_line": 117
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_103_filter_1",
+      "order": 14,
+      "subjob": "m:policy_valuation:s102",
+      "action": "add_component",
+      "operation_id": "op_103_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): PAYMENT_DATE >= intnx('year', \"&val_date\"d, 0, 'B') and PAYMENT_DATE <= \"&val_da",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_103_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "PAYMENT_DATE >= intnx('year', \"&val_date\"d, 0, 'B') and PAYMENT_DATE <= \"&val_date\"d",
+          "talend": null,
+          "line": 103,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función intnx"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_103_filter_1_row_count",
+        "vc_m:policy_valuation:op_103_filter_1_nulls",
+        "vc_m:policy_valuation:op_103_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 103,
+        "end_line": 117
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_103_aggregate_1",
+      "order": 15,
+      "subjob": "m:policy_valuation:s102",
+      "action": "add_component",
+      "operation_id": "op_103_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por POLICY_ID",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "POLICY_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": "LATE_PAYMENTS = count(case when PAYMENT_STATUS = 'LATE' then 1 end)",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "POLICY_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103"
+        },
+        {
+          "name": "sum(PREMIUM_AMOUNT) as COLLECTED_PREMIUM format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103"
+        },
+        {
+          "name": "sum(case when PAYMENT_STATUS = 'RETURNED' then PREMIUM_AMOUNT else 0 end) as RETURNED_PREMIUM format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103"
+        },
+        {
+          "name": "max(PAYMENT_DATE) as LAST_PAYMENT_DATE format=date9.",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103"
+        },
+        {
+          "name": "LATE_PAYMENTS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_103_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:policy_valuation:op_103_aggregate_1_aggregates",
+        "vc_m:policy_valuation:op_103_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 103,
+        "end_line": 117
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_103_write_1",
+      "order": 16,
+      "subjob": "m:policy_valuation:s102",
+      "action": "add_component",
+      "operation_id": "op_103_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.PREMIUM_COLL (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "premium_coll",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:103",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_103_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_103_write_1_row_count",
+        "vc_m:policy_valuation:op_103_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 103,
+        "end_line": 117
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_123_read_1",
+      "order": 17,
+      "subjob": "m:policy_valuation:s123",
+      "action": "add_component",
+      "operation_id": "op_123_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.INFORCE",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "inforce",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:policy_valuation:op_103_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:policy_valuation:op_35_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_123_read_1_row_count",
+        "vc_m:policy_valuation:op_123_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 123,
+        "end_line": 164
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_123_read_2",
+      "order": 18,
+      "subjob": "m:policy_valuation:s123",
+      "action": "add_component",
+      "operation_id": "op_123_read_2",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.CLAIMS_EXP",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "claims_exp",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:policy_valuation:op_79_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_123_read_2_row_count",
+        "vc_m:policy_valuation:op_123_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 123,
+        "end_line": 164
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_123_read_3",
+      "order": 19,
+      "subjob": "m:policy_valuation:s123",
+      "action": "add_component",
+      "operation_id": "op_123_read_3",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.PREMIUM_COLL",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "premium_coll",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:policy_valuation:op_103_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_123_read_3_row_count",
+        "vc_m:policy_valuation:op_123_read_3_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 123,
+        "end_line": 164
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_123_join_1",
+      "order": 20,
+      "subjob": "m:policy_valuation:s123",
+      "action": "add_component",
+      "operation_id": "op_123_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (merge_by): work.inforce, work.claims_exp, work.premium_coll",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "POLICY_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "POLICY_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_123_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:policy_valuation:op_123_read_2",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:policy_valuation:op_123_read_3",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "MERGE BY no es un join SQL: con claves repetidas en ambos lados el resultado difiere"
+      ],
+      "pending": [
+        "Columnas clave y tipos en ambos lados",
+        "Determinar el tipo de join (el programa no usa `if a;`/`if a and b;` de forma reconocible)"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_123_join_1_duplicates",
+        "vc_m:policy_valuation:op_123_join_1_row_count",
+        "vc_m:policy_valuation:op_123_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 123,
+        "end_line": 164
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_123_compute_1",
+      "order": 21,
+      "subjob": "m:policy_valuation:s123",
+      "action": "add_component",
+      "operation_id": "op_123_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "3 asignaciones, 7 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "IBNR_ESTIMATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123"
+        },
+        {
+          "name": "TOTAL_RESERVE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123"
+        },
+        {
+          "name": "VALUATION_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_123_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "max(0, YTD_EARNED_PREMIUM * 0.15 - coalesce(TOTAL_PAID, 0))",
+          "talend": null,
+          "line": 155,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función max"
+          ]
+        },
+        {
+          "sas": "coalesce(OPEN_RESERVES, 0) + IBNR_ESTIMATE",
+          "talend": null,
+          "line": 159,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función coalesce"
+          ]
+        },
+        {
+          "sas": "\"&val_date\"d",
+          "talend": null,
+          "line": 162,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        },
+        {
+          "sas": "if YTD_EARNED_PREMIUM > 0 then\r\n      LOSS_RATIO = coalesce(TOTAL_INCURRED, 0) / YTD_EARNED_PREMIUM",
+          "talend": null,
+          "line": 136,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else\r\n      LOSS_RATIO = .",
+          "talend": null,
+          "line": 138,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if YTD_EARNED_PREMIUM > 0 then\r\n      COMBINED_RATIO = LOSS_RATIO + 0.30",
+          "talend": null,
+          "line": 143,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else\r\n      COMBINED_RATIO = .",
+          "talend": null,
+          "line": 145,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if COMBINED_RATIO = . then PREMIUM_ADEQUATE = 'N'",
+          "talend": null,
+          "line": 150,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if COMBINED_RATIO > 1.0 then PREMIUM_ADEQUATE = 'N'",
+          "talend": null,
+          "line": 151,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else PREMIUM_ADEQUATE = 'Y'",
+          "talend": null,
+          "line": 152,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_123_compute_1_nulls",
+        "vc_m:policy_valuation:op_123_compute_1_dates",
+        "vc_m:policy_valuation:op_123_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 123,
+        "end_line": 164
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_123_write_1",
+      "order": 22,
+      "subjob": "m:policy_valuation:s123",
+      "action": "add_component",
+      "operation_id": "op_123_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir STG_INS.POLICY_VALUATION",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "policy_valuation",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:123",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_123_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería stg_ins es de tipo BASE en /data/sas/staging/insurance: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_123_write_1_row_count",
+        "vc_m:policy_valuation:op_123_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 123,
+        "end_line": 164
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_169_aggregate_1",
+      "order": 23,
+      "subjob": "m:policy_valuation:s169",
+      "action": "add_component",
+      "operation_id": "op_169_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:policy_valuation:op_123_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "PROC MEANS: mapear estadísticas concretas a tAggregateRow"
+      ],
+      "pending": [
+        "Mapear las estadísticas de PROC MEANS a operaciones de agregación"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_169_aggregate_1_aggregates",
+        "vc_m:policy_valuation:op_169_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 169,
+        "end_line": 181
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_184_read_1",
+      "order": 24,
+      "subjob": "m:policy_valuation:s184",
+      "action": "add_component",
+      "operation_id": "op_184_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer REPORTS.LOSS_RATIO_SUMMARY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "loss_ratio_summary",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:policy_valuation:op_169_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería reports es de tipo BASE en /data/sas/reports: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_184_read_1_row_count",
+        "vc_m:policy_valuation:op_184_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 184,
+        "end_line": 193
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_184_compute_1",
+      "order": 25,
+      "subjob": "m:policy_valuation:s184",
+      "action": "add_component",
+      "operation_id": "op_184_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "2 asignaciones, 1 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "TOTAL_EARNED",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:184"
+        },
+        {
+          "name": "TOTAL_INCURRED",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:184"
+        },
+        {
+          "name": "AGG_LOSS_RATIO",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:184"
+        },
+        {
+          "name": "AGG_COMBINED_RATIO",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:184"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_184_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "TOTAL_INCURRED / TOTAL_EARNED",
+          "talend": "(input_row.TOTAL_INCURRED / input_row.TOTAL_EARNED)",
+          "line": 187,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "AGG_LOSS_RATIO + 0.30",
+          "talend": "(input_row.AGG_LOSS_RATIO + 0.30)",
+          "line": 188,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "if TOTAL_EARNED > 0 then do",
+          "talend": null,
+          "line": 186,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_184_compute_1_nulls",
+        "vc_m:policy_valuation:op_184_compute_1_dates",
+        "vc_m:policy_valuation:op_184_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 184,
+        "end_line": 193
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:policy_valuation:op_184_write_1",
+      "order": 26,
+      "subjob": "m:policy_valuation:s184",
+      "action": "add_component",
+      "operation_id": "op_184_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir REPORTS.LOSS_RATIO_SUMMARY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "loss_ratio_summary",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:policy_valuation:op_184_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería reports es de tipo BASE en /data/sas/reports: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:policy_valuation:op_184_write_1_row_count",
+        "vc_m:policy_valuation:op_184_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 184,
+        "end_line": 193
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:policy_valuation:op_200_maintenance_1",
+      "order": 27,
+      "subjob": "m:policy_valuation:s200",
+      "action": "add_component",
+      "operation_id": "op_200_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:policy_valuation:op_184_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "line": 200,
+        "end_line": 202
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": {
+    "name": "policy_valuation",
+    "params": [
+      "val_date",
+      "lob"
+    ],
+    "arguments": {
+      "val_date": "&CURR_DT"
+    }
+  },
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_m:policy_valuation:op_35_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_35_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_35_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:policy_valuation:op_35_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_35_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:policy_valuation:op_35_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_35_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:policy_valuation:op_35_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_35_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:policy_valuation:op_35_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_35_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_35_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_35_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:policy_valuation:op_35_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_35_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:policy_valuation:op_35_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_35_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:policy_valuation:op_35_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_79_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_79_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_79_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:policy_valuation:op_79_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_79_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:policy_valuation:op_79_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_79_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:policy_valuation:op_79_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_79_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:policy_valuation:op_79_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_79_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_79_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_79_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:policy_valuation:op_79_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_79_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:policy_valuation:op_79_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_79_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:policy_valuation:op_79_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_103_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_103_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_103_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:policy_valuation:op_103_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_103_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:policy_valuation:op_103_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_103_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:policy_valuation:op_103_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_103_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:policy_valuation:op_103_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_103_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_103_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_103_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:policy_valuation:op_103_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_103_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:policy_valuation:op_103_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_103_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:policy_valuation:op_103_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_123_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:policy_valuation:op_123_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_123_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:policy_valuation:op_123_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_read_3_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_123_read_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_read_3_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:policy_valuation:op_123_read_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:policy_valuation:op_123_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:policy_valuation:op_123_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:policy_valuation:op_123_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:policy_valuation:op_123_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:policy_valuation:op_123_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:policy_valuation:op_123_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:policy_valuation:op_123_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_123_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:policy_valuation:op_123_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_169_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_169_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_169_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:policy_valuation:op_169_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_184_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:policy_valuation:op_184_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_184_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:policy_valuation:op_184_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_184_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:policy_valuation:op_184_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_184_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:policy_valuation:op_184_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_184_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:policy_valuation:op_184_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_184_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:policy_valuation:op_184_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:policy_valuation:op_184_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:policy_valuation:op_184_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "CURR_DT",
+      "sas_value": null,
+      "suggested": "context.CURR_DT",
+      "origin": "Variable SAS referenciada por %policy_valuation(val_date=...)"
+    },
+    {
+      "name": "lob",
+      "sas_value": null,
+      "suggested": "context.lob",
+      "origin": "Parámetro de la macro principal %policy_valuation; argumento SAS: sin asignar"
+    },
+    {
+      "name": "val_date",
+      "sas_value": null,
+      "suggested": "context.val_date",
+      "origin": "Parámetro de la macro principal %policy_valuation; argumento SAS: &CURR_DT"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "RAW_INS",
+      "engine": null,
+      "path": "/data/sas/raw/insurance",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "REPORTS",
+      "engine": null,
+      "path": "/data/sas/reports",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "STG_INS",
+      "engine": null,
+      "path": "/data/sas/staging/insurance",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [
+      "real/ts-sas-legacy-analytics/BatchJobs/run_daily_insurance.sas#2"
+    ],
+    "grid_recommendations": [
+      {
+        "id": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_insurance.sas:112:sas_macro_step.include_dispatch",
+        "pattern_id": "sas_macro_step.include_dispatch",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Crea un Job hijo para cada programa resuelto y confirma sus parámetros antes de conectar la secuencia.",
+        "reason": "The analyzer resolves tested macro dispatches, but macro defaults and failure behavior require review.",
+        "component_candidate": "tRunJob",
+        "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+        "required": [
+          "Review macro dispatch semantics",
+          "Confirm child Job and context parameters"
+        ],
+        "dependencies": [
+          "real/ts-sas-legacy-analytics/BatchJobs/run_daily_insurance.sas#1"
+        ],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_insurance.sas",
+          "line": 112,
+          "end_line": 112
+        },
+        "details": {
+          "kind": "sas_macro_step",
+          "program": "/opt/sas/custom/programs/Insurance/policy_valuation.sas",
+          "resolved_program": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+          "match_status": "resolved",
+          "job_name": null,
+          "queue": null,
+          "waits": true,
+          "params": {
+            "step_num": "2",
+            "step_name": "Policy Valuation",
+            "program": "/opt/sas/custom/programs/Insurance/policy_valuation.sas"
+          },
+          "condition": null,
+          "unknown_options": [],
+          "incomplete_options": []
+        }
+      },
+      {
+        "id": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:10:scheduler.control_m",
+        "pattern_id": "scheduler.control_m",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Obtén la definición real de Control-M y recrea calendario y dependencias en el planificador elegido.",
+        "reason": "Only a comment is captured; Control-M calendars, dependencies, and job definitions are not parsed.",
+        "component_candidate": null,
+        "doc_url": null,
+        "required": [
+          "Recreate the authoritative schedule in the chosen scheduler"
+        ],
+        "dependencies": [],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas",
+          "line": 10,
+          "end_line": 10
+        },
+        "details": {
+          "schedule": "Monthly 5th business day via Control-M INS_MONTHLY_01"
+        }
+      }
+    ],
+    "schedules": [
+      "Monthly 5th business day via Control-M INS_MONTHLY_01"
+    ],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "include /opt/sas/custom/macros/parmv.sas (real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:14) — external",
+    "include /opt/sas/custom/macros/nobs.sas (real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:15) — external",
+    "macro parmv (real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:19) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:20) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:73) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Insurance/policy_valuation.sas:197) — sin definición en el proyecto"
+  ]
+}

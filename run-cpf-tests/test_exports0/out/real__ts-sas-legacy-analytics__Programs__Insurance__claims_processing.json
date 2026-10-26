@@ -1,0 +1,3115 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+  "sha256": "febd3f80e2f73631228497469fecd57d102dd234209bdd9df505b7c07b063aff",
+  "job_name": "job_claims_processing",
+  "steps": [
+    {
+      "id": "m:claims_processing:op_20_macro_call_1",
+      "order": 1,
+      "subjob": "m:claims_processing:s20",
+      "action": "add_component",
+      "operation_id": "op_20_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %parmv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "parmv",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:20",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "proc_date, _req=1",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:20",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 20,
+        "end_line": 20
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:claims_processing:op_38_read_1",
+      "order": 2,
+      "subjob": "m:claims_processing:s38",
+      "action": "add_component",
+      "operation_id": "op_38_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer RAW_INS.&feed_ds",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "&feed_ds",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:claims_processing:op_20_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería o sistema de origen no determinable (nombre dinámico)"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_38_read_1_row_count",
+        "vc_m:claims_processing:op_38_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 38,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_38_compute_1",
+      "order": 3,
+      "subjob": "m:claims_processing:s38",
+      "action": "add_component",
+      "operation_id": "op_38_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "4 asignaciones, 4 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "rc",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38"
+        },
+        {
+          "name": "VALIDATION_ERROR",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_38_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "h_pol.find()",
+          "talend": null,
+          "line": 57,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función h_pol.find"
+          ]
+        },
+        {
+          "sas": "catx(' ', 'Policy not found or inactive:', POLICY_ID)",
+          "talend": null,
+          "line": 60,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función catx"
+          ]
+        },
+        {
+          "sas": "catx(' ', 'Loss date', put(LOSS_DATE, date9.),\r\n        'outside policy period',\r\n        put(EFFECTIVE_DATE, date9.), '-', put(EXPIRATION_DATE, date9.))",
+          "talend": null,
+          "line": 67,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: \".), 'outside\""
+          ]
+        },
+        {
+          "sas": "catx(' ', 'Claimed amount',\r\n        put(CLAIMED_AMOUNT, dollar18.2), 'exceeds sum insured',\r\n        put(SUM_INSURED, dollar18.2))",
+          "talend": null,
+          "line": 76,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: \".2), 'exceed\""
+          ]
+        },
+        {
+          "sas": "if _N_ = 1 then do",
+          "talend": null,
+          "line": 46,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if rc ne 0 then do",
+          "talend": null,
+          "line": 59,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if LOSS_DATE < EFFECTIVE_DATE or LOSS_DATE > EXPIRATION_DATE then do",
+          "talend": null,
+          "line": 66,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if CLAIMED_AMOUNT > SUM_INSURED then do",
+          "talend": null,
+          "line": 75,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_38_compute_1_nulls",
+        "vc_m:claims_processing:op_38_compute_1_dates",
+        "vc_m:claims_processing:op_38_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 38,
+        "end_line": 85
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:claims_processing:op_38_stateful_1",
+      "order": 4,
+      "subjob": "m:claims_processing:s38",
+      "action": "manual_decision",
+      "operation_id": "op_38_stateful_1",
+      "operation_type": "stateful",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tSortRow + tAggregateRow",
+        "tJavaRow",
+        "tMap con variables"
+      ],
+      "purpose": "Lógica con estado entre filas (RETAIN/FIRST./LAST./ARRAY/hash)",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_38_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Estado entre filas: no hay traducción directa a un componente; requiere diseño manual"
+      ],
+      "pending": [
+        "Diseño manual de la lógica con estado entre filas (RETAIN/FIRST./LAST.)"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_38_stateful_1_ordering",
+        "vc_m:claims_processing:op_38_stateful_1_duplicates"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 38,
+        "end_line": 85
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:claims_processing:op_38_select_columns_1",
+      "order": 5,
+      "subjob": "m:claims_processing:s38",
+      "action": "add_component",
+      "operation_id": "op_38_select_columns_1",
+      "operation_type": "select_columns",
+      "component_candidate": "tFilterColumns",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Conservar/descartar columnas",
+      "properties": [
+        {
+          "name": "SCHEMA",
+          "value": "drop: VALIDATION_ERROR, rc",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Schema",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_38_stateful_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:claims_processing:op_38_select_columns_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 38,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_38_write_1",
+      "order": 6,
+      "subjob": "m:claims_processing:s38",
+      "action": "add_component",
+      "operation_id": "op_38_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.CLAIMS_VALID",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "claims_valid",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_38_select_columns_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_38_write_1_row_count",
+        "vc_m:claims_processing:op_38_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 38,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_38_write_2",
+      "order": 7,
+      "subjob": "m:claims_processing:s38",
+      "action": "add_component",
+      "operation_id": "op_38_write_2",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.CLAIMS_INVALID",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "claims_invalid",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_38_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_38_write_2_row_count",
+        "vc_m:claims_processing:op_38_write_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 38,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_94_read_1",
+      "order": 8,
+      "subjob": "m:claims_processing:s93",
+      "action": "add_component",
+      "operation_id": "op_94_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.CLAIMS_VALID",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "claims_valid",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:claims_processing:op_38_write_2",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:claims_processing:op_38_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_94_read_1_row_count",
+        "vc_m:claims_processing:op_94_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 94,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_94_read_2",
+      "order": 9,
+      "subjob": "m:claims_processing:s93",
+      "action": "add_component",
+      "operation_id": "op_94_read_2",
+      "operation_type": "read",
+      "component_candidate": "tTeradataInput",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer TERA_DW.FRAUD_INDICATORS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "fraud_indicators",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Table Name",
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Query",
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Component List",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Librería tera_dw usa el motor teradata"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_94_read_2_row_count",
+        "vc_m:claims_processing:op_94_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 94,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/teradata/tteradatainput-standard-properties",
+      "variants": [
+        "tAS400Input",
+        "tAccessInput",
+        "tAmazonAuroraInput",
+        "tAmazonOracleInput",
+        "tApacheLogInput",
+        "tAzureSynapseInput",
+        "tBigQueryInput",
+        "tDB2Input",
+        "tExasolInput",
+        "tFirebirdInput",
+        "tGreenplumInput",
+        "tHSQLDbInput"
+      ],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_94_join_1",
+      "order": 10,
+      "subjob": "m:claims_processing:s93",
+      "action": "add_component",
+      "operation_id": "op_94_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (left join): work.claims_valid, tera_dw.fraud_indicators",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Left Outer Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "c.POLICY_ID = f.POLICY_ID, c.CLAIMANT_ID = f.CLAIMANT_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "POLICY_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94"
+        },
+        {
+          "name": "CLAIMANT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_94_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:claims_processing:op_94_read_2",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on c.POLICY_ID = f.POLICY_ID and c.CLAIMANT_ID = f.CLAIMANT_ID",
+          "talend": null,
+          "line": 94,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_94_join_1_duplicates",
+        "vc_m:claims_processing:op_94_join_1_row_count",
+        "vc_m:claims_processing:op_94_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 94,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:claims_processing:op_94_project_1",
+      "order": 11,
+      "subjob": "m:claims_processing:s93",
+      "action": "add_component",
+      "operation_id": "op_94_project_1",
+      "operation_type": "project",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Seleccionar/calcular columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "*, FRAUD_SCORE, INDICATOR_FLAGS, case when f.FRAUD_SCORE >= 80 then 'HIGH' when f.FRAUD_SCORE >= 50 then 'MEDIUM' else 'LOW' end as FRAUD_RISK length=6",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expressions",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "FRAUD_SCORE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94"
+        },
+        {
+          "name": "INDICATOR_FLAGS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_94_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "case when f.FRAUD_SCORE >= 80 then 'HIGH' when f.FRAUD_SCORE >= 50 then 'MEDIUM' else 'LOW' end as FRAUD_RISK length=6",
+          "talend": null,
+          "line": 94,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:claims_processing:op_94_project_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 94,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_94_write_1",
+      "order": 12,
+      "subjob": "m:claims_processing:s93",
+      "action": "add_component",
+      "operation_id": "op_94_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.FRAUD_CHECK (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "fraud_check",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:94",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_94_project_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_94_write_1_row_count",
+        "vc_m:claims_processing:op_94_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 94,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_112_read_1",
+      "order": 13,
+      "subjob": "m:claims_processing:s112",
+      "action": "add_component",
+      "operation_id": "op_112_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.FRAUD_CHECK",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "fraud_check",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:112",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:claims_processing:op_94_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:claims_processing:op_94_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_112_read_1_row_count",
+        "vc_m:claims_processing:op_112_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 112,
+        "end_line": 120
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_114_filter_1",
+      "order": 14,
+      "subjob": "m:claims_processing:s112",
+      "action": "add_component",
+      "operation_id": "op_114_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (sentencia WHERE): FRAUD_RISK = 'HIGH'",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": "&&",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:114",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": "FRAUD_RISK == 'HIGH'",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:114",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": "false",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:114",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "FRAUD_RISK",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:114"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_112_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "FRAUD_RISK = 'HIGH'",
+          "talend": "input_row.FRAUD_RISK.equals(\"HIGH\")",
+          "line": 114,
+          "requires_semantic_validation": true,
+          "warnings": []
+        }
+      ],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:claims_processing:op_114_filter_1_row_count",
+        "vc_m:claims_processing:op_114_filter_1_nulls",
+        "vc_m:claims_processing:op_114_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 114,
+        "end_line": 120
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:claims_processing:op_112_compute_1",
+      "order": 15,
+      "subjob": "m:claims_processing:s112",
+      "action": "add_component",
+      "operation_id": "op_112_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "2 asignaciones, 0 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:112",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ALERT_REASON",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:112"
+        },
+        {
+          "name": "ALERT_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:112"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_114_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "catx('; ',\r\n      catx(' ', 'Fraud score:', put(FRAUD_SCORE, 4.)),\r\n      INDICATOR_FLAGS)",
+          "talend": null,
+          "line": 115,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.)), INDICAT'"
+          ]
+        },
+        {
+          "sas": "\"&proc_date\"d",
+          "talend": null,
+          "line": 118,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_112_compute_1_nulls",
+        "vc_m:claims_processing:op_112_compute_1_dates",
+        "vc_m:claims_processing:op_112_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 112,
+        "end_line": 120
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:claims_processing:op_112_write_1",
+      "order": 16,
+      "subjob": "m:claims_processing:s112",
+      "action": "add_component",
+      "operation_id": "op_112_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.FRAUD_ALERTS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "fraud_alerts",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:112",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:112",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:112",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_112_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_112_write_1_row_count",
+        "vc_m:claims_processing:op_112_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 112,
+        "end_line": 120
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_127_read_1",
+      "order": 17,
+      "subjob": "m:claims_processing:s127",
+      "action": "add_component",
+      "operation_id": "op_127_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.FRAUD_CHECK",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "fraud_check",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:claims_processing:op_112_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:claims_processing:op_94_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_127_read_1_row_count",
+        "vc_m:claims_processing:op_127_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 127,
+        "end_line": 176
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_127_compute_1",
+      "order": 18,
+      "subjob": "m:claims_processing:s127",
+      "action": "add_component",
+      "operation_id": "op_127_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "12 asignaciones, 3 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ADJUDICATION_RESULT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127"
+        },
+        {
+          "name": "ADJUDICATION_REASON",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127"
+        },
+        {
+          "name": "APPROVED_AMOUNT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_127_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "'DENY'",
+          "talend": "\"DENY\"",
+          "line": 137,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "'High fraud risk - SIU referral'",
+          "talend": "\"High fraud risk - SIU referral\"",
+          "line": 138,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "0",
+          "talend": "0",
+          "line": 139,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "'APPR'",
+          "talend": "\"APPR\"",
+          "line": 149,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "'Auto-approved: low risk, small claim'",
+          "talend": "\"Auto-approved: low risk, small claim\"",
+          "line": 150,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "max(0, CLAIMED_AMOUNT - DEDUCTIBLE)",
+          "talend": null,
+          "line": 151,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función max"
+          ]
+        },
+        {
+          "sas": "'APPR'",
+          "talend": "\"APPR\"",
+          "line": 161,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "'Auto-approved: within 25% of sum insured'",
+          "talend": "\"Auto-approved: within 25% of sum insured\"",
+          "line": 162,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "max(0, CLAIMED_AMOUNT - DEDUCTIBLE)",
+          "talend": null,
+          "line": 163,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función max"
+          ]
+        },
+        {
+          "sas": "'PEND'",
+          "talend": "\"PEND\"",
+          "line": 169,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "catx('; ',\r\n      ifc(FRAUD_RISK='MEDIUM', 'Medium fraud risk', ''),\r\n      ifc(CLAIMED_AMOUNT > 50000, 'Large claim', ''),\r\n      ifc(CLAIMED_AMOUNT > SUM_INSURED * 0.25, 'Exceeds 25% threshold', ''))",
+          "talend": null,
+          "line": 170,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función catx"
+          ]
+        },
+        {
+          "sas": ".",
+          "talend": null,
+          "line": 174,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.'"
+          ]
+        },
+        {
+          "sas": "if FRAUD_RISK = 'HIGH' then do",
+          "talend": null,
+          "line": 136,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if FRAUD_RISK = 'LOW'\r\n      and CLAIMED_AMOUNT <= 5000\r\n      and POLICY_TYPE in ('AUTO','HOME','RENT')\r\n    then do",
+          "talend": null,
+          "line": 145,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if FRAUD_RISK = 'LOW'\r\n      and CLAIMED_AMOUNT <= SUM_INSURED * 0.25\r\n      and CLAIMED_AMOUNT <= 50000\r\n    then do",
+          "talend": null,
+          "line": 157,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_127_compute_1_nulls",
+        "vc_m:claims_processing:op_127_compute_1_dates",
+        "vc_m:claims_processing:op_127_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 127,
+        "end_line": 176
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:claims_processing:op_127_write_1",
+      "order": 19,
+      "subjob": "m:claims_processing:s127",
+      "action": "add_component",
+      "operation_id": "op_127_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.AUTO_ADJUDICATED",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "auto_adjudicated",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_127_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_127_write_1_row_count",
+        "vc_m:claims_processing:op_127_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 127,
+        "end_line": 176
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_127_write_2",
+      "order": 20,
+      "subjob": "m:claims_processing:s127",
+      "action": "add_component",
+      "operation_id": "op_127_write_2",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.MANUAL_REVIEW",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "manual_review",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:127",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_127_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_127_write_2_row_count",
+        "vc_m:claims_processing:op_127_write_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 127,
+        "end_line": 176
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_184_read_1",
+      "order": 21,
+      "subjob": "m:claims_processing:s184",
+      "action": "add_component",
+      "operation_id": "op_184_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.AUTO_ADJUDICATED",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "auto_adjudicated",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:claims_processing:op_127_write_2",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:claims_processing:op_127_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_184_read_1_row_count",
+        "vc_m:claims_processing:op_184_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 184,
+        "end_line": 192
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_184_read_2",
+      "order": 22,
+      "subjob": "m:claims_processing:s184",
+      "action": "add_component",
+      "operation_id": "op_184_read_2",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.MANUAL_REVIEW",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "manual_review",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:claims_processing:op_127_write_2): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_184_read_2_row_count",
+        "vc_m:claims_processing:op_184_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 184,
+        "end_line": 192
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_184_union_1",
+      "order": 23,
+      "subjob": "m:claims_processing:s184",
+      "action": "add_component",
+      "operation_id": "op_184_union_1",
+      "operation_type": "union",
+      "component_candidate": "tUnite",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Concatenar entradas",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_184_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Esquemas compatibles entre entradas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_184_union_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 184,
+        "end_line": 192
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/tunite-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:claims_processing:op_184_compute_1",
+      "order": 24,
+      "subjob": "m:claims_processing:s184",
+      "action": "add_component",
+      "operation_id": "op_184_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "2 asignaciones, 0 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "PROCESSING_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:184"
+        },
+        {
+          "name": "ADJUDICATION_RESULT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:184"
+        },
+        {
+          "name": "CLAIM_STATUS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:184"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_184_union_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "\"&proc_date\"d",
+          "talend": null,
+          "line": 188,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        },
+        {
+          "sas": "ADJUDICATION_RESULT",
+          "talend": "input_row.ADJUDICATION_RESULT",
+          "line": 189,
+          "requires_semantic_validation": true,
+          "warnings": []
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_184_compute_1_nulls",
+        "vc_m:claims_processing:op_184_compute_1_dates",
+        "vc_m:claims_processing:op_184_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 184,
+        "end_line": 192
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:claims_processing:op_184_write_1",
+      "order": 25,
+      "subjob": "m:claims_processing:s184",
+      "action": "add_component",
+      "operation_id": "op_184_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.CLAIMS_COMBINED",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "claims_combined",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:184",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:claims_processing:op_184_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_184_write_1_row_count",
+        "vc_m:claims_processing:op_184_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 184,
+        "end_line": 192
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_194_append_1",
+      "order": 26,
+      "subjob": "m:claims_processing:s194",
+      "action": "add_component",
+      "operation_id": "op_194_append_1",
+      "operation_type": "append",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tDBOutput"
+      ],
+      "purpose": "Añadir filas a una tabla existente",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "claims_combined",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:194",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:194",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "NONE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:194",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:claims_processing:op_184_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Tabla base destino",
+        "Librería stg_ins es de tipo BASE en /data/sas/staging/insurance: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_194_append_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 194,
+        "end_line": 196
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_199_append_1",
+      "order": 27,
+      "subjob": "m:claims_processing:s199",
+      "action": "add_component",
+      "operation_id": "op_199_append_1",
+      "operation_type": "append",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tDBOutput"
+      ],
+      "purpose": "Añadir filas a una tabla existente",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "manual_review",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:199",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:199",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "NONE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:199",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:claims_processing:op_194_append_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Tabla base destino",
+        "Librería stg_ins es de tipo BASE en /data/sas/staging/insurance: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_199_append_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 199,
+        "end_line": 201
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_205_append_1",
+      "order": 28,
+      "subjob": "m:claims_processing:s205",
+      "action": "add_component",
+      "operation_id": "op_205_append_1",
+      "operation_type": "append",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tDBOutput"
+      ],
+      "purpose": "Añadir filas a una tabla existente",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "fraud_alerts",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:205",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:205",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "NONE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:205",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:claims_processing:op_199_append_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Tabla base destino",
+        "Librería stg_ins es de tipo BASE en /data/sas/staging/insurance: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:claims_processing:op_205_append_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 205,
+        "end_line": 207
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:claims_processing:op_209_macro_call_1",
+      "order": 29,
+      "subjob": "m:claims_processing:s209",
+      "action": "add_component",
+      "operation_id": "op_209_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %sendmail",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "sendmail",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:209",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "\r\n      to=&EMAIL_ONCALL,\r\n      subject=SIU ALERT: &nobs_fraud high-risk claims on &proc_date,\r\n      body=&nobs_fraud claims flagged for SIU review. See STG_INS.FRAUD_ALERTS.\r\n    ",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:209",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:claims_processing:op_205_append_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 209,
+        "end_line": 213
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:claims_processing:op_229_macro_call_1",
+      "order": 30,
+      "subjob": "m:claims_processing:s229",
+      "action": "add_component",
+      "operation_id": "op_229_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %exit",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "exit",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:229",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:claims_processing:op_209_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "line": 229,
+        "end_line": 231
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": {
+    "name": "claims_processing",
+    "params": [
+      "proc_date"
+    ],
+    "arguments": {
+      "proc_date": "&CURR_DT"
+    }
+  },
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_m:claims_processing:op_38_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:claims_processing:op_38_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:claims_processing:op_38_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:claims_processing:op_38_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:claims_processing:op_38_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:claims_processing:op_38_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_stateful_1_ordering",
+      "kind": "ordering",
+      "description": "Resultado depende del orden de entrada: probar con datos desordenados y con claves repetidas",
+      "applies_to": [
+        "m:claims_processing:op_38_stateful_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_stateful_1_duplicates",
+      "kind": "duplicates",
+      "description": "Grupos de una sola fila y de muchas filas",
+      "applies_to": [
+        "m:claims_processing:op_38_stateful_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:claims_processing:op_38_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:claims_processing:op_38_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:claims_processing:op_38_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_write_2_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:claims_processing:op_38_write_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_38_write_2_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:claims_processing:op_38_write_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_94_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:claims_processing:op_94_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_94_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:claims_processing:op_94_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_94_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:claims_processing:op_94_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_94_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:claims_processing:op_94_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_94_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:claims_processing:op_94_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_94_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:claims_processing:op_94_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_94_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:claims_processing:op_94_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_94_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:claims_processing:op_94_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_94_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:claims_processing:op_94_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_94_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:claims_processing:op_94_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_112_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:claims_processing:op_112_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_112_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:claims_processing:op_112_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_114_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:claims_processing:op_114_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_114_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:claims_processing:op_114_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_114_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:claims_processing:op_114_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_112_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:claims_processing:op_112_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_112_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:claims_processing:op_112_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_112_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:claims_processing:op_112_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_112_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:claims_processing:op_112_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_112_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:claims_processing:op_112_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_127_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:claims_processing:op_127_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_127_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:claims_processing:op_127_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_127_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:claims_processing:op_127_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_127_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:claims_processing:op_127_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_127_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:claims_processing:op_127_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_127_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:claims_processing:op_127_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_127_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:claims_processing:op_127_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_127_write_2_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:claims_processing:op_127_write_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_127_write_2_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:claims_processing:op_127_write_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_184_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:claims_processing:op_184_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_184_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:claims_processing:op_184_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_184_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:claims_processing:op_184_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_184_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:claims_processing:op_184_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_184_union_1_row_count",
+      "kind": "row_count",
+      "description": "Suma de filas de las entradas (UNION sin ALL elimina duplicados)",
+      "applies_to": [
+        "m:claims_processing:op_184_union_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_184_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:claims_processing:op_184_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_184_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:claims_processing:op_184_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_184_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:claims_processing:op_184_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_184_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:claims_processing:op_184_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_184_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:claims_processing:op_184_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_194_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:claims_processing:op_194_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_199_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:claims_processing:op_199_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:claims_processing:op_205_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:claims_processing:op_205_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "CURR_DT",
+      "sas_value": null,
+      "suggested": "context.CURR_DT",
+      "origin": "Variable SAS referenciada por %claims_processing(proc_date=...)"
+    },
+    {
+      "name": "EMAIL_ONCALL",
+      "sas_value": null,
+      "suggested": "context.EMAIL_ONCALL",
+      "origin": "&EMAIL_ONCALL en real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:209"
+    },
+    {
+      "name": "feed_ds",
+      "sas_value": null,
+      "suggested": "context.feed_ds",
+      "origin": "&feed_ds en real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38"
+    },
+    {
+      "name": "nobs_fraud",
+      "sas_value": null,
+      "suggested": "context.nobs_fraud",
+      "origin": "&nobs_fraud en real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:209"
+    },
+    {
+      "name": "proc_date",
+      "sas_value": null,
+      "suggested": "context.proc_date",
+      "origin": "&proc_date en real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:209"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "STG_INS",
+      "engine": null,
+      "path": "/data/sas/staging/insurance",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "TERA_DW",
+      "engine": "teradata",
+      "path": "tdprod.internal.corp",
+      "suggested_connection": "tTeradataConnection",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [
+      "real/ts-sas-legacy-analytics/BatchJobs/run_daily_insurance.sas#1"
+    ],
+    "grid_recommendations": [
+      {
+        "id": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_insurance.sas:109:sas_macro_step.include_dispatch",
+        "pattern_id": "sas_macro_step.include_dispatch",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Crea un Job hijo para cada programa resuelto y confirma sus parámetros antes de conectar la secuencia.",
+        "reason": "The analyzer resolves tested macro dispatches, but macro defaults and failure behavior require review.",
+        "component_candidate": "tRunJob",
+        "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+        "required": [
+          "Review macro dispatch semantics",
+          "Confirm child Job and context parameters"
+        ],
+        "dependencies": [],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_insurance.sas",
+          "line": 109,
+          "end_line": 109
+        },
+        "details": {
+          "kind": "sas_macro_step",
+          "program": "/opt/sas/custom/programs/Insurance/claims_processing.sas",
+          "resolved_program": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+          "match_status": "resolved",
+          "job_name": null,
+          "queue": null,
+          "waits": true,
+          "params": {
+            "step_num": "1",
+            "step_name": "Claims Processing",
+            "program": "/opt/sas/custom/programs/Insurance/claims_processing.sas"
+          },
+          "condition": null,
+          "unknown_options": [],
+          "incomplete_options": []
+        }
+      },
+      {
+        "id": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:10:scheduler.control_m",
+        "pattern_id": "scheduler.control_m",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Obtén la definición real de Control-M y recrea calendario y dependencias en el planificador elegido.",
+        "reason": "Only a comment is captured; Control-M calendars, dependencies, and job definitions are not parsed.",
+        "component_candidate": null,
+        "doc_url": null,
+        "required": [
+          "Recreate the authoritative schedule in the chosen scheduler"
+        ],
+        "dependencies": [],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas",
+          "line": 10,
+          "end_line": 10
+        },
+        "details": {
+          "schedule": "Daily 08:00 via Control-M INS_DAILY_01"
+        }
+      }
+    ],
+    "schedules": [
+      "Daily 08:00 via Control-M INS_DAILY_01"
+    ],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "include /opt/sas/custom/macros/parmv.sas (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:14) — external",
+    "include /opt/sas/custom/macros/nobs.sas (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:15) — external",
+    "include /opt/sas/custom/macros/sendmail.sas (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:16) — external",
+    "dataset_dynamic RAW_INS.&feed_ds (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:38) — nombre de dataset con macrovariables",
+    "macro parmv (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:20) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:87) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:122) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:178) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:179) — sin definición en el proyecto",
+    "macro sendmail (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:209) — sin definición en el proyecto",
+    "macro exit (real/ts-sas-legacy-analytics/Programs/Insurance/claims_processing.sas:229) — sin definición en el proyecto"
+  ]
+}

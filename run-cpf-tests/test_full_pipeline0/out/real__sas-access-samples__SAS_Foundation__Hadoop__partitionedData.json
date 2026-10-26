@@ -1,0 +1,627 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas",
+  "sha256": "bc5025a965122336b3a37aeddd56544a00f31f3f775ac5336270dc471061d6bf",
+  "job_name": "job_partitioneddata",
+  "steps": [
+    {
+      "id": "op_28_maintenance_1",
+      "order": 1,
+      "subjob": "s28",
+      "action": "add_component",
+      "operation_id": "op_28_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas",
+        "line": 28,
+        "end_line": 28
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_37_read_file_1",
+      "order": 2,
+      "subjob": "s35",
+      "action": "add_component",
+      "operation_id": "op_37_read_file_1",
+      "operation_type": "read_file",
+      "component_candidate": "tFileInputDelimited",
+      "alternatives": [
+        "tFileInputPositional",
+        "tFileInputExcel"
+      ],
+      "purpose": "Leer archivo externo",
+      "properties": [
+        {
+          "name": "FILENAME",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "File name/Stream",
+          "options": []
+        },
+        {
+          "name": "FIELDSEPARATOR",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Field Separator",
+          "options": []
+        },
+        {
+          "name": "HEADER",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Header",
+          "options": []
+        },
+        {
+          "name": "ENCODING",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Encoding",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_28_maintenance_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Ruta del archivo, delimitador y codificación",
+        "Esquema (ancho fijo o delimitado)"
+      ],
+      "tests": [
+        "vc_op_37_read_file_1_row_count",
+        "vc_op_37_read_file_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas",
+        "line": 37,
+        "end_line": 59
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+      "variants": [
+        "tFileInputARFF",
+        "tFileInputExcel",
+        "tFileInputFullRow",
+        "tFileInputJSON",
+        "tFileInputLDIF",
+        "tFileInputMail",
+        "tFileInputPositional",
+        "tFileInputProperties",
+        "tFileInputRaw",
+        "tFileInputRegex",
+        "tFileInputXML"
+      ],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_35_inline_data_1",
+      "order": 3,
+      "subjob": "s35",
+      "action": "add_component",
+      "operation_id": "op_35_inline_data_1",
+      "operation_type": "inline_data",
+      "component_candidate": "tFixedFlowInput",
+      "alternatives": [],
+      "purpose": "Datos incrustados (datalines)",
+      "properties": [
+        {
+          "name": "VALUES",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Values",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Datos incrustados en el programa"
+      ],
+      "pending": [
+        "Confirmar los datos incrustados"
+      ],
+      "tests": [
+        "vc_op_35_inline_data_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas",
+        "line": 35,
+        "end_line": 59
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput/tfixedflowinput-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_35_write_1",
+      "order": 4,
+      "subjob": "s35",
+      "action": "add_component",
+      "operation_id": "op_35_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir mydblib.dpart",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "dpart",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_37_read_file_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería mydblib es de tipo BASE: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_35_write_1_row_count",
+        "vc_op_35_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas",
+        "line": 35,
+        "end_line": 59
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_61_read_1",
+      "order": 5,
+      "subjob": "s60",
+      "action": "add_component",
+      "operation_id": "op_61_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer mydblib.dpart",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "dpart",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas:61",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_35_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset producido antes en este programa (op_35_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería mydblib es de tipo BASE: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_op_61_read_1_row_count",
+        "vc_op_61_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas",
+        "line": 61,
+        "end_line": 61
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_61_filter_1",
+      "order": 6,
+      "subjob": "s60",
+      "action": "add_component",
+      "operation_id": "op_61_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): dates = '01mar98'd",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_61_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "dates = '01mar98'd",
+          "talend": null,
+          "line": 61,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_op_61_filter_1_row_count",
+        "vc_op_61_filter_1_nulls",
+        "vc_op_61_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas",
+        "line": 61,
+        "end_line": 61
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_61_project_1",
+      "order": 7,
+      "subjob": "s60",
+      "action": "add_component",
+      "operation_id": "op_61_project_1",
+      "operation_type": "project",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Seleccionar/calcular columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "flight",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas:61",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expressions",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "flight",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas:61"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_61_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_61_project_1_schema"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/Hadoop/partitionedData.sas",
+        "line": 61,
+        "end_line": 61
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_op_37_read_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas leídas, incluidas filas inválidas",
+      "applies_to": [
+        "op_37_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_37_read_file_1_nulls",
+      "kind": "nulls",
+      "description": "Campos vacíos y missing se cargan igual que en SAS",
+      "applies_to": [
+        "op_37_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_35_inline_data_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas",
+      "applies_to": [
+        "op_35_inline_data_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_35_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_35_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_35_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_35_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_61_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_61_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_61_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_61_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_61_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "op_61_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_61_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "op_61_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_61_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "op_61_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_61_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "op_61_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [],
+  "libraries_needed": [
+    {
+      "sas_name": "mydblib",
+      "engine": null,
+      "path": null,
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

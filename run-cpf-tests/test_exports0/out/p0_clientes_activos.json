@@ -1,0 +1,1015 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "p0_clientes_activos.sas",
+  "sha256": "21ee224bdf60fd5ee22f4e081f0d0a858c0c4e376e3a62e3b45f82b73c299dc6",
+  "job_name": "job_p0_clientes_activos",
+  "steps": [
+    {
+      "id": "op_5_read_1",
+      "order": 1,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_5_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer dwh.clientes",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "clientes",
+          "origin": "SAS p0_clientes_activos.sas:5",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería dwh es de tipo BASE en /data/dwh: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_op_5_read_1_row_count",
+        "vc_op_5_read_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 5,
+        "end_line": 13
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_5_rename_1",
+      "order": 2,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_5_rename_1",
+      "operation_type": "rename",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Renombrar columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "id → cliente_id",
+          "origin": "SAS p0_clientes_activos.sas:5",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "cliente_id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_clientes_activos.sas:5"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_5_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_5_rename_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 5,
+        "end_line": 13
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_7_filter_1",
+      "order": 3,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_7_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (sentencia WHERE): estado = 'A' and saldo > 0",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": "&&",
+          "origin": "SAS p0_clientes_activos.sas:7",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": "estado == 'A'; saldo > 0",
+          "origin": "SAS p0_clientes_activos.sas:7",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": "false",
+          "origin": "SAS p0_clientes_activos.sas:7",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "estado",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_clientes_activos.sas:7"
+        },
+        {
+          "name": "saldo",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_clientes_activos.sas:7"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_5_rename_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "estado = 'A' and saldo > 0",
+          "talend": "(input_row.estado.equals(\"A\") && (input_row.saldo > 0))",
+          "line": 7,
+          "requires_semantic_validation": true,
+          "warnings": []
+        }
+      ],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_7_filter_1_row_count",
+        "vc_op_7_filter_1_nulls",
+        "vc_op_7_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 7,
+        "end_line": 13
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_5_compute_1",
+      "order": 4,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_5_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "0 asignaciones, 3 condicionales",
+          "origin": "SAS p0_clientes_activos.sas:5",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_7_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "if saldo >= 100000 then segmento = 'ALTO'",
+          "talend": null,
+          "line": 9,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if saldo >= 10000 then segmento = 'MEDIO'",
+          "talend": null,
+          "line": 10,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else segmento = 'BAJO'",
+          "talend": null,
+          "line": 11,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_op_5_compute_1_nulls",
+        "vc_op_5_compute_1_dates",
+        "vc_op_5_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 5,
+        "end_line": 13
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_5_select_columns_1",
+      "order": 5,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_5_select_columns_1",
+      "operation_type": "select_columns",
+      "component_candidate": "tFilterColumns",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Conservar/descartar columnas",
+      "properties": [
+        {
+          "name": "SCHEMA",
+          "value": "drop: estado",
+          "origin": "SAS p0_clientes_activos.sas:5",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Schema",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_5_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_5_select_columns_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 5,
+        "end_line": 13
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_5_select_columns_2",
+      "order": 6,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_5_select_columns_2",
+      "operation_type": "select_columns",
+      "component_candidate": "tFilterColumns",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Conservar/descartar columnas",
+      "properties": [
+        {
+          "name": "SCHEMA",
+          "value": "keep: cliente_id, nombre, saldo, segmento",
+          "origin": "SAS p0_clientes_activos.sas:5",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Schema",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "cliente_id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_clientes_activos.sas:5"
+        },
+        {
+          "name": "nombre",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_clientes_activos.sas:5"
+        },
+        {
+          "name": "saldo",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_clientes_activos.sas:5"
+        },
+        {
+          "name": "segmento",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_clientes_activos.sas:5"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_5_select_columns_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_5_select_columns_2_schema"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 5,
+        "end_line": 13
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_5_write_1",
+      "order": 7,
+      "subjob": "s5",
+      "action": "add_component",
+      "operation_id": "op_5_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir stg.clientes_activos",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "clientes_activos",
+          "origin": "SAS p0_clientes_activos.sas:5",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS p0_clientes_activos.sas:5",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS p0_clientes_activos.sas:5",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_5_select_columns_2",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería stg es de tipo BASE en /data/staging: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_5_write_1_row_count",
+        "vc_op_5_write_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 5,
+        "end_line": 13
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_15_read_1",
+      "order": 8,
+      "subjob": "s15",
+      "action": "add_component",
+      "operation_id": "op_15_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer stg.clientes_activos",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "clientes_activos",
+          "origin": "SAS p0_clientes_activos.sas:15",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_5_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset producido antes en este programa (op_5_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería stg es de tipo BASE en /data/staging: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_op_15_read_1_row_count",
+        "vc_op_15_read_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 15,
+        "end_line": 17
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_15_sort_1",
+      "order": 9,
+      "subjob": "s15",
+      "action": "add_component",
+      "operation_id": "op_15_sort_1",
+      "operation_type": "sort",
+      "component_candidate": "tSortRow",
+      "alternatives": [],
+      "purpose": "Ordenar por cliente_id",
+      "properties": [
+        {
+          "name": "CRITERIA",
+          "value": "cliente_id",
+          "origin": "SAS p0_clientes_activos.sas:15",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Criteria",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "cliente_id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_clientes_activos.sas:15"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_15_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_15_sort_1_ordering"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 15,
+        "end_line": 17
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_15_dedupe_1",
+      "order": 10,
+      "subjob": "s15",
+      "action": "add_component",
+      "operation_id": "op_15_dedupe_1",
+      "operation_type": "dedupe",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Eliminar duplicados",
+      "properties": [
+        {
+          "name": "UNIQUE_KEY",
+          "value": "cliente_id",
+          "origin": "SAS p0_clientes_activos.sas:15",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "cliente_id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p0_clientes_activos.sas:15"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_15_sort_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Definir la clave y la lógica para conservar la fila correcta por grupo; confirmar una opción disponible en la instalación actual."
+      ],
+      "tests": [
+        "vc_op_15_dedupe_1_duplicates"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 15,
+        "end_line": 17
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_15_write_1",
+      "order": 11,
+      "subjob": "s15",
+      "action": "add_component",
+      "operation_id": "op_15_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir stg.clientes_activos_ord",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "clientes_activos_ord",
+          "origin": "SAS p0_clientes_activos.sas:15",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS p0_clientes_activos.sas:15",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS p0_clientes_activos.sas:15",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_15_dedupe_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería stg es de tipo BASE en /data/staging: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_15_write_1_row_count",
+        "vc_op_15_write_1_schema"
+      ],
+      "evidence": {
+        "file": "p0_clientes_activos.sas",
+        "line": 15,
+        "end_line": 17
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_op_5_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_5_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_5_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_5_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_5_rename_1_schema",
+      "kind": "schema",
+      "description": "Nombres de columna finales",
+      "applies_to": [
+        "op_5_rename_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_7_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "op_7_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_7_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "op_7_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_7_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "op_7_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_5_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "op_5_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_5_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "op_5_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_5_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "op_5_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_5_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "op_5_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_5_select_columns_2_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "op_5_select_columns_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_5_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_5_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_5_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_5_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_15_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_15_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_15_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_15_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_15_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "op_15_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_15_dedupe_1_duplicates",
+      "kind": "duplicates",
+      "description": "Se conserva la misma fila por clave (NODUPKEY conserva la primera)",
+      "applies_to": [
+        "op_15_dedupe_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_15_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_15_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_15_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_15_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [],
+  "libraries_needed": [
+    {
+      "sas_name": "dwh",
+      "engine": null,
+      "path": "/data/dwh",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "stg",
+      "engine": null,
+      "path": "/data/staging",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

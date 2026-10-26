@@ -1,0 +1,1111 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/RX_build.sas",
+  "sha256": "e3b268c2bc5a9381d058092fbde7d696abfd21381078a2f277013cb9e66c8dd2",
+  "job_name": "job_rx_build",
+  "steps": [
+    {
+      "id": "op_43_macro_call_1",
+      "order": 1,
+      "subjob": "s43",
+      "action": "add_component",
+      "operation_id": "op_43_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %setenv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "setenv",
+          "origin": "SAS real/tmsis-analytic-file/RX_build.sas:43",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %setenv (definida en real/tmsis-analytic-file/001_batch_bsf.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/RX_build.sas",
+        "line": 43,
+        "end_line": 43
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_98_unsupported_1",
+      "order": 2,
+      "subjob": "s97",
+      "action": "manual_decision",
+      "operation_id": "op_98_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_43_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/RX_build.sas",
+        "line": 98,
+        "end_line": 98
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_108_unsupported_1",
+      "order": 3,
+      "subjob": "s107",
+      "action": "manual_decision",
+      "operation_id": "op_108_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_98_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/RX_build.sas",
+        "line": 108,
+        "end_line": 108
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_119_compute_1",
+      "order": 4,
+      "subjob": "s119",
+      "action": "add_component",
+      "operation_id": "op_119_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "2 asignaciones, 0 condicionales",
+          "origin": "SAS real/tmsis-analytic-file/RX_build.sas:119",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "rep_date",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/tmsis-analytic-file/RX_build.sas:119"
+        },
+        {
+          "name": "FILE_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/tmsis-analytic-file/RX_build.sas:119"
+        }
+      ],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_108_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "input(strip(\"&REPORTING_PERIOD\"),YYMMDD12.)",
+          "talend": null,
+          "line": 122,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.)'"
+          ]
+        },
+        {
+          "sas": "input(put(input(\"&REPORTING_PERIOD\", ANYDTDTE10.),yymmn6.),6.)",
+          "talend": null,
+          "line": 123,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.),yymmn6.),'"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_op_119_compute_1_nulls",
+        "vc_op_119_compute_1_dates",
+        "vc_op_119_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/RX_build.sas",
+        "line": 119,
+        "end_line": 130
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_124_set_variable_1",
+      "order": 5,
+      "subjob": "s119",
+      "action": "add_component",
+      "operation_id": "op_124_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/RX_build.sas:124",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_119_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/RX_build.sas",
+        "line": 124,
+        "end_line": 130
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_126_set_variable_1",
+      "order": 6,
+      "subjob": "s119",
+      "action": "add_component",
+      "operation_id": "op_126_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/RX_build.sas:126",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_124_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/RX_build.sas",
+        "line": 126,
+        "end_line": 130
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_127_set_variable_1",
+      "order": 7,
+      "subjob": "s119",
+      "action": "add_component",
+      "operation_id": "op_127_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/RX_build.sas:127",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_126_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/RX_build.sas",
+        "line": 127,
+        "end_line": 130
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_128_set_variable_1",
+      "order": 8,
+      "subjob": "s119",
+      "action": "add_component",
+      "operation_id": "op_128_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/RX_build.sas:128",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_127_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/RX_build.sas",
+        "line": 128,
+        "end_line": 130
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_129_set_variable_1",
+      "order": 9,
+      "subjob": "s119",
+      "action": "add_component",
+      "operation_id": "op_129_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/RX_build.sas:129",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_128_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/RX_build.sas",
+        "line": 129,
+        "end_line": 130
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_184_macro_call_1",
+      "order": 10,
+      "subjob": "s184",
+      "action": "add_component",
+      "operation_id": "op_184_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %process",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "process",
+          "origin": "SAS real/tmsis-analytic-file/RX_build.sas:184",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_129_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %process (definida en real/tmsis-analytic-file/IP_Build.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/RX_build.sas",
+        "line": 184,
+        "end_line": 184
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "setENV",
+      "params": [],
+      "steps": []
+    },
+    {
+      "name": "PROCESS",
+      "params": [],
+      "steps": [
+        {
+          "id": "m:PROCESS:op_136_maintenance_1",
+          "order": 1,
+          "subjob": "m:PROCESS:s136",
+          "action": "add_component",
+          "operation_id": "op_136_maintenance_1",
+          "operation_type": "maintenance",
+          "component_candidate": "tDBRow",
+          "alternatives": [
+            "ninguno"
+          ],
+          "purpose": "Mantenimiento de datasets",
+          "properties": [
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Decidir si la operación de mantenimiento aplica en el destino"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 136,
+            "end_line": 138
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_143_unsupported_1",
+          "order": 2,
+          "subjob": "m:PROCESS:s141",
+          "action": "manual_decision",
+          "operation_id": "op_143_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:PROCESS:op_136_maintenance_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 143,
+            "end_line": 143
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_145_unsupported_1",
+          "order": 3,
+          "subjob": "m:PROCESS:s141",
+          "action": "manual_decision",
+          "operation_id": "op_145_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:PROCESS:op_143_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 145,
+            "end_line": 145
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_147_unsupported_1",
+          "order": 4,
+          "subjob": "m:PROCESS:s141",
+          "action": "manual_decision",
+          "operation_id": "op_147_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:PROCESS:op_145_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 147,
+            "end_line": 147
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_149_unsupported_1",
+          "order": 5,
+          "subjob": "m:PROCESS:s141",
+          "action": "manual_decision",
+          "operation_id": "op_149_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:PROCESS:op_147_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 149,
+            "end_line": 149
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_151_unsupported_1",
+          "order": 6,
+          "subjob": "m:PROCESS:s141",
+          "action": "manual_decision",
+          "operation_id": "op_151_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:PROCESS:op_149_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 151,
+            "end_line": 151
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_153_unsupported_1",
+          "order": 7,
+          "subjob": "m:PROCESS:s141",
+          "action": "manual_decision",
+          "operation_id": "op_153_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:PROCESS:op_151_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 153,
+            "end_line": 153
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_155_unsupported_1",
+          "order": 8,
+          "subjob": "m:PROCESS:s141",
+          "action": "manual_decision",
+          "operation_id": "op_155_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:PROCESS:op_153_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 155,
+            "end_line": 155
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_159_unsupported_1",
+          "order": 9,
+          "subjob": "m:PROCESS:s141",
+          "action": "manual_decision",
+          "operation_id": "op_159_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:PROCESS:op_155_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 159,
+            "end_line": 159
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_164_unsupported_1",
+          "order": 10,
+          "subjob": "m:PROCESS:s141",
+          "action": "manual_decision",
+          "operation_id": "op_164_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:PROCESS:op_159_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 164,
+            "end_line": 164
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_167_unsupported_1",
+          "order": 11,
+          "subjob": "m:PROCESS:s141",
+          "action": "manual_decision",
+          "operation_id": "op_167_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:PROCESS:op_164_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 167,
+            "end_line": 167
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:PROCESS:op_175_maintenance_1",
+          "order": 12,
+          "subjob": "m:PROCESS:s175",
+          "action": "add_component",
+          "operation_id": "op_175_maintenance_1",
+          "operation_type": "maintenance",
+          "component_candidate": "tDBRow",
+          "alternatives": [
+            "ninguno"
+          ],
+          "purpose": "Mantenimiento de datasets",
+          "properties": [
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:PROCESS:op_167_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Decidir si la operación de mantenimiento aplica en el destino"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/RX_build.sas",
+            "line": 175,
+            "end_line": 175
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "vc_op_119_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "op_119_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_119_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "op_119_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_119_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "op_119_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "da_config_macro",
+      "sas_value": "\"/sasdata/users/&sysuserid/tmsislockdown/config/da_config.sas\"",
+      "suggested": "context.da_config_macro",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "FL",
+      "sas_value": "RX",
+      "suggested": "context.FL",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "path",
+      "sas_value": "/sasdata/users/&sysuserid/&TMSIS/&sub_env/data_analytics/taf/rx",
+      "suggested": "context.path",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "tms_config_macro",
+      "sas_value": "\"/sasdata/users/&sysuserid/tmsislockdown/config/tms_config.sas\"",
+      "suggested": "context.tms_config_macro",
+      "origin": "%LET de primer nivel"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "include &tms_config_macro (real/tmsis-analytic-file/RX_build.sas:23) — ruta dinámica",
+    "include &da_config_macro (real/tmsis-analytic-file/RX_build.sas:27) — ruta dinámica",
+    "include \"/sasdata/users/&sysuserid/&tmsis./&sub_env./data_analytics/taf/programs/AWS_Shared_Macros.sas\" (real/tmsis-analytic-file/RX_build.sas:66) — ruta dinámica",
+    "include \"/sasdata/users/&sysuserid/&tmsis./&sub_env./data_analytics/taf/programs/AWS_Grouper_Macro.sas\" (real/tmsis-analytic-file/RX_build.sas:67) — ruta dinámica",
+    "include \"/sasdata/users/&sysuserid/&tmsis./&sub_env./data_analytics/taf/rx/programs/AWS_RX_Macros.sas\" (real/tmsis-analytic-file/RX_build.sas:68) — ruta dinámica",
+    "include \"/sasdata/users/&sysuserid/&tmsis./&sub_env./data_analytics/taf/programs/Fasc.sas\" (real/tmsis-analytic-file/RX_build.sas:69) — ruta dinámica",
+    "macro tmsis_connect (real/tmsis-analytic-file/RX_build.sas:99) — sin definición en el proyecto",
+    "macro job_control_rd (real/tmsis-analytic-file/RX_build.sas:101) — sin definición en el proyecto",
+    "macro tmsis_disconnect (real/tmsis-analytic-file/RX_build.sas:103) — sin definición en el proyecto",
+    "macro tmsis_connect (real/tmsis-analytic-file/RX_build.sas:109) — sin definición en el proyecto",
+    "macro job_control_updt (real/tmsis-analytic-file/RX_build.sas:111) — sin definición en el proyecto",
+    "macro tmsis_disconnect (real/tmsis-analytic-file/RX_build.sas:113) — sin definición en el proyecto",
+    "macro tmsis_connect (real/tmsis-analytic-file/RX_build.sas:142) — sin definición en el proyecto",
+    "macro aws_maxid_pull (real/tmsis-analytic-file/RX_build.sas:144) — sin definición en el proyecto",
+    "macro aws_claims_family_table_link (real/tmsis-analytic-file/RX_build.sas:146) — sin definición en el proyecto",
+    "macro process_nppes (real/tmsis-analytic-file/RX_build.sas:148) — sin definición en el proyecto",
+    "macro process_ccs (real/tmsis-analytic-file/RX_build.sas:150) — sin definición en el proyecto",
+    "macro aws_extract_line_ (real/tmsis-analytic-file/RX_build.sas:152) — sin definición en el proyecto",
+    "macro build_ (real/tmsis-analytic-file/RX_build.sas:154) — sin definición en el proyecto",
+    "macro job_control_updt2 (real/tmsis-analytic-file/RX_build.sas:156) — sin definición en el proyecto",
+    "macro create_meta_info (real/tmsis-analytic-file/RX_build.sas:160) — sin definición en el proyecto",
+    "macro create_eftsmeta_info (real/tmsis-analytic-file/RX_build.sas:161) — sin definición en el proyecto",
+    "macro create_meta_info (real/tmsis-analytic-file/RX_build.sas:165) — sin definición en el proyecto",
+    "macro create_eftsmeta_info (real/tmsis-analytic-file/RX_build.sas:166) — sin definición en el proyecto",
+    "macro final_control_info (real/tmsis-analytic-file/RX_build.sas:168) — sin definición en el proyecto",
+    "macro tmsis_disconnect (real/tmsis-analytic-file/RX_build.sas:170) — sin definición en el proyecto"
+  ]
+}

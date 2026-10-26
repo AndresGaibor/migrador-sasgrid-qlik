@@ -1,0 +1,274 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/002_eligibility_dates.sas",
+  "sha256": "2b1bfa2c8b50960d060bf9890cefda3b4bab9cb48ad2c03d0ddf545e3e88aab3",
+  "job_name": "job_002_eligibility_dates",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "create_ELDTS",
+      "params": [],
+      "steps": [
+        {
+          "id": "m:create_ELDTS:op_23_macro_call_1",
+          "order": 1,
+          "subjob": "m:create_ELDTS:s23",
+          "action": "add_component",
+          "operation_id": "op_23_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %create_temp_table",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "create_temp_table",
+              "origin": "SAS real/tmsis-analytic-file/002_eligibility_dates.sas:23",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "eligibility_dates,\r\n\t                subcols=%nrbquote( %monthly_array_eldts(MDCD_ENRLMT_EFF_DT_,nslots=16,truncfirst=1)\r\n\r\n\t\t\t\t\t),\r\n\t                subcols2=%nrbquote( %monthly_array_eldts(MDCD_ENRLMT_END_DT_,nslots=16,truncfirst=0) \r\n\t\t\t\t\t),\r\n\t                subcols3=%nrbquote( %monthly_array_eldts(CHIP_ENRLMT_EFF_DT_,nslots=16,truncfirst=1)\r\n\t\t\t\t\t),\r\n\t                subcols4=%nrbquote( %monthly_array_eldts(CHIP_ENRLMT_END_DT_,nslots=16,truncfirst=0)\r\n\t\t\t\t\t) ",
+              "origin": "SAS real/tmsis-analytic-file/002_eligibility_dates.sas:23",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/002_eligibility_dates.sas",
+            "line": 23,
+            "end_line": 32
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_ELDTS:op_317_macro_call_1",
+          "order": 2,
+          "subjob": "m:create_ELDTS:s317",
+          "action": "add_component",
+          "operation_id": "op_317_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %dates",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "dates",
+              "origin": "SAS real/tmsis-analytic-file/002_eligibility_dates.sas:317",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "MDCD,1",
+              "origin": "SAS real/tmsis-analytic-file/002_eligibility_dates.sas:317",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_ELDTS:op_23_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %dates (definida en real/tmsis-analytic-file/002_eligibility_dates.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/002_eligibility_dates.sas",
+            "line": 317,
+            "end_line": 317
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:create_ELDTS:op_318_macro_call_1",
+          "order": 3,
+          "subjob": "m:create_ELDTS:s318",
+          "action": "add_component",
+          "operation_id": "op_318_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %dates",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "dates",
+              "origin": "SAS real/tmsis-analytic-file/002_eligibility_dates.sas:318",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "CHIP,2",
+              "origin": "SAS real/tmsis-analytic-file/002_eligibility_dates.sas:318",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_ELDTS:op_317_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %dates (definida en real/tmsis-analytic-file/002_eligibility_dates.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/002_eligibility_dates.sas",
+            "line": 318,
+            "end_line": 318
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:create_ELDTS:op_413_macro_call_1",
+          "order": 4,
+          "subjob": "m:create_ELDTS:s413",
+          "action": "add_component",
+          "operation_id": "op_413_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %drop_tables",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "drop_tables",
+              "origin": "SAS real/tmsis-analytic-file/002_eligibility_dates.sas:413",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "eligibility_dates_&year. MDCD_dates_out CHIP_dates_out MDCD_days_out CHIP_days_out numbers",
+              "origin": "SAS real/tmsis-analytic-file/002_eligibility_dates.sas:413",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_ELDTS:op_318_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/002_eligibility_dates.sas",
+            "line": 413,
+            "end_line": 413
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "year",
+      "sas_value": null,
+      "suggested": "context.year",
+      "origin": "&year en real/tmsis-analytic-file/002_eligibility_dates.sas:413"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro create_temp_table (real/tmsis-analytic-file/002_eligibility_dates.sas:23) — sin definición en el proyecto",
+    "macro monthly_array_eldts (real/tmsis-analytic-file/002_eligibility_dates.sas:23) — sin definición en el proyecto",
+    "macro drop_tables (real/tmsis-analytic-file/002_eligibility_dates.sas:312) — sin definición en el proyecto",
+    "macro table_id_cols (real/tmsis-analytic-file/002_eligibility_dates.sas:347) — sin definición en el proyecto",
+    "macro drop_tables (real/tmsis-analytic-file/002_eligibility_dates.sas:413) — sin definición en el proyecto"
+  ]
+}

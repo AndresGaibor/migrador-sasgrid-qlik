@@ -1,0 +1,101 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Config/autoexec.sas",
+  "sha256": "9f1f13cd17b34948b2eaa5fc15737ea773bcdc77d1986c04fa6d02206d7442d1",
+  "job_name": "job_autoexec",
+  "steps": [],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "ABORT_ON_ERR",
+      "sas_value": "Y",
+      "suggested": "context.ABORT_ON_ERR",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "ARCHIVE_PATH",
+      "sas_value": "/data/sas/archive",
+      "suggested": "context.ARCHIVE_PATH",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "BASE_PATH",
+      "sas_value": "/data/sas",
+      "suggested": "context.BASE_PATH",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "CURR_DT",
+      "sas_value": "%sysfunc(today(), date9.)",
+      "suggested": "context.CURR_DT",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "CURR_YM",
+      "sas_value": "%sysfunc(today(), yymmn6.)",
+      "suggested": "context.CURR_YM",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "EMAIL_DL",
+      "sas_value": "sas-ops@corp.internal",
+      "suggested": "context.EMAIL_DL",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "EMAIL_ONCALL",
+      "sas_value": "oncall-data@corp.internal",
+      "suggested": "context.EMAIL_ONCALL",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "ENVIRONMENT",
+      "sas_value": "PROD",
+      "suggested": "context.ENVIRONMENT",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "FY_START",
+      "sas_value": "%sysfunc(intnx(year, %sysfunc(today()), 0, B), date9.)",
+      "suggested": "context.FY_START",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "LOG_PATH",
+      "sas_value": "/data/sas/logs",
+      "suggested": "context.LOG_PATH",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "MAX_OBS_WARN",
+      "sas_value": "10000000",
+      "suggested": "context.MAX_OBS_WARN",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "PREV_YM",
+      "sas_value": "%sysfunc(intnx(month, %sysfunc(today()), -1), yymmn6.)",
+      "suggested": "context.PREV_YM",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "REPORT_PATH",
+      "sas_value": "/data/sas/reports/output",
+      "suggested": "context.REPORT_PATH",
+      "origin": "%LET de primer nivel"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

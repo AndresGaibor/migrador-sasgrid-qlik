@@ -1,0 +1,1218 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+  "sha256": "1c70d9431fd8e061681a76aab0c92a1cfb628ffd2ba1aa006a185a3c387adcfa",
+  "job_name": "job_dsc_appendtocustomerdb",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "dsc_appendtocustomerdb",
+      "params": [
+        "range_id"
+      ],
+      "steps": [
+        {
+          "id": "m:dsc_appendtocustomerdb:op_10_read_1",
+          "order": 1,
+          "subjob": "m:dsc_appendtocustomerdb:s9",
+          "action": "add_component",
+          "operation_id": "op_10_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer Download_details",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "download_details",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:10",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_10_read_1_row_count",
+            "vc_m:dsc_appendtocustomerdb:op_10_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 10,
+            "end_line": 12
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_10_filter_1",
+          "order": 2,
+          "subjob": "m:dsc_appendtocustomerdb:s9",
+          "action": "add_component",
+          "operation_id": "op_10_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (WHERE): range_id= &range_id.",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": "&&",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:10",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": "range_id == &range_id.",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:10",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "false",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:10",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "range_id",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:10"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_appendtocustomerdb:op_10_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "range_id= &range_id.",
+              "talend": "(input_row.range_id == context.range_id)",
+              "line": 10,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &range_id → context.range_id (crear variable de contexto)"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_10_filter_1_row_count",
+            "vc_m:dsc_appendtocustomerdb:op_10_filter_1_nulls",
+            "vc_m:dsc_appendtocustomerdb:op_10_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 10,
+            "end_line": 12
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_10_project_1",
+          "order": 3,
+          "subjob": "m:dsc_appendtocustomerdb:s9",
+          "action": "add_component",
+          "operation_id": "op_10_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "distinct entityName, entity_cd",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:10",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "entity_cd",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:10"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_appendtocustomerdb:op_10_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "distinct entityName",
+              "talend": null,
+              "line": 10,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: texto sobrante"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_10_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 10,
+            "end_line": 12
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_10_set_variable_1",
+          "order": 4,
+          "subjob": "m:dsc_appendtocustomerdb:s9",
+          "action": "add_component",
+          "operation_id": "op_10_set_variable_1",
+          "operation_type": "set_variable",
+          "component_candidate": "tSetGlobalVar",
+          "alternatives": [
+            "tJava",
+            "tFlowToIterate"
+          ],
+          "purpose": "Asignar variable desde datos",
+          "properties": [
+            {
+              "name": "VARIABLES",
+              "value": "KEY=Entities separated by '",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:10",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Variables",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_appendtocustomerdb:op_10_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Origen del valor y alcance de la variable"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 10,
+            "end_line": 12
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_36_read_1",
+          "order": 5,
+          "subjob": "m:dsc_appendtocustomerdb:s35",
+          "action": "add_component",
+          "operation_id": "op_36_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer dictionary.tables",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "tables",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:36",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_appendtocustomerdb:op_10_set_variable_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería dictionary es de tipo BASE: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_36_read_1_row_count",
+            "vc_m:dsc_appendtocustomerdb:op_36_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 36,
+            "end_line": 42
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_36_filter_1",
+          "order": 6,
+          "subjob": "m:dsc_appendtocustomerdb:s35",
+          "action": "add_component",
+          "operation_id": "op_36_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (WHERE): upcase(libname) = \"DSCEXTR\" and MEMNAME like \"&current_entity_cd%\"",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_appendtocustomerdb:op_36_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "upcase(libname) = \"DSCEXTR\" and MEMNAME like \"&current_entity_cd%\"",
+              "talend": null,
+              "line": 36,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: texto sobrante"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [
+            "Traducir la condición manualmente (no hay traducción automática segura)"
+          ],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_36_filter_1_row_count",
+            "vc_m:dsc_appendtocustomerdb:op_36_filter_1_nulls",
+            "vc_m:dsc_appendtocustomerdb:op_36_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 36,
+            "end_line": 42
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_36_project_1",
+          "order": 7,
+          "subjob": "m:dsc_appendtocustomerdb:s35",
+          "action": "add_component",
+          "operation_id": "op_36_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "'DSCEXTR.' || memname",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:36",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "memname",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:36"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_appendtocustomerdb:op_36_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "'DSCEXTR.' || memname",
+              "talend": "(\"DSCEXTR.\" + input_row.memname)",
+              "line": 36,
+              "requires_semantic_validation": true,
+              "warnings": []
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_36_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 36,
+            "end_line": 42
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_36_set_variable_1",
+          "order": 8,
+          "subjob": "m:dsc_appendtocustomerdb:s35",
+          "action": "add_component",
+          "operation_id": "op_36_set_variable_1",
+          "operation_type": "set_variable",
+          "component_candidate": "tSetGlobalVar",
+          "alternatives": [
+            "tJava",
+            "tFlowToIterate"
+          ],
+          "purpose": "Asignar variable desde datos",
+          "properties": [
+            {
+              "name": "VARIABLES",
+              "value": "KEY=TableParts separated by ' '",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:36",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Variables",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_appendtocustomerdb:op_36_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Origen del valor y alcance de la variable"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 36,
+            "end_line": 42
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_44_read_1",
+          "order": 9,
+          "subjob": "m:dsc_appendtocustomerdb:s44",
+          "action": "add_component",
+          "operation_id": "op_44_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer &TableParts.",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_appendtocustomerdb:op_36_set_variable_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_44_read_1_row_count",
+            "vc_m:dsc_appendtocustomerdb:op_44_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 44,
+            "end_line": 46
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_44_write_1",
+          "order": 10,
+          "subjob": "m:dsc_appendtocustomerdb:s44",
+          "action": "add_component",
+          "operation_id": "op_44_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir &&entity&entityNum.",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:44",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:44",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_appendtocustomerdb:op_44_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_44_write_1_row_count",
+            "vc_m:dsc_appendtocustomerdb:op_44_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 44,
+            "end_line": 46
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_48_append_1",
+          "order": 11,
+          "subjob": "m:dsc_appendtocustomerdb:s48",
+          "action": "add_component",
+          "operation_id": "op_48_append_1",
+          "operation_type": "append",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tDBOutput"
+          ],
+          "purpose": "Añadir filas a una tabla existente",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:48",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "NONE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:48",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_appendtocustomerdb:op_44_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Tabla base destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_48_append_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 48,
+            "end_line": 49
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_55_append_1",
+          "order": 12,
+          "subjob": "m:dsc_appendtocustomerdb:s55",
+          "action": "add_component",
+          "operation_id": "op_55_append_1",
+          "operation_type": "append",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tDBOutput"
+          ],
+          "purpose": "Añadir filas a una tabla existente",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "download_history",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:55",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:55",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "NONE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:55",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_appendtocustomerdb:op_48_append_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Tabla base destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_55_append_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 55,
+            "end_line": 56
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_59_append_1",
+          "order": 13,
+          "subjob": "m:dsc_appendtocustomerdb:s59",
+          "action": "add_component",
+          "operation_id": "op_59_append_1",
+          "operation_type": "append",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tDBOutput"
+          ],
+          "purpose": "Añadir filas a una tabla existente",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "download_history",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:59",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:59",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "NONE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:59",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_appendtocustomerdb:op_55_append_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Tabla base destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:dsc_appendtocustomerdb:op_59_append_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 59,
+            "end_line": 60
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_appendtocustomerdb:op_65_maintenance_1",
+          "order": 14,
+          "subjob": "m:dsc_appendtocustomerdb:s65",
+          "action": "add_component",
+          "operation_id": "op_65_maintenance_1",
+          "operation_type": "maintenance",
+          "component_candidate": "tDBRow",
+          "alternatives": [
+            "ninguno"
+          ],
+          "purpose": "Mantenimiento de datasets",
+          "properties": [
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_appendtocustomerdb:op_59_append_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Decidir si la operación de mantenimiento aplica en el destino"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_appendtocustomerdb.sas",
+            "line": 65,
+            "end_line": 66
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_10_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_10_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_10_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_10_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_10_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_10_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_10_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_10_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_10_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_10_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_10_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_10_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_36_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_36_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_36_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_36_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_36_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_36_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_36_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_36_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_36_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_36_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_36_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_36_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_44_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_44_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_44_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_44_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_44_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_44_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_44_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_44_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_48_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_48_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_55_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_55_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_appendtocustomerdb:op_59_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:dsc_appendtocustomerdb:op_59_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "range_id",
+      "sas_value": null,
+      "suggested": "context.range_id",
+      "origin": "&range_id en real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:10"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "dictionary",
+      "engine": null,
+      "path": null,
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "dataset_dynamic &TableParts. (real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:44) — nombre de dataset con macrovariables",
+    "dataset_dynamic &&entity&entityNum. (real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:44) — nombre de dataset con macrovariables",
+    "dataset_dynamic &&entity&entityNum. (real/ci360-download-client/macros/dsc_appendtocustomerdb.sas:48) — nombre de dataset con macrovariables"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/002_mc_macros.sas",
+  "sha256": "2a1b518fc83f688e7018b11e711f0b33ce8a79bc4b45b7668d757ff3dcf2e67f",
+  "job_name": "job_002_mc_macros",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "upper_case",
+      "params": [
+        "textst"
+      ],
+      "steps": []
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

@@ -1,0 +1,1317 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+  "sha256": "0f80ab9167b7e1e91a72a028e9ee0bdab9ac5e4e44a1d39a58e374b9883b615b",
+  "job_name": "job_dsc_cdm_version_update",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "dsc_cdm_version_update",
+      "params": [
+        "version_num"
+      ],
+      "steps": [
+        {
+          "id": "m:dsc_cdm_version_update:op_14_read_1",
+          "order": 1,
+          "subjob": "m:dsc_cdm_version_update:s13",
+          "action": "add_component",
+          "operation_id": "op_14_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer &ver_hist_ds.",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_14_read_1_row_count",
+            "vc_m:dsc_cdm_version_update:op_14_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 14,
+            "end_line": 14
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_14_aggregate_1",
+          "order": 2,
+          "subjob": "m:dsc_cdm_version_update:s13",
+          "action": "add_component",
+          "operation_id": "op_14_aggregate_1",
+          "operation_type": "aggregate",
+          "component_candidate": "tAggregateRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Agregar",
+          "properties": [
+            {
+              "name": "GROUPBYS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Group by",
+              "options": []
+            },
+            {
+              "name": "OPERATIONS",
+              "value": "? = max(ver_num)",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:14",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Operations",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_cdm_version_update:op_14_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_14_aggregate_1_aggregates",
+            "vc_m:dsc_cdm_version_update:op_14_aggregate_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 14,
+            "end_line": 14
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_14_set_variable_1",
+          "order": 3,
+          "subjob": "m:dsc_cdm_version_update:s13",
+          "action": "add_component",
+          "operation_id": "op_14_set_variable_1",
+          "operation_type": "set_variable",
+          "component_candidate": "tSetGlobalVar",
+          "alternatives": [
+            "tJava",
+            "tFlowToIterate"
+          ],
+          "purpose": "Asignar variable desde datos",
+          "properties": [
+            {
+              "name": "VARIABLES",
+              "value": "KEY=cdm_ver_num",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:14",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Variables",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_cdm_version_update:op_14_aggregate_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Origen del valor y alcance de la variable"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 14,
+            "end_line": 14
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_29_read_1",
+          "order": 4,
+          "subjob": "m:dsc_cdm_version_update:s29",
+          "action": "add_component",
+          "operation_id": "op_29_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer &table_nm.",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_cdm_version_update:op_14_set_variable_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_29_read_1_row_count",
+            "vc_m:dsc_cdm_version_update:op_29_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 29,
+            "end_line": 31
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_29_write_1",
+          "order": 5,
+          "subjob": "m:dsc_cdm_version_update:s29",
+          "action": "add_component",
+          "operation_id": "op_29_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir &table_nm._bkp",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_bkp",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:29",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:29",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:29",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_cdm_version_update:op_29_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_29_write_1_row_count",
+            "vc_m:dsc_cdm_version_update:op_29_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 29,
+            "end_line": 31
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_32_read_1",
+          "order": 6,
+          "subjob": "m:dsc_cdm_version_update:s32",
+          "action": "add_component",
+          "operation_id": "op_32_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer &table_nm.",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_cdm_version_update:op_29_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_32_read_1_row_count",
+            "vc_m:dsc_cdm_version_update:op_32_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 32,
+            "end_line": 36
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_32_write_1",
+          "order": 7,
+          "subjob": "m:dsc_cdm_version_update:s32",
+          "action": "add_component",
+          "operation_id": "op_32_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir &table_nm.",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:32",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:32",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_cdm_version_update:op_32_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_32_write_1_row_count",
+            "vc_m:dsc_cdm_version_update:op_32_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 32,
+            "end_line": 36
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_44_compute_1",
+          "order": 8,
+          "subjob": "m:dsc_cdm_version_update:s44",
+          "action": "add_component",
+          "operation_id": "op_44_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "2 asignaciones, 0 condicionales",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:44",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ver_num",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:44"
+            },
+            {
+              "name": "ver_create_dttm",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:44"
+            }
+          ],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_cdm_version_update:op_32_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "&version_num.",
+              "talend": "context.version_num",
+              "line": 47,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &version_num → context.version_num (crear variable de contexto)"
+              ]
+            },
+            {
+              "sas": "datetime()",
+              "talend": null,
+              "line": 48,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función datetime"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_44_compute_1_nulls",
+            "vc_m:dsc_cdm_version_update:op_44_compute_1_dates",
+            "vc_m:dsc_cdm_version_update:op_44_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 44,
+            "end_line": 49
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_44_write_1",
+          "order": 9,
+          "subjob": "m:dsc_cdm_version_update:s44",
+          "action": "add_component",
+          "operation_id": "op_44_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir cdm_version_hist",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "cdm_version_hist",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:44",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:44",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:44",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_cdm_version_update:op_44_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_44_write_1_row_count",
+            "vc_m:dsc_cdm_version_update:op_44_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 44,
+            "end_line": 49
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_51_append_1",
+          "order": 10,
+          "subjob": "m:dsc_cdm_version_update:s51",
+          "action": "add_component",
+          "operation_id": "op_51_append_1",
+          "operation_type": "append",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tDBOutput"
+          ],
+          "purpose": "Añadir filas a una tabla existente",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "cdm_version_hist",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:51",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:51",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "NONE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:51",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_cdm_version_update:op_44_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Tabla base destino",
+            "Librería dsccnfg es de tipo BASE en &UtilityLocation./data/dsccnfg: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_51_append_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 51,
+            "end_line": 52
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_57_compute_1",
+          "order": 11,
+          "subjob": "m:dsc_cdm_version_update:s57",
+          "action": "add_component",
+          "operation_id": "op_57_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "2 asignaciones, 0 condicionales",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:57",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ver_num",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:57"
+            },
+            {
+              "name": "ver_create_dttm",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:57"
+            }
+          ],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_cdm_version_update:op_51_append_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "&version_num.",
+              "talend": "context.version_num",
+              "line": 60,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &version_num → context.version_num (crear variable de contexto)"
+              ]
+            },
+            {
+              "sas": "datetime()",
+              "talend": null,
+              "line": 61,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función datetime"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_57_compute_1_nulls",
+            "vc_m:dsc_cdm_version_update:op_57_compute_1_dates",
+            "vc_m:dsc_cdm_version_update:op_57_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 57,
+            "end_line": 62
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_57_write_1",
+          "order": 12,
+          "subjob": "m:dsc_cdm_version_update:s57",
+          "action": "add_component",
+          "operation_id": "op_57_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir cdm_version_hist",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "cdm_version_hist",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:57",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:57",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:57",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:dsc_cdm_version_update:op_57_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_57_write_1_row_count",
+            "vc_m:dsc_cdm_version_update:op_57_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 57,
+            "end_line": 62
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_64_append_1",
+          "order": 13,
+          "subjob": "m:dsc_cdm_version_update:s64",
+          "action": "add_component",
+          "operation_id": "op_64_append_1",
+          "operation_type": "append",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tDBOutput"
+          ],
+          "purpose": "Añadir filas a una tabla existente",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "cdm_version_hist",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:64",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:64",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "NONE",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:64",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_cdm_version_update:op_57_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Tabla base destino",
+            "Librería dsccnfg es de tipo BASE en &UtilityLocation./data/dsccnfg: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:dsc_cdm_version_update:op_64_append_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 64,
+            "end_line": 65
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:dsc_cdm_version_update:op_68_macro_call_1",
+          "order": 14,
+          "subjob": "m:dsc_cdm_version_update:s68",
+          "action": "add_component",
+          "operation_id": "op_68_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %exit",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "exit",
+              "origin": "SAS real/ci360-download-client/macros/dsc_cdm_version_update.sas:68",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:dsc_cdm_version_update:op_64_append_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ci360-download-client/macros/dsc_cdm_version_update.sas",
+            "line": 68,
+            "end_line": 70
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_14_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_14_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_14_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_14_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_14_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_14_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_14_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_14_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_29_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_29_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_29_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_29_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_29_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_29_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_29_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_29_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_32_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_32_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_32_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_32_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_32_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_32_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_32_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_32_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_44_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_44_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_44_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_44_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_44_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_44_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_44_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_44_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_44_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_44_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_51_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_51_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_57_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_57_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_57_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_57_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_57_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_57_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_57_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_57_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_57_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_57_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:dsc_cdm_version_update:op_64_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:dsc_cdm_version_update:op_64_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "version_num",
+      "sas_value": null,
+      "suggested": "context.version_num",
+      "origin": "&version_num en real/ci360-download-client/macros/dsc_cdm_version_update.sas:44"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "DSCCNFG",
+      "engine": null,
+      "path": "&UtilityLocation./data/dsccnfg",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "dataset_dynamic &ver_hist_ds. (real/ci360-download-client/macros/dsc_cdm_version_update.sas:13) — nombre de dataset con macrovariables",
+    "dataset_dynamic &table_nm. (real/ci360-download-client/macros/dsc_cdm_version_update.sas:29) — nombre de dataset con macrovariables",
+    "dataset_dynamic &table_nm._bkp (real/ci360-download-client/macros/dsc_cdm_version_update.sas:29) — nombre de dataset con macrovariables",
+    "dataset_dynamic &table_nm. (real/ci360-download-client/macros/dsc_cdm_version_update.sas:32) — nombre de dataset con macrovariables",
+    "macro exit (real/ci360-download-client/macros/dsc_cdm_version_update.sas:68) — sin definición en el proyecto"
+  ]
+}

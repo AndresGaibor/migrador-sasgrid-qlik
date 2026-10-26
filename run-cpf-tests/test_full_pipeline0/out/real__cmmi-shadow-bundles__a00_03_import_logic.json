@@ -1,0 +1,4718 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+  "sha256": "ad893fef25cb87f0f18bca2b87644c864dbbbc33f66714be428654d3b1051f0c",
+  "job_name": "job_a00_03_import_logic",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "a00_03_import_logic",
+      "params": [],
+      "steps": [
+        {
+          "id": "m:a00_03_import_logic:op_12_macro_call_1",
+          "order": 1,
+          "subjob": "m:a00_03_import_logic:s12",
+          "action": "add_component",
+          "operation_id": "op_12_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %mkdirs",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "mkdirs",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:12",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "&out_path.\\output,&out_path.\\output\\ref",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:12",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %mkdirs (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 12,
+            "end_line": 12
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_16_read_file_1",
+          "order": 2,
+          "subjob": "m:a00_03_import_logic:s16",
+          "action": "add_component",
+          "operation_id": "op_16_read_file_1",
+          "operation_type": "read_file",
+          "component_candidate": "tFileInputDelimited",
+          "alternatives": [
+            "tFileInputPositional",
+            "tFileInputExcel"
+          ],
+          "purpose": "Leer archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": "&logic_path.\\&clinical_logic_date._bpci_a_trigger_list.xlsx",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:16",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File name/Stream",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "HEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_12_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta del archivo, delimitador y codificación",
+            "Esquema (ancho fijo o delimitado)"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_16_read_file_1_row_count",
+            "vc_m:a00_03_import_logic:op_16_read_file_1_nulls"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 16,
+            "end_line": 22
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+          "variants": [
+            "tFileInputARFF",
+            "tFileInputExcel",
+            "tFileInputFullRow",
+            "tFileInputJSON",
+            "tFileInputLDIF",
+            "tFileInputMail",
+            "tFileInputPositional",
+            "tFileInputProperties",
+            "tFileInputRaw",
+            "tFileInputRegex",
+            "tFileInputXML"
+          ],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_25_read_1",
+          "order": 3,
+          "subjob": "m:a00_03_import_logic:s24",
+          "action": "add_component",
+          "operation_id": "op_25_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer ip_ce_drg",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "ip_ce_drg",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_16_read_file_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_25_read_1_row_count",
+            "vc_m:a00_03_import_logic:op_25_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 25,
+            "end_line": 34
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_25_filter_1",
+          "order": 4,
+          "subjob": "m:a00_03_import_logic:s24",
+          "action": "add_component",
+          "operation_id": "op_25_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (WHERE): not missing(d)",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "true",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": "!((input_row.d == null))",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "d",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_25_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "not missing(d)",
+              "talend": "!((input_row.d == null))",
+              "line": 25,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "missing(): null (y cadena vacía si es texto) en Java"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_25_filter_1_row_count",
+            "vc_m:a00_03_import_logic:op_25_filter_1_nulls",
+            "vc_m:a00_03_import_logic:op_25_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 25,
+            "end_line": 34
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_25_project_1",
+          "order": 5,
+          "subjob": "m:a00_03_import_logic:s24",
+          "action": "add_component",
+          "operation_id": "op_25_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "distinct d as episode_group_id format=$5. length=5, ce_description, anchor_type, epi_type, e as drg format=$3. length=3",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ce_description",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25"
+            },
+            {
+              "name": "anchor_type",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25"
+            },
+            {
+              "name": "epi_type",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_25_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "distinct d as episode_group_id format=$5. length=5",
+              "talend": null,
+              "line": 25,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: token no soportado: '$5. length=5'"
+              ]
+            },
+            {
+              "sas": "\"ip\"",
+              "talend": "\"ip\"",
+              "line": 25,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "substr(strip(c),1,2)",
+              "talend": null,
+              "line": 25,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función substr"
+              ]
+            },
+            {
+              "sas": "e as drg format=$3. length=3",
+              "talend": null,
+              "line": 25,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: token no soportado: '$3. length=3'"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_25_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 25,
+            "end_line": 34
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_25_sort_1",
+          "order": 6,
+          "subjob": "m:a00_03_import_logic:s24",
+          "action": "add_component",
+          "operation_id": "op_25_sort_1",
+          "operation_type": "sort",
+          "component_candidate": "tSortRow",
+          "alternatives": [],
+          "purpose": "Ordenar por substr(d,4,2)",
+          "properties": [
+            {
+              "name": "CRITERIA",
+              "value": "substr(d,4,2)",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Criteria",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "substr(d,4,2)",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_25_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_25_sort_1_ordering"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 25,
+            "end_line": 34
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_25_write_1",
+          "order": 7,
+          "subjob": "m:a00_03_import_logic:s24",
+          "action": "add_component",
+          "operation_id": "op_25_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir ref.ip_ce_drg (reemplaza)",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "ip_ce_drg",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:25",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_25_sort_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_25_write_1_row_count",
+            "vc_m:a00_03_import_logic:op_25_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 25,
+            "end_line": 34
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_38_read_file_1",
+          "order": 8,
+          "subjob": "m:a00_03_import_logic:s38",
+          "action": "add_component",
+          "operation_id": "op_38_read_file_1",
+          "operation_type": "read_file",
+          "component_candidate": "tFileInputDelimited",
+          "alternatives": [
+            "tFileInputPositional",
+            "tFileInputExcel"
+          ],
+          "purpose": "Leer archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": "&logic_path.\\&clinical_logic_date._bpci_a_trigger_list.xlsx",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:38",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File name/Stream",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "HEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_25_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta del archivo, delimitador y codificación",
+            "Esquema (ancho fijo o delimitado)"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_38_read_file_1_row_count",
+            "vc_m:a00_03_import_logic:op_38_read_file_1_nulls"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 38,
+            "end_line": 44
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+          "variants": [
+            "tFileInputARFF",
+            "tFileInputExcel",
+            "tFileInputFullRow",
+            "tFileInputJSON",
+            "tFileInputLDIF",
+            "tFileInputMail",
+            "tFileInputPositional",
+            "tFileInputProperties",
+            "tFileInputRaw",
+            "tFileInputRegex",
+            "tFileInputXML"
+          ],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_46_read_file_1",
+          "order": 9,
+          "subjob": "m:a00_03_import_logic:s46",
+          "action": "add_component",
+          "operation_id": "op_46_read_file_1",
+          "operation_type": "read_file",
+          "component_candidate": "tFileInputDelimited",
+          "alternatives": [
+            "tFileInputPositional",
+            "tFileInputExcel"
+          ],
+          "purpose": "Leer archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": "&logic_path.\\&clinical_logic_date._bpci_a_hcpcs_apc_mapping.xlsx",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:46",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File name/Stream",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "HEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_38_read_file_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta del archivo, delimitador y codificación",
+            "Esquema (ancho fijo o delimitado)"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_46_read_file_1_row_count",
+            "vc_m:a00_03_import_logic:op_46_read_file_1_nulls"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 46,
+            "end_line": 52
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+          "variants": [
+            "tFileInputARFF",
+            "tFileInputExcel",
+            "tFileInputFullRow",
+            "tFileInputJSON",
+            "tFileInputLDIF",
+            "tFileInputMail",
+            "tFileInputPositional",
+            "tFileInputProperties",
+            "tFileInputRaw",
+            "tFileInputRegex",
+            "tFileInputXML"
+          ],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_55_read_1",
+          "order": 10,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_55_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer op_ce",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "op_ce",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:55",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_46_read_file_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_55_read_1_row_count",
+            "vc_m:a00_03_import_logic:op_55_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 55,
+            "end_line": 61
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_55_project_1",
+          "order": 11,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_55_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "distinct d as episode_group_id format=$5. length=5, c as ce_description format=$70. length=70, anchor_type, epi_type",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:55",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "anchor_type",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:55"
+            },
+            {
+              "name": "epi_type",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:55"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_55_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "distinct d as episode_group_id format=$5. length=5",
+              "talend": null,
+              "line": 55,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: token no soportado: '$5. length=5'"
+              ]
+            },
+            {
+              "sas": "c as ce_description format=$70. length=70",
+              "talend": null,
+              "line": 55,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: token no soportado: '$70. length='"
+              ]
+            },
+            {
+              "sas": "\"op\"",
+              "talend": "\"op\"",
+              "line": 55,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "substr(strip(c),1,2)",
+              "talend": null,
+              "line": 55,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función substr"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_55_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 55,
+            "end_line": 61
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_55_sort_1",
+          "order": 12,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_55_sort_1",
+          "operation_type": "sort",
+          "component_candidate": "tSortRow",
+          "alternatives": [],
+          "purpose": "Ordenar por d",
+          "properties": [
+            {
+              "name": "CRITERIA",
+              "value": "d",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:55",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Criteria",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "d",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:55"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_55_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_55_sort_1_ordering"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 55,
+            "end_line": 61
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_55_write_1",
+          "order": 13,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_55_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir ref.op_ce (reemplaza)",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "op_ce",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:55",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:55",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:55",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_55_sort_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_55_write_1_row_count",
+            "vc_m:a00_03_import_logic:op_55_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 55,
+            "end_line": 61
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_63_read_1",
+          "order": 14,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_63_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer op_apc",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "op_apc",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:63",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_63_read_1_row_count",
+            "vc_m:a00_03_import_logic:op_63_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 63,
+            "end_line": 74
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_63_read_2",
+          "order": 15,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_63_read_2",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer op_apc",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "op_apc",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:63",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_63_read_2_row_count",
+            "vc_m:a00_03_import_logic:op_63_read_2_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 63,
+            "end_line": 74
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_63_union_1",
+          "order": 16,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_63_union_1",
+          "operation_type": "union",
+          "component_candidate": "tUnite",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Concatenar entradas",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_55_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Esquemas compatibles entre entradas"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_63_union_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 63,
+            "end_line": 74
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/tunite-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_63_filter_1",
+          "order": 17,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_63_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (WHERE): not missing(g)",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "true",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:63",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": "!((input_row.g == null))",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:63",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "g",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:63"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_63_union_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "not missing(g)",
+              "talend": "!((input_row.g == null))",
+              "line": 63,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "missing(): null (y cadena vacía si es texto) en Java"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_63_filter_1_row_count",
+            "vc_m:a00_03_import_logic:op_63_filter_1_nulls",
+            "vc_m:a00_03_import_logic:op_63_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 63,
+            "end_line": 74
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_63_project_1",
+          "order": 18,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_63_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "c as ce_description format=$70. length=70, year, g as apc format=$4. length=4",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:63",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "year",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:63"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_63_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "c as ce_description format=$70. length=70",
+              "talend": null,
+              "line": 63,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: token no soportado: '$70. length='"
+              ]
+            },
+            {
+              "sas": "g as apc format=$4. length=4",
+              "talend": null,
+              "line": 63,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: token no soportado: '$4. length=4'"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_63_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 63,
+            "end_line": 74
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_63_write_1",
+          "order": 19,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_63_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir ref.op_apc (reemplaza)",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "op_apc",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:63",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:63",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:63",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_63_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_63_write_1_row_count",
+            "vc_m:a00_03_import_logic:op_63_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 63,
+            "end_line": 74
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_76_read_1",
+          "order": 20,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_76_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer ref.op_ce",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "op_ce",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_76_read_1_row_count",
+            "vc_m:a00_03_import_logic:op_76_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 76,
+            "end_line": 84
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_76_read_2",
+          "order": 21,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_76_read_2",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer ref.op_apc",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "op_apc",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_76_read_2_row_count",
+            "vc_m:a00_03_import_logic:op_76_read_2_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 76,
+            "end_line": 84
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_76_join_1",
+          "order": 22,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_76_join_1",
+          "operation_type": "join",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJoin"
+          ],
+          "purpose": "Unir (implicit): ref.op_ce, ref.op_apc",
+          "properties": [
+            {
+              "name": "Join model",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Match model",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expression key",
+              "value": "a.ce_description = b.ce_description",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ce_description",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_55_read_1",
+              "label": null
+            },
+            {
+              "type": "Lookup",
+              "from_step": "m:a00_03_import_logic:op_63_read_1",
+              "label": null
+            },
+            {
+              "type": "Lookup",
+              "from_step": "m:a00_03_import_logic:op_63_read_2",
+              "label": null
+            },
+            {
+              "type": "Lookup",
+              "from_step": "m:a00_03_import_logic:op_76_read_1",
+              "label": null
+            },
+            {
+              "type": "Lookup",
+              "from_step": "m:a00_03_import_logic:op_76_read_2",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "a.ce_description = b.ce_description",
+              "talend": null,
+              "line": 76,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Mapear las claves del ON en la tabla de join de tMap"
+              ]
+            }
+          ],
+          "assumptions": [
+            "Join por coma: la condición está en el WHERE"
+          ],
+          "pending": [
+            "Columnas clave y tipos en ambos lados"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_76_join_1_duplicates",
+            "vc_m:a00_03_import_logic:op_76_join_1_row_count",
+            "vc_m:a00_03_import_logic:op_76_join_1_nulls"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 76,
+            "end_line": 84
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_76_filter_1",
+          "order": 23,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_76_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (WHERE): a.ce_description = b.ce_description",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "true",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": "(input_row.ce_description == input_row.ce_description)",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ce_description",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_76_join_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "a.ce_description = b.ce_description",
+              "talend": "(input_row.ce_description == input_row.ce_description)",
+              "line": 76,
+              "requires_semantic_validation": true,
+              "warnings": []
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_76_filter_1_row_count",
+            "vc_m:a00_03_import_logic:op_76_filter_1_nulls",
+            "vc_m:a00_03_import_logic:op_76_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 76,
+            "end_line": 84
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_76_project_1",
+          "order": 24,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_76_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "distinct a.episode_group_id, anchor_type, epi_type, *",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "anchor_type",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76"
+            },
+            {
+              "name": "epi_type",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_76_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "distinct a.episode_group_id",
+              "talend": null,
+              "line": 76,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: texto sobrante"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_76_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 76,
+            "end_line": 84
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_76_sort_1",
+          "order": 25,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_76_sort_1",
+          "operation_type": "sort",
+          "component_candidate": "tSortRow",
+          "alternatives": [],
+          "purpose": "Ordenar por substr(episode_group_id,4,2)",
+          "properties": [
+            {
+              "name": "CRITERIA",
+              "value": "substr(episode_group_id,4,2)",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Criteria",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "substr(episode_group_id,4,2)",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_76_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_76_sort_1_ordering"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 76,
+            "end_line": 84
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_76_write_1",
+          "order": 26,
+          "subjob": "m:a00_03_import_logic:s54",
+          "action": "add_component",
+          "operation_id": "op_76_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir ref.op_ce_apc (reemplaza)",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "op_ce_apc",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:76",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_76_sort_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_76_write_1_row_count",
+            "vc_m:a00_03_import_logic:op_76_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 76,
+            "end_line": 84
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_87_read_1",
+          "order": 27,
+          "subjob": "m:a00_03_import_logic:s87",
+          "action": "add_component",
+          "operation_id": "op_87_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer ref.ip_ce_drg",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "ip_ce_drg",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_76_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_87_read_1_row_count",
+            "vc_m:a00_03_import_logic:op_87_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 87,
+            "end_line": 92
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_87_select_columns_1",
+          "order": 28,
+          "subjob": "m:a00_03_import_logic:s87",
+          "action": "add_component",
+          "operation_id": "op_87_select_columns_1",
+          "operation_type": "select_columns",
+          "component_candidate": "tFilterColumns",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Conservar/descartar columnas",
+          "properties": [
+            {
+              "name": "SCHEMA",
+              "value": "keep: EPISODE_GROUP_ID, CE_DESCRIPTION, EPI_TYPE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Schema",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "EPISODE_GROUP_ID",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87"
+            },
+            {
+              "name": "CE_DESCRIPTION",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87"
+            },
+            {
+              "name": "EPI_TYPE",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_87_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_87_select_columns_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 87,
+            "end_line": 92
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_87_read_2",
+          "order": 29,
+          "subjob": "m:a00_03_import_logic:s87",
+          "action": "add_component",
+          "operation_id": "op_87_read_2",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer ref.op_ce",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "op_ce",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_87_read_2_row_count",
+            "vc_m:a00_03_import_logic:op_87_read_2_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 87,
+            "end_line": 92
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_87_select_columns_2",
+          "order": 30,
+          "subjob": "m:a00_03_import_logic:s87",
+          "action": "add_component",
+          "operation_id": "op_87_select_columns_2",
+          "operation_type": "select_columns",
+          "component_candidate": "tFilterColumns",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Conservar/descartar columnas",
+          "properties": [
+            {
+              "name": "SCHEMA",
+              "value": "keep: EPISODE_GROUP_ID, CE_DESCRIPTION, EPI_TYPE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Schema",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "EPISODE_GROUP_ID",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87"
+            },
+            {
+              "name": "CE_DESCRIPTION",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87"
+            },
+            {
+              "name": "EPI_TYPE",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_87_select_columns_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_87_select_columns_2_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 87,
+            "end_line": 92
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_87_union_1",
+          "order": 31,
+          "subjob": "m:a00_03_import_logic:s87",
+          "action": "add_component",
+          "operation_id": "op_87_union_1",
+          "operation_type": "union",
+          "component_candidate": "tUnite",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Concatenar entradas",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_87_select_columns_2",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Esquemas compatibles entre entradas"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_87_union_1_row_count"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 87,
+            "end_line": 92
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/tunite-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_87_compute_1",
+          "order": 32,
+          "subjob": "m:a00_03_import_logic:s87",
+          "action": "add_component",
+          "operation_id": "op_87_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "1 asignaciones, 0 condicionales",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ce_id",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_87_union_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "substr(strip(EPISODE_GROUP_ID),4,2)",
+              "talend": null,
+              "line": 91,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función substr"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_87_compute_1_nulls",
+            "vc_m:a00_03_import_logic:op_87_compute_1_dates",
+            "vc_m:a00_03_import_logic:op_87_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 87,
+            "end_line": 92
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_87_write_1",
+          "order": 33,
+          "subjob": "m:a00_03_import_logic:s87",
+          "action": "add_component",
+          "operation_id": "op_87_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir ref.ce_id_epi_type_all",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "ce_id_epi_type_all",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:87",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_87_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_87_write_1_row_count",
+            "vc_m:a00_03_import_logic:op_87_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 87,
+            "end_line": 92
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_94_read_1",
+          "order": 34,
+          "subjob": "m:a00_03_import_logic:s94",
+          "action": "add_component",
+          "operation_id": "op_94_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer ref.ce_id_epi_type_all",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "ce_id_epi_type_all",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_87_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_94_read_1_row_count",
+            "vc_m:a00_03_import_logic:op_94_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 94,
+            "end_line": 96
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_94_sort_1",
+          "order": 35,
+          "subjob": "m:a00_03_import_logic:s94",
+          "action": "add_component",
+          "operation_id": "op_94_sort_1",
+          "operation_type": "sort",
+          "component_candidate": "tSortRow",
+          "alternatives": [],
+          "purpose": "Ordenar por ce_id, EPISODE_GROUP_ID, CE_DESCRIPTION, EPI_TYPE",
+          "properties": [
+            {
+              "name": "CRITERIA",
+              "value": "ce_id, EPISODE_GROUP_ID, CE_DESCRIPTION, EPI_TYPE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Criteria",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ce_id",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94"
+            },
+            {
+              "name": "EPISODE_GROUP_ID",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94"
+            },
+            {
+              "name": "CE_DESCRIPTION",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94"
+            },
+            {
+              "name": "EPI_TYPE",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_94_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_94_sort_1_ordering"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 94,
+            "end_line": 96
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_94_dedupe_1",
+          "order": 36,
+          "subjob": "m:a00_03_import_logic:s94",
+          "action": "add_component",
+          "operation_id": "op_94_dedupe_1",
+          "operation_type": "dedupe",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Eliminar duplicados",
+          "properties": [
+            {
+              "name": "UNIQUE_KEY",
+              "value": "ce_id, EPISODE_GROUP_ID, CE_DESCRIPTION, EPI_TYPE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "ce_id",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94"
+            },
+            {
+              "name": "EPISODE_GROUP_ID",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94"
+            },
+            {
+              "name": "CE_DESCRIPTION",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94"
+            },
+            {
+              "name": "EPI_TYPE",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_94_sort_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Definir la clave y la lógica para conservar la fila correcta por grupo; confirmar una opción disponible en la instalación actual."
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_94_dedupe_1_duplicates"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 94,
+            "end_line": 96
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_94_write_1",
+          "order": 37,
+          "subjob": "m:a00_03_import_logic:s94",
+          "action": "add_component",
+          "operation_id": "op_94_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir ref.ce_id_epi_type_all",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "ce_id_epi_type_all",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:94",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_94_dedupe_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_94_write_1_row_count",
+            "vc_m:a00_03_import_logic:op_94_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 94,
+            "end_line": 96
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_99_macro_call_1",
+          "order": 38,
+          "subjob": "m:a00_03_import_logic:s99",
+          "action": "add_component",
+          "operation_id": "op_99_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %macarray",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "macarray",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:99",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "vars, tha\r\n                  ~ tsa\r\n                  , dlm= ~",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:99",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_94_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %macarray (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 99,
+            "end_line": 101
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_104_macro_call_1",
+          "order": 39,
+          "subjob": "m:a00_03_import_logic:s104",
+          "action": "add_component",
+          "operation_id": "op_104_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %macarray",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "macarray",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:104",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "kept_var, &keep_cols.",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:104",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_99_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %macarray (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 104,
+            "end_line": 104
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_107_macro_call_1",
+          "order": 40,
+          "subjob": "m:a00_03_import_logic:s107",
+          "action": "add_component",
+          "operation_id": "op_107_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %macarray",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "macarray",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:107",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "rename_var, Covariate ICD_Version Source_DGN_code Code_Specification ICD_Diagnosis_Code Code_Description",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:107",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_104_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %macarray (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 107,
+            "end_line": 107
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_110_macro_call_1",
+          "order": 41,
+          "subjob": "m:a00_03_import_logic:s110",
+          "action": "add_component",
+          "operation_id": "op_110_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %macarray",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "macarray",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:110",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "length_var, $100. $10. $10. $20. $10. $300.",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:110",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_107_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %macarray (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 110,
+            "end_line": 110
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_116_read_file_1",
+          "order": 42,
+          "subjob": "m:a00_03_import_logic:s116",
+          "action": "add_component",
+          "operation_id": "op_116_read_file_1",
+          "operation_type": "read_file",
+          "component_candidate": "tFileInputDelimited",
+          "alternatives": [
+            "tFileInputPositional",
+            "tFileInputExcel"
+          ],
+          "purpose": "Leer archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": "&&vars&t.._dgn",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:116",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File name/Stream",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "HEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_110_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta del archivo, delimitador y codificación",
+            "Esquema (ancho fijo o delimitado)"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_116_read_file_1_row_count",
+            "vc_m:a00_03_import_logic:op_116_read_file_1_nulls"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 116,
+            "end_line": 123
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+          "variants": [
+            "tFileInputARFF",
+            "tFileInputExcel",
+            "tFileInputFullRow",
+            "tFileInputJSON",
+            "tFileInputLDIF",
+            "tFileInputMail",
+            "tFileInputPositional",
+            "tFileInputProperties",
+            "tFileInputRaw",
+            "tFileInputRegex",
+            "tFileInputXML"
+          ],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_127_read_1",
+          "order": 43,
+          "subjob": "m:a00_03_import_logic:s126",
+          "action": "add_component",
+          "operation_id": "op_127_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer ref.&&vars&t.._covariates_list",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_covariates_list",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:127",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_116_read_file_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_127_read_1_row_count",
+            "vc_m:a00_03_import_logic:op_127_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 127,
+            "end_line": 131
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_127_project_1",
+          "order": 44,
+          "subjob": "m:a00_03_import_logic:s126",
+          "action": "add_component",
+          "operation_id": "op_127_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "substr(VARIABLES, 5, lengthn(VARIABLES)), case when lengthn(substr(VARIABLES, 5)) > 29 then substr(VARIABLES, 5, 29) else substr(VARIABLES, 5, lengthn(VARIABLES)) end",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:127",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_127_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "substr(VARIABLES, 5, lengthn(VARIABLES))",
+              "talend": null,
+              "line": 127,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función substr"
+              ]
+            },
+            {
+              "sas": "case when lengthn(substr(VARIABLES, 5)) > 29 then substr(VARIABLES, 5, 29) else substr(VARIABLES, 5, lengthn(VARIABLES)) end",
+              "talend": null,
+              "line": 127,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: texto sobrante"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_127_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 127,
+            "end_line": 131
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_127_set_variable_1",
+          "order": 45,
+          "subjob": "m:a00_03_import_logic:s126",
+          "action": "add_component",
+          "operation_id": "op_127_set_variable_1",
+          "operation_type": "set_variable",
+          "component_candidate": "tSetGlobalVar",
+          "alternatives": [
+            "tJava",
+            "tFlowToIterate"
+          ],
+          "purpose": "Asignar variable desde datos",
+          "properties": [
+            {
+              "name": "VARIABLES",
+              "value": "KEY=cov_sheet_name_list separated by \"~\"",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:127",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Variables",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_127_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Origen del valor y alcance de la variable"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 127,
+            "end_line": 131
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_127_set_variable_2",
+          "order": 46,
+          "subjob": "m:a00_03_import_logic:s126",
+          "action": "add_component",
+          "operation_id": "op_127_set_variable_2",
+          "operation_type": "set_variable",
+          "component_candidate": "tSetGlobalVar",
+          "alternatives": [
+            "tJava",
+            "tFlowToIterate"
+          ],
+          "purpose": "Asignar variable desde datos",
+          "properties": [
+            {
+              "name": "VARIABLES",
+              "value": "KEY=cov_ds_name_list separated by \"~\"",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:127",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Variables",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_127_set_variable_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Origen del valor y alcance de la variable"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 127,
+            "end_line": 131
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:a00_03_import_logic:op_133_macro_call_1",
+          "order": 47,
+          "subjob": "m:a00_03_import_logic:s133",
+          "action": "add_component",
+          "operation_id": "op_133_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %macarray",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "macarray",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:133",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "ds_names, &cov_ds_name_list., dlm = \"~\" ",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:133",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_127_set_variable_2",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %macarray (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 133,
+            "end_line": 133
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_134_macro_call_1",
+          "order": 48,
+          "subjob": "m:a00_03_import_logic:s134",
+          "action": "add_component",
+          "operation_id": "op_134_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %macarray",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "macarray",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:134",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "sheet_names, &cov_sheet_name_list., dlm = \"~\" ",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:134",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_133_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %macarray (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 134,
+            "end_line": 134
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_138_read_file_1",
+          "order": 49,
+          "subjob": "m:a00_03_import_logic:s138",
+          "action": "add_component",
+          "operation_id": "op_138_read_file_1",
+          "operation_type": "read_file",
+          "component_candidate": "tFileInputDelimited",
+          "alternatives": [
+            "tFileInputPositional",
+            "tFileInputExcel"
+          ],
+          "purpose": "Leer archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File name/Stream",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "HEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_134_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta del archivo, delimitador y codificación",
+            "Esquema (ancho fijo o delimitado)"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_138_read_file_1_row_count",
+            "vc_m:a00_03_import_logic:op_138_read_file_1_nulls"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 138,
+            "end_line": 145
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+          "variants": [
+            "tFileInputARFF",
+            "tFileInputExcel",
+            "tFileInputFullRow",
+            "tFileInputJSON",
+            "tFileInputLDIF",
+            "tFileInputMail",
+            "tFileInputPositional",
+            "tFileInputProperties",
+            "tFileInputRaw",
+            "tFileInputRegex",
+            "tFileInputXML"
+          ],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_148_read_1",
+          "order": 50,
+          "subjob": "m:a00_03_import_logic:s148",
+          "action": "add_component",
+          "operation_id": "op_148_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer ref.&&ds_names&a.._&&vars&t..",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_138_read_file_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_148_read_1_row_count",
+            "vc_m:a00_03_import_logic:op_148_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 148,
+            "end_line": 154
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_148_write_1",
+          "order": 51,
+          "subjob": "m:a00_03_import_logic:s148",
+          "action": "add_component",
+          "operation_id": "op_148_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir ref.&&ds_names&a.._&&vars&t..",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:148",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:148",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:a00_03_import_logic:op_148_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_148_write_1_row_count",
+            "vc_m:a00_03_import_logic:op_148_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 148,
+            "end_line": 154
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:a00_03_import_logic:op_160_read_file_1",
+          "order": 52,
+          "subjob": "m:a00_03_import_logic:s160",
+          "action": "add_component",
+          "operation_id": "op_160_read_file_1",
+          "operation_type": "read_file",
+          "component_candidate": "tFileInputDelimited",
+          "alternatives": [
+            "tFileInputPositional",
+            "tFileInputExcel"
+          ],
+          "purpose": "Leer archivo externo",
+          "properties": [
+            {
+              "name": "FILENAME",
+              "value": "fname",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_03_import_logic.sas:160",
+              "verified": false,
+              "in_catalog": true,
+              "label": "File name/Stream",
+              "options": []
+            },
+            {
+              "name": "FIELDSEPARATOR",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Field Separator",
+              "options": []
+            },
+            {
+              "name": "HEADER",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Header",
+              "options": []
+            },
+            {
+              "name": "ENCODING",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Encoding",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:a00_03_import_logic:op_148_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Ruta del archivo, delimitador y codificación",
+            "Esquema (ancho fijo o delimitado)"
+          ],
+          "tests": [
+            "vc_m:a00_03_import_logic:op_160_read_file_1_row_count",
+            "vc_m:a00_03_import_logic:op_160_read_file_1_nulls"
+          ],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_03_import_logic.sas",
+            "line": 160,
+            "end_line": 165
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+          "variants": [
+            "tFileInputARFF",
+            "tFileInputExcel",
+            "tFileInputFullRow",
+            "tFileInputJSON",
+            "tFileInputLDIF",
+            "tFileInputMail",
+            "tFileInputPositional",
+            "tFileInputProperties",
+            "tFileInputRaw",
+            "tFileInputRegex",
+            "tFileInputXML"
+          ],
+          "requires_semantic_validation": false
+        }
+      ]
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "vc_m:a00_03_import_logic:op_16_read_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas leídas, incluidas filas inválidas",
+      "applies_to": [
+        "m:a00_03_import_logic:op_16_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_16_read_file_1_nulls",
+      "kind": "nulls",
+      "description": "Campos vacíos y missing se cargan igual que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_16_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_25_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_25_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_25_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_25_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_25_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_25_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_25_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:a00_03_import_logic:op_25_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_25_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:a00_03_import_logic:op_25_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_25_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:a00_03_import_logic:op_25_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_25_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:a00_03_import_logic:op_25_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_25_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:a00_03_import_logic:op_25_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_25_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:a00_03_import_logic:op_25_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_38_read_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas leídas, incluidas filas inválidas",
+      "applies_to": [
+        "m:a00_03_import_logic:op_38_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_38_read_file_1_nulls",
+      "kind": "nulls",
+      "description": "Campos vacíos y missing se cargan igual que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_38_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_46_read_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas leídas, incluidas filas inválidas",
+      "applies_to": [
+        "m:a00_03_import_logic:op_46_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_46_read_file_1_nulls",
+      "kind": "nulls",
+      "description": "Campos vacíos y missing se cargan igual que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_46_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_55_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_55_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_55_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_55_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_55_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:a00_03_import_logic:op_55_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_55_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:a00_03_import_logic:op_55_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_55_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:a00_03_import_logic:op_55_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_55_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:a00_03_import_logic:op_55_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_union_1_row_count",
+      "kind": "row_count",
+      "description": "Suma de filas de las entradas (UNION sin ALL elimina duplicados)",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_union_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_63_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:a00_03_import_logic:op_63_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_76_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:a00_03_import_logic:op_76_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_select_columns_2_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_select_columns_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_union_1_row_count",
+      "kind": "row_count",
+      "description": "Suma de filas de las entradas (UNION sin ALL elimina duplicados)",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_union_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_87_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:a00_03_import_logic:op_87_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_94_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_94_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_94_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_94_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_94_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:a00_03_import_logic:op_94_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_94_dedupe_1_duplicates",
+      "kind": "duplicates",
+      "description": "Se conserva la misma fila por clave (NODUPKEY conserva la primera)",
+      "applies_to": [
+        "m:a00_03_import_logic:op_94_dedupe_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_94_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:a00_03_import_logic:op_94_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_94_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:a00_03_import_logic:op_94_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_116_read_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas leídas, incluidas filas inválidas",
+      "applies_to": [
+        "m:a00_03_import_logic:op_116_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_116_read_file_1_nulls",
+      "kind": "nulls",
+      "description": "Campos vacíos y missing se cargan igual que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_116_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_127_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_127_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_127_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_127_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_127_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:a00_03_import_logic:op_127_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_138_read_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas leídas, incluidas filas inválidas",
+      "applies_to": [
+        "m:a00_03_import_logic:op_138_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_138_read_file_1_nulls",
+      "kind": "nulls",
+      "description": "Campos vacíos y missing se cargan igual que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_138_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_148_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_148_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_148_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_03_import_logic:op_148_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_148_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:a00_03_import_logic:op_148_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_148_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:a00_03_import_logic:op_148_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_160_read_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas leídas, incluidas filas inválidas",
+      "applies_to": [
+        "m:a00_03_import_logic:op_160_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_03_import_logic:op_160_read_file_1_nulls",
+      "kind": "nulls",
+      "description": "Campos vacíos y missing se cargan igual que en SAS",
+      "applies_to": [
+        "m:a00_03_import_logic:op_160_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "clinical_logic_date",
+      "sas_value": null,
+      "suggested": "context.clinical_logic_date",
+      "origin": "&clinical_logic_date en real/cmmi-shadow-bundles/a00_03_import_logic.sas:16"
+    },
+    {
+      "name": "cov_ds_name_list",
+      "sas_value": null,
+      "suggested": "context.cov_ds_name_list",
+      "origin": "&cov_ds_name_list en real/cmmi-shadow-bundles/a00_03_import_logic.sas:133"
+    },
+    {
+      "name": "cov_sheet_name_list",
+      "sas_value": null,
+      "suggested": "context.cov_sheet_name_list",
+      "origin": "&cov_sheet_name_list en real/cmmi-shadow-bundles/a00_03_import_logic.sas:134"
+    },
+    {
+      "name": "keep_cols",
+      "sas_value": null,
+      "suggested": "context.keep_cols",
+      "origin": "&keep_cols en real/cmmi-shadow-bundles/a00_03_import_logic.sas:104"
+    },
+    {
+      "name": "logic_path",
+      "sas_value": null,
+      "suggested": "context.logic_path",
+      "origin": "&logic_path en real/cmmi-shadow-bundles/a00_03_import_logic.sas:16"
+    },
+    {
+      "name": "out_path",
+      "sas_value": null,
+      "suggested": "context.out_path",
+      "origin": "&out_path en real/cmmi-shadow-bundles/a00_03_import_logic.sas:12"
+    },
+    {
+      "name": "t",
+      "sas_value": null,
+      "suggested": "context.t",
+      "origin": "&t en real/cmmi-shadow-bundles/a00_03_import_logic.sas:116"
+    },
+    {
+      "name": "vars",
+      "sas_value": null,
+      "suggested": "context.vars",
+      "origin": "&vars en real/cmmi-shadow-bundles/a00_03_import_logic.sas:116"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "ref",
+      "engine": null,
+      "path": "&out_path.\\output\\ref",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "dataset_dynamic ref.&&vars&t.._covariates_list (real/cmmi-shadow-bundles/a00_03_import_logic.sas:116) — nombre de dataset con macrovariables",
+    "dataset_dynamic ref.&&vars&t.._covariates_list (real/cmmi-shadow-bundles/a00_03_import_logic.sas:126) — nombre de dataset con macrovariables",
+    "dataset_dynamic ref.&&ds_names&a.._&&vars&t.. (real/cmmi-shadow-bundles/a00_03_import_logic.sas:138) — nombre de dataset con macrovariables",
+    "dataset_dynamic ref.&&ds_names&a.._&&vars&t.. (real/cmmi-shadow-bundles/a00_03_import_logic.sas:148) — nombre de dataset con macrovariables"
+  ]
+}

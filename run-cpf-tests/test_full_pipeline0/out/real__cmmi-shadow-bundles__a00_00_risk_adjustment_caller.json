@@ -1,0 +1,1671 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+  "sha256": "345abc29d70f31abebe98143436d835b56a5e22440f6d62e99b81c9e626eb979",
+  "job_name": "job_a00_00_risk_adjustment_caller",
+  "steps": [
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_50_macro_call_1",
+      "order": 1,
+      "subjob": "m:a00_00_risk_adjustment_caller:s50",
+      "action": "add_component",
+      "operation_id": "op_50_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %a00_01_utility_macros",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "a00_01_utility_macros",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:50",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %a00_01_utility_macros (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 50,
+        "end_line": 50
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_54_macro_call_1",
+      "order": 2,
+      "subjob": "m:a00_00_risk_adjustment_caller:s54",
+      "action": "add_component",
+      "operation_id": "op_54_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %a00_02_assign_globals",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "a00_02_assign_globals",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:54",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_50_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %a00_02_assign_globals (definida en real/cmmi-shadow-bundles/a00_02_assign_globals.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 54,
+        "end_line": 54
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_58_macro_call_1",
+      "order": 3,
+      "subjob": "m:a00_00_risk_adjustment_caller:s58",
+      "action": "add_component",
+      "operation_id": "op_58_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %a00_03_import_logic",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "a00_03_import_logic",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:58",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_54_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %a00_03_import_logic (definida en real/cmmi-shadow-bundles/a00_03_import_logic.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 58,
+        "end_line": 58
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_62_macro_call_1",
+      "order": 4,
+      "subjob": "m:a00_00_risk_adjustment_caller:s62",
+      "action": "add_component",
+      "operation_id": "op_62_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %a00_04_assign_libs",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "a00_04_assign_libs",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:62",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_58_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 62,
+        "end_line": 62
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_74_macro_call_1",
+      "order": 5,
+      "subjob": "m:a00_00_risk_adjustment_caller:s74",
+      "action": "add_component",
+      "operation_id": "op_74_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %generate_log",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "generate_log",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:74",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "log_filename=process_af",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:74",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_62_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %generate_log (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 74,
+        "end_line": 74
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_76_macro_call_1",
+      "order": 6,
+      "subjob": "m:a00_00_risk_adjustment_caller:s76",
+      "action": "add_component",
+      "operation_id": "op_76_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %a01_01_process_af",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "a01_01_process_af",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:76",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_74_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 76,
+        "end_line": 76
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_82_macro_call_1",
+      "order": 7,
+      "subjob": "m:a00_00_risk_adjustment_caller:s82",
+      "action": "add_component",
+      "operation_id": "op_82_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %generate_log",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "generate_log",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:82",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "log_filename=ach_threshold",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:82",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_76_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %generate_log (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 82,
+        "end_line": 82
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_83_macro_call_1",
+      "order": 8,
+      "subjob": "m:a00_00_risk_adjustment_caller:s83",
+      "action": "add_component",
+      "operation_id": "op_83_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %a01_02_ach_threshold",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "a01_02_ach_threshold",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:83",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_82_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 83,
+        "end_line": 83
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_89_macro_call_1",
+      "order": 9,
+      "subjob": "m:a00_00_risk_adjustment_caller:s89",
+      "action": "add_component",
+      "operation_id": "op_89_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %a02_01_prep_episodes_for_logit",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "a02_01_prep_episodes_for_logit",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:89",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_83_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 89,
+        "end_line": 89
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_91_macro_call_1",
+      "order": 10,
+      "subjob": "m:a00_00_risk_adjustment_caller:s91",
+      "action": "add_component",
+      "operation_id": "op_91_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %a02_02_logit_regression",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "a02_02_logit_regression",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:91",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_89_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 91,
+        "end_line": 91
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_93_macro_call_1",
+      "order": 11,
+      "subjob": "m:a00_00_risk_adjustment_caller:s93",
+      "action": "add_component",
+      "operation_id": "op_93_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %a02_03_flag_pseudo_op",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "a02_03_flag_pseudo_op",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:93",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_91_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 93,
+        "end_line": 93
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_101_macro_call_1",
+      "order": 12,
+      "subjob": "m:a00_00_risk_adjustment_caller:s101",
+      "action": "add_component",
+      "operation_id": "op_101_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %b00_01_assign_libs_globals",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "b00_01_assign_libs_globals",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:101",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_93_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 101,
+        "end_line": 101
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_104_macro_call_1",
+      "order": 13,
+      "subjob": "m:a00_00_risk_adjustment_caller:s104",
+      "action": "add_component",
+      "operation_id": "op_104_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %b01_01_prep_risk_adj_covariates",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "b01_01_prep_risk_adj_covariates",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:104",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "ref_files = 1,\r\n                                          tsp_files = 1",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:104",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_101_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 104,
+        "end_line": 105
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_109_macro_call_1",
+      "order": 14,
+      "subjob": "m:a00_00_risk_adjustment_caller:s109",
+      "action": "add_component",
+      "operation_id": "op_109_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %b01_02_assign_covariate",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "b01_02_assign_covariate",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:109",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_104_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 109,
+        "end_line": 109
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_111_macro_call_1",
+      "order": 15,
+      "subjob": "m:a00_00_risk_adjustment_caller:s111",
+      "action": "add_component",
+      "operation_id": "op_111_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %generate_log",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "generate_log",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:111",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "log_filename=ra_ce_&ce_start_index._start_ce._&ce_end_index._end_ce.",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:111",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_109_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %generate_log (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 111,
+        "end_line": 111
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_114_read_1",
+      "order": 16,
+      "subjob": "m:a00_00_risk_adjustment_caller:s113",
+      "action": "add_component",
+      "operation_id": "op_114_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer ref.ce_id_epi_type_all",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "ce_id_epi_type_all",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:114",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_111_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería ref es de tipo BASE en &out_path.\\output\\ref: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:a00_00_risk_adjustment_caller:op_114_read_1_row_count",
+        "vc_m:a00_00_risk_adjustment_caller:op_114_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 114,
+        "end_line": 115
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_114_project_1",
+      "order": 17,
+      "subjob": "m:a00_00_risk_adjustment_caller:s113",
+      "action": "add_component",
+      "operation_id": "op_114_project_1",
+      "operation_type": "project",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Seleccionar/calcular columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "episode_group_id, epi_type",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:114",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expressions",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "episode_group_id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:114"
+        },
+        {
+          "name": "epi_type",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:114"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_114_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:a00_00_risk_adjustment_caller:op_114_project_1_schema"
+      ],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 114,
+        "end_line": 115
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_114_set_variable_1",
+      "order": 18,
+      "subjob": "m:a00_00_risk_adjustment_caller:s113",
+      "action": "add_component",
+      "operation_id": "op_114_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY= ce_id_list separated by \" \"",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:114",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_114_project_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 114,
+        "end_line": 115
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_114_set_variable_2",
+      "order": 19,
+      "subjob": "m:a00_00_risk_adjustment_caller:s113",
+      "action": "add_component",
+      "operation_id": "op_114_set_variable_2",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY= ce_epi_type_list separated by \" \"",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:114",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_114_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 114,
+        "end_line": 115
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_118_macro_call_1",
+      "order": 20,
+      "subjob": "m:a00_00_risk_adjustment_caller:s118",
+      "action": "add_component",
+      "operation_id": "op_118_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %macarray",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "macarray",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:118",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "ce_ids, &ce_id_list.",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:118",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_114_set_variable_2",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %macarray (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 118,
+        "end_line": 118
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_119_macro_call_1",
+      "order": 21,
+      "subjob": "m:a00_00_risk_adjustment_caller:s119",
+      "action": "add_component",
+      "operation_id": "op_119_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %macarray",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "macarray",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:119",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "epi_types, &ce_epi_type_list.",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:119",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_118_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %macarray (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 119,
+        "end_line": 119
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_131_macro_call_1",
+      "order": 22,
+      "subjob": "m:a00_00_risk_adjustment_caller:s131",
+      "action": "add_component",
+      "operation_id": "op_131_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %b02_01_risk_adjustment",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "b02_01_risk_adjustment",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:131",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "run_tsp = &run_tsp_model.,\r\n                                       run_glm = &run_GLM_model.",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:131",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_119_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 131,
+        "end_line": 132
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:a00_00_risk_adjustment_caller:op_138_read_file_1",
+      "order": 23,
+      "subjob": "m:a00_00_risk_adjustment_caller:s138",
+      "action": "add_component",
+      "operation_id": "op_138_read_file_1",
+      "operation_type": "read_file",
+      "component_candidate": "tFileInputDelimited",
+      "alternatives": [
+        "tFileInputPositional",
+        "tFileInputExcel"
+      ],
+      "purpose": "Leer archivo externo",
+      "properties": [
+        {
+          "name": "FILENAME",
+          "value": "&logic_path.\\Acumen_calculated_estimates.xlsx",
+          "origin": "SAS real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:138",
+          "verified": false,
+          "in_catalog": true,
+          "label": "File name/Stream",
+          "options": []
+        },
+        {
+          "name": "FIELDSEPARATOR",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Field Separator",
+          "options": []
+        },
+        {
+          "name": "HEADER",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Header",
+          "options": []
+        },
+        {
+          "name": "ENCODING",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Encoding",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:a00_00_risk_adjustment_caller:op_131_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Ruta del archivo, delimitador y codificación",
+        "Esquema (ancho fijo o delimitado)"
+      ],
+      "tests": [
+        "vc_m:a00_00_risk_adjustment_caller:op_138_read_file_1_row_count",
+        "vc_m:a00_00_risk_adjustment_caller:op_138_read_file_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas",
+        "line": 138,
+        "end_line": 144
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+      "variants": [
+        "tFileInputARFF",
+        "tFileInputExcel",
+        "tFileInputFullRow",
+        "tFileInputJSON",
+        "tFileInputLDIF",
+        "tFileInputMail",
+        "tFileInputPositional",
+        "tFileInputProperties",
+        "tFileInputRaw",
+        "tFileInputRegex",
+        "tFileInputXML"
+      ],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": {
+    "name": "a00_00_risk_adjustment_caller",
+    "params": [
+      "code_dir",
+      "run_date",
+      "clinical_logic_date",
+      "medical_code_list",
+      "fy_version",
+      "cy_version",
+      "obs",
+      "import_switch",
+      "ce_start_index",
+      "ce_end_index",
+      "run_a_series",
+      "run_process_af",
+      "run_ach_threshold",
+      "run_mjrle_stage0",
+      "run_b_series",
+      "import_covariates",
+      "run_risk_adjustment",
+      "run_tsp_model",
+      "run_GLM_model"
+    ],
+    "arguments": {
+      "code_dir": "/** All series parameters **/\r\n                      run_date            = 2025_02_12",
+      "clinical_logic_date": "2024_06_14",
+      "medical_code_list": "2024_08_19",
+      "fy_version": "24",
+      "cy_version": "24",
+      "obs": "max",
+      "import_switch": "0",
+      "ce_start_index": "21",
+      "ce_end_index": "21",
+      "run_date": "/** a series switches   **/\r\n                      run_a_series        = 1",
+      "run_process_af": "0",
+      "run_ach_threshold": "1",
+      "run_mjrle_stage0": "0",
+      "run_a_series": "/** b series switches   **/\r\n                     run_b_series         = 0",
+      "import_covariates": "0",
+      "run_risk_adjustment": "1",
+      "run_b_series": "/** To run risk adjustment",
+      "run_tsp_model": "execute one of below switch **/\r\n                           run_tsp_model        = 0",
+      "run_GLM_model": "1"
+    }
+  },
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_m:a00_00_risk_adjustment_caller:op_114_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:a00_00_risk_adjustment_caller:op_114_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_00_risk_adjustment_caller:op_114_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:a00_00_risk_adjustment_caller:op_114_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_00_risk_adjustment_caller:op_114_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:a00_00_risk_adjustment_caller:op_114_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_00_risk_adjustment_caller:op_138_read_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas leídas, incluidas filas inválidas",
+      "applies_to": [
+        "m:a00_00_risk_adjustment_caller:op_138_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:a00_00_risk_adjustment_caller:op_138_read_file_1_nulls",
+      "kind": "nulls",
+      "description": "Campos vacíos y missing se cargan igual que en SAS",
+      "applies_to": [
+        "m:a00_00_risk_adjustment_caller:op_138_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "ce_end_index",
+      "sas_value": null,
+      "suggested": "context.ce_end_index",
+      "origin": "&ce_end_index en real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:111"
+    },
+    {
+      "name": "ce_epi_type_list",
+      "sas_value": null,
+      "suggested": "context.ce_epi_type_list",
+      "origin": "&ce_epi_type_list en real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:119"
+    },
+    {
+      "name": "ce_id_list",
+      "sas_value": null,
+      "suggested": "context.ce_id_list",
+      "origin": "&ce_id_list en real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:118"
+    },
+    {
+      "name": "ce_start_index",
+      "sas_value": null,
+      "suggested": "context.ce_start_index",
+      "origin": "&ce_start_index en real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:111"
+    },
+    {
+      "name": "clinical_logic_date",
+      "sas_value": "2024_06_14",
+      "suggested": "context.clinical_logic_date",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: 2024_06_14"
+    },
+    {
+      "name": "code_dir",
+      "sas_value": "/** All series parameters **/\r\n                      run_date            = 2025_02_12",
+      "suggested": "context.code_dir",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: /** All series parameters **/\r\n                      run_date            = 2025_02_12"
+    },
+    {
+      "name": "cy_version",
+      "sas_value": "24",
+      "suggested": "context.cy_version",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: 24"
+    },
+    {
+      "name": "fy_version",
+      "sas_value": "24",
+      "suggested": "context.fy_version",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: 24"
+    },
+    {
+      "name": "import_covariates",
+      "sas_value": "0",
+      "suggested": "context.import_covariates",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: 0"
+    },
+    {
+      "name": "import_switch",
+      "sas_value": "0",
+      "suggested": "context.import_switch",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: 0"
+    },
+    {
+      "name": "logic_path",
+      "sas_value": null,
+      "suggested": "context.logic_path",
+      "origin": "&logic_path en real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:138"
+    },
+    {
+      "name": "medical_code_list",
+      "sas_value": "2024_08_19",
+      "suggested": "context.medical_code_list",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: 2024_08_19"
+    },
+    {
+      "name": "obs",
+      "sas_value": "max",
+      "suggested": "context.obs",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: max"
+    },
+    {
+      "name": "run_a_series",
+      "sas_value": "/** b series switches   **/\r\n                     run_b_series         = 0",
+      "suggested": "context.run_a_series",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: /** b series switches   **/\r\n                     run_b_series         = 0"
+    },
+    {
+      "name": "run_ach_threshold",
+      "sas_value": "1",
+      "suggested": "context.run_ach_threshold",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: 1"
+    },
+    {
+      "name": "run_b_series",
+      "sas_value": "/** To run risk adjustment",
+      "suggested": "context.run_b_series",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: /** To run risk adjustment"
+    },
+    {
+      "name": "run_date",
+      "sas_value": "/** a series switches   **/\r\n                      run_a_series        = 1",
+      "suggested": "context.run_date",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: /** a series switches   **/\r\n                      run_a_series        = 1"
+    },
+    {
+      "name": "run_GLM_model",
+      "sas_value": null,
+      "suggested": "context.run_GLM_model",
+      "origin": "&run_GLM_model en real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:131"
+    },
+    {
+      "name": "run_mjrle_stage0",
+      "sas_value": "0",
+      "suggested": "context.run_mjrle_stage0",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: 0"
+    },
+    {
+      "name": "run_process_af",
+      "sas_value": "0",
+      "suggested": "context.run_process_af",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: 0"
+    },
+    {
+      "name": "run_risk_adjustment",
+      "sas_value": "1",
+      "suggested": "context.run_risk_adjustment",
+      "origin": "Parámetro de la macro principal %a00_00_risk_adjustment_caller; argumento SAS: 1"
+    },
+    {
+      "name": "run_tsp_model",
+      "sas_value": null,
+      "suggested": "context.run_tsp_model",
+      "origin": "&run_tsp_model en real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:131"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "ref",
+      "engine": null,
+      "path": "&out_path.\\output\\ref",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "dataset_dynamic out&ce_id_short..&ce_id_w_type._estimates (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:138) — nombre de dataset con macrovariables",
+    "macro a00_04_assign_libs (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:62) — sin definición en el proyecto",
+    "macro a01_01_process_af (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:76) — sin definición en el proyecto",
+    "macro a01_02_ach_threshold (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:83) — sin definición en el proyecto",
+    "macro a02_01_prep_episodes_for_logit (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:89) — sin definición en el proyecto",
+    "macro a02_02_logit_regression (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:91) — sin definición en el proyecto",
+    "macro a02_03_flag_pseudo_op (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:93) — sin definición en el proyecto",
+    "macro b00_01_assign_libs_globals (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:101) — sin definición en el proyecto",
+    "macro b01_01_prep_risk_adj_covariates (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:104) — sin definición en el proyecto",
+    "macro b01_02_assign_covariate (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:109) — sin definición en el proyecto",
+    "macro b02_01_risk_adjustment (real/cmmi-shadow-bundles/a00_00_risk_adjustment_caller.sas:131) — sin definición en el proyecto"
+  ]
+}

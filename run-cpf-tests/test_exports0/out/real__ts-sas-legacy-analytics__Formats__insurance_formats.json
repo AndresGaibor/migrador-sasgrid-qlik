@@ -1,0 +1,113 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Formats/insurance_formats.sas",
+  "sha256": "3051af02bbc5b97d9ba9272bed77bca9fa059da9a7a45b8fc9a45cdf4753468b",
+  "job_name": "job_insurance_formats",
+  "steps": [
+    {
+      "id": "op_11_format_definition_1",
+      "order": 1,
+      "subjob": "s11",
+      "action": "add_component",
+      "operation_id": "op_11_format_definition_1",
+      "operation_type": "format_definition",
+      "component_candidate": "tFixedFlowInput",
+      "alternatives": [
+        "tMap (lookup)",
+        "Rutina Java"
+      ],
+      "purpose": "Definir formatos como tabla de lookup",
+      "properties": [
+        {
+          "name": "USE_INTABLE",
+          "value": "true",
+          "origin": "SAS real/ts-sas-legacy-analytics/Formats/insurance_formats.sas:11",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use Inline Table",
+          "options": []
+        },
+        {
+          "name": "INTABLE",
+          "value": "POLTYPE | WL | Whole Life\nPOLTYPE | TL | Term Life\nPOLTYPE | UL | Universal Life\nPOLTYPE | VL | Variable Life\nPOLTYPE | AUTO | Auto Insurance\nPOLTYPE | HOME | Homeowners\nPOLTYPE | RENT | Renters\nPOLTYPE | UMBR | Umbrella\nPOLTYPE | HLTH | Health\nPOLTYPE | DNTL | Dental\nPOLTYPE | VIS | Vision\nPOLTYPE | DISAB | Disability\nPOLTYPE | LTCI | Long-Term Care\nPOLTYPE | OTHER | Unknown\nCLMSTAT | NEW | New\nCLMSTAT | OPEN | Open\nCLMSTAT | INV | Under Investigation\nCLMSTAT | ADJ | Adjusting\nCLMSTAT | PEND | Pending Approval\nCLMSTAT | APPR | Approved\nCLMSTAT | DENY | Denied\nCLMSTAT | PAID | Paid\nCLMSTAT | CLOS | Closed\nCLMSTAT | REOP | Reopened\nCLMSTAT | SUSP | Suspended\nCLMSTAT | LITI | In Litigation\nCLMSTAT | OTHER | Unknown\nRISKCAT | STD | Standard\nRISKCAT | PREF | Preferred\nRISKCAT | SPRM | Super Preferred\nRISKCAT | SUB | Substandard\nRISKCAT | DEC | Declined\nRISKCAT | OTHER | Unrated\nCOVTYPE | COMP | Comprehensive\nCOVTYPE | COLL | Collision\nCOVTYPE | LIAB | Liability\nCOVTYPE | PIP | Personal Injury Protection\nCOVTYPE | UMBI | Uninsured Motorist BI\nCOVTYPE | UMPD | Uninsured Motorist PD\nCOVTYPE | MED | Medical Payments\nCOVTYPE | TOW | Towing\nCOVTYPE | RENT | Rental Reimbursement\nCOVTYPE | OTHER | Other\nLOSSRANGE | LOW-<0 | Recovery\nLOSSRANGE | 0 | No Loss\nLOSSRANGE | 0<-<5000 | $0-$4,999\nLOSSRANGE | 5000-<25000 | $5K-$24,999\nLOSSRANGE | 25000-<100000 | $25K-$99,999\nLOSSRANGE | 100000-<500000 | $100K-$499,999\nLOSSRANGE | 500000-HIGH | $500K+",
+          "origin": "SAS real/ts-sas-legacy-analytics/Formats/insurance_formats.sas:11",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Inline Table",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "FORMAT",
+          "talend_type": "String",
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Formats/insurance_formats.sas:11"
+        },
+        {
+          "name": "CODE",
+          "talend_type": "String",
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Formats/insurance_formats.sas:11"
+        },
+        {
+          "name": "LABEL",
+          "talend_type": "String",
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Formats/insurance_formats.sas:11"
+        }
+      ],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Confirmar cómo aplicar el formato: los rangos y OTHER necesitan lógica equivalente, no solo una tabla de filas"
+      ],
+      "tests": [
+        "vc_op_11_format_definition_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Formats/insurance_formats.sas",
+        "line": 11,
+        "end_line": 83
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput/tfixedflowinput-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_op_11_format_definition_1_schema",
+      "kind": "schema",
+      "description": "Valores formateados iguales para todo el rango",
+      "applies_to": [
+        "op_11_format_definition_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

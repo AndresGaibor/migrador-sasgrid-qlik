@@ -1,0 +1,553 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/de_annual_build.sas",
+  "sha256": "e4468a94ecea65da295127b3258dc78d978e38330b1e13001869ac2220d0eaa3",
+  "job_name": "job_de_annual_build",
+  "steps": [
+    {
+      "id": "op_41_macro_call_1",
+      "order": 1,
+      "subjob": "s41",
+      "action": "add_component",
+      "operation_id": "op_41_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %setenv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "setenv",
+          "origin": "SAS real/tmsis-analytic-file/de_annual_build.sas:41",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %setenv (definida en real/tmsis-analytic-file/001_batch_bsf.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/de_annual_build.sas",
+        "line": 41,
+        "end_line": 41
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_120_unsupported_1",
+      "order": 2,
+      "subjob": "s119",
+      "action": "manual_decision",
+      "operation_id": "op_120_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_41_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/de_annual_build.sas",
+        "line": 120,
+        "end_line": 120
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_125_unsupported_1",
+      "order": 3,
+      "subjob": "s119",
+      "action": "manual_decision",
+      "operation_id": "op_125_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_120_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/de_annual_build.sas",
+        "line": 125,
+        "end_line": 125
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_138_set_variable_1",
+      "order": 4,
+      "subjob": "s137",
+      "action": "add_component",
+      "operation_id": "op_138_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/de_annual_build.sas:138",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_125_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/de_annual_build.sas",
+        "line": 138,
+        "end_line": 139
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_141_maintenance_1",
+      "order": 5,
+      "subjob": "s141",
+      "action": "add_component",
+      "operation_id": "op_141_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_138_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/de_annual_build.sas",
+        "line": 141,
+        "end_line": 142
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_152_macro_call_1",
+      "order": 6,
+      "subjob": "s152",
+      "action": "add_component",
+      "operation_id": "op_152_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %create_pyears",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "create_pyears",
+          "origin": "SAS real/tmsis-analytic-file/de_annual_build.sas:152",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_141_maintenance_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/de_annual_build.sas",
+        "line": 152,
+        "end_line": 152
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_237_unsupported_1",
+      "order": 7,
+      "subjob": "s157",
+      "action": "manual_decision",
+      "operation_id": "op_237_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_152_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/de_annual_build.sas",
+        "line": 237,
+        "end_line": 237
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_244_maintenance_1",
+      "order": 8,
+      "subjob": "s244",
+      "action": "add_component",
+      "operation_id": "op_244_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_237_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/de_annual_build.sas",
+        "line": 244,
+        "end_line": 245
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "setENV",
+      "params": [],
+      "steps": []
+    },
+    {
+      "name": "priorids",
+      "params": [],
+      "steps": [
+        {
+          "id": "m:priorids:op_180_macro_call_1",
+          "order": 1,
+          "subjob": "m:priorids:s180",
+          "action": "add_component",
+          "operation_id": "op_180_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %max_run_id",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "max_run_id",
+              "origin": "SAS real/tmsis-analytic-file/de_annual_build.sas:180",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "file=DE, tbl=taf_ann_de_base, inyear=&pyear.",
+              "origin": "SAS real/tmsis-analytic-file/de_annual_build.sas:180",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/de_annual_build.sas",
+            "line": 180,
+            "end_line": 180
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "basedir",
+      "sas_value": "/sasdata/users/&sysuserid/&TMSIS/&sub_env/data_analytics/taf/ann_de",
+      "suggested": "context.basedir",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "da_config_macro",
+      "sas_value": "\"/sasdata/users/&sysuserid/tmsislockdown/config/da_config.sas\"",
+      "suggested": "context.da_config_macro",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DA_RUN_ID",
+      "sas_value": "&DA_RUN_ID.",
+      "suggested": "context.DA_RUN_ID",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "MONTHSB",
+      "sas_value": "12 11 10 09 08 07 06 05 04 03 02 01",
+      "suggested": "context.MONTHSB",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "NMCSLOTS",
+      "sas_value": "16",
+      "suggested": "context.NMCSLOTS",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "NWAIVSLOTS",
+      "sas_value": "10",
+      "suggested": "context.NWAIVSLOTS",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "pyear",
+      "sas_value": null,
+      "suggested": "context.pyear",
+      "origin": "&pyear en real/tmsis-analytic-file/de_annual_build.sas:180"
+    },
+    {
+      "name": "tms_config_macro",
+      "sas_value": "\"/sasdata/users/&sysuserid/tmsislockdown/config/tms_config.sas\"",
+      "suggested": "context.tms_config_macro",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "YEAR",
+      "sas_value": "&YEAR.",
+      "suggested": "context.YEAR",
+      "origin": "%LET de primer nivel"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "include &tms_config_macro (real/tmsis-analytic-file/de_annual_build.sas:13) — ruta dinámica",
+    "include &da_config_macro (real/tmsis-analytic-file/de_annual_build.sas:17) — ruta dinámica",
+    "include \"/sasdata/users/&sysuserid/&TMSIS/&sub_env/data_analytics/taf/programs/AWS_Shared_Macros.sas\" (real/tmsis-analytic-file/de_annual_build.sas:59) — ruta dinámica",
+    "include \"&basedir./programs/annual_macros.sas\" (real/tmsis-analytic-file/de_annual_build.sas:65) — ruta dinámica",
+    "include \"&basedir./programs/001_base.sas\" (real/tmsis-analytic-file/de_annual_build.sas:66) — ruta dinámica",
+    "include \"&basedir./programs/002_eligibility_dates.sas\" (real/tmsis-analytic-file/de_annual_build.sas:67) — ruta dinámica",
+    "include \"&basedir./programs/003_address_phone.sas\" (real/tmsis-analytic-file/de_annual_build.sas:68) — ruta dinámica",
+    "include \"&basedir./programs/005_managed_care.sas\" (real/tmsis-analytic-file/de_annual_build.sas:69) — ruta dinámica",
+    "include \"&basedir./programs/006_waiver.sas\" (real/tmsis-analytic-file/de_annual_build.sas:70) — ruta dinámica",
+    "include \"&basedir./programs/007_mfp.sas\" (real/tmsis-analytic-file/de_annual_build.sas:71) — ruta dinámica",
+    "include \"&basedir./programs/008_hh_spo.sas\" (real/tmsis-analytic-file/de_annual_build.sas:72) — ruta dinámica",
+    "include \"&basedir./programs/009_disability_need.sas\" (real/tmsis-analytic-file/de_annual_build.sas:73) — ruta dinámica",
+    "macro tmsis_connect (real/tmsis-analytic-file/de_annual_build.sas:121) — sin definición en el proyecto",
+    "macro job_control_rd (real/tmsis-analytic-file/de_annual_build.sas:123) — sin definición en el proyecto",
+    "macro job_control_updt (real/tmsis-analytic-file/de_annual_build.sas:127) — sin definición en el proyecto",
+    "macro tmsis_disconnect (real/tmsis-analytic-file/de_annual_build.sas:129) — sin definición en el proyecto",
+    "macro left (real/tmsis-analytic-file/de_annual_build.sas:141) — sin definición en el proyecto",
+    "macro create_pyears (real/tmsis-analytic-file/de_annual_build.sas:152) — sin definición en el proyecto",
+    "macro tmsis_connect (real/tmsis-analytic-file/de_annual_build.sas:158) — sin definición en el proyecto",
+    "macro max_run_id (real/tmsis-analytic-file/de_annual_build.sas:166) — sin definición en el proyecto",
+    "macro max_run_id (real/tmsis-analytic-file/de_annual_build.sas:168) — sin definición en el proyecto",
+    "macro max_run_id (real/tmsis-analytic-file/de_annual_build.sas:169) — sin definición en el proyecto",
+    "macro max_run_id (real/tmsis-analytic-file/de_annual_build.sas:170) — sin definición en el proyecto",
+    "macro max_run_id (real/tmsis-analytic-file/de_annual_build.sas:171) — sin definición en el proyecto",
+    "macro max_run_id (real/tmsis-analytic-file/de_annual_build.sas:180) — sin definición en el proyecto",
+    "macro any_pyear (real/tmsis-analytic-file/de_annual_build.sas:193) — sin definición en el proyecto",
+    "macro create_segment (real/tmsis-analytic-file/de_annual_build.sas:198) — sin definición en el proyecto",
+    "macro create_segment (real/tmsis-analytic-file/de_annual_build.sas:202) — sin definición en el proyecto",
+    "macro create_segment (real/tmsis-analytic-file/de_annual_build.sas:207) — sin definición en el proyecto",
+    "macro create_segment (real/tmsis-analytic-file/de_annual_build.sas:212) — sin definición en el proyecto",
+    "macro create_segment (real/tmsis-analytic-file/de_annual_build.sas:217) — sin definición en el proyecto",
+    "macro create_segment (real/tmsis-analytic-file/de_annual_build.sas:222) — sin definición en el proyecto",
+    "macro create_segment (real/tmsis-analytic-file/de_annual_build.sas:227) — sin definición en el proyecto",
+    "macro create_segment (real/tmsis-analytic-file/de_annual_build.sas:233) — sin definición en el proyecto",
+    "macro job_control_updt2 (real/tmsis-analytic-file/de_annual_build.sas:238) — sin definición en el proyecto",
+    "macro tmsis_disconnect (real/tmsis-analytic-file/de_annual_build.sas:240) — sin definición en el proyecto"
+  ]
+}

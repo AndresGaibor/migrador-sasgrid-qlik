@@ -1,0 +1,1997 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+  "sha256": "529f42d3a29f88af971c9e5d5045ed579451193cd7b856188de9c05722de80bb",
+  "job_name": "job_create_format",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "create_format",
+      "params": [
+        "DATA",
+        "LIB",
+        "CAT",
+        "NAME",
+        "TYPE",
+        "START",
+        "END",
+        "LABEL",
+        "DEFAULT",
+        "MIN",
+        "MAX",
+        "FUZZ",
+        "OTHER",
+        "KEEP",
+        "WHERE",
+        "DEDUP"
+      ],
+      "steps": [
+        {
+          "id": "m:create_format:op_215_macro_call_1",
+          "order": 1,
+          "subjob": "m:create_format:s215",
+          "action": "add_component",
+          "operation_id": "op_215_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:215",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "DATA,         _req=1,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:215",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 215,
+            "end_line": 215
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_216_macro_call_1",
+          "order": 2,
+          "subjob": "m:create_format:s216",
+          "action": "add_component",
+          "operation_id": "op_216_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:216",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "LIB,          _req=1,_words=0,_case=U",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:216",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_215_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 216,
+            "end_line": 216
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_217_macro_call_1",
+          "order": 3,
+          "subjob": "m:create_format:s217",
+          "action": "add_component",
+          "operation_id": "op_217_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:217",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "CAT,          _req=1,_words=0,_case=U",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:217",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_216_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 217,
+            "end_line": 217
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_218_macro_call_1",
+          "order": 4,
+          "subjob": "m:create_format:s218",
+          "action": "add_component",
+          "operation_id": "op_218_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:218",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "NAME,         _req=1,_words=0,_case=U",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:218",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_217_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 218,
+            "end_line": 218
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_219_macro_call_1",
+          "order": 5,
+          "subjob": "m:create_format:s219",
+          "action": "add_component",
+          "operation_id": "op_219_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:219",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "TYPE,         _req=1,_words=0,_case=U,_val=CHR_FORMAT NUM_FORMAT CHR_INFORMAT NUM_INFORMAT",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:219",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_218_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 219,
+            "end_line": 219
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_220_macro_call_1",
+          "order": 6,
+          "subjob": "m:create_format:s220",
+          "action": "add_component",
+          "operation_id": "op_220_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:220",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "START,        _req=1,_words=0,_case=U",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:220",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_219_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 220,
+            "end_line": 220
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_221_macro_call_1",
+          "order": 7,
+          "subjob": "m:create_format:s221",
+          "action": "add_component",
+          "operation_id": "op_221_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:221",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "END,          _req=0,_words=0,_case=U",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:221",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_220_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 221,
+            "end_line": 221
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_222_macro_call_1",
+          "order": 8,
+          "subjob": "m:create_format:s222",
+          "action": "add_component",
+          "operation_id": "op_222_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:222",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "LABEL,        _req=1,_words=0,_case=U",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:222",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_221_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 222,
+            "end_line": 222
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_223_macro_call_1",
+          "order": 9,
+          "subjob": "m:create_format:s223",
+          "action": "add_component",
+          "operation_id": "op_223_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:223",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "DEFAULT,      _req=0,_words=0,_case=U,_val=POSITIVE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:223",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_222_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 223,
+            "end_line": 223
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_224_macro_call_1",
+          "order": 10,
+          "subjob": "m:create_format:s224",
+          "action": "add_component",
+          "operation_id": "op_224_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:224",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "MIN,          _req=0,_words=0,_case=U,_val=POSITIVE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:224",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_223_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 224,
+            "end_line": 224
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_225_macro_call_1",
+          "order": 11,
+          "subjob": "m:create_format:s225",
+          "action": "add_component",
+          "operation_id": "op_225_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:225",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "MAX,          _req=0,_words=0,_case=U,_val=POSITIVE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:225",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_224_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 225,
+            "end_line": 225
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_226_macro_call_1",
+          "order": 12,
+          "subjob": "m:create_format:s226",
+          "action": "add_component",
+          "operation_id": "op_226_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:226",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "FUZZ,         _req=0,_words=0,_case=U",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:226",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_225_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 226,
+            "end_line": 226
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_227_macro_call_1",
+          "order": 13,
+          "subjob": "m:create_format:s227",
+          "action": "add_component",
+          "operation_id": "op_227_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:227",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "DEDUP,        _req=1,_words=0,_case=U,_val=0 1",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:227",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_226_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 227,
+            "end_line": 227
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_239_read_1",
+          "order": 14,
+          "subjob": "m:create_format:s239",
+          "action": "add_component",
+          "operation_id": "op_239_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer &DATA",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "&DATA",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_227_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:create_format:op_239_read_1_row_count",
+            "vc_m:create_format:op_239_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 239,
+            "end_line": 379
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:create_format:op_239_select_columns_1",
+          "order": 15,
+          "subjob": "m:create_format:s239",
+          "action": "add_component",
+          "operation_id": "op_239_select_columns_1",
+          "operation_type": "select_columns",
+          "component_candidate": "tFilterColumns",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Conservar/descartar columnas",
+          "properties": [
+            {
+              "name": "SCHEMA",
+              "value": "keep: &keep",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Schema",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "&keep",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:create_format:op_239_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:create_format:op_239_select_columns_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 239,
+            "end_line": 379
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:create_format:op_301_filter_1",
+          "order": 16,
+          "subjob": "m:create_format:s239",
+          "action": "add_component",
+          "operation_id": "op_301_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (sentencia WHERE): &WHERE",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "true",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:301",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": "context.WHERE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:301",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:create_format:op_239_select_columns_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "&WHERE",
+              "talend": "context.WHERE",
+              "line": 301,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &WHERE → context.WHERE (crear variable de contexto)"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:create_format:op_301_filter_1_row_count",
+            "vc_m:create_format:op_301_filter_1_nulls",
+            "vc_m:create_format:op_301_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 301,
+            "end_line": 379
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_239_compute_1",
+          "order": 17,
+          "subjob": "m:create_format:s239",
+          "action": "add_component",
+          "operation_id": "op_239_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "8 asignaciones, 2 condicionales",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "FMTNAME",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+            },
+            {
+              "name": "TYPE",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+            },
+            {
+              "name": "START",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+            },
+            {
+              "name": "DEFAULT",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+            },
+            {
+              "name": "MIN",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+            },
+            {
+              "name": "MAX",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+            },
+            {
+              "name": "FUZZ",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+            },
+            {
+              "name": "HLO",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:create_format:op_301_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "&NAME",
+              "talend": "context.NAME",
+              "line": 304,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &NAME → context.NAME (crear variable de contexto)"
+              ]
+            },
+            {
+              "sas": "\"&type\"",
+              "talend": "\"&type\"",
+              "line": 305,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "&START",
+              "talend": "context.START",
+              "line": 306,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &START → context.START (crear variable de contexto)"
+              ]
+            },
+            {
+              "sas": "&default",
+              "talend": "context.default",
+              "line": 311,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &default → context.default (crear variable de contexto)"
+              ]
+            },
+            {
+              "sas": "&min",
+              "talend": "context.min",
+              "line": 315,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &min → context.min (crear variable de contexto)"
+              ]
+            },
+            {
+              "sas": "&max",
+              "talend": "context.max",
+              "line": 319,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &max → context.max (crear variable de contexto)"
+              ]
+            },
+            {
+              "sas": "&fuzz",
+              "talend": "context.fuzz",
+              "line": 323,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &fuzz → context.fuzz (crear variable de contexto)"
+              ]
+            },
+            {
+              "sas": "\"O\"",
+              "talend": "\"O\"",
+              "line": 349,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "if _n_=1 then call missing(of _all_)",
+              "talend": null,
+              "line": 266,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "if (_last_) then do",
+              "talend": null,
+              "line": 329,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            }
+          ],
+          "assumptions": [
+            "Lógica condicional: revisar orden de evaluación y valores missing"
+          ],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:create_format:op_239_compute_1_nulls",
+            "vc_m:create_format:op_239_compute_1_dates",
+            "vc_m:create_format:op_239_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 239,
+            "end_line": 379
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_239_write_1",
+          "order": 18,
+          "subjob": "m:create_format:s239",
+          "action": "add_component",
+          "operation_id": "op_239_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir &cntlin",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "&cntlin",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:239",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:create_format:op_239_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:create_format:op_239_write_1_row_count",
+            "vc_m:create_format:op_239_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 239,
+            "end_line": 379
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:create_format:op_385_read_1",
+          "order": 19,
+          "subjob": "m:create_format:s385",
+          "action": "add_component",
+          "operation_id": "op_385_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer _crtfmt_._cntlin_",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_cntlin_",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:385",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_239_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería _crtfmt_ es de tipo BASE en %sysfunc(pathname(work)): Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:create_format:op_385_read_1_row_count",
+            "vc_m:create_format:op_385_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 385,
+            "end_line": 387
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:create_format:op_385_sort_1",
+          "order": 20,
+          "subjob": "m:create_format:s385",
+          "action": "add_component",
+          "operation_id": "op_385_sort_1",
+          "operation_type": "sort",
+          "component_candidate": "tSortRow",
+          "alternatives": [],
+          "purpose": "Ordenar por fmtname, start",
+          "properties": [
+            {
+              "name": "CRITERIA",
+              "value": "fmtname, start",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:385",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Criteria",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "fmtname",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:385"
+            },
+            {
+              "name": "start",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:385"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:create_format:op_385_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:create_format:op_385_sort_1_ordering"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 385,
+            "end_line": 387
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_385_dedupe_1",
+          "order": 21,
+          "subjob": "m:create_format:s385",
+          "action": "add_component",
+          "operation_id": "op_385_dedupe_1",
+          "operation_type": "dedupe",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Eliminar duplicados",
+          "properties": [
+            {
+              "name": "UNIQUE_KEY",
+              "value": "fmtname, start",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:385",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "fmtname",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:385"
+            },
+            {
+              "name": "start",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:385"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:create_format:op_385_sort_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Definir la clave y la lógica para conservar la fila correcta por grupo; confirmar una opción disponible en la instalación actual."
+          ],
+          "tests": [
+            "vc_m:create_format:op_385_dedupe_1_duplicates"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 385,
+            "end_line": 387
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_385_write_1",
+          "order": 22,
+          "subjob": "m:create_format:s385",
+          "action": "add_component",
+          "operation_id": "op_385_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir &cntlin",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "&cntlin",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:385",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:385",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:385",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:create_format:op_385_dedupe_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:create_format:op_385_write_1_row_count",
+            "vc_m:create_format:op_385_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 385,
+            "end_line": 387
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:create_format:op_400_format_definition_1",
+          "order": 23,
+          "subjob": "m:create_format:s400",
+          "action": "add_component",
+          "operation_id": "op_400_format_definition_1",
+          "operation_type": "format_definition",
+          "component_candidate": "tFixedFlowInput",
+          "alternatives": [
+            "tMap (lookup)",
+            "Rutina Java"
+          ],
+          "purpose": "Definir formatos como tabla de lookup",
+          "properties": [
+            {
+              "name": "USE_INTABLE",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use Inline Table",
+              "options": []
+            },
+            {
+              "name": "INTABLE",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Inline Table",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_385_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Confirmar cómo aplicar el formato: los rangos y OTHER necesitan lógica equivalente, no solo una tabla de filas"
+          ],
+          "tests": [
+            "vc_m:create_format:op_400_format_definition_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 400,
+            "end_line": 401
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput/tfixedflowinput-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_format:op_403_macro_call_1",
+          "order": 24,
+          "subjob": "m:create_format:s403",
+          "action": "add_component",
+          "operation_id": "op_403_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %quit",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "quit",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/create_format.sas:403",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_format:op_400_format_definition_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/create_format.sas",
+            "line": 403,
+            "end_line": 404
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "vc_m:create_format:op_239_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:create_format:op_239_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_239_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:create_format:op_239_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_239_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:create_format:op_239_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_301_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:create_format:op_301_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_301_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:create_format:op_301_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_301_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:create_format:op_301_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_239_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:create_format:op_239_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_239_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:create_format:op_239_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_239_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:create_format:op_239_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_239_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:create_format:op_239_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_239_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:create_format:op_239_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_385_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:create_format:op_385_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_385_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:create_format:op_385_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_385_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:create_format:op_385_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_385_dedupe_1_duplicates",
+      "kind": "duplicates",
+      "description": "Se conserva la misma fila por clave (NODUPKEY conserva la primera)",
+      "applies_to": [
+        "m:create_format:op_385_dedupe_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_385_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:create_format:op_385_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_385_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:create_format:op_385_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:create_format:op_400_format_definition_1_schema",
+      "kind": "schema",
+      "description": "Valores formateados iguales para todo el rango",
+      "applies_to": [
+        "m:create_format:op_400_format_definition_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "cntlin",
+      "sas_value": null,
+      "suggested": "context.cntlin",
+      "origin": "&cntlin en real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+    },
+    {
+      "name": "DATA",
+      "sas_value": null,
+      "suggested": "context.DATA",
+      "origin": "&DATA en real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+    },
+    {
+      "name": "default",
+      "sas_value": null,
+      "suggested": "context.default",
+      "origin": "&default en real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+    },
+    {
+      "name": "fuzz",
+      "sas_value": null,
+      "suggested": "context.fuzz",
+      "origin": "&fuzz en real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+    },
+    {
+      "name": "keep",
+      "sas_value": null,
+      "suggested": "context.keep",
+      "origin": "&keep en real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+    },
+    {
+      "name": "max",
+      "sas_value": null,
+      "suggested": "context.max",
+      "origin": "&max en real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+    },
+    {
+      "name": "min",
+      "sas_value": null,
+      "suggested": "context.min",
+      "origin": "&min en real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+    },
+    {
+      "name": "NAME",
+      "sas_value": null,
+      "suggested": "context.NAME",
+      "origin": "&NAME en real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+    },
+    {
+      "name": "START",
+      "sas_value": null,
+      "suggested": "context.START",
+      "origin": "&START en real/ts-sas-legacy-analytics/Macro/create_format.sas:239"
+    },
+    {
+      "name": "WHERE",
+      "sas_value": null,
+      "suggested": "context.WHERE",
+      "origin": "&WHERE en real/ts-sas-legacy-analytics/Macro/create_format.sas:301"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "_crtfmt_",
+      "engine": "spde",
+      "path": "%sysfunc(pathname(work))",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "dataset_dynamic &DATA (real/ts-sas-legacy-analytics/Macro/create_format.sas:239) — nombre de dataset con macrovariables",
+    "dataset_dynamic &cntlin (real/ts-sas-legacy-analytics/Macro/create_format.sas:239) — nombre de dataset con macrovariables",
+    "dataset_dynamic &cntlin (real/ts-sas-legacy-analytics/Macro/create_format.sas:385) — nombre de dataset con macrovariables",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:215) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:216) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:217) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:218) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:219) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:220) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:221) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:222) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:223) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:224) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:225) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:226) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/create_format.sas:227) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Macro/create_format.sas:390) — sin definición en el proyecto",
+    "macro quit (real/ts-sas-legacy-analytics/Macro/create_format.sas:403) — sin definición en el proyecto"
+  ]
+}

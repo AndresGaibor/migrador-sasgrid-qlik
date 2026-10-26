@@ -1,0 +1,369 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/001_base.sas",
+  "sha256": "39618570f7cdfd1228cf6c59885a8d2e9617d034f62a95a4ed595dcfa3683f81",
+  "job_name": "job_001_base",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "create_BASE",
+      "params": [],
+      "steps": [
+        {
+          "id": "m:create_BASE:op_22_macro_call_1",
+          "order": 1,
+          "subjob": "m:create_BASE:s22",
+          "action": "add_component",
+          "operation_id": "op_22_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %create_temp_table",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "create_temp_table",
+              "origin": "SAS real/tmsis-analytic-file/001_base.sas:22",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "base_nondemo,\r\n\t\t          subcols=%nrbquote( %last_best(CTZNSHP_VRFCTN_IND)\r\n\t\t\t\t\t\t\t\t     %last_best(IMGRTN_STUS_CD)\r\n\t\t\t\t\t\t\t\t     %last_best(IMGRTN_VRFCTN_IND) \r\n\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_01\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_02\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_03\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_04\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_05\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_06\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_07\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_08\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_09\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_10\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_11\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_12\r\n\r\n\t\t\t\t\t\t\t\t\t ,null :: smallint as PRGNCY_FLAG_EVR\r\n\r\n\t\t\t\t\t\t\t\t\t %monthly_array(ELGBLTY_GRP_CD)\r\n\t\t\t\t\t\t\t\t\t %last_best(ELGBLTY_GRP_CD,outcol=ELGBLTY_GRP_CD_LTST)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(MASBOE_CD)\r\n\t\t\t\t\t\t\t\t\t %last_best(MASBOE_CD,outcol=MASBOE_CD_LTST)\r\n\t\t\t\t\t\t\t\t\t %last_best(CARE_LVL_STUS_CD)\r\n\t\t\t\t\t\t\t\t\t %ever_year(DEAF_DSBL_FLAG)\r\n\t\t\t\t\t\t\t\t\t %ever_year(BLND_DSBL_FLAG)\r\n\t\t\t\t\t\t\t\t\t %ever_year(DFCLTY_CONC_DSBL_FLAG,outcol=DFCLTY_CNCNTRTNG_DSBL_FLAG_EVR)\r\n\t\t\t\t\t\t\t\t\t %ever_year(DFCLTY_WLKG_DSBL_FLAG)\r\n\t\t\t\t\t\t\t\t\t %ever_year(DFCLTY_DRSNG_BATHG_DSBL_FLAG,outcol=DFCLTY_DRSNG_BTH_DSBL_FLAG_EVR)\r\n\t\t\t\t\t\t\t\t\t %ever_year(DFCLTY_ERRANDS_ALN_DSBL_FLAG,outcol=DFCLTY_ERNDS_ALN_DSBL_FLAG_EVR)\r\n\t\t\t\t\t\t\t\t\t %ever_year(OTHR_DSBL_FLAG)\r\n\r\n\t\t\t\t\t\t\t\t\t %monthly_array(CHIP_CD)\r\n\t\t\t\t\t\t\t\t\t %last_best(CHIP_CD,outcol=CHIP_CD_LTST)\r\n     \r\n\t\t\t\t\t\t\t\t\t %monthly_array(STATE_SPEC_ELGBLTY_FCTR_TXT,outcol=STATE_SPEC_ELGBLTY_GRP)\r\n\t\t\t\t\t\t\t\t\t %last_best(STATE_SPEC_ELGBLTY_FCTR_TXT,outcol=STATE_SPEC_ELGBLTY_GRP_LTST)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(DUAL_ELGBL_CD)\r\n\t\t\t\t\t\t\t\t\t %last_best(DUAL_ELGBL_CD,outcol=DUAL_ELGBL_CD_LTST)\r\n\t\t\t\t\t\t\t\t\t                     \r\n\t\t\t\t\t\t\t\t\t %mc_type_rank(smonth=1,emonth=2)\r\n\t\t\t\t\t\t\t\t\t                  \r\n\t\t\t\t\t\t\t\t\t %monthly_array(RSTRCTD_BNFTS_CD)\r\n\t\t\t\t\t\t\t\t\t %last_best(RSTRCTD_BNFTS_CD,outcol=RSTRCTD_BNFTS_CD_LTST)\r\n\t\t\t\t\t\t\t\t\t %last_best(SSDI_IND)\r\n\t\t\t\t\t\t\t\t\t %last_best(SSI_IND)\r\n\t\t\t\t\t\t\t\t\t %last_best(SSI_STATE_SPLMT_STUS_CD)\r\n\t\t\t\t\t\t\t\t\t %last_best(SSI_STUS_CD)\r\n\t\t\t\t\t\t\t\t\t %last_best(BIRTH_CNCPTN_IND)\r\n\t\t\t\t\t\t\t\t\t %last_best(TANF_CASH_CD)\r\n\t\t\t\t\t\t\t\t\t %last_best(TPL_INSRNC_CVRG_IND)\r\n\t\t\t\t\t\t\t\t\t %last_best(TPL_OTHR_CVRG_IND)\t\r\n\r\n\t\t\t\t\t\t\t\t\t %misg_enrlmt_type\r\n\t\t\t\t\t\t\t\t\t \r\n\t\t\t\t\t\t\t\t\t %last_best(incol=AGE_NUM, outcol = AGE_NUM_TEMP)\t\r\n\t\t\t\t\t\t\t\t\t %last_best(incol=AGE_GRP_FLAG, outcol = AGE_GRP_FLAG_TEMP)\t\r\n\t\t\t\t\t\t\t\t\t %last_best(incol=ELGBL_AFTR_EOM_IND, outcol = ELGBL_AFTR_EOM_TEMP)\r\n\t\t\t\t\t\t\t\t\t %nonmiss_month(incol = msis_ident_num,outcol = BSF_RECORD)\r\n\r\n\t\t\t\t\t\t\t\t\t %monthly_array(ELGBLTY_CHG_RSN_CD)\r\n\r\n\t\t              ),\r\n                      subcols2=%nrbquote(\r\n                                     %mc_type_rank(smonth=3,emonth=4)\r\n                     ),\r\n                      subcols3=%nrbquote(\r\n                                     %mc_type_rank(smonth=5,emonth=6)\r\n                     ),\r\n                      subcols4=%nrbquote(\r\n                                     %mc_type_rank(smonth=7,emonth=8)\r\n                     ),\r\n                      subcols5=%nrbquote(\r\n                                     %mc_type_rank(smonth=9,emonth=10)\r\n                     ),\r\n                      subcols6=%nrbquote(\r\n                                     %mc_type_rank(smonth=11,emonth=12)\r\n\r\n                     ) ",
+              "origin": "SAS real/tmsis-analytic-file/001_base.sas:22",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/001_base.sas",
+            "line": 22,
+            "end_line": 101
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_BASE:op_162_macro_call_1",
+          "order": 2,
+          "subjob": "m:create_BASE:s162",
+          "action": "add_component",
+          "operation_id": "op_162_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %demographics",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "demographics",
+              "origin": "SAS real/tmsis-analytic-file/001_base.sas:162",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "&year.",
+              "origin": "SAS real/tmsis-analytic-file/001_base.sas:162",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_BASE:op_22_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %demographics (definida en real/tmsis-analytic-file/001_base.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/001_base.sas",
+            "line": 162,
+            "end_line": 162
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:create_BASE:op_170_macro_call_1",
+          "order": 3,
+          "subjob": "m:create_BASE:s170",
+          "action": "add_component",
+          "operation_id": "op_170_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %create_hist_demo",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "create_hist_demo",
+              "origin": "SAS real/tmsis-analytic-file/001_base.sas:170",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "base_demo, inyear = &pyear.",
+              "origin": "SAS real/tmsis-analytic-file/001_base.sas:170",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_BASE:op_162_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/001_base.sas",
+            "line": 170,
+            "end_line": 170
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_BASE:op_302_macro_call_1",
+          "order": 4,
+          "subjob": "m:create_BASE:s302",
+          "action": "add_component",
+          "operation_id": "op_302_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %drop_tables",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "drop_tables",
+              "origin": "SAS real/tmsis-analytic-file/001_base.sas:302",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "base_demo_&year. %do p=1 %to %sysfunc(countw(&pyears.));\r\n\t \t\t      \t\t\t\t\t\t\t%let pyear=%scan(&pyears.,&p.); \r\n                                            base_demo_&pyear.\r\n\t\t\t\t\t\t\t\t\t  %end; ",
+              "origin": "SAS real/tmsis-analytic-file/001_base.sas:302",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_BASE:op_170_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/001_base.sas",
+            "line": 302,
+            "end_line": 305
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_BASE:op_382_macro_call_1",
+          "order": 5,
+          "subjob": "m:create_BASE:s382",
+          "action": "add_component",
+          "operation_id": "op_382_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %drop_tables",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "drop_tables",
+              "origin": "SAS real/tmsis-analytic-file/001_base.sas:382",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "base_&year. enrolled_days_&year. MNGD_CARE_SPLMTL_&year. WAIVER_SPLMTL_&year. MFP_SPLMTL_&year.\r\n\t             HH_SPO_SPLMTL_&year. DIS_NEED_SPLMTLS_&year.",
+              "origin": "SAS real/tmsis-analytic-file/001_base.sas:382",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_BASE:op_302_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/001_base.sas",
+            "line": 382,
+            "end_line": 383
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "p",
+      "sas_value": null,
+      "suggested": "context.p",
+      "origin": "&p en real/tmsis-analytic-file/001_base.sas:302"
+    },
+    {
+      "name": "pyear",
+      "sas_value": null,
+      "suggested": "context.pyear",
+      "origin": "&pyear en real/tmsis-analytic-file/001_base.sas:170"
+    },
+    {
+      "name": "pyears",
+      "sas_value": null,
+      "suggested": "context.pyears",
+      "origin": "&pyears en real/tmsis-analytic-file/001_base.sas:302"
+    },
+    {
+      "name": "year",
+      "sas_value": null,
+      "suggested": "context.year",
+      "origin": "&year en real/tmsis-analytic-file/001_base.sas:162"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro create_temp_table (real/tmsis-analytic-file/001_base.sas:22) — sin definición en el proyecto",
+    "macro last_best (real/tmsis-analytic-file/001_base.sas:22) — sin definición en el proyecto",
+    "macro monthly_array (real/tmsis-analytic-file/001_base.sas:22) — sin definición en el proyecto",
+    "macro ever_year (real/tmsis-analytic-file/001_base.sas:22) — sin definición en el proyecto",
+    "macro mc_type_rank (real/tmsis-analytic-file/001_base.sas:22) — sin definición en el proyecto",
+    "macro misg_enrlmt_type (real/tmsis-analytic-file/001_base.sas:22) — sin definición en el proyecto",
+    "macro nonmiss_month (real/tmsis-analytic-file/001_base.sas:22) — sin definición en el proyecto",
+    "macro create_temp_table (real/tmsis-analytic-file/001_base.sas:109) — sin definición en el proyecto",
+    "macro last_best (real/tmsis-analytic-file/001_base.sas:109) — sin definición en el proyecto",
+    "macro monthly_array (real/tmsis-analytic-file/001_base.sas:109) — sin definición en el proyecto",
+    "macro nonmiss_month (real/tmsis-analytic-file/001_base.sas:109) — sin definición en el proyecto",
+    "macro assign_nonmiss_month (real/tmsis-analytic-file/001_base.sas:109) — sin definición en el proyecto",
+    "macro create_hist_demo (real/tmsis-analytic-file/001_base.sas:170) — sin definición en el proyecto",
+    "macro last_best (real/tmsis-analytic-file/001_base.sas:180) — sin definición en el proyecto",
+    "macro address_same_year (real/tmsis-analytic-file/001_base.sas:212) — sin definición en el proyecto",
+    "macro last_best (real/tmsis-analytic-file/001_base.sas:212) — sin definición en el proyecto",
+    "macro age_date_calculate (real/tmsis-analytic-file/001_base.sas:252) — sin definición en el proyecto",
+    "macro drop_tables (real/tmsis-analytic-file/001_base.sas:302) — sin definición en el proyecto",
+    "macro drop_tables (real/tmsis-analytic-file/001_base.sas:382) — sin definición en el proyecto",
+    "macro unique_claims_ids (real/tmsis-analytic-file/001_base.sas:389) — sin definición en el proyecto",
+    "macro table_id_cols (real/tmsis-analytic-file/001_base.sas:656) — sin definición en el proyecto"
+  ]
+}

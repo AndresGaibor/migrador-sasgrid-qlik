@@ -1,0 +1,609 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas",
+  "sha256": "da0c61dfd48e74a747d4c4b03ba3832f588136be6efcd973e6d0e4214d851f48",
+  "job_name": "job_runall_controltable",
+  "steps": [
+    {
+      "id": "op_128_read_file_1",
+      "order": 1,
+      "subjob": "s126",
+      "action": "add_component",
+      "operation_id": "op_128_read_file_1",
+      "operation_type": "read_file",
+      "component_candidate": "tFileInputDelimited",
+      "alternatives": [
+        "tFileInputPositional",
+        "tFileInputExcel"
+      ],
+      "purpose": "Leer archivo externo",
+      "properties": [
+        {
+          "name": "FILENAME",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "File name/Stream",
+          "options": []
+        },
+        {
+          "name": "FIELDSEPARATOR",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Field Separator",
+          "options": []
+        },
+        {
+          "name": "HEADER",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Header",
+          "options": []
+        },
+        {
+          "name": "ENCODING",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Encoding",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Ruta del archivo, delimitador y codificación",
+        "Esquema (ancho fijo o delimitado)"
+      ],
+      "tests": [
+        "vc_op_128_read_file_1_row_count",
+        "vc_op_128_read_file_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas",
+        "line": 128,
+        "end_line": 151
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+      "variants": [
+        "tFileInputARFF",
+        "tFileInputExcel",
+        "tFileInputFullRow",
+        "tFileInputJSON",
+        "tFileInputLDIF",
+        "tFileInputMail",
+        "tFileInputPositional",
+        "tFileInputProperties",
+        "tFileInputRaw",
+        "tFileInputRegex",
+        "tFileInputXML"
+      ],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_126_inline_data_1",
+      "order": 2,
+      "subjob": "s126",
+      "action": "add_component",
+      "operation_id": "op_126_inline_data_1",
+      "operation_type": "inline_data",
+      "component_candidate": "tFixedFlowInput",
+      "alternatives": [],
+      "purpose": "Datos incrustados (datalines)",
+      "properties": [
+        {
+          "name": "VALUES",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Values",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Datos incrustados en el programa"
+      ],
+      "pending": [
+        "Confirmar los datos incrustados"
+      ],
+      "tests": [
+        "vc_op_126_inline_data_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas",
+        "line": 126,
+        "end_line": 151
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput/tfixedflowinput-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_126_compute_1",
+      "order": 3,
+      "subjob": "s126",
+      "action": "add_component",
+      "operation_id": "op_126_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "4 asignaciones, 0 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:126",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "source",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:126"
+        },
+        {
+          "name": "env",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:126"
+        },
+        {
+          "name": "log",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:126"
+        },
+        {
+          "name": "print",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:126"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_128_read_file_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "\"&source\"",
+          "talend": "\"&source\"",
+          "line": 129,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "\"&env\"",
+          "talend": "\"&env\"",
+          "line": 130,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "quote(\"&log\")",
+          "talend": null,
+          "line": 131,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función quote"
+          ]
+        },
+        {
+          "sas": "quote(\"&print\")",
+          "talend": null,
+          "line": 132,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función quote"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_op_126_compute_1_nulls",
+        "vc_op_126_compute_1_dates",
+        "vc_op_126_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas",
+        "line": 126,
+        "end_line": 151
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_126_write_1",
+      "order": 4,
+      "subjob": "s126",
+      "action": "add_component",
+      "operation_id": "op_126_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir programs",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "programs",
+          "origin": "SAS real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:126",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:126",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:126",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_126_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_126_write_1_row_count",
+        "vc_op_126_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas",
+        "line": 126,
+        "end_line": 151
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_155_macro_call_1",
+      "order": 5,
+      "subjob": "s155",
+      "action": "add_component",
+      "operation_id": "op_155_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %runall",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "runall",
+          "origin": "SAS real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:155",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "debug=N",
+          "origin": "SAS real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:155",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_126_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %runall (definida en real/ts-sas-legacy-analytics/Macro/RunAll.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas",
+        "line": 155,
+        "end_line": 155
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_op_128_read_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas leídas, incluidas filas inválidas",
+      "applies_to": [
+        "op_128_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_128_read_file_1_nulls",
+      "kind": "nulls",
+      "description": "Campos vacíos y missing se cargan igual que en SAS",
+      "applies_to": [
+        "op_128_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_126_inline_data_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas",
+      "applies_to": [
+        "op_126_inline_data_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_126_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "op_126_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_126_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "op_126_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_126_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "op_126_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_126_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_126_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_126_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_126_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "abort",
+      "sas_value": "Y",
+      "suggested": "context.abort",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "abort_codes",
+      "sas_value": "0 1",
+      "suggested": "context.abort_codes",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "autoexec",
+      "sas_value": "&base.&fs.&env.&fs.autoexec.sas",
+      "suggested": "context.autoexec",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "base",
+      "sas_value": "/proj/009/tak491_303",
+      "suggested": "context.base",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "command",
+      "sas_value": "&sas",
+      "suggested": "context.command",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "config",
+      "sas_value": "",
+      "suggested": "context.config",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "end_time",
+      "sas_value": "%sysfunc(datetime())",
+      "suggested": "context.end_time",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "env",
+      "sas_value": "prod",
+      "suggested": "context.env",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "fs",
+      "sas_value": "/",
+      "suggested": "context.fs",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "log",
+      "sas_value": "&base.&fs.&env.&fs.output&fs.logs",
+      "suggested": "context.log",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "max_threads",
+      "sas_value": "10",
+      "suggested": "context.max_threads",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "options",
+      "sas_value": "-autoexec &autoexec",
+      "suggested": "context.options",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "print",
+      "sas_value": "&base.&fs.&env.&fs.output&fs.reports",
+      "suggested": "context.print",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "sas",
+      "sas_value": "%sysget(SAS_ROOT)/sas",
+      "suggested": "context.sas",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "source",
+      "sas_value": "&base.&fs.&env.&fs.programs",
+      "suggested": "context.source",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "start_time",
+      "sas_value": "%sysfunc(datetime())",
+      "suggested": "context.start_time",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "summary_rpt",
+      "sas_value": "&log.&fs.RunAll.&summary_rpt_type",
+      "suggested": "context.summary_rpt",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "summary_rpt_type",
+      "sas_value": "html",
+      "suggested": "context.summary_rpt_type",
+      "origin": "%LET de primer nivel"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "include /proj/009/tak491_303/RunAll.sas (real/ts-sas-legacy-analytics/Macro/RunAll_ControlTable.sas:154) — candidate → real/ts-sas-legacy-analytics/Macro/RunAll.sas"
+  ]
+}

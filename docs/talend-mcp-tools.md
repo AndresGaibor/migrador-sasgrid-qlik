@@ -12,6 +12,20 @@ La herramienta de escritura recibe `jobName`, `version`, `defaultContext`, `fold
 
 Una aplicación crea el Job en la carpeta configurada o reabre el Job coincidente y reutiliza sus componentes. Agrega contextos que faltan, conserva un valor de contexto existente cuando la nueva instrucción lo deja vacío y sustituye una conexión solo cuando la guía solicita la misma pareja de componentes con otro conector. Los componentes marcados como borrador reciben las propiedades verificadas por el portal; no se rellenan los datos desconocidos.
 
+El planificador ya selecciona componentes por operación: por ejemplo, `tFilterRow` para filtros, `tMap` para joins/proyecciones/cálculos, `tAggregateRow` para agregaciones y componentes específicos de archivo o base de datos para entrada/salida. Las conexiones y esquemas viajan por separado. Sin embargo, el generador no construye `mapper`; por eso los `tMap` que ejecutan un join, proyección, cálculo o renombre ahora se envían como borrador con el motivo pendiente, aunque la expresión SAS tenga traducción candidata. Un componente `tMap` creado no significa que su transformación esté configurada.
+
+Ejemplo del estado enviado al MCP para una proyección con `amount * 2`:
+
+```json
+{
+  "componentName": "tMap",
+  "draftOnly": true,
+  "draftReason": "...el motor aún no genera su configuración de mapper..."
+}
+```
+
+La expresión Talend candidata sigue disponible en `instructions.steps[].expressions`; se necesita completar y validar el mapper en Studio.
+
 ## Contextos de migración
 
 El portal envía valores SAS solo cuando el análisis los conoce. Las variables desconocidas quedan vacías. Los pendientes técnicos se agrupan por paso o por asunto en contextos `migration_todo_<hash>` vacíos; sus comentarios conservan cada detalle de la guía. El hash mantiene un nombre estable entre reintentos. Al reaplicar una guía, el MCP sustituye los marcadores vacíos antiguos que creó el portal y conserva cualquier marcador que alguien ya haya llenado.
@@ -28,6 +42,19 @@ TALEND_APPLY_FOLDER=Process/PruebasWebSAS
 ```
 
 El MCP configura su propio host y puerto con `TALEND_MCP_HOST` y `TALEND_MCP_PORT`. La URL de la API debe coincidir con esos valores. Mantén los procesos en el mismo Windows que Talend Studio para que MCP pueda comunicarse con el Bridge.
+
+### Parámetros individuales por Job (.cpf)
+
+Qlik documenta la configuración de contextos y la carga dinámica con `tContextLoad` o Implicit Context Load, pero no documenta `.cpf` como extensión nativa de Talend. El motor acepta `.cpf` como archivo de parámetros del portal: UTF-8, una asignación `nombre=valor` por línea; líneas vacías y comentarios `#` o `!` se ignoran. Por ejemplo:
+
+```text
+source_path=/data/input.csv
+run_date=2026-10-26
+```
+
+El llamador del generador selecciona el archivo del Job con `build_apply_spec(plan, context_file=Path("daily.cpf"))`. Los pares se convierten en variables del contexto Talend, reemplazan variables con el mismo nombre (sin distinguir mayúsculas) y agregan las nuevas. Nombres inválidos, valores vacíos, duplicados, extensión distinta de `.cpf`, archivo inexistente o problemas de lectura producen un error de validación. Los valores no se transforman ni se insertan en código Java.
+
+El modelo actual no declara qué parámetros son obligatorios, así que no se puede rechazar un archivo solo porque omita uno. Las variables suministradas deben ser referenciadas por los componentes como `context.nombre`; el `.cpf` no se adjunta como artefacto ni configura por sí solo la carga dinámica en tiempo de ejecución.
 
 ### Diagnóstico de la conexión
 

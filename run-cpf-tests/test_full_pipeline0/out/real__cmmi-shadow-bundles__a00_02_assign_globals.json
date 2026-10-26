@@ -1,0 +1,89 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/cmmi-shadow-bundles/a00_02_assign_globals.sas",
+  "sha256": "784bbb044b7cad9304eb994a0afd2851f8ad88c3d8b61293435ba1284bef385a",
+  "job_name": "job_a00_02_assign_globals",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "a00_02_assign_globals",
+      "params": [],
+      "steps": [
+        {
+          "id": "m:a00_02_assign_globals:op_123_macro_call_1",
+          "order": 1,
+          "subjob": "m:a00_02_assign_globals:s123",
+          "action": "add_component",
+          "operation_id": "op_123_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %mkdirs",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "mkdirs",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_02_assign_globals.sas:123",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "&log_path.",
+              "origin": "SAS real/cmmi-shadow-bundles/a00_02_assign_globals.sas:123",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %mkdirs (definida en real/cmmi-shadow-bundles/a00_01_utility_macros.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/cmmi-shadow-bundles/a00_02_assign_globals.sas",
+            "line": 123,
+            "end_line": 123
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        }
+      ]
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "log_path",
+      "sas_value": null,
+      "suggested": "context.log_path",
+      "origin": "&log_path en real/cmmi-shadow-bundles/a00_02_assign_globals.sas:123"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

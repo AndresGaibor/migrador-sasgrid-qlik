@@ -1,0 +1,1171 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/001_batch_bsf.sas",
+  "sha256": "eee7c90f6b5ce7f13ffd0748fcff102792ae419832d191bd9058387dd2067cea",
+  "job_name": "job_001_batch_bsf",
+  "steps": [
+    {
+      "id": "op_39_macro_call_1",
+      "order": 1,
+      "subjob": "s39",
+      "action": "add_component",
+      "operation_id": "op_39_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %setenv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "setenv",
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:39",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %setenv (definida en real/tmsis-analytic-file/001_batch_bsf.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 39,
+        "end_line": 39
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_88_unsupported_1",
+      "order": 2,
+      "subjob": "s87",
+      "action": "manual_decision",
+      "operation_id": "op_88_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_39_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 88,
+        "end_line": 88
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_94_unsupported_1",
+      "order": 3,
+      "subjob": "s87",
+      "action": "manual_decision",
+      "operation_id": "op_94_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_88_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 94,
+        "end_line": 94
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_102_compute_1",
+      "order": 4,
+      "subjob": "s102",
+      "action": "add_component",
+      "operation_id": "op_102_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "6 asignaciones, 0 condicionales",
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:102",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "begmon",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:102"
+        },
+        {
+          "name": "BSF_FILE_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:102"
+        },
+        {
+          "name": "RPT_PRD",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:102"
+        },
+        {
+          "name": "RPT_OUT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:102"
+        },
+        {
+          "name": "FILE_DT_END",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:102"
+        },
+        {
+          "name": "numdays",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:102"
+        }
+      ],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_94_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "put(intnx('month',input(\"&REPORTING_PERIOD\",YYMMDD12.),0,\"BEGINNING\"),date9.)",
+          "talend": null,
+          "line": 103,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.),0,\"BEGINN'"
+          ]
+        },
+        {
+          "sas": "input(put(input(\"&REPORTING_PERIOD\",YYMMDD12.),yymmn6.),6.)",
+          "talend": null,
+          "line": 107,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.),yymmn6.),'"
+          ]
+        },
+        {
+          "sas": "cats(\"'\",put(input(strip(\"&REPORTING_PERIOD\"),YYMMDD12.),date9.),\"'\")",
+          "talend": null,
+          "line": 110,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.),date9.),\"'"
+          ]
+        },
+        {
+          "sas": "compress(RPT_PRD,\"'\")",
+          "talend": null,
+          "line": 113,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función compress"
+          ]
+        },
+        {
+          "sas": "put(intnx('month',input(\"&sysdate\",date9.),0,\"END\"),date9.)",
+          "talend": null,
+          "line": 116,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.),0,\"END\"),'"
+          ]
+        },
+        {
+          "sas": "day(input(\"&REPORTING_PERIOD\",YYMMDD12.))",
+          "talend": null,
+          "line": 121,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.))'"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_op_102_compute_1_nulls",
+        "vc_op_102_compute_1_dates",
+        "vc_op_102_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 102,
+        "end_line": 124
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_104_set_variable_1",
+      "order": 5,
+      "subjob": "s102",
+      "action": "add_component",
+      "operation_id": "op_104_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:104",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_102_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 104,
+        "end_line": 124
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_105_set_variable_1",
+      "order": 6,
+      "subjob": "s102",
+      "action": "add_component",
+      "operation_id": "op_105_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:105",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_104_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 105,
+        "end_line": 124
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_108_set_variable_1",
+      "order": 7,
+      "subjob": "s102",
+      "action": "add_component",
+      "operation_id": "op_108_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:108",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_105_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 108,
+        "end_line": 124
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_111_set_variable_1",
+      "order": 8,
+      "subjob": "s102",
+      "action": "add_component",
+      "operation_id": "op_111_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:111",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_108_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 111,
+        "end_line": 124
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_114_set_variable_1",
+      "order": 9,
+      "subjob": "s102",
+      "action": "add_component",
+      "operation_id": "op_114_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:114",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_111_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 114,
+        "end_line": 124
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_117_set_variable_1",
+      "order": 10,
+      "subjob": "s102",
+      "action": "add_component",
+      "operation_id": "op_117_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:117",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_114_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 117,
+        "end_line": 124
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_119_set_variable_1",
+      "order": 11,
+      "subjob": "s102",
+      "action": "add_component",
+      "operation_id": "op_119_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:119",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_117_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 119,
+        "end_line": 124
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_122_set_variable_1",
+      "order": 12,
+      "subjob": "s102",
+      "action": "add_component",
+      "operation_id": "op_122_set_variable_1",
+      "operation_type": "set_variable",
+      "component_candidate": "tSetGlobalVar",
+      "alternatives": [
+        "tJava",
+        "tFlowToIterate"
+      ],
+      "purpose": "Asignar variable desde datos",
+      "properties": [
+        {
+          "name": "VARIABLES",
+          "value": "KEY=None",
+          "origin": "SAS real/tmsis-analytic-file/001_batch_bsf.sas:122",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Variables",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_119_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Origen del valor y alcance de la variable"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 122,
+        "end_line": 124
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/global-variable/tsetglobalvar",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_126_maintenance_1",
+      "order": 13,
+      "subjob": "s126",
+      "action": "add_component",
+      "operation_id": "op_126_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_122_set_variable_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 126,
+        "end_line": 128
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_236_unsupported_1",
+      "order": 14,
+      "subjob": "s165",
+      "action": "manual_decision",
+      "operation_id": "op_236_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_126_maintenance_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 236,
+        "end_line": 236
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_238_unsupported_1",
+      "order": 15,
+      "subjob": "s165",
+      "action": "manual_decision",
+      "operation_id": "op_238_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_236_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 238,
+        "end_line": 238
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_240_unsupported_1",
+      "order": 16,
+      "subjob": "s165",
+      "action": "manual_decision",
+      "operation_id": "op_240_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_238_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 240,
+        "end_line": 240
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_242_unsupported_1",
+      "order": 17,
+      "subjob": "s165",
+      "action": "manual_decision",
+      "operation_id": "op_242_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_240_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 242,
+        "end_line": 242
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_245_unsupported_1",
+      "order": 18,
+      "subjob": "s165",
+      "action": "manual_decision",
+      "operation_id": "op_245_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_242_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 245,
+        "end_line": 245
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_253_maintenance_1",
+      "order": 19,
+      "subjob": "s253",
+      "action": "add_component",
+      "operation_id": "op_253_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_245_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/tmsis-analytic-file/001_batch_bsf.sas",
+        "line": 253,
+        "end_line": 253
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "setENV",
+      "params": [],
+      "steps": []
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "vc_op_102_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "op_102_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_102_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "op_102_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_102_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "op_102_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "BSF_FILE_DATE",
+      "sas_value": "&TAF_FILE_DATE",
+      "suggested": "context.BSF_FILE_DATE",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "da_config_macro",
+      "sas_value": "\"/sasdata/users/&sysuserid/tmsislockdown/config/da_config.sas\"",
+      "suggested": "context.da_config_macro",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "FIL_4TH_NODE",
+      "sas_value": "BSF",
+      "suggested": "context.FIL_4TH_NODE",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "MAX_KEEP",
+      "sas_value": "0",
+      "suggested": "context.MAX_KEEP",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "path",
+      "sas_value": "/sasdata/users/&sysuserid/&TMSIS/&sub_env/data_analytics/taf/bsf",
+      "suggested": "context.path",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "prog_path",
+      "sas_value": "&path./programs",
+      "suggested": "context.prog_path",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "TABLE_NAME",
+      "sas_value": "TAF_MON_BSF",
+      "suggested": "context.TABLE_NAME",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "TEST_RUN",
+      "sas_value": "NO",
+      "suggested": "context.TEST_RUN",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "tms_config_macro",
+      "sas_value": "\"/sasdata/users/&sysuserid/tmsislockdown/config/tms_config.sas\"",
+      "suggested": "context.tms_config_macro",
+      "origin": "%LET de primer nivel"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "include &tms_config_macro (real/tmsis-analytic-file/001_batch_bsf.sas:16) — ruta dinámica",
+    "include &da_config_macro (real/tmsis-analytic-file/001_batch_bsf.sas:20) — ruta dinámica",
+    "include \"/sasdata/users/&sysuserid/&TMSIS/&sub_env/data_analytics/taf/programs/AWS_Shared_Macros.sas\" (real/tmsis-analytic-file/001_batch_bsf.sas:59) — ruta dinámica",
+    "include \"&prog_path./000_bsf_macros.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:140) — ruta dinámica",
+    "include \"&prog_path./002_bsf_ELG00002.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:141) — ruta dinámica",
+    "include \"&prog_path./003_bsf_ELG00003.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:142) — ruta dinámica",
+    "include \"&prog_path./004_bsf_ELG00004.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:143) — ruta dinámica",
+    "include \"&prog_path./005_bsf_ELG00005.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:144) — ruta dinámica",
+    "include \"&prog_path./006_bsf_ELG00006.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:145) — ruta dinámica",
+    "include \"&prog_path./007_bsf_ELG00007.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:146) — ruta dinámica",
+    "include \"&prog_path./008_bsf_ELG00008.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:147) — ruta dinámica",
+    "include \"&prog_path./009_bsf_ELG00009.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:148) — ruta dinámica",
+    "include \"&prog_path./010_bsf_ELG00010.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:149) — ruta dinámica",
+    "include \"&prog_path./011_bsf_ELG00011.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:150) — ruta dinámica",
+    "include \"&prog_path./012_bsf_ELG00012.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:151) — ruta dinámica",
+    "include \"&prog_path./013_bsf_ELG00013.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:152) — ruta dinámica",
+    "include \"&prog_path./014_bsf_ELG00014.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:153) — ruta dinámica",
+    "include \"&prog_path./015_bsf_ELG00015.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:154) — ruta dinámica",
+    "include \"&prog_path./016_bsf_ELG00016.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:155) — ruta dinámica",
+    "include \"&prog_path./017_bsf_ELG00017.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:156) — ruta dinámica",
+    "include \"&prog_path./018_bsf_ELG00018.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:157) — ruta dinámica",
+    "include \"&prog_path./020_bsf_ELG00020.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:158) — ruta dinámica",
+    "include \"&prog_path./021_bsf_ELG00021.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:159) — ruta dinámica",
+    "include \"&prog_path./022b_bsf_ELG00022.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:160) — ruta dinámica",
+    "include \"&prog_path./022_bsf_TPL00002.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:161) — ruta dinámica",
+    "include \"&prog_path./023_bsf_final.sas\" /source2 (real/tmsis-analytic-file/001_batch_bsf.sas:162) — ruta dinámica",
+    "macro tmsis_connect (real/tmsis-analytic-file/001_batch_bsf.sas:89) — sin definición en el proyecto",
+    "macro job_control_rd (real/tmsis-analytic-file/001_batch_bsf.sas:91) — sin definición en el proyecto",
+    "macro job_control_updt (real/tmsis-analytic-file/001_batch_bsf.sas:96) — sin definición en el proyecto",
+    "macro tmsis_disconnect (real/tmsis-analytic-file/001_batch_bsf.sas:98) — sin definición en el proyecto",
+    "macro tmsis_connect (real/tmsis-analytic-file/001_batch_bsf.sas:167) — sin definición en el proyecto",
+    "macro aws_maxid_pull_bsf (real/tmsis-analytic-file/001_batch_bsf.sas:169) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:171) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:172) — sin definición en el proyecto",
+    "macro create_elg00002 (real/tmsis-analytic-file/001_batch_bsf.sas:173) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:175) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:176) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:179) — sin definición en el proyecto",
+    "macro create_elg00004 (real/tmsis-analytic-file/001_batch_bsf.sas:180) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:182) — sin definición en el proyecto",
+    "macro create_elg00005 (real/tmsis-analytic-file/001_batch_bsf.sas:183) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:185) — sin definición en el proyecto",
+    "macro create_elg00006 (real/tmsis-analytic-file/001_batch_bsf.sas:186) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:188) — sin definición en el proyecto",
+    "macro create_elg00007 (real/tmsis-analytic-file/001_batch_bsf.sas:189) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:191) — sin definición en el proyecto",
+    "macro create_elg00008 (real/tmsis-analytic-file/001_batch_bsf.sas:192) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:194) — sin definición en el proyecto",
+    "macro create_elg00009 (real/tmsis-analytic-file/001_batch_bsf.sas:195) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:196) — sin definición en el proyecto",
+    "macro create_elg00010 (real/tmsis-analytic-file/001_batch_bsf.sas:197) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:199) — sin definición en el proyecto",
+    "macro create_elg00011 (real/tmsis-analytic-file/001_batch_bsf.sas:200) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:202) — sin definición en el proyecto",
+    "macro create_elg00012 (real/tmsis-analytic-file/001_batch_bsf.sas:203) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:205) — sin definición en el proyecto",
+    "macro create_elg00013 (real/tmsis-analytic-file/001_batch_bsf.sas:206) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:208) — sin definición en el proyecto",
+    "macro create_elg00014 (real/tmsis-analytic-file/001_batch_bsf.sas:209) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:211) — sin definición en el proyecto",
+    "macro create_elg00015 (real/tmsis-analytic-file/001_batch_bsf.sas:212) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:214) — sin definición en el proyecto",
+    "macro create_elg00016 (real/tmsis-analytic-file/001_batch_bsf.sas:215) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:217) — sin definición en el proyecto",
+    "macro create_elg00017 (real/tmsis-analytic-file/001_batch_bsf.sas:218) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:219) — sin definición en el proyecto",
+    "macro create_elg00018 (real/tmsis-analytic-file/001_batch_bsf.sas:220) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:222) — sin definición en el proyecto",
+    "macro create_elg00020 (real/tmsis-analytic-file/001_batch_bsf.sas:223) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:225) — sin definición en el proyecto",
+    "macro create_elg00021 (real/tmsis-analytic-file/001_batch_bsf.sas:226) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:228) — sin definición en el proyecto",
+    "macro create_elg00022 (real/tmsis-analytic-file/001_batch_bsf.sas:229) — sin definición en el proyecto",
+    "macro create_initial_table (real/tmsis-analytic-file/001_batch_bsf.sas:231) — sin definición en el proyecto",
+    "macro create_tpl00002 (real/tmsis-analytic-file/001_batch_bsf.sas:232) — sin definición en el proyecto",
+    "macro build_bsf (real/tmsis-analytic-file/001_batch_bsf.sas:237) — sin definición en el proyecto",
+    "macro job_control_updt2 (real/tmsis-analytic-file/001_batch_bsf.sas:239) — sin definición en el proyecto",
+    "macro get_cnt (real/tmsis-analytic-file/001_batch_bsf.sas:241) — sin definición en el proyecto",
+    "macro create_meta_info (real/tmsis-analytic-file/001_batch_bsf.sas:243) — sin definición en el proyecto",
+    "macro create_eftsmeta_info (real/tmsis-analytic-file/001_batch_bsf.sas:244) — sin definición en el proyecto",
+    "macro final_control_info (real/tmsis-analytic-file/001_batch_bsf.sas:246) — sin definición en el proyecto",
+    "macro tmsis_disconnect (real/tmsis-analytic-file/001_batch_bsf.sas:249) — sin definición en el proyecto"
+  ]
+}

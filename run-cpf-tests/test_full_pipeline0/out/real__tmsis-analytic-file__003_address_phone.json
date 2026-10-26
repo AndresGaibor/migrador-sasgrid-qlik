@@ -1,0 +1,308 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/003_address_phone.sas",
+  "sha256": "2bf6676587cf1f84d3770e7c7f1befd8b98fbc36472e44d7e316738ba7d4a273",
+  "job_name": "job_003_address_phone",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "create_CNTCT_DTLS",
+      "params": [],
+      "steps": [
+        {
+          "id": "m:create_CNTCT_DTLS:op_15_macro_call_1",
+          "order": 1,
+          "subjob": "m:create_CNTCT_DTLS:s15",
+          "action": "add_component",
+          "operation_id": "op_15_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %create_temp_table",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "create_temp_table",
+              "origin": "SAS real/tmsis-analytic-file/003_address_phone.sas:15",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "name,\r\n\t              subcols=%nrbquote(  %last_best(ELGBL_1ST_NAME)\r\n\t                                  %last_best(ELGBL_LAST_NAME)\r\n\t                                  %last_best(ELGBL_MDL_INITL_NAME)\r\n\r\n\t\t\t\t ) ",
+              "origin": "SAS real/tmsis-analytic-file/003_address_phone.sas:15",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/003_address_phone.sas",
+            "line": 15,
+            "end_line": 20
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_CNTCT_DTLS:op_64_macro_call_1",
+          "order": 2,
+          "subjob": "m:create_CNTCT_DTLS:s64",
+          "action": "add_component",
+          "operation_id": "op_64_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %address_phone",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "address_phone",
+              "origin": "SAS real/tmsis-analytic-file/003_address_phone.sas:64",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "&year.",
+              "origin": "SAS real/tmsis-analytic-file/003_address_phone.sas:64",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_CNTCT_DTLS:op_15_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %address_phone (definida en real/tmsis-analytic-file/003_address_phone.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/003_address_phone.sas",
+            "line": 64,
+            "end_line": 64
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:create_CNTCT_DTLS:op_72_macro_call_1",
+          "order": 3,
+          "subjob": "m:create_CNTCT_DTLS:s72",
+          "action": "add_component",
+          "operation_id": "op_72_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %create_hist_adr",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "create_hist_adr",
+              "origin": "SAS real/tmsis-analytic-file/003_address_phone.sas:72",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "address_phone, inyear = &pyear.",
+              "origin": "SAS real/tmsis-analytic-file/003_address_phone.sas:72",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_CNTCT_DTLS:op_64_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/003_address_phone.sas",
+            "line": 72,
+            "end_line": 72
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_CNTCT_DTLS:op_189_macro_call_1",
+          "order": 4,
+          "subjob": "m:create_CNTCT_DTLS:s189",
+          "action": "add_component",
+          "operation_id": "op_189_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %drop_tables",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "drop_tables",
+              "origin": "SAS real/tmsis-analytic-file/003_address_phone.sas:189",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "name_&year. name_address_phone_&year. address_phone_&year._out\r\n\t             %if &getprior.=1 %then %do;\r\n                      address_phone_&year. \r\n\t\t\t\t\t  %do p=1 %to %sysfunc(countw(&pyears.));\r\n\t \t\t      \t\t   %let pyear=%scan(&pyears.,&p.);\r\n                   \t\t   address_phone_&pyear. \r\n                      %end;\r\n                 %end; ",
+              "origin": "SAS real/tmsis-analytic-file/003_address_phone.sas:189",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_CNTCT_DTLS:op_72_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/003_address_phone.sas",
+            "line": 189,
+            "end_line": 196
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "getprior",
+      "sas_value": null,
+      "suggested": "context.getprior",
+      "origin": "&getprior en real/tmsis-analytic-file/003_address_phone.sas:189"
+    },
+    {
+      "name": "p",
+      "sas_value": null,
+      "suggested": "context.p",
+      "origin": "&p en real/tmsis-analytic-file/003_address_phone.sas:189"
+    },
+    {
+      "name": "pyear",
+      "sas_value": null,
+      "suggested": "context.pyear",
+      "origin": "&pyear en real/tmsis-analytic-file/003_address_phone.sas:72"
+    },
+    {
+      "name": "pyears",
+      "sas_value": null,
+      "suggested": "context.pyears",
+      "origin": "&pyears en real/tmsis-analytic-file/003_address_phone.sas:189"
+    },
+    {
+      "name": "year",
+      "sas_value": null,
+      "suggested": "context.year",
+      "origin": "&year en real/tmsis-analytic-file/003_address_phone.sas:64"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro create_temp_table (real/tmsis-analytic-file/003_address_phone.sas:15) — sin definición en el proyecto",
+    "macro last_best (real/tmsis-analytic-file/003_address_phone.sas:15) — sin definición en el proyecto",
+    "macro create_temp_table (real/tmsis-analytic-file/003_address_phone.sas:26) — sin definición en el proyecto",
+    "macro monthly_array (real/tmsis-analytic-file/003_address_phone.sas:26) — sin definición en el proyecto",
+    "macro last_best (real/tmsis-analytic-file/003_address_phone.sas:26) — sin definición en el proyecto",
+    "macro nonmiss_month (real/tmsis-analytic-file/003_address_phone.sas:26) — sin definición en el proyecto",
+    "macro address_flag (real/tmsis-analytic-file/003_address_phone.sas:26) — sin definición en el proyecto",
+    "macro assign_nonmiss_month (real/tmsis-analytic-file/003_address_phone.sas:26) — sin definición en el proyecto",
+    "macro create_hist_adr (real/tmsis-analytic-file/003_address_phone.sas:72) — sin definición en el proyecto",
+    "macro last_best (real/tmsis-analytic-file/003_address_phone.sas:78) — sin definición en el proyecto",
+    "macro address_same_year (real/tmsis-analytic-file/003_address_phone.sas:93) — sin definición en el proyecto",
+    "macro last_best (real/tmsis-analytic-file/003_address_phone.sas:93) — sin definición en el proyecto",
+    "macro table_id_cols (real/tmsis-analytic-file/003_address_phone.sas:165) — sin definición en el proyecto",
+    "macro drop_tables (real/tmsis-analytic-file/003_address_phone.sas:189) — sin definición en el proyecto"
+  ]
+}

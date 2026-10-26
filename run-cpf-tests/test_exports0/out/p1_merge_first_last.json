@@ -1,0 +1,1242 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "p1_merge_first_last.sas",
+  "sha256": "e59f0d6437551615374002b35db6600a02439e26bf97dafda394eae07e2c04b1",
+  "job_name": "job_p1_merge_first_last",
+  "steps": [
+    {
+      "id": "op_2_format_definition_1",
+      "order": 1,
+      "subjob": "s2",
+      "action": "add_component",
+      "operation_id": "op_2_format_definition_1",
+      "operation_type": "format_definition",
+      "component_candidate": "tFixedFlowInput",
+      "alternatives": [
+        "tMap (lookup)",
+        "Rutina Java"
+      ],
+      "purpose": "Definir formatos como tabla de lookup",
+      "properties": [
+        {
+          "name": "USE_INTABLE",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use Inline Table",
+          "options": []
+        },
+        {
+          "name": "INTABLE",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Inline Table",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Confirmar cómo aplicar el formato: los rangos y OTHER necesitan lógica equivalente, no solo una tabla de filas"
+      ],
+      "tests": [
+        "vc_op_2_format_definition_1_schema"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 2,
+        "end_line": 4
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput/tfixedflowinput-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_6_read_1",
+      "order": 2,
+      "subjob": "s6",
+      "action": "add_component",
+      "operation_id": "op_6_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer work.pagos",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "pagos",
+          "origin": "SAS p1_merge_first_last.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_2_format_definition_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_op_6_read_1_row_count",
+        "vc_op_6_read_1_schema"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 6,
+        "end_line": 6
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_6_sort_1",
+      "order": 3,
+      "subjob": "s6",
+      "action": "add_component",
+      "operation_id": "op_6_sort_1",
+      "operation_type": "sort",
+      "component_candidate": "tSortRow",
+      "alternatives": [],
+      "purpose": "Ordenar por cliente_id, fecha_pago",
+      "properties": [
+        {
+          "name": "CRITERIA",
+          "value": "cliente_id, fecha_pago",
+          "origin": "SAS p1_merge_first_last.sas:6",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Criteria",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "cliente_id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p1_merge_first_last.sas:6"
+        },
+        {
+          "name": "fecha_pago",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p1_merge_first_last.sas:6"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_6_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_6_sort_1_ordering"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 6,
+        "end_line": 6
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_6_write_1",
+      "order": 4,
+      "subjob": "s6",
+      "action": "add_component",
+      "operation_id": "op_6_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir work.pagos",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "pagos",
+          "origin": "SAS p1_merge_first_last.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS p1_merge_first_last.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS p1_merge_first_last.sas:6",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_6_sort_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_6_write_1_row_count",
+        "vc_op_6_write_1_schema"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 6,
+        "end_line": 6
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_7_read_1",
+      "order": 5,
+      "subjob": "s7",
+      "action": "add_component",
+      "operation_id": "op_7_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer work.clientes",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "clientes",
+          "origin": "SAS p1_merge_first_last.sas:7",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_6_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_op_7_read_1_row_count",
+        "vc_op_7_read_1_schema"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 7,
+        "end_line": 7
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_7_sort_1",
+      "order": 6,
+      "subjob": "s7",
+      "action": "add_component",
+      "operation_id": "op_7_sort_1",
+      "operation_type": "sort",
+      "component_candidate": "tSortRow",
+      "alternatives": [],
+      "purpose": "Ordenar por cliente_id",
+      "properties": [
+        {
+          "name": "CRITERIA",
+          "value": "cliente_id",
+          "origin": "SAS p1_merge_first_last.sas:7",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Criteria",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "cliente_id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p1_merge_first_last.sas:7"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_7_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_7_sort_1_ordering"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 7,
+        "end_line": 7
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_7_write_1",
+      "order": 7,
+      "subjob": "s7",
+      "action": "add_component",
+      "operation_id": "op_7_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir work.clientes",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "clientes",
+          "origin": "SAS p1_merge_first_last.sas:7",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS p1_merge_first_last.sas:7",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS p1_merge_first_last.sas:7",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_7_sort_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_7_write_1_row_count",
+        "vc_op_7_write_1_schema"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 7,
+        "end_line": 7
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_9_read_1",
+      "order": 8,
+      "subjob": "s9",
+      "action": "add_component",
+      "operation_id": "op_9_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer work.clientes",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "clientes",
+          "origin": "SAS p1_merge_first_last.sas:9",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_7_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (op_7_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_op_9_read_1_row_count",
+        "vc_op_9_read_1_schema"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 9,
+        "end_line": 22
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_9_read_2",
+      "order": 9,
+      "subjob": "s9",
+      "action": "add_component",
+      "operation_id": "op_9_read_2",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer work.pagos",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "pagos",
+          "origin": "SAS p1_merge_first_last.sas:9",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (op_6_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_op_9_read_2_row_count",
+        "vc_op_9_read_2_schema"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 9,
+        "end_line": 22
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_9_join_1",
+      "order": 10,
+      "subjob": "s9",
+      "action": "add_component",
+      "operation_id": "op_9_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (merge_by): work.clientes, work.pagos",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Left Outer Join",
+          "origin": "SAS p1_merge_first_last.sas:9",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "cliente_id",
+          "origin": "SAS p1_merge_first_last.sas:9",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "cliente_id",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p1_merge_first_last.sas:9"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_9_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "op_9_read_2",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "MERGE BY no es un join SQL: con claves repetidas en ambos lados el resultado difiere"
+      ],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_op_9_join_1_duplicates",
+        "vc_op_9_join_1_row_count",
+        "vc_op_9_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 9,
+        "end_line": 22
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_9_compute_1",
+      "order": 11,
+      "subjob": "s9",
+      "action": "add_component",
+      "operation_id": "op_9_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "3 asignaciones, 3 condicionales",
+          "origin": "SAS p1_merge_first_last.sas:9",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "dias",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p1_merge_first_last.sas:9"
+        },
+        {
+          "name": "mes_pago",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p1_merge_first_last.sas:9"
+        },
+        {
+          "name": "tramo",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS p1_merge_first_last.sas:9"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_9_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "intck('day', fecha_pago, today())",
+          "talend": null,
+          "line": 18,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función intck"
+          ]
+        },
+        {
+          "sas": "put(fecha_pago, yymmn6.)",
+          "talend": null,
+          "line": 19,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.)'"
+          ]
+        },
+        {
+          "sas": "put(edad, tramo.)",
+          "talend": null,
+          "line": 20,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.)'"
+          ]
+        },
+        {
+          "sas": "if first.cliente_id then acumulado = 0",
+          "talend": null,
+          "line": 15,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if missing(monto) then flag_sin_pago = 1",
+          "talend": null,
+          "line": 17,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if last.cliente_id then output",
+          "talend": null,
+          "line": 21,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_op_9_compute_1_nulls",
+        "vc_op_9_compute_1_dates",
+        "vc_op_9_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 9,
+        "end_line": 22
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_9_stateful_1",
+      "order": 12,
+      "subjob": "s9",
+      "action": "manual_decision",
+      "operation_id": "op_9_stateful_1",
+      "operation_type": "stateful",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tSortRow + tAggregateRow",
+        "tJavaRow",
+        "tMap con variables"
+      ],
+      "purpose": "Lógica con estado entre filas (RETAIN/FIRST./LAST./ARRAY/hash)",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_9_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Estado entre filas: no hay traducción directa a un componente; requiere diseño manual"
+      ],
+      "pending": [
+        "Diseño manual de la lógica con estado entre filas (RETAIN/FIRST./LAST.)"
+      ],
+      "tests": [
+        "vc_op_9_stateful_1_ordering",
+        "vc_op_9_stateful_1_duplicates"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 9,
+        "end_line": 22
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_9_write_1",
+      "order": 13,
+      "subjob": "s9",
+      "action": "add_component",
+      "operation_id": "op_9_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir work.pagos_cliente",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "pagos_cliente",
+          "origin": "SAS p1_merge_first_last.sas:9",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS p1_merge_first_last.sas:9",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS p1_merge_first_last.sas:9",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_9_stateful_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_9_write_1_row_count",
+        "vc_op_9_write_1_schema"
+      ],
+      "evidence": {
+        "file": "p1_merge_first_last.sas",
+        "line": 9,
+        "end_line": 22
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_op_2_format_definition_1_schema",
+      "kind": "schema",
+      "description": "Valores formateados iguales para todo el rango",
+      "applies_to": [
+        "op_2_format_definition_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_6_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_6_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "op_6_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_6_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_6_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_6_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_7_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_7_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_7_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_7_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_7_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "op_7_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_7_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_7_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_7_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_7_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_9_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_9_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_9_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_9_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "op_9_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "op_9_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "op_9_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "op_9_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "op_9_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "op_9_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_stateful_1_ordering",
+      "kind": "ordering",
+      "description": "Resultado depende del orden de entrada: probar con datos desordenados y con claves repetidas",
+      "applies_to": [
+        "op_9_stateful_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_stateful_1_duplicates",
+      "kind": "duplicates",
+      "description": "Grupos de una sola fila y de muchas filas",
+      "applies_to": [
+        "op_9_stateful_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_9_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_9_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_9_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

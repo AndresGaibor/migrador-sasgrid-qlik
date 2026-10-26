@@ -1,0 +1,643 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+  "sha256": "5590a44d669e27e1b55a224375486bcf896aa0b911fc569b7134161b0a946979",
+  "job_name": "job_run_daily_banking",
+  "steps": [
+    {
+      "id": "m:run_daily_banking:op_31_write_1",
+      "order": 1,
+      "subjob": "m:run_daily_banking:s31",
+      "action": "add_component",
+      "operation_id": "op_31_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.BATCH_CONTROL",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "batch_control",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:31",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:31",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:31",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:run_daily_banking:op_31_write_1_row_count",
+        "vc_m:run_daily_banking:op_31_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+        "line": 31,
+        "end_line": 36
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:run_daily_banking:op_121_macro_call_1",
+      "order": 2,
+      "subjob": "m:run_daily_banking:s121",
+      "action": "add_component",
+      "operation_id": "op_121_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %run_step",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "run_step",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:121",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "1, Load Customer Accounts,\r\n    /opt/sas/custom/programs/Banking/load_customer_accounts.sas",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:121",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:run_daily_banking:op_31_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %run_step (definida en real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+        "line": 121,
+        "end_line": 122
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:run_daily_banking:op_124_macro_call_1",
+      "order": 3,
+      "subjob": "m:run_daily_banking:s124",
+      "action": "add_component",
+      "operation_id": "op_124_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %run_step",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "run_step",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:124",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "2, Daily Transaction Processing,\r\n    /opt/sas/custom/programs/Banking/daily_transaction_processing.sas",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:124",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:run_daily_banking:op_121_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %run_step (definida en real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+        "line": 124,
+        "end_line": 125
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:run_daily_banking:op_127_macro_call_1",
+      "order": 4,
+      "subjob": "m:run_daily_banking:s127",
+      "action": "add_component",
+      "operation_id": "op_127_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %run_step",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "run_step",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:127",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "3, Credit Risk Scoring,\r\n    /opt/sas/custom/programs/Banking/credit_risk_scoring.sas",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:127",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:run_daily_banking:op_124_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %run_step (definida en real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+        "line": 127,
+        "end_line": 128
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:run_daily_banking:op_130_macro_call_1",
+      "order": 5,
+      "subjob": "m:run_daily_banking:s130",
+      "action": "add_component",
+      "operation_id": "op_130_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %run_step",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "run_step",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:130",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "4, Monthly Regulatory Reporting,\r\n    /opt/sas/custom/programs/Banking/monthly_regulatory_reporting.sas",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:130",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:run_daily_banking:op_127_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %run_step (definida en real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+        "line": 130,
+        "end_line": 131
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:run_daily_banking:op_137_report_1",
+      "order": 6,
+      "subjob": "m:run_daily_banking:s137",
+      "action": "manual_decision",
+      "operation_id": "op_137_report_1",
+      "operation_type": "report",
+      "component_candidate": "ninguno",
+      "alternatives": [
+        "tLogRow",
+        "tFileOutputDelimited"
+      ],
+      "purpose": "Salida de reporte",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:run_daily_banking:op_130_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Salida de reporte: decidir si se migra"
+      ],
+      "pending": [
+        "Decidir si el reporte se migra o se descarta"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+        "line": 137,
+        "end_line": 138
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:run_daily_banking:op_142_append_1",
+      "order": 7,
+      "subjob": "m:run_daily_banking:s142",
+      "action": "add_component",
+      "operation_id": "op_142_append_1",
+      "operation_type": "append",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tDBOutput"
+      ],
+      "purpose": "Añadir filas a una tabla existente",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "batch_control",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:142",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:142",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "NONE",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:142",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:run_daily_banking:op_137_report_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Tabla base destino",
+        "Librería archive es de tipo BASE en /data/sas/archive: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:run_daily_banking:op_142_append_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+        "line": 142,
+        "end_line": 143
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:run_daily_banking:op_146_macro_call_1",
+      "order": 8,
+      "subjob": "m:run_daily_banking:s146",
+      "action": "add_component",
+      "operation_id": "op_146_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %sendmail",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "sendmail",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:146",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "\r\n    to=&EMAIL_DL,\r\n    subject=Batch &batch_id: &job_pass pass / &job_fail fail of &job_count steps,\r\n    body=See ARCHIVE.BATCH_HISTORY for details. Duration: %sysfunc(putn(%sysevalf(%sysfunc(datetime())-&start_tm), time8.))\r\n  ",
+          "origin": "SAS real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:146",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:run_daily_banking:op_142_append_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+        "line": 146,
+        "end_line": 150
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": {
+    "name": "run_daily_banking",
+    "params": [
+      "run_date",
+      "restart_from"
+    ],
+    "arguments": {
+      "run_date": "&CURR_DT"
+    }
+  },
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_m:run_daily_banking:op_31_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:run_daily_banking:op_31_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:run_daily_banking:op_31_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:run_daily_banking:op_31_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:run_daily_banking:op_142_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:run_daily_banking:op_142_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "batch_id",
+      "sas_value": null,
+      "suggested": "context.batch_id",
+      "origin": "&batch_id en real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:146"
+    },
+    {
+      "name": "CURR_DT",
+      "sas_value": null,
+      "suggested": "context.CURR_DT",
+      "origin": "Variable SAS referenciada por %run_daily_banking(run_date=...)"
+    },
+    {
+      "name": "EMAIL_DL",
+      "sas_value": null,
+      "suggested": "context.EMAIL_DL",
+      "origin": "&EMAIL_DL en real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:146"
+    },
+    {
+      "name": "job_count",
+      "sas_value": null,
+      "suggested": "context.job_count",
+      "origin": "&job_count en real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:146"
+    },
+    {
+      "name": "job_fail",
+      "sas_value": null,
+      "suggested": "context.job_fail",
+      "origin": "&job_fail en real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:146"
+    },
+    {
+      "name": "job_pass",
+      "sas_value": null,
+      "suggested": "context.job_pass",
+      "origin": "&job_pass en real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:146"
+    },
+    {
+      "name": "restart_from",
+      "sas_value": null,
+      "suggested": "context.restart_from",
+      "origin": "Parámetro de la macro principal %run_daily_banking; argumento SAS: sin asignar"
+    },
+    {
+      "name": "run_date",
+      "sas_value": null,
+      "suggested": "context.run_date",
+      "origin": "Parámetro de la macro principal %run_daily_banking; argumento SAS: &CURR_DT"
+    },
+    {
+      "name": "start_tm",
+      "sas_value": null,
+      "suggested": "context.start_tm",
+      "origin": "&start_tm en real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:146"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "ARCHIVE",
+      "engine": null,
+      "path": "/data/sas/archive",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [
+      "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#1",
+      "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#2",
+      "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#3",
+      "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#4"
+    ],
+    "grid_recommendations": [
+      {
+        "id": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:6:scheduler.control_m",
+        "pattern_id": "scheduler.control_m",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Obtén la definición real de Control-M y recrea calendario y dependencias en el planificador elegido.",
+        "reason": "Only a comment is captured; Control-M calendars, dependencies, and job definitions are not parsed.",
+        "component_candidate": null,
+        "doc_url": null,
+        "required": [
+          "Recreate the authoritative schedule in the chosen scheduler"
+        ],
+        "dependencies": [],
+        "target_program": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+          "line": 6,
+          "end_line": 6
+        },
+        "details": {
+          "schedule": "Daily 05:45 via Control-M BANK_MASTER"
+        }
+      }
+    ],
+    "schedules": [
+      "Daily 05:45 via Control-M BANK_MASTER"
+    ],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "include /opt/sas/config/Lev1/SASApp/autoexec.sas (real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:10) — candidate → real/ts-sas-legacy-analytics/Config/autoexec.sas",
+    "macro sendmail (real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:106) — sin definición en el proyecto",
+    "macro sendmail (real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:146) — sin definición en el proyecto"
+  ]
+}

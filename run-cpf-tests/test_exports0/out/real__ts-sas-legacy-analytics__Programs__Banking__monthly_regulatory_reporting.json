@@ -1,0 +1,2984 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+  "sha256": "55b71f669666bc91333fa5701f947b55408012fffbe6e55bec7d67006304698c",
+  "job_name": "job_monthly_regulatory_reporting",
+  "steps": [
+    {
+      "id": "m:monthly_regulatory_reporting:op_24_macro_call_1",
+      "order": 1,
+      "subjob": "m:monthly_regulatory_reporting:s24",
+      "action": "add_component",
+      "operation_id": "op_24_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %parmv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "parmv",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:24",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "report_month, _req=1",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:24",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 24,
+        "end_line": 24
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_41_read_1",
+      "order": 2,
+      "subjob": "m:monthly_regulatory_reporting:s40",
+      "action": "add_component",
+      "operation_id": "op_41_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer STG_BANK.CUST_ACCOUNTS_DAILY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "cust_accounts_daily",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:monthly_regulatory_reporting:op_24_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería stg_bank es de tipo BASE en /data/sas/staging/banking: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_41_read_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_41_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 41,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_41_read_2",
+      "order": 3,
+      "subjob": "m:monthly_regulatory_reporting:s40",
+      "action": "add_component",
+      "operation_id": "op_41_read_2",
+      "operation_type": "read",
+      "component_candidate": "tOracleInput",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer ORA_DW.LOAN_DETAILS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "loan_details",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Table Name",
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Query",
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Component List",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Librería ora_dw usa el motor oracle"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_41_read_2_row_count",
+        "vc_m:monthly_regulatory_reporting:op_41_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 41,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toracleinput-standard-properties",
+      "variants": [
+        "tAS400Input",
+        "tAccessInput",
+        "tAmazonAuroraInput",
+        "tAmazonOracleInput",
+        "tApacheLogInput",
+        "tAzureSynapseInput",
+        "tBigQueryInput",
+        "tDB2Input",
+        "tExasolInput",
+        "tFirebirdInput",
+        "tGreenplumInput",
+        "tHSQLDbInput"
+      ],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_41_join_1",
+      "order": 4,
+      "subjob": "m:monthly_regulatory_reporting:s40",
+      "action": "add_component",
+      "operation_id": "op_41_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (left join): stg_bank.cust_accounts_daily, ora_dw.loan_details",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Left Outer Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "a.ACCOUNT_ID = l.ACCOUNT_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_41_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:monthly_regulatory_reporting:op_41_read_2",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on a.ACCOUNT_ID = l.ACCOUNT_ID",
+          "talend": null,
+          "line": 41,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_41_join_1_duplicates",
+        "vc_m:monthly_regulatory_reporting:op_41_join_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_41_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 41,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_41_filter_1",
+      "order": 5,
+      "subjob": "m:monthly_regulatory_reporting:s40",
+      "action": "add_component",
+      "operation_id": "op_41_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): a.SNAPSHOT_DATE = \"&month_end\"d",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_41_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "a.SNAPSHOT_DATE = \"&month_end\"d",
+          "talend": null,
+          "line": 41,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_41_filter_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_41_filter_1_nulls",
+        "vc_m:monthly_regulatory_reporting:op_41_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 41,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_41_aggregate_1",
+      "order": 6,
+      "subjob": "m:monthly_regulatory_reporting:s40",
+      "action": "add_component",
+      "operation_id": "op_41_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por 1, 2, 3, 4",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "1, 2, 3, 4",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": "N_ACCOUNTS = count(*)",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "\"&report_month\" as REPORT_MONTH length=6",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "ACCOUNT_TYPE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "CUSTOMER_SEGMENT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "RISK_WEIGHT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "N_ACCOUNTS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "sum(CURRENT_BALANCE) as TOTAL_EXPOSURE format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "sum(CURRENT_BALANCE * calculated RISK_WEIGHT) as RWA format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "1",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "3",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "4",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_41_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_41_aggregate_1_aggregates",
+        "vc_m:monthly_regulatory_reporting:op_41_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 41,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_41_sort_1",
+      "order": 7,
+      "subjob": "m:monthly_regulatory_reporting:s40",
+      "action": "add_component",
+      "operation_id": "op_41_sort_1",
+      "operation_type": "sort",
+      "component_candidate": "tSortRow",
+      "alternatives": [],
+      "purpose": "Ordenar por ACCOUNT_TYPE, CUSTOMER_SEGMENT",
+      "properties": [
+        {
+          "name": "CRITERIA",
+          "value": "ACCOUNT_TYPE, CUSTOMER_SEGMENT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Criteria",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_TYPE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        },
+        {
+          "name": "CUSTOMER_SEGMENT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_41_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_41_sort_1_ordering"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 41,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_41_write_1",
+      "order": 8,
+      "subjob": "m:monthly_regulatory_reporting:s40",
+      "action": "add_component",
+      "operation_id": "op_41_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir REPORTS.MONTHLY_RWA (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "monthly_rwa",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:41",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_41_sort_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería reports es de tipo BASE en /data/sas/reports: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_41_write_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_41_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 41,
+        "end_line": 66
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_73_read_1",
+      "order": 9,
+      "subjob": "m:monthly_regulatory_reporting:s72",
+      "action": "add_component",
+      "operation_id": "op_73_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer STG_BANK.CUST_ACCOUNTS_DAILY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "cust_accounts_daily",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:monthly_regulatory_reporting:op_41_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería stg_bank es de tipo BASE en /data/sas/staging/banking: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_73_read_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_73_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 73,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_73_read_2",
+      "order": 10,
+      "subjob": "m:monthly_regulatory_reporting:s72",
+      "action": "add_component",
+      "operation_id": "op_73_read_2",
+      "operation_type": "read",
+      "component_candidate": "tOracleInput",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer ORA_DW.LOAN_DETAILS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "loan_details",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Table Name",
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Query",
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Component List",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Librería ora_dw usa el motor oracle"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_73_read_2_row_count",
+        "vc_m:monthly_regulatory_reporting:op_73_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 73,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toracleinput-standard-properties",
+      "variants": [
+        "tAS400Input",
+        "tAccessInput",
+        "tAmazonAuroraInput",
+        "tAmazonOracleInput",
+        "tApacheLogInput",
+        "tAzureSynapseInput",
+        "tBigQueryInput",
+        "tDB2Input",
+        "tExasolInput",
+        "tFirebirdInput",
+        "tGreenplumInput",
+        "tHSQLDbInput"
+      ],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_73_join_1",
+      "order": 11,
+      "subjob": "m:monthly_regulatory_reporting:s72",
+      "action": "add_component",
+      "operation_id": "op_73_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (left join): stg_bank.cust_accounts_daily, ora_dw.loan_details",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Left Outer Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "a.ACCOUNT_ID = l.ACCOUNT_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_73_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:monthly_regulatory_reporting:op_73_read_2",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on a.ACCOUNT_ID = l.ACCOUNT_ID",
+          "talend": null,
+          "line": 73,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_73_join_1_duplicates",
+        "vc_m:monthly_regulatory_reporting:op_73_join_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_73_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 73,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_73_filter_1",
+      "order": 12,
+      "subjob": "m:monthly_regulatory_reporting:s72",
+      "action": "add_component",
+      "operation_id": "op_73_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): a.SNAPSHOT_DATE = \"&month_end\"d and a.ACCOUNT_TYPE in ('MTG','AUTO','PERS','CC',",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_73_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "a.SNAPSHOT_DATE = \"&month_end\"d and a.ACCOUNT_TYPE in ('MTG','AUTO','PERS','CC','LOC','HELC')",
+          "talend": null,
+          "line": 73,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_73_filter_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_73_filter_1_nulls",
+        "vc_m:monthly_regulatory_reporting:op_73_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 73,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_73_aggregate_1",
+      "order": 13,
+      "subjob": "m:monthly_regulatory_reporting:s72",
+      "action": "add_component",
+      "operation_id": "op_73_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por 1, 2, 3, 4",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "1, 2, 3, 4",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": "N_ACCOUNTS = count(*)",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "\"&report_month\" as REPORT_MONTH length=6",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "ACCOUNT_TYPE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "REGION_CODE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "case when DAYS_PAST_DUE = 0 then 'Current' when DAYS_PAST_DUE between 1 and 29 then '1-29' when DAYS_PAST_DUE between 30 and 59 then '30-59' when DAYS_PAST_DUE between 60 and 89 then '60-89' when DAYS_PAST_DUE between 90 and 119 then '90-119' when DAYS_PAST_DUE between 120 and 179 then '120-179' when DAYS_PAST_DUE >= 180 then '180+' else 'Unknown' end as DELINQ_BUCKET length=10",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "N_ACCOUNTS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "sum(CURRENT_BALANCE) as TOTAL_BALANCE format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "sum(PAST_DUE_AMOUNT) as TOTAL_PAST_DUE format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "1",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "3",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "4",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_73_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_73_aggregate_1_aggregates",
+        "vc_m:monthly_regulatory_reporting:op_73_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 73,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_73_sort_1",
+      "order": 14,
+      "subjob": "m:monthly_regulatory_reporting:s72",
+      "action": "add_component",
+      "operation_id": "op_73_sort_1",
+      "operation_type": "sort",
+      "component_candidate": "tSortRow",
+      "alternatives": [],
+      "purpose": "Ordenar por ACCOUNT_TYPE, REGION_CODE, case when calculated DELINQ_BUCKET = 'Current' then 0 when calculated DELINQ_BUCKET = '1-29' then 1 when calculated DELINQ_BUCKET = '30-59' then 2 when calculated DELINQ_BUCKET = '60-89' then 3 when calculated DELINQ_BUCKET = '90-119' then 4 when calculated DELINQ_BUCKET = '120-179' then 5 when calculated DELINQ_BUCKET = '180+' then 6 else 7 end",
+      "properties": [
+        {
+          "name": "CRITERIA",
+          "value": "ACCOUNT_TYPE, REGION_CODE, case when calculated DELINQ_BUCKET = 'Current' then 0 when calculated DELINQ_BUCKET = '1-29' then 1 when calculated DELINQ_BUCKET = '30-59' then 2 when calculated DELINQ_BUCKET = '60-89' then 3 when calculated DELINQ_BUCKET = '90-119' then 4 when calculated DELINQ_BUCKET = '120-179' then 5 when calculated DELINQ_BUCKET = '180+' then 6 else 7 end",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Criteria",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_TYPE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "REGION_CODE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        },
+        {
+          "name": "case when calculated DELINQ_BUCKET = 'Current' then 0 when calculated DELINQ_BUCKET = '1-29' then 1 when calculated DELINQ_BUCKET = '30-59' then 2 when calculated DELINQ_BUCKET = '60-89' then 3 when calculated DELINQ_BUCKET = '90-119' then 4 when calculated DELINQ_BUCKET = '120-179' then 5 when calculated DELINQ_BUCKET = '180+' then 6 else 7 end",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_73_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_73_sort_1_ordering"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 73,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_73_write_1",
+      "order": 15,
+      "subjob": "m:monthly_regulatory_reporting:s72",
+      "action": "add_component",
+      "operation_id": "op_73_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir REPORTS.DELINQUENCY_AGING (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "delinquency_aging",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:73",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_73_sort_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería reports es de tipo BASE en /data/sas/reports: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_73_write_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_73_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 73,
+        "end_line": 108
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_115_read_1",
+      "order": 16,
+      "subjob": "m:monthly_regulatory_reporting:s114",
+      "action": "add_component",
+      "operation_id": "op_115_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer STG_BANK.CUST_ACCOUNTS_DAILY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "cust_accounts_daily",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:monthly_regulatory_reporting:op_73_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería stg_bank es de tipo BASE en /data/sas/staging/banking: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_115_read_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_115_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 115,
+        "end_line": 140
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_115_read_2",
+      "order": 17,
+      "subjob": "m:monthly_regulatory_reporting:s114",
+      "action": "add_component",
+      "operation_id": "op_115_read_2",
+      "operation_type": "read",
+      "component_candidate": "tOracleInput",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer ORA_DW.LOAN_DETAILS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "loan_details",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Table Name",
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Query",
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Component List",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Librería ora_dw usa el motor oracle"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_115_read_2_row_count",
+        "vc_m:monthly_regulatory_reporting:op_115_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 115,
+        "end_line": 140
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toracleinput-standard-properties",
+      "variants": [
+        "tAS400Input",
+        "tAccessInput",
+        "tAmazonAuroraInput",
+        "tAmazonOracleInput",
+        "tApacheLogInput",
+        "tAzureSynapseInput",
+        "tBigQueryInput",
+        "tDB2Input",
+        "tExasolInput",
+        "tFirebirdInput",
+        "tGreenplumInput",
+        "tHSQLDbInput"
+      ],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_115_join_1",
+      "order": 18,
+      "subjob": "m:monthly_regulatory_reporting:s114",
+      "action": "add_component",
+      "operation_id": "op_115_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (inner join): stg_bank.cust_accounts_daily, ora_dw.loan_details",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Inner Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "a.ACCOUNT_ID = l.ACCOUNT_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_115_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:monthly_regulatory_reporting:op_115_read_2",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on a.ACCOUNT_ID = l.ACCOUNT_ID",
+          "talend": null,
+          "line": 115,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_115_join_1_duplicates",
+        "vc_m:monthly_regulatory_reporting:op_115_join_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_115_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 115,
+        "end_line": 140
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_115_filter_1",
+      "order": 19,
+      "subjob": "m:monthly_regulatory_reporting:s114",
+      "action": "add_component",
+      "operation_id": "op_115_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): a.SNAPSHOT_DATE = \"&month_end\"d and a.ACCOUNT_TYPE in ('MTG','AUTO','PERS','CC',",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_115_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "a.SNAPSHOT_DATE = \"&month_end\"d and a.ACCOUNT_TYPE in ('MTG','AUTO','PERS','CC','LOC','HELC')",
+          "talend": null,
+          "line": 115,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_115_filter_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_115_filter_1_nulls",
+        "vc_m:monthly_regulatory_reporting:op_115_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 115,
+        "end_line": 140
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_115_aggregate_1",
+      "order": 20,
+      "subjob": "m:monthly_regulatory_reporting:s114",
+      "action": "add_component",
+      "operation_id": "op_115_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por 1, 2",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "1, 2",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": "N_LOANS = count(*)",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "\"&report_month\" as REPORT_MONTH length=6",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        },
+        {
+          "name": "ACCOUNT_TYPE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        },
+        {
+          "name": "N_LOANS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        },
+        {
+          "name": "sum(a.CURRENT_BALANCE) as GROSS_LOANS format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        },
+        {
+          "name": "sum(l.ALLOWANCE_AMT) as TOTAL_ALLOWANCE format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        },
+        {
+          "name": "case when sum(a.CURRENT_BALANCE) > 0 then sum(l.ALLOWANCE_AMT) / sum(a.CURRENT_BALANCE) * 100 else 0 end as COVERAGE_PCT format=8.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        },
+        {
+          "name": "sum(case when l.DAYS_PAST_DUE >= 90 then a.CURRENT_BALANCE else 0 end) as NPL_BALANCE format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        },
+        {
+          "name": "case when calculated NPL_BALANCE > 0 then sum(l.ALLOWANCE_AMT) / calculated NPL_BALANCE * 100 else 0 end as NPL_COVERAGE_PCT format=8.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        },
+        {
+          "name": "1",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        },
+        {
+          "name": "2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_115_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_115_aggregate_1_aggregates",
+        "vc_m:monthly_regulatory_reporting:op_115_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 115,
+        "end_line": 140
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_115_write_1",
+      "order": 21,
+      "subjob": "m:monthly_regulatory_reporting:s114",
+      "action": "add_component",
+      "operation_id": "op_115_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir REPORTS.LLP_COVERAGE (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "llp_coverage",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:115",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_115_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería reports es de tipo BASE en /data/sas/reports: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_115_write_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_115_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 115,
+        "end_line": 140
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_146_macro_call_1",
+      "order": 22,
+      "subjob": "m:monthly_regulatory_reporting:s146",
+      "action": "add_component",
+      "operation_id": "op_146_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %export_xlsx",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "export_xlsx",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:146",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "\r\n    data=REPORTS.MONTHLY_RWA,\r\n    file=&REPORT_PATH/REG_REPORT_&report_month..xlsx,\r\n    sheet=RWA\r\n  ",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:146",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:monthly_regulatory_reporting:op_115_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 146,
+        "end_line": 150
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_152_macro_call_1",
+      "order": 23,
+      "subjob": "m:monthly_regulatory_reporting:s152",
+      "action": "add_component",
+      "operation_id": "op_152_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %export_xlsx",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "export_xlsx",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:152",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "\r\n    data=REPORTS.DELINQUENCY_AGING,\r\n    file=&REPORT_PATH/REG_REPORT_&report_month..xlsx,\r\n    sheet=Delinquency\r\n  ",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:152",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:monthly_regulatory_reporting:op_146_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 152,
+        "end_line": 156
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_158_macro_call_1",
+      "order": 24,
+      "subjob": "m:monthly_regulatory_reporting:s158",
+      "action": "add_component",
+      "operation_id": "op_158_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %export_xlsx",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "export_xlsx",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:158",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "\r\n    data=REPORTS.LLP_COVERAGE,\r\n    file=&REPORT_PATH/REG_REPORT_&report_month..xlsx,\r\n    sheet=LLP_Coverage\r\n  ",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:158",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:monthly_regulatory_reporting:op_152_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 158,
+        "end_line": 162
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_170_read_1",
+      "order": 25,
+      "subjob": "m:monthly_regulatory_reporting:s169",
+      "action": "add_component",
+      "operation_id": "op_170_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer REPORTS.MONTHLY_RWA",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "monthly_rwa",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:monthly_regulatory_reporting:op_158_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset producido antes en este programa (m:monthly_regulatory_reporting:op_41_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería reports es de tipo BASE en /data/sas/reports: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_170_read_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_170_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 170,
+        "end_line": 189
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_170_aggregate_1",
+      "order": 26,
+      "subjob": "m:monthly_regulatory_reporting:s169",
+      "action": "add_component",
+      "operation_id": "op_170_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "\"&report_month\" as REPORT_MONTH length=6",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        },
+        {
+          "name": "sum(RWA) as TOTAL_RWA format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        },
+        {
+          "name": "50000000 as CET1_CAPITAL format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        },
+        {
+          "name": "65000000 as TIER1_CAPITAL format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        },
+        {
+          "name": "80000000 as TOTAL_CAPITAL format=dollar20.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        },
+        {
+          "name": "case when sum(RWA) > 0 then 50000000 / sum(RWA) * 100 else . end as CET1_RATIO format=8.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        },
+        {
+          "name": "case when sum(RWA) > 0 then 65000000 / sum(RWA) * 100 else . end as TIER1_RATIO format=8.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        },
+        {
+          "name": "case when sum(RWA) > 0 then 80000000 / sum(RWA) * 100 else . end as TOTAL_CAPITAL_RATIO format=8.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        },
+        {
+          "name": "case when sum(RWA) = 0 then 'PASS' when 50000000/sum(RWA)*100 >= 4.5 then 'PASS' else 'FAIL' end as CET1_STATUS length=4",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        },
+        {
+          "name": "case when sum(RWA) = 0 then 'PASS' when 65000000/sum(RWA)*100 >= 6.0 then 'PASS' else 'FAIL' end as TIER1_STATUS length=4",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        },
+        {
+          "name": "case when sum(RWA) = 0 then 'PASS' when 80000000/sum(RWA)*100 >= 8.0 then 'PASS' else 'FAIL' end as TOTAL_CAPITAL_STATUS length=4",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_170_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_170_aggregate_1_aggregates",
+        "vc_m:monthly_regulatory_reporting:op_170_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 170,
+        "end_line": 189
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:monthly_regulatory_reporting:op_170_write_1",
+      "order": 27,
+      "subjob": "m:monthly_regulatory_reporting:s169",
+      "action": "add_component",
+      "operation_id": "op_170_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir REPORTS.CAPITAL_ADEQUACY (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "capital_adequacy",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:170",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:monthly_regulatory_reporting:op_170_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería reports es de tipo BASE en /data/sas/reports: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:monthly_regulatory_reporting:op_170_write_1_row_count",
+        "vc_m:monthly_regulatory_reporting:op_170_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "line": 170,
+        "end_line": 189
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": {
+    "name": "monthly_regulatory_reporting",
+    "params": [
+      "report_month"
+    ],
+    "arguments": {
+      "report_month": "&PREV_YM"
+    }
+  },
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_41_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_41_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_73_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_73_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_115_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_115_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_170_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_170_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_170_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_170_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_170_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_170_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_170_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_170_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_170_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_170_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:monthly_regulatory_reporting:op_170_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:monthly_regulatory_reporting:op_170_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "PREV_YM",
+      "sas_value": null,
+      "suggested": "context.PREV_YM",
+      "origin": "Variable SAS referenciada por %monthly_regulatory_reporting(report_month=...)"
+    },
+    {
+      "name": "report_month",
+      "sas_value": null,
+      "suggested": "context.report_month",
+      "origin": "&report_month en real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:146"
+    },
+    {
+      "name": "REPORT_PATH",
+      "sas_value": null,
+      "suggested": "context.REPORT_PATH",
+      "origin": "&REPORT_PATH en real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:146"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "ORA_DW",
+      "engine": "oracle",
+      "path": "FINPROD",
+      "suggested_connection": "tOracleConnection",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "REPORTS",
+      "engine": null,
+      "path": "/data/sas/reports",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "STG_BANK",
+      "engine": null,
+      "path": "/data/sas/staging/banking",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [
+      "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#4"
+    ],
+    "grid_recommendations": [
+      {
+        "id": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:130:sas_macro_step.include_dispatch",
+        "pattern_id": "sas_macro_step.include_dispatch",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Crea un Job hijo para cada programa resuelto y confirma sus parámetros antes de conectar la secuencia.",
+        "reason": "The analyzer resolves tested macro dispatches, but macro defaults and failure behavior require review.",
+        "component_candidate": "tRunJob",
+        "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+        "required": [
+          "Review macro dispatch semantics",
+          "Confirm child Job and context parameters"
+        ],
+        "dependencies": [
+          "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#3"
+        ],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+          "line": 130,
+          "end_line": 130
+        },
+        "details": {
+          "kind": "sas_macro_step",
+          "program": "/opt/sas/custom/programs/Banking/monthly_regulatory_reporting.sas",
+          "resolved_program": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+          "match_status": "resolved",
+          "job_name": null,
+          "queue": null,
+          "waits": true,
+          "params": {
+            "step_num": "4",
+            "step_name": "Monthly Regulatory Reporting",
+            "program": "/opt/sas/custom/programs/Banking/monthly_regulatory_reporting.sas"
+          },
+          "condition": null,
+          "unknown_options": [],
+          "incomplete_options": []
+        }
+      },
+      {
+        "id": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:14:scheduler.control_m",
+        "pattern_id": "scheduler.control_m",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Obtén la definición real de Control-M y recrea calendario y dependencias en el planificador elegido.",
+        "reason": "Only a comment is captured; Control-M calendars, dependencies, and job definitions are not parsed.",
+        "component_candidate": null,
+        "doc_url": null,
+        "required": [
+          "Recreate the authoritative schedule in the chosen scheduler"
+        ],
+        "dependencies": [],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+          "line": 14,
+          "end_line": 14
+        },
+        "details": {
+          "schedule": "Monthly 3rd business day via Control-M BANK_MONTHLY_01"
+        }
+      }
+    ],
+    "schedules": [
+      "Monthly 3rd business day via Control-M BANK_MONTHLY_01"
+    ],
+    "upstream": [
+      "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas"
+    ],
+    "downstream": []
+  },
+  "unresolved": [
+    "include /opt/sas/custom/macros/parmv.sas (real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:18) — external",
+    "include /opt/sas/custom/macros/nobs.sas (real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:19) — external",
+    "include /opt/sas/custom/macros/export_xlsx.sas (real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:20) — external",
+    "macro parmv (real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:24) — sin definición en el proyecto",
+    "macro export_xlsx (real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:146) — sin definición en el proyecto",
+    "macro export_xlsx (real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:152) — sin definición en el proyecto",
+    "macro export_xlsx (real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas:158) — sin definición en el proyecto"
+  ]
+}

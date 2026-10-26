@@ -1,0 +1,149 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/005_oa.sas",
+  "sha256": "f5983c821c206be4efd479df3d7c1a1ed2da60359d0a3adb603c6643d5ebc27e",
+  "job_name": "job_005_oa",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "create_OA",
+      "params": [],
+      "steps": [
+        {
+          "id": "m:create_OA:op_13_macro_call_1",
+          "order": 1,
+          "subjob": "m:create_OA:s13",
+          "action": "add_component",
+          "operation_id": "op_13_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %create_temp_table",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "create_temp_table",
+              "origin": "SAS real/tmsis-analytic-file/005_oa.sas:13",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "fileseg=MCP, tblname=oa_pl,\r\n\t\t          subcols=%nrbquote( \r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_01, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_02, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_03, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_04, nslots=1)\r\n\t\t\t\t\t\t\t\t\t ),\r\n\t\t          subcols2=%nrbquote(\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_05, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_06, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_07, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_08, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_09, nslots=1)\r\n\t\t\t\t\t\t\t\t\t ),\r\n\t\t          subcols3=%nrbquote(\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_10, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_11, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_12, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_13, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_14, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(WVR_ID_15, nslots=1)\r\n\t\t\t\t\t\t\t\t\t),\r\n\t\t          subcols4=%nrbquote(\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_01, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_02, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_03, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_04, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_05, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_06, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_07, nslots=1)\r\n\t\t\t\t\t\t\t\t\t ),\r\n\t\t          subcols5=%nrbquote(\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_08, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_09, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_10, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_11, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_12, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_13, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_14, nslots=1)\r\n\t\t\t\t\t\t\t\t\t %monthly_array(OPRTG_AUTHRTY_15, nslots=1)\r\n\t\t\t\t\t\t\t\t\t ) ",
+              "origin": "SAS real/tmsis-analytic-file/005_oa.sas:13",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/005_oa.sas",
+            "line": 13,
+            "end_line": 53
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_OA:op_126_macro_call_1",
+          "order": 2,
+          "subjob": "m:create_OA:s126",
+          "action": "add_component",
+          "operation_id": "op_126_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %create_splmlt",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "create_splmlt",
+              "origin": "SAS real/tmsis-analytic-file/005_oa.sas:126",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "segname=OPRTG_AUTHRTY, segfile=OpAuth1",
+              "origin": "SAS real/tmsis-analytic-file/005_oa.sas:126",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_OA:op_13_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/005_oa.sas",
+            "line": 126,
+            "end_line": 126
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro create_temp_table (real/tmsis-analytic-file/005_oa.sas:13) — sin definición en el proyecto",
+    "macro monthly_array (real/tmsis-analytic-file/005_oa.sas:13) — sin definición en el proyecto",
+    "macro create_splmlt (real/tmsis-analytic-file/005_oa.sas:126) — sin definición en el proyecto",
+    "macro table_id_cols (real/tmsis-analytic-file/005_oa.sas:149) — sin definición en el proyecto",
+    "macro drop_tables (real/tmsis-analytic-file/005_oa.sas:163) — sin definición en el proyecto"
+  ]
+}

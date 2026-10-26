@@ -1,0 +1,46 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/023_bsf_final.sas",
+  "sha256": "74af159a2013806654c8746f91c5932ce4f15b72d290c413072b5a347258c785",
+  "job_name": "job_023_bsf_final",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "hh_chk",
+      "params": [
+        "col"
+      ],
+      "steps": []
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro elg00002 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro elg00003 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro elg00004 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro elg00005 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro elg00006 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro elg00007 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro elg00010 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro elg00015 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro elg00016 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro elg00018 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro tpl00002 (real/tmsis-analytic-file/023_bsf_final.sas:21) — sin definición en el proyecto",
+    "macro drop_table_multi (real/tmsis-analytic-file/023_bsf_final.sas:230) — sin definición en el proyecto",
+    "macro final_format (real/tmsis-analytic-file/023_bsf_final.sas:239) — sin definición en el proyecto",
+    "macro get_audt_counts (real/tmsis-analytic-file/023_bsf_final.sas:249) — sin definición en el proyecto",
+    "macro drop_table_multi (real/tmsis-analytic-file/023_bsf_final.sas:251) — sin definición en el proyecto"
+  ]
+}

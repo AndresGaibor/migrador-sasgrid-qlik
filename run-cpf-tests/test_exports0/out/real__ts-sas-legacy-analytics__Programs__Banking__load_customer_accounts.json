@@ -1,0 +1,2305 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+  "sha256": "11035230a26e28c4c078c15ca62a7a6c3474f2a4cb4946bbf8cf2e332f4abbfb",
+  "job_name": "job_load_customer_accounts",
+  "steps": [
+    {
+      "id": "m:load_customer_accounts:op_19_macro_call_1",
+      "order": 1,
+      "subjob": "m:load_customer_accounts:s19",
+      "action": "add_component",
+      "operation_id": "op_19_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %parmv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "parmv",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:19",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "run_date, _req=1, _msg=Run date is required",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:19",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 19,
+        "end_line": 19
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:load_customer_accounts:op_20_macro_call_1",
+      "order": 2,
+      "subjob": "m:load_customer_accounts:s20",
+      "action": "add_component",
+      "operation_id": "op_20_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %parmv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "parmv",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:20",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "region,   _req=0, _val=ALL NE SE MW SW W NW",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:20",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:load_customer_accounts:op_19_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 20,
+        "end_line": 20
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:load_customer_accounts:op_35_read_1",
+      "order": 3,
+      "subjob": "m:load_customer_accounts:s34",
+      "action": "add_component",
+      "operation_id": "op_35_read_1",
+      "operation_type": "read",
+      "component_candidate": "tOracleInput",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer ORA_DW.CUST_ACCOUNTS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "cust_accounts",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Table Name",
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Query",
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Component List",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:load_customer_accounts:op_20_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Librería ora_dw usa el motor oracle"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_35_read_1_row_count",
+        "vc_m:load_customer_accounts:op_35_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 35,
+        "end_line": 64
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toracleinput-standard-properties",
+      "variants": [
+        "tAS400Input",
+        "tAccessInput",
+        "tAmazonAuroraInput",
+        "tAmazonOracleInput",
+        "tApacheLogInput",
+        "tAzureSynapseInput",
+        "tBigQueryInput",
+        "tDB2Input",
+        "tExasolInput",
+        "tFirebirdInput",
+        "tGreenplumInput",
+        "tHSQLDbInput"
+      ],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_35_read_2",
+      "order": 4,
+      "subjob": "m:load_customer_accounts:s34",
+      "action": "add_component",
+      "operation_id": "op_35_read_2",
+      "operation_type": "read",
+      "component_candidate": "tOracleInput",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer ORA_DW.CUST_DEMOGRAPHICS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "cust_demographics",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Table Name",
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Query",
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Component List",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Librería ora_dw usa el motor oracle"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_35_read_2_row_count",
+        "vc_m:load_customer_accounts:op_35_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 35,
+        "end_line": 64
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toracleinput-standard-properties",
+      "variants": [
+        "tAS400Input",
+        "tAccessInput",
+        "tAmazonAuroraInput",
+        "tAmazonOracleInput",
+        "tApacheLogInput",
+        "tAzureSynapseInput",
+        "tBigQueryInput",
+        "tDB2Input",
+        "tExasolInput",
+        "tFirebirdInput",
+        "tGreenplumInput",
+        "tHSQLDbInput"
+      ],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_35_join_1",
+      "order": 5,
+      "subjob": "m:load_customer_accounts:s34",
+      "action": "add_component",
+      "operation_id": "op_35_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (inner join): ora_dw.cust_accounts, ora_dw.cust_demographics",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Inner Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "a.CUSTOMER_ID = d.CUSTOMER_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "CUSTOMER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_35_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:load_customer_accounts:op_35_read_2",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on a.CUSTOMER_ID = d.CUSTOMER_ID",
+          "talend": null,
+          "line": 35,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_35_join_1_duplicates",
+        "vc_m:load_customer_accounts:op_35_join_1_row_count",
+        "vc_m:load_customer_accounts:op_35_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 35,
+        "end_line": 64
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:load_customer_accounts:op_35_filter_1",
+      "order": 6,
+      "subjob": "m:load_customer_accounts:s34",
+      "action": "add_component",
+      "operation_id": "op_35_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): a.ACCOUNT_STATUS not in ('W', 'C') and a.OPEN_DATE <= \"&run_date\"d %if &region n",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_35_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "a.ACCOUNT_STATUS not in ('W', 'C') and a.OPEN_DATE <= \"&run_date\"d %if &region ne ALL %then %do",
+          "talend": null,
+          "line": 35,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: ' %if &region'"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_35_filter_1_row_count",
+        "vc_m:load_customer_accounts:op_35_filter_1_nulls",
+        "vc_m:load_customer_accounts:op_35_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 35,
+        "end_line": 64
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:load_customer_accounts:op_35_project_1",
+      "order": 7,
+      "subjob": "m:load_customer_accounts:s34",
+      "action": "add_component",
+      "operation_id": "op_35_project_1",
+      "operation_type": "project",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Seleccionar/calcular columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "ACCOUNT_ID, CUSTOMER_ID, ACCOUNT_TYPE, ACCOUNT_STATUS, OPEN_DATE, CLOSE_DATE, CURRENT_BALANCE, AVAILABLE_BALANCE, CREDIT_LIMIT, INTEREST_RATE, BRANCH_ID, OFFICER_ID, LAST_ACTIVITY_DATE, FIRST_NAME, LAST_NAME, SSN_HASH, DATE_OF_BIRTH, CUSTOMER_SEGMENT, RISK_RATING, REGION_CODE, PRIMARY_EMAIL, PHONE_NUMBER",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expressions",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "CUSTOMER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "ACCOUNT_TYPE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "ACCOUNT_STATUS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "OPEN_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "CLOSE_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "CURRENT_BALANCE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "AVAILABLE_BALANCE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "CREDIT_LIMIT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "INTEREST_RATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "BRANCH_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "OFFICER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "LAST_ACTIVITY_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "FIRST_NAME",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "LAST_NAME",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "SSN_HASH",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "DATE_OF_BIRTH",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "CUSTOMER_SEGMENT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "RISK_RATING",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "REGION_CODE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "PRIMARY_EMAIL",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        },
+        {
+          "name": "PHONE_NUMBER",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_35_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:load_customer_accounts:op_35_project_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 35,
+        "end_line": 64
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_35_write_1",
+      "order": 8,
+      "subjob": "m:load_customer_accounts:s34",
+      "action": "add_component",
+      "operation_id": "op_35_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.ACCT_RAW (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "acct_raw",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:35",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_35_project_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_35_write_1_row_count",
+        "vc_m:load_customer_accounts:op_35_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 35,
+        "end_line": 64
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_65_unsupported_1",
+      "order": 9,
+      "subjob": "m:load_customer_accounts:s34",
+      "action": "manual_decision",
+      "operation_id": "op_65_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_35_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 65,
+        "end_line": 66
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:load_customer_accounts:op_67_unsupported_1",
+      "order": 10,
+      "subjob": "m:load_customer_accounts:s34",
+      "action": "manual_decision",
+      "operation_id": "op_67_unsupported_1",
+      "operation_type": "unsupported",
+      "component_candidate": "por_determinar",
+      "alternatives": [],
+      "purpose": "Lógica sin traducción definida",
+      "properties": [],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_65_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Documentar la lógica y decidir el diseño manualmente"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 67,
+        "end_line": 68
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:load_customer_accounts:op_82_read_1",
+      "order": 11,
+      "subjob": "m:load_customer_accounts:s82",
+      "action": "add_component",
+      "operation_id": "op_82_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.ACCT_RAW",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "acct_raw",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:load_customer_accounts:op_67_unsupported_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:load_customer_accounts:op_35_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_82_read_1_row_count",
+        "vc_m:load_customer_accounts:op_82_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 82,
+        "end_line": 157
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_82_compute_1",
+      "order": 12,
+      "subjob": "m:load_customer_accounts:s82",
+      "action": "add_component",
+      "operation_id": "op_82_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "10 asignaciones, 9 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCT_AGE_MONTHS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82"
+        },
+        {
+          "name": "DAYS_INACTIVE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82"
+        },
+        {
+          "name": "EXCEPTION_CODE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82"
+        },
+        {
+          "name": "EXCEPTION_DESC",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82"
+        },
+        {
+          "name": "SNAPSHOT_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82"
+        },
+        {
+          "name": "LOAD_TIMESTAMP",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_82_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "intck('month', OPEN_DATE, \"&run_date\"d)",
+          "talend": null,
+          "line": 100,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función intck"
+          ]
+        },
+        {
+          "sas": "\"&run_date\"d - LAST_ACTIVITY_DATE",
+          "talend": null,
+          "line": 103,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        },
+        {
+          "sas": "'NEG_BAL'",
+          "talend": "\"NEG_BAL\"",
+          "line": 125,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "catx(' ', 'Negative balance',\r\n        put(CURRENT_BALANCE, dollar18.2),\r\n        'on deposit account', ACCOUNT_ID)",
+          "talend": null,
+          "line": 126,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: \".2), 'on dep\""
+          ]
+        },
+        {
+          "sas": "'HIGH_UTIL'",
+          "talend": "\"HIGH_UTIL\"",
+          "line": 134,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "catx(' ', 'Utilization at',\r\n        put(UTILIZATION_PCT, 5.1), '%',\r\n        'for account', ACCOUNT_ID)",
+          "talend": null,
+          "line": 135,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función catx"
+          ]
+        },
+        {
+          "sas": "'NO_RISK'",
+          "talend": "\"NO_RISK\"",
+          "line": 143,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "catx(' ', 'Missing risk rating for customer',\r\n        CUSTOMER_ID)",
+          "talend": null,
+          "line": 144,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función catx"
+          ]
+        },
+        {
+          "sas": "\"&run_date\"d",
+          "talend": null,
+          "line": 150,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        },
+        {
+          "sas": "datetime()",
+          "talend": null,
+          "line": 151,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función datetime"
+          ]
+        },
+        {
+          "sas": "if ACCOUNT_TYPE in ('CC', 'LOC', 'HELC') and CREDIT_LIMIT > 0 then\r\n      UTILIZATION_PCT = (CURRENT_BALANCE / CREDIT_LIMIT) * 100",
+          "talend": null,
+          "line": 106,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else\r\n      UTILIZATION_PCT = .",
+          "talend": null,
+          "line": 108,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if DAYS_INACTIVE > 365 and ACCOUNT_STATUS = 'A' then\r\n      DORMANCY_FLAG = 'Y'",
+          "talend": null,
+          "line": 112,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else\r\n      DORMANCY_FLAG = 'N'",
+          "talend": null,
+          "line": 114,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if CURRENT_BALANCE >= 250000 then\r\n      HIGH_BALANCE_FLAG = 'Y'",
+          "talend": null,
+          "line": 118,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else\r\n      HIGH_BALANCE_FLAG = 'N'",
+          "talend": null,
+          "line": 120,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if ACCOUNT_TYPE in ('CHK', 'SAV', 'MMA', 'CD') and CURRENT_BALANCE < 0 then do",
+          "talend": null,
+          "line": 124,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if UTILIZATION_PCT > 95 then do",
+          "talend": null,
+          "line": 133,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if RISK_RATING = . then do",
+          "talend": null,
+          "line": 142,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_82_compute_1_nulls",
+        "vc_m:load_customer_accounts:op_82_compute_1_dates",
+        "vc_m:load_customer_accounts:op_82_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 82,
+        "end_line": 157
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:load_customer_accounts:op_82_select_columns_1",
+      "order": 13,
+      "subjob": "m:load_customer_accounts:s82",
+      "action": "add_component",
+      "operation_id": "op_82_select_columns_1",
+      "operation_type": "select_columns",
+      "component_candidate": "tFilterColumns",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Conservar/descartar columnas",
+      "properties": [
+        {
+          "name": "SCHEMA",
+          "value": "drop: EXCEPTION_CODE, EXCEPTION_DESC",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Schema",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_82_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:load_customer_accounts:op_82_select_columns_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 82,
+        "end_line": 157
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_82_write_1",
+      "order": 14,
+      "subjob": "m:load_customer_accounts:s82",
+      "action": "add_component",
+      "operation_id": "op_82_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir STG_BANK.CUST_ACCOUNTS_DAILY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "cust_accounts_daily",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_82_select_columns_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería stg_bank es de tipo BASE en /data/sas/staging/banking: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_82_write_1_row_count",
+        "vc_m:load_customer_accounts:op_82_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 82,
+        "end_line": 157
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_82_write_2",
+      "order": 15,
+      "subjob": "m:load_customer_accounts:s82",
+      "action": "add_component",
+      "operation_id": "op_82_write_2",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.ACCT_EXCEPTIONS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "acct_exceptions",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:82",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_82_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_82_write_2_row_count",
+        "vc_m:load_customer_accounts:op_82_write_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 82,
+        "end_line": 157
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_168_read_1",
+      "order": 16,
+      "subjob": "m:load_customer_accounts:s167",
+      "action": "add_component",
+      "operation_id": "op_168_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.ACCT_EXCEPTIONS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "acct_exceptions",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:168",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:load_customer_accounts:op_82_write_2",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:load_customer_accounts:op_82_write_2): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_168_read_1_row_count",
+        "vc_m:load_customer_accounts:op_168_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 168,
+        "end_line": 169
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_168_project_1",
+      "order": 17,
+      "subjob": "m:load_customer_accounts:s167",
+      "action": "add_component",
+      "operation_id": "op_168_project_1",
+      "operation_type": "project",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Seleccionar/calcular columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "*",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:168",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expressions",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_168_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:load_customer_accounts:op_168_project_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 168,
+        "end_line": 169
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_168_write_1",
+      "order": 18,
+      "subjob": "m:load_customer_accounts:s167",
+      "action": "add_component",
+      "operation_id": "op_168_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir STG_BANK.ACCT_EXCEPTIONS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "acct_exceptions",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:168",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:168",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:168",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:load_customer_accounts:op_168_project_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería stg_bank es de tipo BASE en /data/sas/staging/banking: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_168_write_1_row_count",
+        "vc_m:load_customer_accounts:op_168_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 168,
+        "end_line": 169
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_174_include_1",
+      "order": 19,
+      "subjob": "m:load_customer_accounts:s174",
+      "action": "add_component",
+      "operation_id": "op_174_include_1",
+      "operation_type": "include",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet",
+        "Rutina"
+      ],
+      "purpose": "Incluir otro programa",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "\"/opt/sas/custom/macros/sendmail.sas\"",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:174",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:load_customer_accounts:op_168_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Confirmar si el programa incluido se migra como Job hijo"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 174,
+        "end_line": 174
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:load_customer_accounts:op_175_macro_call_1",
+      "order": 20,
+      "subjob": "m:load_customer_accounts:s175",
+      "action": "add_component",
+      "operation_id": "op_175_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %sendmail",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "sendmail",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:175",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "\r\n        to=&EMAIL_ONCALL,\r\n        subject=ALERT: &nobs_except account exceptions on &run_date,\r\n        body=Critical volume of account exceptions. Review STG_BANK.ACCT_EXCEPTIONS.\r\n      ",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:175",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:load_customer_accounts:op_174_include_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 175,
+        "end_line": 179
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:load_customer_accounts:op_188_aggregate_1",
+      "order": 21,
+      "subjob": "m:load_customer_accounts:s188",
+      "action": "add_component",
+      "operation_id": "op_188_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:load_customer_accounts:op_175_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "PROC MEANS: mapear estadísticas concretas a tAggregateRow"
+      ],
+      "pending": [
+        "Mapear las estadísticas de PROC MEANS a operaciones de agregación"
+      ],
+      "tests": [
+        "vc_m:load_customer_accounts:op_188_aggregate_1_aggregates",
+        "vc_m:load_customer_accounts:op_188_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 188,
+        "end_line": 198
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:load_customer_accounts:op_207_macro_call_1",
+      "order": 22,
+      "subjob": "m:load_customer_accounts:s207",
+      "action": "add_component",
+      "operation_id": "op_207_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %exit",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "exit",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:207",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:load_customer_accounts:op_188_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "line": 207,
+        "end_line": 209
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": {
+    "name": "load_customer_accounts",
+    "params": [
+      "run_date",
+      "region"
+    ],
+    "arguments": {
+      "run_date": "&CURR_DT"
+    }
+  },
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_m:load_customer_accounts:op_35_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_35_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:load_customer_accounts:op_35_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_82_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:load_customer_accounts:op_82_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_82_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:load_customer_accounts:op_82_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_82_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:load_customer_accounts:op_82_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_82_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:load_customer_accounts:op_82_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_82_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:load_customer_accounts:op_82_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_82_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:load_customer_accounts:op_82_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_82_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:load_customer_accounts:op_82_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_82_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:load_customer_accounts:op_82_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_82_write_2_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:load_customer_accounts:op_82_write_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_82_write_2_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:load_customer_accounts:op_82_write_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_168_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:load_customer_accounts:op_168_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_168_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:load_customer_accounts:op_168_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_168_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:load_customer_accounts:op_168_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_168_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:load_customer_accounts:op_168_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_168_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:load_customer_accounts:op_168_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_188_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:load_customer_accounts:op_188_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:load_customer_accounts:op_188_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:load_customer_accounts:op_188_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "CURR_DT",
+      "sas_value": null,
+      "suggested": "context.CURR_DT",
+      "origin": "Variable SAS referenciada por %load_customer_accounts(run_date=...)"
+    },
+    {
+      "name": "EMAIL_ONCALL",
+      "sas_value": null,
+      "suggested": "context.EMAIL_ONCALL",
+      "origin": "&EMAIL_ONCALL en real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:175"
+    },
+    {
+      "name": "nobs_except",
+      "sas_value": null,
+      "suggested": "context.nobs_except",
+      "origin": "&nobs_except en real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:175"
+    },
+    {
+      "name": "region",
+      "sas_value": null,
+      "suggested": "context.region",
+      "origin": "Parámetro de la macro principal %load_customer_accounts; argumento SAS: sin asignar"
+    },
+    {
+      "name": "run_date",
+      "sas_value": null,
+      "suggested": "context.run_date",
+      "origin": "&run_date en real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:175"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "ORA_DW",
+      "engine": "oracle",
+      "path": "FINPROD",
+      "suggested_connection": "tOracleConnection",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "STG_BANK",
+      "engine": null,
+      "path": "/data/sas/staging/banking",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [
+      "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#1"
+    ],
+    "grid_recommendations": [
+      {
+        "id": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:121:sas_macro_step.include_dispatch",
+        "pattern_id": "sas_macro_step.include_dispatch",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Crea un Job hijo para cada programa resuelto y confirma sus parámetros antes de conectar la secuencia.",
+        "reason": "The analyzer resolves tested macro dispatches, but macro defaults and failure behavior require review.",
+        "component_candidate": "tRunJob",
+        "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+        "required": [
+          "Review macro dispatch semantics",
+          "Confirm child Job and context parameters"
+        ],
+        "dependencies": [],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+          "line": 121,
+          "end_line": 121
+        },
+        "details": {
+          "kind": "sas_macro_step",
+          "program": "/opt/sas/custom/programs/Banking/load_customer_accounts.sas",
+          "resolved_program": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+          "match_status": "resolved",
+          "job_name": null,
+          "queue": null,
+          "waits": true,
+          "params": {
+            "step_num": "1",
+            "step_name": "Load Customer Accounts",
+            "program": "/opt/sas/custom/programs/Banking/load_customer_accounts.sas"
+          },
+          "condition": null,
+          "unknown_options": [],
+          "incomplete_options": []
+        }
+      },
+      {
+        "id": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:9:scheduler.control_m",
+        "pattern_id": "scheduler.control_m",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Obtén la definición real de Control-M y recrea calendario y dependencias en el planificador elegido.",
+        "reason": "Only a comment is captured; Control-M calendars, dependencies, and job definitions are not parsed.",
+        "component_candidate": null,
+        "doc_url": null,
+        "required": [
+          "Recreate the authoritative schedule in the chosen scheduler"
+        ],
+        "dependencies": [],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas",
+          "line": 9,
+          "end_line": 9
+        },
+        "details": {
+          "schedule": "Daily 06:00 via Control-M job BANK_DAILY_01"
+        }
+      }
+    ],
+    "schedules": [
+      "Daily 06:00 via Control-M job BANK_DAILY_01"
+    ],
+    "upstream": [],
+    "downstream": [
+      "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+      "real/ts-sas-legacy-analytics/Programs/Banking/daily_transaction_processing.sas",
+      "real/ts-sas-legacy-analytics/Programs/Banking/monthly_regulatory_reporting.sas",
+      "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas"
+    ]
+  },
+  "unresolved": [
+    "include /opt/sas/custom/macros/parmv.sas (real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:13) — external",
+    "include /opt/sas/custom/macros/nobs.sas (real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:14) — external",
+    "include /opt/sas/custom/macros/lock.sas (real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:15) — external",
+    "macro parmv (real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:19) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:20) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:71) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:162) — sin definición en el proyecto",
+    "macro sendmail (real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:175) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:186) — sin definición en el proyecto",
+    "macro exit (real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas:207) — sin definición en el proyecto"
+  ]
+}

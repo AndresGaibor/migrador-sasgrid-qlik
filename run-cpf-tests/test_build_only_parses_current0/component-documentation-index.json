@@ -1,0 +1,1 @@
+{"documentation_target": "Talend Studio 8.0 R2026-09", "license_profile": {"code": "TP_ALL", "label": "Talend Data Fabric"}, "components": [{"name": "tMap", "lifecycle_status": "current"}, {"name": "tDeprecatedFixture", "lifecycle_status": "deprecated"}]}

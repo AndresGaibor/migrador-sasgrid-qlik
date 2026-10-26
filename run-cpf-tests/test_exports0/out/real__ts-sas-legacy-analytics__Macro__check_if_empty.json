@@ -1,0 +1,217 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Macro/check_if_empty.sas",
+  "sha256": "0ee0d02e06beafebe30380cb4a41fad44299c88d951957438fd8319c2395f221",
+  "job_name": "job_check_if_empty",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "check_if_empty",
+      "params": [
+        "DATA"
+      ],
+      "steps": [
+        {
+          "id": "m:check_if_empty:op_119_macro_call_1",
+          "order": 1,
+          "subjob": "m:check_if_empty:s119",
+          "action": "add_component",
+          "operation_id": "op_119_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:119",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "DATA,         _req=1,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:119",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/check_if_empty.sas",
+            "line": 119,
+            "end_line": 119
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:check_if_empty:op_136_macro_call_1",
+          "order": 2,
+          "subjob": "m:check_if_empty:s136",
+          "action": "add_component",
+          "operation_id": "op_136_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:136",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "_msg=&dataset does not exist",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:136",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:check_if_empty:op_119_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/check_if_empty.sas",
+            "line": 136,
+            "end_line": 136
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:check_if_empty:op_142_macro_call_1",
+          "order": 3,
+          "subjob": "m:check_if_empty:s142",
+          "action": "add_component",
+          "operation_id": "op_142_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:142",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "_msg=Unable to open &dataset for input",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:142",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:check_if_empty:op_136_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/check_if_empty.sas",
+            "line": 142,
+            "end_line": 142
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "dataset",
+      "sas_value": null,
+      "suggested": "context.dataset",
+      "origin": "&dataset en real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:136"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:119) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:136) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:142) — sin definición en el proyecto",
+    "macro quit (real/ts-sas-legacy-analytics/Macro/check_if_empty.sas:147) — sin definición en el proyecto"
+  ]
+}

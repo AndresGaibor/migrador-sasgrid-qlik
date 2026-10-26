@@ -1,0 +1,4808 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+  "sha256": "560b94d8ca6e3e0f64a95e4e471d20e4cb919283257f3faed837036d52a6d8e9",
+  "job_name": "job_createtableorview",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "CreateTableOrView",
+      "params": [
+        "DATA",
+        "OUT",
+        "KEEP",
+        "DROP",
+        "BY",
+        "INDEX",
+        "WHERE",
+        "RENAME",
+        "META_COLUMNS",
+        "META_COLUMNS_COND",
+        "SHELL",
+        "LANG",
+        "TYPE",
+        "FILE",
+        "APPEND",
+        "RUN",
+        "PRE_PROCESS",
+        "POST_PROCESS"
+      ],
+      "steps": [
+        {
+          "id": "m:CreateTableOrView:op_573_macro_call_1",
+          "order": 1,
+          "subjob": "m:CreateTableOrView:s573",
+          "action": "add_component",
+          "operation_id": "op_573_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:573",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "DATA,               _req=1,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:573",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 573,
+            "end_line": 573
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_574_macro_call_1",
+          "order": 2,
+          "subjob": "m:CreateTableOrView:s574",
+          "action": "add_component",
+          "operation_id": "op_574_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:574",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "OUT,                _req=1,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:574",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_573_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 574,
+            "end_line": 574
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_575_macro_call_1",
+          "order": 3,
+          "subjob": "m:CreateTableOrView:s575",
+          "action": "add_component",
+          "operation_id": "op_575_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:575",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "KEEP,               _req=0,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:575",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_574_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 575,
+            "end_line": 575
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_576_macro_call_1",
+          "order": 4,
+          "subjob": "m:CreateTableOrView:s576",
+          "action": "add_component",
+          "operation_id": "op_576_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:576",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "DROP,               _req=0,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:576",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_575_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 576,
+            "end_line": 576
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_577_macro_call_1",
+          "order": 5,
+          "subjob": "m:CreateTableOrView:s577",
+          "action": "add_component",
+          "operation_id": "op_577_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:577",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "BY,                 _req=0,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:577",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_576_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 577,
+            "end_line": 577
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_578_macro_call_1",
+          "order": 6,
+          "subjob": "m:CreateTableOrView:s578",
+          "action": "add_component",
+          "operation_id": "op_578_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:578",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "INDEX,              _req=0,_words=1,_case=U,_val=0 1",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:578",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_577_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 578,
+            "end_line": 578
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_579_macro_call_1",
+          "order": 7,
+          "subjob": "m:CreateTableOrView:s579",
+          "action": "add_component",
+          "operation_id": "op_579_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:579",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "WHERE,              _req=0,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:579",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_578_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 579,
+            "end_line": 579
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_580_macro_call_1",
+          "order": 8,
+          "subjob": "m:CreateTableOrView:s580",
+          "action": "add_component",
+          "operation_id": "op_580_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:580",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "RENAME,             _req=0,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:580",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_579_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 580,
+            "end_line": 580
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_581_macro_call_1",
+          "order": 9,
+          "subjob": "m:CreateTableOrView:s581",
+          "action": "add_component",
+          "operation_id": "op_581_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:581",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "META_COLUMNS,       _req=0,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:581",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_580_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 581,
+            "end_line": 581
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_582_macro_call_1",
+          "order": 10,
+          "subjob": "m:CreateTableOrView:s582",
+          "action": "add_component",
+          "operation_id": "op_582_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:582",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "META_COLUMNS_COND,  _req=0,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:582",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_581_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 582,
+            "end_line": 582
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_583_macro_call_1",
+          "order": 11,
+          "subjob": "m:CreateTableOrView:s583",
+          "action": "add_component",
+          "operation_id": "op_583_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:583",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "SHELL,              _req=0,_words=0,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:583",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_582_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 583,
+            "end_line": 583
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_584_macro_call_1",
+          "order": 12,
+          "subjob": "m:CreateTableOrView:s584",
+          "action": "add_component",
+          "operation_id": "op_584_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:584",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "LANG,               _req=1,_words=0,_case=U,_val=SAS SQL",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:584",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_583_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 584,
+            "end_line": 584
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_585_macro_call_1",
+          "order": 13,
+          "subjob": "m:CreateTableOrView:s585",
+          "action": "add_component",
+          "operation_id": "op_585_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:585",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "TYPE,               _req=1,_words=0,_case=U,_val=TABLE VIEW",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:585",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_584_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 585,
+            "end_line": 585
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_586_macro_call_1",
+          "order": 14,
+          "subjob": "m:CreateTableOrView:s586",
+          "action": "add_component",
+          "operation_id": "op_586_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:586",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "FILE,               _req=0,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:586",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_585_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 586,
+            "end_line": 586
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_587_macro_call_1",
+          "order": 15,
+          "subjob": "m:CreateTableOrView:s587",
+          "action": "add_component",
+          "operation_id": "op_587_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:587",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "APPEND,             _req=0,_words=0,_case=U,_val=0 1",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:587",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_586_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 587,
+            "end_line": 587
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_588_macro_call_1",
+          "order": 16,
+          "subjob": "m:CreateTableOrView:s588",
+          "action": "add_component",
+          "operation_id": "op_588_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:588",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "RUN,                _req=0,_words=0,_case=U,_val=0 1",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:588",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_587_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 588,
+            "end_line": 588
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_589_macro_call_1",
+          "order": 17,
+          "subjob": "m:CreateTableOrView:s589",
+          "action": "add_component",
+          "operation_id": "op_589_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:589",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "PRE_PROCESS,        _req=0,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:589",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_588_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 589,
+            "end_line": 589
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_590_macro_call_1",
+          "order": 18,
+          "subjob": "m:CreateTableOrView:s590",
+          "action": "add_component",
+          "operation_id": "op_590_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:590",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "POST_PROCESS,       _req=0,_words=1,_case=N",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:590",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_589_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 590,
+            "end_line": 590
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_611_macro_call_1",
+          "order": 19,
+          "subjob": "m:CreateTableOrView:s611",
+          "action": "add_component",
+          "operation_id": "op_611_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:611",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "_msg=&data data set or view does not exist",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:611",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_590_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 611,
+            "end_line": 611
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_617_macro_call_1",
+          "order": 20,
+          "subjob": "m:CreateTableOrView:s617",
+          "action": "add_component",
+          "operation_id": "op_617_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:617",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "_msg=The descending option is not supported for indexes",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:617",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_611_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 617,
+            "end_line": 617
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_625_macro_call_1",
+          "order": 21,
+          "subjob": "m:CreateTableOrView:s625",
+          "action": "add_component",
+          "operation_id": "op_625_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:625",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "_msg=Indexes are not supported for views",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:625",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_617_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 625,
+            "end_line": 625
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_697_macro_call_1",
+          "order": 22,
+          "subjob": "m:CreateTableOrView:s697",
+          "action": "add_component",
+          "operation_id": "op_697_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %dump_mvars",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "dump_mvars",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:697",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "\r\n   data     data_libname   data_memname   data_options\r\n   out      out_libname    out_memname    out_options\r\n   shell    shell_libname  shell_memname\r\n   dslabel\r\n   keep\r\n   drop\r\n   rename\r\n   where\r\n   by\r\n   index    index_stmt\r\n   file     run\r\n",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:697",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_625_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %dump_mvars (definida en real/ts-sas-legacy-analytics/Macro/batch_submit.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 697,
+            "end_line": 709
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_716_maintenance_1",
+          "order": 23,
+          "subjob": "m:CreateTableOrView:s716",
+          "action": "add_component",
+          "operation_id": "op_716_maintenance_1",
+          "operation_type": "maintenance",
+          "component_candidate": "tDBRow",
+          "alternatives": [
+            "ninguno"
+          ],
+          "purpose": "Mantenimiento de datasets",
+          "properties": [
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_697_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Decidir si la operación de mantenimiento aplica en el destino"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 716,
+            "end_line": 718
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_758_macro_call_1",
+          "order": 24,
+          "subjob": "m:CreateTableOrView:s758",
+          "action": "add_component",
+          "operation_id": "op_758_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %parmv",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "parmv",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:758",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "_msg=&_out_fileref fileref is not allocated",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:758",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_716_maintenance_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 758,
+            "end_line": 758
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_787_read_1",
+          "order": 25,
+          "subjob": "m:CreateTableOrView:s786",
+          "action": "add_component",
+          "operation_id": "op_787_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer dictionary.columns",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "columns",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_758_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería dictionary es de tipo BASE: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_787_read_1_row_count",
+            "vc_m:CreateTableOrView:op_787_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 787,
+            "end_line": 798
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_787_filter_1",
+          "order": 26,
+          "subjob": "m:CreateTableOrView:s786",
+          "action": "add_component",
+          "operation_id": "op_787_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (WHERE): libname=\"%upcase(&data_libname)\" and memname=\"%upcase(&data_memname)\"",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": "&&",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": "libname == \"%upcase(&data_libname)\"; memname == \"%upcase(&data_memname)\"",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "false",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "libname",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787"
+            },
+            {
+              "name": "memname",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_787_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "libname=\"%upcase(&data_libname)\" and memname=\"%upcase(&data_memname)\"",
+              "talend": "(input_row.libname.equals(\"%upcase(&data_libname)\") && input_row.memname.equals(\"%upcase(&data_memname)\"))",
+              "line": 787,
+              "requires_semantic_validation": true,
+              "warnings": []
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_787_filter_1_row_count",
+            "vc_m:CreateTableOrView:op_787_filter_1_nulls",
+            "vc_m:CreateTableOrView:op_787_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 787,
+            "end_line": 798
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_787_project_1",
+          "order": 27,
+          "subjob": "m:CreateTableOrView:s786",
+          "action": "add_component",
+          "operation_id": "op_787_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "_order_, _uname_, &vars_sql",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "_order_",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787"
+            },
+            {
+              "name": "_uname_",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787"
+            },
+            {
+              "name": "name",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_787_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "monotonic()+2000",
+              "talend": null,
+              "line": 787,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función monotonic"
+              ]
+            },
+            {
+              "sas": "upcase(name)",
+              "talend": "input_row.name.toUpperCase()",
+              "line": 787,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "upcase(): comprobar nulos antes de invocar el método"
+              ]
+            },
+            {
+              "sas": "&vars_sql",
+              "talend": "context.vars_sql",
+              "line": 787,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &vars_sql → context.vars_sql (crear variable de contexto)"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_787_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 787,
+            "end_line": 798
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_787_sort_1",
+          "order": 28,
+          "subjob": "m:CreateTableOrView:s786",
+          "action": "add_component",
+          "operation_id": "op_787_sort_1",
+          "operation_type": "sort",
+          "component_candidate": "tSortRow",
+          "alternatives": [],
+          "purpose": "Ordenar por varnum",
+          "properties": [
+            {
+              "name": "CRITERIA",
+              "value": "varnum",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Criteria",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "varnum",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_787_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_787_sort_1_ordering"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 787,
+            "end_line": 798
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_787_write_1",
+          "order": 29,
+          "subjob": "m:CreateTableOrView:s786",
+          "action": "add_component",
+          "operation_id": "op_787_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir _meta_source_ (reemplaza)",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_meta_source_",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_787_sort_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_787_write_1_row_count",
+            "vc_m:CreateTableOrView:op_787_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 787,
+            "end_line": 798
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_803_read_1",
+          "order": 30,
+          "subjob": "m:CreateTableOrView:s802",
+          "action": "add_component",
+          "operation_id": "op_803_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer dictionary.columns",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "columns",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_787_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería dictionary es de tipo BASE: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_803_read_1_row_count",
+            "vc_m:CreateTableOrView:op_803_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 803,
+            "end_line": 814
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_803_filter_1",
+          "order": 31,
+          "subjob": "m:CreateTableOrView:s802",
+          "action": "add_component",
+          "operation_id": "op_803_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (WHERE): libname=\"%upcase(&shell_libname)\" and memname=\"%upcase(&shell_memname)\"",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": "&&",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": "libname == \"%upcase(&shell_libname)\"; memname == \"%upcase(&shell_memname)\"",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "false",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "libname",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803"
+            },
+            {
+              "name": "memname",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_803_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "libname=\"%upcase(&shell_libname)\" and memname=\"%upcase(&shell_memname)\"",
+              "talend": "(input_row.libname.equals(\"%upcase(&shell_libname)\") && input_row.memname.equals(\"%upcase(&shell_memname)\"))",
+              "line": 803,
+              "requires_semantic_validation": true,
+              "warnings": []
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_803_filter_1_row_count",
+            "vc_m:CreateTableOrView:op_803_filter_1_nulls",
+            "vc_m:CreateTableOrView:op_803_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 803,
+            "end_line": 814
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_803_project_1",
+          "order": 32,
+          "subjob": "m:CreateTableOrView:s802",
+          "action": "add_component",
+          "operation_id": "op_803_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "_order_, _uname_, &vars_sql",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "_order_",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803"
+            },
+            {
+              "name": "_uname_",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803"
+            },
+            {
+              "name": "name",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_803_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "monotonic()",
+              "talend": null,
+              "line": 803,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función monotonic"
+              ]
+            },
+            {
+              "sas": "upcase(name)",
+              "talend": "input_row.name.toUpperCase()",
+              "line": 803,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "upcase(): comprobar nulos antes de invocar el método"
+              ]
+            },
+            {
+              "sas": "&vars_sql",
+              "talend": "context.vars_sql",
+              "line": 803,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Macrovariable &vars_sql → context.vars_sql (crear variable de contexto)"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_803_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 803,
+            "end_line": 814
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_803_sort_1",
+          "order": 33,
+          "subjob": "m:CreateTableOrView:s802",
+          "action": "add_component",
+          "operation_id": "op_803_sort_1",
+          "operation_type": "sort",
+          "component_candidate": "tSortRow",
+          "alternatives": [],
+          "purpose": "Ordenar por varnum",
+          "properties": [
+            {
+              "name": "CRITERIA",
+              "value": "varnum",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Criteria",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "varnum",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_803_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_803_sort_1_ordering"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 803,
+            "end_line": 814
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_803_write_1",
+          "order": 34,
+          "subjob": "m:CreateTableOrView:s802",
+          "action": "add_component",
+          "operation_id": "op_803_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir _meta_shell_ (reemplaza)",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_meta_shell_",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_803_sort_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_803_write_1_row_count",
+            "vc_m:CreateTableOrView:op_803_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 803,
+            "end_line": 814
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_820_project_1",
+          "order": 35,
+          "subjob": "m:CreateTableOrView:s819",
+          "action": "add_component",
+          "operation_id": "op_820_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "_order_, _uname_, *",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:820",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "_order_",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:820"
+            },
+            {
+              "name": "_uname_",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:820"
+            },
+            {
+              "name": "name",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:820"
+            }
+          ],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_803_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "monotonic()+1000",
+              "talend": null,
+              "line": 820,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función monotonic"
+              ]
+            },
+            {
+              "sas": "upcase(name)",
+              "talend": "input_row.name.toUpperCase()",
+              "line": 820,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "upcase(): comprobar nulos antes de invocar el método"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_820_project_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 820,
+            "end_line": 826
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_820_write_1",
+          "order": 36,
+          "subjob": "m:CreateTableOrView:s819",
+          "action": "add_component",
+          "operation_id": "op_820_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir _meta_columns_ (reemplaza)",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_meta_columns_",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:820",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:820",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:820",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_820_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_820_write_1_row_count",
+            "vc_m:CreateTableOrView:op_820_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 820,
+            "end_line": 826
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_827_unsupported_1",
+          "order": 37,
+          "subjob": "m:CreateTableOrView:s819",
+          "action": "manual_decision",
+          "operation_id": "op_827_unsupported_1",
+          "operation_type": "unsupported",
+          "component_candidate": "por_determinar",
+          "alternatives": [],
+          "purpose": "Lógica sin traducción definida",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_820_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Documentar la lógica y decidir el diseño manualmente"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 827,
+            "end_line": 828
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_837_compute_1",
+          "order": 38,
+          "subjob": "m:CreateTableOrView:s837",
+          "action": "add_component",
+          "operation_id": "op_837_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "8 asignaciones, 0 condicionales",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "buffer",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837"
+            },
+            {
+              "name": "rx",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837"
+            },
+            {
+              "name": "i",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837"
+            },
+            {
+              "name": "word",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837"
+            },
+            {
+              "name": "name",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837"
+            },
+            {
+              "name": "_uname_",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837"
+            }
+          ],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_827_unsupported_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "\"&rename\"",
+              "talend": "\"&rename\"",
+              "line": 839,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "prxparse(\"s/\\s*=\\s*/=/\")",
+              "talend": null,
+              "line": 842,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función prxparse"
+              ]
+            },
+            {
+              "sas": "prxchange(rx,-1,buffer)",
+              "talend": null,
+              "line": 843,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función prxchange"
+              ]
+            },
+            {
+              "sas": "1",
+              "talend": "1",
+              "line": 845,
+              "requires_semantic_validation": true,
+              "warnings": []
+            },
+            {
+              "sas": "scan(buffer,i,\" \")",
+              "talend": null,
+              "line": 846,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función scan"
+              ]
+            },
+            {
+              "sas": "scan(word,1,\"=\")",
+              "talend": null,
+              "line": 848,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función scan"
+              ]
+            },
+            {
+              "sas": "upcase(name)",
+              "talend": "input_row.name.toUpperCase()",
+              "line": 850,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "upcase(): comprobar nulos antes de invocar el método"
+              ]
+            },
+            {
+              "sas": "scan(buffer,i,\" \")",
+              "talend": null,
+              "line": 853,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función scan"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_837_compute_1_nulls",
+            "vc_m:CreateTableOrView:op_837_compute_1_dates",
+            "vc_m:CreateTableOrView:op_837_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 837,
+            "end_line": 856
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_837_select_columns_1",
+          "order": 39,
+          "subjob": "m:CreateTableOrView:s837",
+          "action": "add_component",
+          "operation_id": "op_837_select_columns_1",
+          "operation_type": "select_columns",
+          "component_candidate": "tFilterColumns",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Conservar/descartar columnas",
+          "properties": [
+            {
+              "name": "SCHEMA",
+              "value": "keep: _uname_, name, rename",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Schema",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "_uname_",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837"
+            },
+            {
+              "name": "name",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837"
+            },
+            {
+              "name": "rename",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_837_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_837_select_columns_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 837,
+            "end_line": 856
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_837_rename_1",
+          "order": 40,
+          "subjob": "m:CreateTableOrView:s837",
+          "action": "add_component",
+          "operation_id": "op_837_rename_1",
+          "operation_type": "rename",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Renombrar columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_837_select_columns_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_837_rename_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 837,
+            "end_line": 856
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_837_write_1",
+          "order": 41,
+          "subjob": "m:CreateTableOrView:s837",
+          "action": "add_component",
+          "operation_id": "op_837_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir _meta_rename_",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_meta_rename_",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:837",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_837_rename_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_837_write_1_row_count",
+            "vc_m:CreateTableOrView:op_837_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 837,
+            "end_line": 856
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_859_read_1",
+          "order": 42,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_859_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer %if",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "%if",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_837_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_859_read_1_row_count",
+            "vc_m:CreateTableOrView:op_859_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 859,
+            "end_line": 888
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_859_read_2",
+          "order": 43,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_859_read_2",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer %sysfunc",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "%sysfunc",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_859_read_2_row_count",
+            "vc_m:CreateTableOrView:op_859_read_2_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 859,
+            "end_line": 888
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_859_read_3",
+          "order": 44,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_859_read_3",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer %then",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "%then",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_859_read_3_row_count",
+            "vc_m:CreateTableOrView:op_859_read_3_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 859,
+            "end_line": 888
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_859_read_4",
+          "order": 45,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_859_read_4",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer _meta_source_",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_meta_source_",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_859_read_4_row_count",
+            "vc_m:CreateTableOrView:op_859_read_4_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 859,
+            "end_line": 888
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_859_rename_1",
+          "order": 46,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_859_rename_1",
+          "operation_type": "rename",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Renombrar columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "_order_ → _order_so",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "_order_so",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_859_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_859_rename_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 859,
+            "end_line": 888
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_859_join_1",
+          "order": 47,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_859_join_1",
+          "operation_type": "join",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJoin"
+          ],
+          "purpose": "Unir (merge_by): %if, %sysfunc, %then, work._meta_source_",
+          "properties": [
+            {
+              "name": "Join model",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Match model",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expression key",
+              "value": "_uname_",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "_uname_",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_859_read_1",
+              "label": null
+            },
+            {
+              "type": "Lookup",
+              "from_step": "m:CreateTableOrView:op_859_read_2",
+              "label": null
+            },
+            {
+              "type": "Lookup",
+              "from_step": "m:CreateTableOrView:op_859_read_3",
+              "label": null
+            },
+            {
+              "type": "Lookup",
+              "from_step": "m:CreateTableOrView:op_859_read_4",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "MERGE BY no es un join SQL: con claves repetidas en ambos lados el resultado difiere"
+          ],
+          "pending": [
+            "Columnas clave y tipos en ambos lados",
+            "Determinar el tipo de join (el programa no usa `if a;`/`if a and b;` de forma reconocible)"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_859_join_1_duplicates",
+            "vc_m:CreateTableOrView:op_859_join_1_row_count",
+            "vc_m:CreateTableOrView:op_859_join_1_nulls"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 859,
+            "end_line": 888
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_875_filter_1",
+          "order": 48,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_875_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (IF subsetting): _uname_ in (%upcase(%seplist(&keep,nest=QQ)))",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_859_join_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "_uname_ in (%upcase(%seplist(&keep,nest=QQ)))",
+              "talend": null,
+              "line": 875,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: token no soportado: '%upcase(%sep'"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [
+            "Traducir la condición manualmente (no hay traducción automática segura)"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_875_filter_1_row_count",
+            "vc_m:CreateTableOrView:op_875_filter_1_nulls",
+            "vc_m:CreateTableOrView:op_875_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 875,
+            "end_line": 888
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_885_filter_1",
+          "order": 49,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_885_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (IF subsetting): in_meta",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": "true",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:885",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": "input_row.in_meta",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:885",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "in_meta",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:885"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_875_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "in_meta",
+              "talend": "input_row.in_meta",
+              "line": 885,
+              "requires_semantic_validation": true,
+              "warnings": []
+            }
+          ],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_885_filter_1_row_count",
+            "vc_m:CreateTableOrView:op_885_filter_1_nulls",
+            "vc_m:CreateTableOrView:op_885_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 885,
+            "end_line": 888
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_859_compute_1",
+          "order": 50,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_859_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "2 asignaciones, 2 condicionales",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "_order_",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859"
+            },
+            {
+              "name": "in_meta",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_885_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "coalesce(_order_sh,_order_md,_order_so)",
+              "talend": null,
+              "line": 870,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función coalesce"
+              ]
+            },
+            {
+              "sas": "max(0,in_shell,in_columns,in_rename)",
+              "talend": null,
+              "line": 878,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función max"
+              ]
+            },
+            {
+              "sas": "if _uname_ in (%upcase(%seplist(&drop,nest=QQ))) then delete",
+              "talend": null,
+              "line": 874,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "if (in_meta and not in_source) then do",
+              "talend": null,
+              "line": 880,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            }
+          ],
+          "assumptions": [
+            "Lógica condicional: revisar orden de evaluación y valores missing"
+          ],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_859_compute_1_nulls",
+            "vc_m:CreateTableOrView:op_859_compute_1_dates",
+            "vc_m:CreateTableOrView:op_859_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 859,
+            "end_line": 888
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_859_select_columns_1",
+          "order": 51,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_859_select_columns_1",
+          "operation_type": "select_columns",
+          "component_candidate": "tFilterColumns",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Conservar/descartar columnas",
+          "properties": [
+            {
+              "name": "SCHEMA",
+              "value": "drop: _order_so, _order_sh, _order_md, in_source, in_shell, in_columns, in_rename",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Schema",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_859_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_859_select_columns_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 859,
+            "end_line": 888
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_859_write_1",
+          "order": 52,
+          "subjob": "m:CreateTableOrView:s859",
+          "action": "add_component",
+          "operation_id": "op_859_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir _meta_columns_",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_meta_columns_",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:859",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_859_select_columns_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_859_write_1_row_count",
+            "vc_m:CreateTableOrView:op_859_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 859,
+            "end_line": 888
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_889_read_1",
+          "order": 53,
+          "subjob": "m:CreateTableOrView:s889",
+          "action": "add_component",
+          "operation_id": "op_889_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer _meta_columns_",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_meta_columns_",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:889",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:CreateTableOrView:op_859_write_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_889_read_1_row_count",
+            "vc_m:CreateTableOrView:op_889_read_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 889,
+            "end_line": 901
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_889_compute_1",
+          "order": 54,
+          "subjob": "m:CreateTableOrView:s889",
+          "action": "add_component",
+          "operation_id": "op_889_compute_1",
+          "operation_type": "compute",
+          "component_candidate": "tMap",
+          "alternatives": [
+            "tJavaRow"
+          ],
+          "purpose": "Calcular columnas (asignaciones y condicionales)",
+          "properties": [
+            {
+              "name": "Expressions",
+              "value": "1 asignaciones, 3 condicionales",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:889",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Var table",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [
+            {
+              "name": "buffer",
+              "talend_type": null,
+              "nullable": null,
+              "length": null,
+              "precision": null,
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:889"
+            }
+          ],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_889_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "catx(\" \",buffer,name)",
+              "talend": null,
+              "line": 896,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función catx"
+              ]
+            },
+            {
+              "sas": "if ^missing(rename) then buffer2=catx(\" \",buffer2,catx(\"=\",name,rename))",
+              "talend": null,
+              "line": 897,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "if (eof) then call symputx(\"keep\",buffer,\"F\")",
+              "talend": null,
+              "line": 898,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            },
+            {
+              "sas": "if (eof) then call symputx(\"rename\",buffer2,\"F\")",
+              "talend": null,
+              "line": 899,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+              ]
+            }
+          ],
+          "assumptions": [
+            "Lógica condicional: revisar orden de evaluación y valores missing"
+          ],
+          "pending": [
+            "Tipos de las columnas calculadas"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_889_compute_1_nulls",
+            "vc_m:CreateTableOrView:op_889_compute_1_dates",
+            "vc_m:CreateTableOrView:op_889_compute_1_numeric"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 889,
+            "end_line": 901
+          },
+          "confidence": "medium",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_889_stateful_1",
+          "order": 55,
+          "subjob": "m:CreateTableOrView:s889",
+          "action": "manual_decision",
+          "operation_id": "op_889_stateful_1",
+          "operation_type": "stateful",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tSortRow + tAggregateRow",
+            "tJavaRow",
+            "tMap con variables"
+          ],
+          "purpose": "Lógica con estado entre filas (RETAIN/FIRST./LAST./ARRAY/hash)",
+          "properties": [],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_889_compute_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Estado entre filas: no hay traducción directa a un componente; requiere diseño manual"
+          ],
+          "pending": [
+            "Diseño manual de la lógica con estado entre filas (RETAIN/FIRST./LAST.)"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_889_stateful_1_ordering",
+            "vc_m:CreateTableOrView:op_889_stateful_1_duplicates"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 889,
+            "end_line": 901
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:CreateTableOrView:op_889_select_columns_1",
+          "order": 56,
+          "subjob": "m:CreateTableOrView:s889",
+          "action": "add_component",
+          "operation_id": "op_889_select_columns_1",
+          "operation_type": "select_columns",
+          "component_candidate": "tFilterColumns",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Conservar/descartar columnas",
+          "properties": [
+            {
+              "name": "SCHEMA",
+              "value": "drop: buffer, buffer2",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:889",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Schema",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_889_stateful_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:CreateTableOrView:op_889_select_columns_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 889,
+            "end_line": 901
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:CreateTableOrView:op_889_write_1",
+          "order": 57,
+          "subjob": "m:CreateTableOrView:s889",
+          "action": "add_component",
+          "operation_id": "op_889_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir _meta_columns_",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "_meta_columns_",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:889",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:889",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:889",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:CreateTableOrView:op_889_select_columns_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+          ],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:CreateTableOrView:op_889_write_1_row_count",
+            "vc_m:CreateTableOrView:op_889_write_1_schema"
+          ],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas",
+            "line": 889,
+            "end_line": 901
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        }
+      ]
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "vc_m:CreateTableOrView:op_787_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_787_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_787_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:CreateTableOrView:op_787_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_787_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_787_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_787_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:CreateTableOrView:op_787_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_787_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:CreateTableOrView:op_787_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_787_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:CreateTableOrView:op_787_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_787_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:CreateTableOrView:op_787_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_787_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:CreateTableOrView:op_787_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_787_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:CreateTableOrView:op_787_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_803_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_803_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_803_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:CreateTableOrView:op_803_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_803_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_803_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_803_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:CreateTableOrView:op_803_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_803_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:CreateTableOrView:op_803_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_803_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:CreateTableOrView:op_803_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_803_sort_1_ordering",
+      "kind": "ordering",
+      "description": "Solo si el orden forma parte del contrato; SAS ordena missing primero",
+      "applies_to": [
+        "m:CreateTableOrView:op_803_sort_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_803_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:CreateTableOrView:op_803_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_803_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:CreateTableOrView:op_803_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_820_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:CreateTableOrView:op_820_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_820_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:CreateTableOrView:op_820_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_820_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:CreateTableOrView:op_820_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_837_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:CreateTableOrView:op_837_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_837_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:CreateTableOrView:op_837_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_837_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:CreateTableOrView:op_837_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_837_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:CreateTableOrView:op_837_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_837_rename_1_schema",
+      "kind": "schema",
+      "description": "Nombres de columna finales",
+      "applies_to": [
+        "m:CreateTableOrView:op_837_rename_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_837_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:CreateTableOrView:op_837_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_837_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:CreateTableOrView:op_837_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_read_3_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_read_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_read_3_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_read_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_read_4_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_read_4"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_read_4_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_read_4"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_rename_1_schema",
+      "kind": "schema",
+      "description": "Nombres de columna finales",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_rename_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_875_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_875_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_875_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:CreateTableOrView:op_875_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_875_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:CreateTableOrView:op_875_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_885_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_885_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_885_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:CreateTableOrView:op_885_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_885_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:CreateTableOrView:op_885_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_859_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:CreateTableOrView:op_859_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_889_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:CreateTableOrView:op_889_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_889_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:CreateTableOrView:op_889_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_889_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:CreateTableOrView:op_889_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_889_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:CreateTableOrView:op_889_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_889_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:CreateTableOrView:op_889_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_889_stateful_1_ordering",
+      "kind": "ordering",
+      "description": "Resultado depende del orden de entrada: probar con datos desordenados y con claves repetidas",
+      "applies_to": [
+        "m:CreateTableOrView:op_889_stateful_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_889_stateful_1_duplicates",
+      "kind": "duplicates",
+      "description": "Grupos de una sola fila y de muchas filas",
+      "applies_to": [
+        "m:CreateTableOrView:op_889_stateful_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_889_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:CreateTableOrView:op_889_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_889_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:CreateTableOrView:op_889_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:CreateTableOrView:op_889_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:CreateTableOrView:op_889_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "_out_fileref",
+      "sas_value": null,
+      "suggested": "context._out_fileref",
+      "origin": "&_out_fileref en real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:758"
+    },
+    {
+      "name": "data",
+      "sas_value": null,
+      "suggested": "context.data",
+      "origin": "&data en real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:611"
+    },
+    {
+      "name": "data_libname",
+      "sas_value": null,
+      "suggested": "context.data_libname",
+      "origin": "&data_libname en real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787"
+    },
+    {
+      "name": "data_memname",
+      "sas_value": null,
+      "suggested": "context.data_memname",
+      "origin": "&data_memname en real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787"
+    },
+    {
+      "name": "shell_libname",
+      "sas_value": null,
+      "suggested": "context.shell_libname",
+      "origin": "&shell_libname en real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803"
+    },
+    {
+      "name": "shell_memname",
+      "sas_value": null,
+      "suggested": "context.shell_memname",
+      "origin": "&shell_memname en real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:803"
+    },
+    {
+      "name": "vars_sql",
+      "sas_value": null,
+      "suggested": "context.vars_sql",
+      "origin": "&vars_sql en real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:787"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "dictionary",
+      "engine": null,
+      "path": null,
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "dataset_dynamic &data (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:996) — nombre de dataset con macrovariables",
+    "dataset_dynamic &out (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:996) — nombre de dataset con macrovariables",
+    "dataset_dynamic &out (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:1042) — nombre de dataset con macrovariables",
+    "dataset_dynamic &out_saved (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:1042) — nombre de dataset con macrovariables",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:573) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:574) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:575) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:576) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:577) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:578) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:579) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:580) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:581) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:582) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:583) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:584) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:585) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:586) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:587) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:588) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:589) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:590) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:611) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:617) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:625) — sin definición en el proyecto",
+    "macro data_attr (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:640) — sin definición en el proyecto",
+    "macro count_words (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:683) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:758) — sin definición en el proyecto",
+    "macro seplist (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:780) — sin definición en el proyecto",
+    "macro seplist (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:874) — sin definición en el proyecto",
+    "macro seplist (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:875) — sin definición en el proyecto",
+    "macro varexist (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:954) — sin definición en el proyecto",
+    "macro loop (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:1098) — sin definición en el proyecto",
+    "macro splitvar (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:1166) — sin definición en el proyecto",
+    "macro splitvar (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:1184) — sin definición en el proyecto",
+    "macro loop (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:1345) — sin definición en el proyecto",
+    "macro quit (real/ts-sas-legacy-analytics/Macro/CreateTableOrView.sas:1534) — sin definición en el proyecto"
+  ]
+}

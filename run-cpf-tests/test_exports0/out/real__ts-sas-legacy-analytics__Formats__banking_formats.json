@@ -1,0 +1,113 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Formats/banking_formats.sas",
+  "sha256": "3d292f2a22435955cd7cda15ad4f4ca5b5980bcfc975e118652e3d4e24d0999a",
+  "job_name": "job_banking_formats",
+  "steps": [
+    {
+      "id": "op_12_format_definition_1",
+      "order": 1,
+      "subjob": "s12",
+      "action": "add_component",
+      "operation_id": "op_12_format_definition_1",
+      "operation_type": "format_definition",
+      "component_candidate": "tFixedFlowInput",
+      "alternatives": [
+        "tMap (lookup)",
+        "Rutina Java"
+      ],
+      "purpose": "Definir formatos como tabla de lookup",
+      "properties": [
+        {
+          "name": "USE_INTABLE",
+          "value": "true",
+          "origin": "SAS real/ts-sas-legacy-analytics/Formats/banking_formats.sas:12",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use Inline Table",
+          "options": []
+        },
+        {
+          "name": "INTABLE",
+          "value": "ACCTTYPE | CHK | Checking\nACCTTYPE | SAV | Savings\nACCTTYPE | MMA | Money Market\nACCTTYPE | CD | Certificate of Deposit\nACCTTYPE | IRA | Individual Retirement\nACCTTYPE | LOC | Line of Credit\nACCTTYPE | MTG | Mortgage\nACCTTYPE | AUTO | Auto Loan\nACCTTYPE | PERS | Personal Loan\nACCTTYPE | CC | Credit Card\nACCTTYPE | HELC | Home Equity LOC\nACCTTYPE | OTHER | Unknown\nACCTSTAT | A | Active\nACCTSTAT | C | Closed\nACCTSTAT | D | Dormant\nACCTSTAT | F | Frozen\nACCTSTAT | R | Restricted\nACCTSTAT | S | Suspended\nACCTSTAT | P | Pending\nACCTSTAT | W | Written Off\nACCTSTAT | OTHER | Unknown\nRISKRATE | 1 | Minimal Risk\nRISKRATE | 2 | Low Risk\nRISKRATE | 3 | Moderate Risk\nRISKRATE | 4 | Elevated Risk\nRISKRATE | 5 | High Risk\nRISKRATE | 6 | Very High Risk\nRISKRATE | 7 | Loss Expected\nRISKRATE | OTHER | Not Rated\nTXNCAT | DEP | Deposit\nTXNCAT | WDR | Withdrawal\nTXNCAT | TRF | Transfer\nTXNCAT | PMT | Payment\nTXNCAT | FEE | Fee\nTXNCAT | INT | Interest\nTXNCAT | ADJ | Adjustment\nTXNCAT | REV | Reversal\nTXNCAT | CHG | Charge\nTXNCAT | REF | Refund\nTXNCAT | OTHER | Other\nDELQBKT | 0 | Current\nDELQBKT | 1-29 | 1-29 Days\nDELQBKT | 30-59 | 30-59 Days\nDELQBKT | 60-89 | 60-89 Days\nDELQBKT | 90-119 | 90-119 Days\nDELQBKT | 120-179 | 120-179 Days\nDELQBKT | 180-HIGH | 180+ Days\nBALRANGE | LOW-<0 | Negative\nBALRANGE | 0 | Zero\nBALRANGE | 0<-<1000 | $0-$999\nBALRANGE | 1000-<5000 | $1K-$4,999\nBALRANGE | 5000-<25000 | $5K-$24,999\nBALRANGE | 25000-<100000 | $25K-$99,999\nBALRANGE | 100000-<500000 | $100K-$499,999\nBALRANGE | 500000-HIGH | $500K+\nREGION | NE | Northeast\nREGION | SE | Southeast\nREGION | MW | Midwest\nREGION | SW | Southwest\nREGION | W | West\nREGION | NW | Northwest\nREGION | HQ | Headquarters\nREGION | OTHER | Unknown\nCUSTSEG | RET | Retail\nCUSTSEG | PREM | Premium\nCUSTSEG | PB | Private Banking\nCUSTSEG | SMB | Small Business\nCUSTSEG | COMM | Commercial\nCUSTSEG | CORP | Corporate\nCUSTSEG | OTHER | Unclassified\nLNPURP | PURCH | Purchase\nLNPURP | REFI | Refinance\nLNPURP | CASHOUT | Cash-Out Refinance\nLNPURP | CONST | Construction\nLNPURP | RENO | Renovation\nLNPURP | CONSOL | Debt Consolidation\nLNPURP | EDUC | Education\nLNPURP | MEDIC | Medical\nLNPURP | OTHER | Other",
+          "origin": "SAS real/ts-sas-legacy-analytics/Formats/banking_formats.sas:12",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Inline Table",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "FORMAT",
+          "talend_type": "String",
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Formats/banking_formats.sas:12"
+        },
+        {
+          "name": "CODE",
+          "talend_type": "String",
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Formats/banking_formats.sas:12"
+        },
+        {
+          "name": "LABEL",
+          "talend_type": "String",
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Formats/banking_formats.sas:12"
+        }
+      ],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Confirmar cómo aplicar el formato: los rangos y OTHER necesitan lógica equivalente, no solo una tabla de filas"
+      ],
+      "tests": [
+        "vc_op_12_format_definition_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Formats/banking_formats.sas",
+        "line": 12,
+        "end_line": 129
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput/tfixedflowinput-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_op_12_format_definition_1_schema",
+      "kind": "schema",
+      "description": "Valores formateados iguales para todo el rango",
+      "applies_to": [
+        "op_12_format_definition_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

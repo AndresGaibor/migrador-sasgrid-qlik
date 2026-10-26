@@ -1,0 +1,305 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ci360-download-client/macros/dsc_download.sas",
+  "sha256": "1c4e03a8464b5b753d0100ccd00a1a2bcdab8453229c035f0b8e15ca3a311750",
+  "job_name": "job_dsc_download",
+  "steps": [
+    {
+      "id": "op_37_maintenance_1",
+      "order": 1,
+      "subjob": "s37",
+      "action": "add_component",
+      "operation_id": "op_37_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ci360-download-client/macros/dsc_download.sas",
+        "line": 37,
+        "end_line": 37
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_157_macro_call_1",
+      "order": 2,
+      "subjob": "s157",
+      "action": "add_component",
+      "operation_id": "op_157_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %dsc_download_data",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "dsc_download_data",
+          "origin": "SAS real/ci360-download-client/macros/dsc_download.sas:157",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "mart_nm=&mart_nm., reset_day_offset=&reset_day_offset.",
+          "origin": "SAS real/ci360-download-client/macros/dsc_download.sas:157",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_37_maintenance_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ci360-download-client/macros/dsc_download.sas",
+        "line": 157,
+        "end_line": 157
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_162_maintenance_1",
+      "order": 3,
+      "subjob": "s162",
+      "action": "add_component",
+      "operation_id": "op_162_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_157_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ci360-download-client/macros/dsc_download.sas",
+        "line": 162,
+        "end_line": 162
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "AUTORESET",
+      "sas_value": "yes",
+      "suggested": "context.AUTORESET",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "CATEGORY",
+      "sas_value": "",
+      "suggested": "context.CATEGORY",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "CODE",
+      "sas_value": "",
+      "suggested": "context.CODE",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_AGENT_NAME",
+      "sas_value": "ci360_agent",
+      "suggested": "context.DSC_AGENT_NAME",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_DOWNLOAD_URL",
+      "sas_value": "%nrstr(https://extapigwservice-prod.ci360.sas.com/marketingGateway/discoverService/dataDownload/eventData/)",
+      "suggested": "context.DSC_DOWNLOAD_URL",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_FILE_READ_OPTION",
+      "sas_value": "%str(LRECL=60000 MISSOVER)",
+      "suggested": "context.DSC_FILE_READ_OPTION",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_HTTP_MAX_RETRY_ATTEMPTS",
+      "sas_value": "3",
+      "suggested": "context.DSC_HTTP_MAX_RETRY_ATTEMPTS",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_HTTP_RETRY_WAIT_SEC",
+      "sas_value": "5",
+      "suggested": "context.DSC_HTTP_RETRY_WAIT_SEC",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_LOAD_END_DTTM",
+      "sas_value": "%nrquote(12Nov2019 13:59:59)",
+      "suggested": "context.DSC_LOAD_END_DTTM",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_LOAD_START_DTTM",
+      "sas_value": "%nrquote(12Nov2019 13:00:00)",
+      "suggested": "context.DSC_LOAD_START_DTTM",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_PROXY_AUTH",
+      "sas_value": "",
+      "suggested": "context.DSC_PROXY_AUTH",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_PROXY_HOST",
+      "sas_value": "",
+      "suggested": "context.DSC_PROXY_HOST",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_PROXY_PORT",
+      "sas_value": "",
+      "suggested": "context.DSC_PROXY_PORT",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_SCHEMA_VERSION",
+      "sas_value": "1",
+      "suggested": "context.DSC_SCHEMA_VERSION",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_SECRET_KEY",
+      "sas_value": "***",
+      "suggested": "context.DSC_SECRET_KEY",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_SUB_HOURLY_MINUTES",
+      "sas_value": "60",
+      "suggested": "context.DSC_SUB_HOURLY_MINUTES",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "DSC_TENANT_ID",
+      "sas_value": "%str(abc123-ci360-tenant-id-xyz)",
+      "suggested": "context.DSC_TENANT_ID",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "mart_nm",
+      "sas_value": "detail",
+      "suggested": "context.mart_nm",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "RESET_DAY_OFFSET",
+      "sas_value": "60",
+      "suggested": "context.RESET_DAY_OFFSET",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "reset_day_offset",
+      "sas_value": null,
+      "suggested": "context.reset_day_offset",
+      "origin": "&reset_day_offset en real/ci360-download-client/macros/dsc_download.sas:157"
+    },
+    {
+      "name": "UtilityLocation",
+      "sas_value": "C:\\dev\\Client",
+      "suggested": "context.UtilityLocation",
+      "origin": "%LET de primer nivel"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro left (real/ci360-download-client/macros/dsc_download.sas:37) — sin definición en el proyecto",
+    "macro dsc_download_data (real/ci360-download-client/macros/dsc_download.sas:157) — sin definición en el proyecto"
+  ]
+}

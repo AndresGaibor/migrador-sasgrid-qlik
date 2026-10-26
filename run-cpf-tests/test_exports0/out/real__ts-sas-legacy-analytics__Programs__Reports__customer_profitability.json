@@ -1,0 +1,2514 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+  "sha256": "b387416e930121c061a728f2cfb8992aa08fd4ba328891416c265d6406a10b1e",
+  "job_name": "job_customer_profitability",
+  "steps": [
+    {
+      "id": "m:customer_profitability:op_21_macro_call_1",
+      "order": 1,
+      "subjob": "m:customer_profitability:s21",
+      "action": "add_component",
+      "operation_id": "op_21_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %parmv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "parmv",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:21",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "report_month, _req=1",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:21",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 21,
+        "end_line": 21
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_36_read_1",
+      "order": 2,
+      "subjob": "m:customer_profitability:s35",
+      "action": "add_component",
+      "operation_id": "op_36_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer STG_BANK.CUST_ACCOUNTS_DAILY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "cust_accounts_daily",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:customer_profitability:op_21_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería stg_bank es de tipo BASE en /data/sas/staging/banking: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_36_read_1_row_count",
+        "vc_m:customer_profitability:op_36_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 36,
+        "end_line": 59
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_36_filter_1",
+      "order": 3,
+      "subjob": "m:customer_profitability:s35",
+      "action": "add_component",
+      "operation_id": "op_36_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): a.SNAPSHOT_DATE = \"&month_end\"d",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_36_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "a.SNAPSHOT_DATE = \"&month_end\"d",
+          "talend": null,
+          "line": 36,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_36_filter_1_row_count",
+        "vc_m:customer_profitability:op_36_filter_1_nulls",
+        "vc_m:customer_profitability:op_36_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 36,
+        "end_line": 59
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_36_aggregate_1",
+      "order": 4,
+      "subjob": "m:customer_profitability:s35",
+      "action": "add_component",
+      "operation_id": "op_36_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por a.CUSTOMER_ID",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "CUSTOMER_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": "CUSTOMER_SEGMENT = max(CUSTOMER_SEGMENT); REGION_CODE = max(REGION_CODE); BRANCH_ID = max(BRANCH_ID); NUM_ACCOUNTS = count(ACCOUNT_ID)",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "CUSTOMER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36"
+        },
+        {
+          "name": "CUSTOMER_SEGMENT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36"
+        },
+        {
+          "name": "REGION_CODE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36"
+        },
+        {
+          "name": "BRANCH_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36"
+        },
+        {
+          "name": "sum(case when a.ACCOUNT_TYPE in ('MTG','AUTO','PERS','CC','LOC','HELC') then a.CURRENT_BALANCE * a.INTEREST_RATE / 12 else 0 end) as LENDING_INCOME format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36"
+        },
+        {
+          "name": "sum(case when a.ACCOUNT_TYPE in ('CHK','SAV','MMA','CD','IRA') then a.CURRENT_BALANCE * a.INTEREST_RATE / 12 else 0 end) as DEPOSIT_COST format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36"
+        },
+        {
+          "name": "calculated LENDING_INCOME - calculated DEPOSIT_COST as NET_INTEREST_INCOME format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36"
+        },
+        {
+          "name": "NUM_ACCOUNTS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36"
+        },
+        {
+          "name": "sum(a.CURRENT_BALANCE) as TOTAL_RELATIONSHIP format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_36_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:customer_profitability:op_36_aggregate_1_aggregates",
+        "vc_m:customer_profitability:op_36_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 36,
+        "end_line": 59
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_36_write_1",
+      "order": 5,
+      "subjob": "m:customer_profitability:s35",
+      "action": "add_component",
+      "operation_id": "op_36_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.INTEREST_INCOME (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "interest_income",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:36",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_36_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_36_write_1_row_count",
+        "vc_m:customer_profitability:op_36_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 36,
+        "end_line": 59
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_66_read_1",
+      "order": 6,
+      "subjob": "m:customer_profitability:s65",
+      "action": "add_component",
+      "operation_id": "op_66_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer CURATED.DAILY_TRANSACTIONS",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "daily_transactions",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:66",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:customer_profitability:op_36_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería curated es de tipo BASE en /data/sas/curated: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_66_read_1_row_count",
+        "vc_m:customer_profitability:op_66_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 66,
+        "end_line": 79
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_66_filter_1",
+      "order": 7,
+      "subjob": "m:customer_profitability:s65",
+      "action": "add_component",
+      "operation_id": "op_66_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): t.TRANSACTION_DATE between \"&month_start\"d and \"&month_end\"d",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_66_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "t.TRANSACTION_DATE between \"&month_start\"d and \"&month_end\"d",
+          "talend": null,
+          "line": 66,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_66_filter_1_row_count",
+        "vc_m:customer_profitability:op_66_filter_1_nulls",
+        "vc_m:customer_profitability:op_66_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 66,
+        "end_line": 79
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_66_aggregate_1",
+      "order": 8,
+      "subjob": "m:customer_profitability:s65",
+      "action": "add_component",
+      "operation_id": "op_66_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por t.CUSTOMER_ID",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "CUSTOMER_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:66",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": "TXN_VOLUME = count(*)",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:66",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "CUSTOMER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:66"
+        },
+        {
+          "name": "sum(case when t.TRANSACTION_TYPE = 'FEE' then abs(t.TRANSACTION_AMOUNT) else 0 end) as FEE_INCOME format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:66"
+        },
+        {
+          "name": "sum(case when t.TRANSACTION_TYPE = 'INT' then abs(t.TRANSACTION_AMOUNT) else 0 end) as INT_CREDITED format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:66"
+        },
+        {
+          "name": "TXN_VOLUME",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:66"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_66_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:customer_profitability:op_66_aggregate_1_aggregates",
+        "vc_m:customer_profitability:op_66_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 66,
+        "end_line": 79
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_66_write_1",
+      "order": 9,
+      "subjob": "m:customer_profitability:s65",
+      "action": "add_component",
+      "operation_id": "op_66_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.FEE_INCOME (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "fee_income",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:66",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:66",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:66",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_66_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_66_write_1_row_count",
+        "vc_m:customer_profitability:op_66_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 66,
+        "end_line": 79
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_86_read_1",
+      "order": 10,
+      "subjob": "m:customer_profitability:s85",
+      "action": "add_component",
+      "operation_id": "op_86_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer CURATED.RISK_SCORES",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "risk_scores",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:86",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:customer_profitability:op_66_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería curated es de tipo BASE en /data/sas/curated: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_86_read_1_row_count",
+        "vc_m:customer_profitability:op_86_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 86,
+        "end_line": 94
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_86_read_2",
+      "order": 11,
+      "subjob": "m:customer_profitability:s85",
+      "action": "add_component",
+      "operation_id": "op_86_read_2",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer CURATED.RISK_SCORES",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "risk_scores",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:86",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería curated es de tipo BASE en /data/sas/curated: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_86_read_2_row_count",
+        "vc_m:customer_profitability:op_86_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 86,
+        "end_line": 94
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_86_filter_1",
+      "order": 12,
+      "subjob": "m:customer_profitability:s85",
+      "action": "add_component",
+      "operation_id": "op_86_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): r.SCORE_DATE = (select max(SCORE_DATE) from CURATED.RISK_SCORES where SCORE_DATE",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_86_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "r.SCORE_DATE = (select max(SCORE_DATE) from CURATED.RISK_SCORES where SCORE_DATE <= \"&month_end\"d)",
+          "talend": null,
+          "line": 86,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: paréntesis sin cerrar"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_86_filter_1_row_count",
+        "vc_m:customer_profitability:op_86_filter_1_nulls",
+        "vc_m:customer_profitability:op_86_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 86,
+        "end_line": 94
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_86_aggregate_1",
+      "order": 13,
+      "subjob": "m:customer_profitability:s85",
+      "action": "add_component",
+      "operation_id": "op_86_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar por r.CUSTOMER_ID",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": "CUSTOMER_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:86",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "CUSTOMER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:86"
+        },
+        {
+          "name": "sum(r.EXPECTED_LOSS) as TOTAL_ECL format=dollar18.2",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:86"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_86_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:customer_profitability:op_86_aggregate_1_aggregates",
+        "vc_m:customer_profitability:op_86_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 86,
+        "end_line": 94
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_86_write_1",
+      "order": 14,
+      "subjob": "m:customer_profitability:s85",
+      "action": "add_component",
+      "operation_id": "op_86_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.ECL (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "ecl",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:86",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:86",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:86",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_86_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_86_write_1_row_count",
+        "vc_m:customer_profitability:op_86_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 86,
+        "end_line": 94
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_100_read_1",
+      "order": 15,
+      "subjob": "m:customer_profitability:s100",
+      "action": "add_component",
+      "operation_id": "op_100_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.INTEREST_INCOME",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "interest_income",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:customer_profitability:op_86_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:customer_profitability:op_36_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_100_read_1_row_count",
+        "vc_m:customer_profitability:op_100_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 100,
+        "end_line": 135
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_100_read_2",
+      "order": 16,
+      "subjob": "m:customer_profitability:s100",
+      "action": "add_component",
+      "operation_id": "op_100_read_2",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.FEE_INCOME",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "fee_income",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:customer_profitability:op_66_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_100_read_2_row_count",
+        "vc_m:customer_profitability:op_100_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 100,
+        "end_line": 135
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_100_read_3",
+      "order": 17,
+      "subjob": "m:customer_profitability:s100",
+      "action": "add_component",
+      "operation_id": "op_100_read_3",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.ECL",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "ecl",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:customer_profitability:op_86_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_100_read_3_row_count",
+        "vc_m:customer_profitability:op_100_read_3_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 100,
+        "end_line": 135
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_100_join_1",
+      "order": 18,
+      "subjob": "m:customer_profitability:s100",
+      "action": "add_component",
+      "operation_id": "op_100_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (merge_by): work.interest_income, work.fee_income, work.ecl",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "CUSTOMER_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "CUSTOMER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_100_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:customer_profitability:op_100_read_2",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:customer_profitability:op_100_read_3",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "MERGE BY no es un join SQL: con claves repetidas en ambos lados el resultado difiere"
+      ],
+      "pending": [
+        "Columnas clave y tipos en ambos lados",
+        "Determinar el tipo de join (el programa no usa `if a;`/`if a and b;` de forma reconocible)"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_100_join_1_duplicates",
+        "vc_m:customer_profitability:op_100_join_1_row_count",
+        "vc_m:customer_profitability:op_100_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 100,
+        "end_line": 135
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_100_compute_1",
+      "order": 19,
+      "subjob": "m:customer_profitability:s100",
+      "action": "add_component",
+      "operation_id": "op_100_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "4 asignaciones, 6 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "NUM_ACCOUNTS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100"
+        },
+        {
+          "name": "OPERATING_COST",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100"
+        },
+        {
+          "name": "TOTAL_REVENUE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100"
+        },
+        {
+          "name": "NET_PROFIT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100"
+        },
+        {
+          "name": "REPORT_MONTH",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_100_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "NUM_ACCOUNTS * 15",
+          "talend": "(input_row.NUM_ACCOUNTS * 15)",
+          "line": 109,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "sum(NET_INTEREST_INCOME, FEE_INCOME, 0)",
+          "talend": null,
+          "line": 113,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función sum"
+          ]
+        },
+        {
+          "sas": "TOTAL_REVENUE - OPERATING_COST - coalesce(TOTAL_ECL, 0)",
+          "talend": null,
+          "line": 117,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función coalesce"
+          ]
+        },
+        {
+          "sas": "\"&report_month\"",
+          "talend": "\"&report_month\"",
+          "line": 134,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "if TOTAL_RELATIONSHIP > 0 then\r\n      ROA = (NET_PROFIT * 12) / TOTAL_RELATIONSHIP",
+          "talend": null,
+          "line": 121,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else\r\n      ROA = .",
+          "talend": null,
+          "line": 123,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if NET_PROFIT >= 500    then PROFIT_TIER = 'Highly Profitable'",
+          "talend": null,
+          "line": 129,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if NET_PROFIT >= 100 then PROFIT_TIER = 'Profitable'",
+          "talend": null,
+          "line": 130,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if NET_PROFIT >= 0   then PROFIT_TIER = 'Marginal'",
+          "talend": null,
+          "line": 131,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else PROFIT_TIER = 'Unprofitable'",
+          "talend": null,
+          "line": 132,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_100_compute_1_nulls",
+        "vc_m:customer_profitability:op_100_compute_1_dates",
+        "vc_m:customer_profitability:op_100_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 100,
+        "end_line": 135
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_100_write_1",
+      "order": 20,
+      "subjob": "m:customer_profitability:s100",
+      "action": "add_component",
+      "operation_id": "op_100_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir REPORTS.CUSTOMER_PNL",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "customer_pnl",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:100",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:customer_profitability:op_100_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería reports es de tipo BASE en /data/sas/reports: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_100_write_1_row_count",
+        "vc_m:customer_profitability:op_100_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 100,
+        "end_line": 135
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:customer_profitability:op_140_aggregate_1",
+      "order": 21,
+      "subjob": "m:customer_profitability:s140",
+      "action": "add_component",
+      "operation_id": "op_140_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:customer_profitability:op_100_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "PROC MEANS: mapear estadísticas concretas a tAggregateRow"
+      ],
+      "pending": [
+        "Mapear las estadísticas de PROC MEANS a operaciones de agregación"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_140_aggregate_1_aggregates",
+        "vc_m:customer_profitability:op_140_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 140,
+        "end_line": 148
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_150_aggregate_1",
+      "order": 22,
+      "subjob": "m:customer_profitability:s150",
+      "action": "add_component",
+      "operation_id": "op_150_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:customer_profitability:op_140_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "PROC MEANS: mapear estadísticas concretas a tAggregateRow"
+      ],
+      "pending": [
+        "Mapear las estadísticas de PROC MEANS a operaciones de agregación"
+      ],
+      "tests": [
+        "vc_m:customer_profitability:op_150_aggregate_1_aggregates",
+        "vc_m:customer_profitability:op_150_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 150,
+        "end_line": 157
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_159_macro_call_1",
+      "order": 23,
+      "subjob": "m:customer_profitability:s159",
+      "action": "add_component",
+      "operation_id": "op_159_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %export_xlsx",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "export_xlsx",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:159",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "\r\n    data=REPORTS.SEGMENT_PROFITABILITY,\r\n    file=&REPORT_PATH/PROFITABILITY_&report_month..xlsx,\r\n    sheet=By_Segment\r\n  ",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:159",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:customer_profitability:op_150_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 159,
+        "end_line": 163
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:customer_profitability:op_170_maintenance_1",
+      "order": 24,
+      "subjob": "m:customer_profitability:s170",
+      "action": "add_component",
+      "operation_id": "op_170_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:customer_profitability:op_159_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "line": 170,
+        "end_line": 172
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": {
+    "name": "customer_profitability",
+    "params": [
+      "report_month"
+    ],
+    "arguments": {
+      "report_month": "&PREV_YM"
+    }
+  },
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_m:customer_profitability:op_36_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_36_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_36_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:customer_profitability:op_36_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_36_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:customer_profitability:op_36_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_36_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:customer_profitability:op_36_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_36_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:customer_profitability:op_36_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_36_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_36_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_36_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:customer_profitability:op_36_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_36_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:customer_profitability:op_36_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_36_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:customer_profitability:op_36_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_66_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_66_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_66_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:customer_profitability:op_66_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_66_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:customer_profitability:op_66_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_66_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:customer_profitability:op_66_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_66_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:customer_profitability:op_66_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_66_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_66_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_66_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:customer_profitability:op_66_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_66_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:customer_profitability:op_66_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_66_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:customer_profitability:op_66_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_86_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:customer_profitability:op_86_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_86_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:customer_profitability:op_86_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:customer_profitability:op_86_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:customer_profitability:op_86_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:customer_profitability:op_86_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_86_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:customer_profitability:op_86_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:customer_profitability:op_86_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_86_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:customer_profitability:op_86_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_100_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:customer_profitability:op_100_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_100_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:customer_profitability:op_100_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_read_3_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_100_read_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_read_3_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:customer_profitability:op_100_read_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:customer_profitability:op_100_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:customer_profitability:op_100_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:customer_profitability:op_100_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:customer_profitability:op_100_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:customer_profitability:op_100_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:customer_profitability:op_100_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:customer_profitability:op_100_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_100_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:customer_profitability:op_100_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_140_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_140_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_140_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:customer_profitability:op_140_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_150_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:customer_profitability:op_150_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:customer_profitability:op_150_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:customer_profitability:op_150_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "PREV_YM",
+      "sas_value": null,
+      "suggested": "context.PREV_YM",
+      "origin": "Variable SAS referenciada por %customer_profitability(report_month=...)"
+    },
+    {
+      "name": "report_month",
+      "sas_value": null,
+      "suggested": "context.report_month",
+      "origin": "&report_month en real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:159"
+    },
+    {
+      "name": "REPORT_PATH",
+      "sas_value": null,
+      "suggested": "context.REPORT_PATH",
+      "origin": "&REPORT_PATH en real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:159"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "CURATED",
+      "engine": null,
+      "path": "/data/sas/curated",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "REPORTS",
+      "engine": null,
+      "path": "/data/sas/reports",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "STG_BANK",
+      "engine": null,
+      "path": "/data/sas/staging/banking",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [
+      {
+        "id": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:11:scheduler.control_m",
+        "pattern_id": "scheduler.control_m",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Obtén la definición real de Control-M y recrea calendario y dependencias en el planificador elegido.",
+        "reason": "Only a comment is captured; Control-M calendars, dependencies, and job definitions are not parsed.",
+        "component_candidate": null,
+        "doc_url": null,
+        "required": [
+          "Recreate the authoritative schedule in the chosen scheduler"
+        ],
+        "dependencies": [],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas",
+          "line": 11,
+          "end_line": 11
+        },
+        "details": {
+          "schedule": "Monthly 10th business day via Control-M BANK_MONTHLY_03"
+        }
+      }
+    ],
+    "schedules": [
+      "Monthly 10th business day via Control-M BANK_MONTHLY_03"
+    ],
+    "upstream": [
+      "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas"
+    ],
+    "downstream": []
+  },
+  "unresolved": [
+    "include /opt/sas/custom/macros/parmv.sas (real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:15) — external",
+    "include /opt/sas/custom/macros/nobs.sas (real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:16) — external",
+    "include /opt/sas/custom/macros/export_xlsx.sas (real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:17) — external",
+    "macro parmv (real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:21) — sin definición en el proyecto",
+    "macro export_xlsx (real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:159) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Reports/customer_profitability.sas:167) — sin definición en el proyecto"
+  ]
+}

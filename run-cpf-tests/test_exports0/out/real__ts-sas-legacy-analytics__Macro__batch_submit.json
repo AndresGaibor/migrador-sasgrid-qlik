@@ -1,0 +1,279 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Macro/batch_submit.sas",
+  "sha256": "709c781094e406e12de1be7decf34f88a74eeee97db9991daa7adb113937e0ea",
+  "job_name": "job_batch_submit",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "batch_submit",
+      "params": [
+        "FILE",
+        "CONFIG"
+      ],
+      "steps": [
+        {
+          "id": "m:batch_submit:op_168_macro_call_1",
+          "order": 1,
+          "subjob": "m:batch_submit:s168",
+          "action": "add_component",
+          "operation_id": "op_168_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %dump_mvars",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "dump_mvars",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/batch_submit.sas:168",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "sas file path config",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/batch_submit.sas:168",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %dump_mvars (definida en real/ts-sas-legacy-analytics/Macro/batch_submit.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/batch_submit.sas",
+            "line": 168,
+            "end_line": 168
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:batch_submit:op_169_os_command_1",
+          "order": 2,
+          "subjob": "m:batch_submit:s169",
+          "action": "add_component",
+          "operation_id": "op_169_os_command_1",
+          "operation_type": "os_command",
+          "component_candidate": "tSystem",
+          "alternatives": [],
+          "purpose": "Comando del sistema operativo",
+          "properties": [
+            {
+              "name": "COMMAND",
+              "value": "systask command \" \"\"&sas\"\" -config \"\"&config\"\" -sysin \"\"&file\"\" \" nowait",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/batch_submit.sas:169",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Command",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:batch_submit:op_168_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Comando del SO: mover a orquestación"
+          ],
+          "pending": [
+            "Moverlo a la orquestación o confirmar necesidad"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/batch_submit.sas",
+            "line": 169,
+            "end_line": 169
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/system/tsystem",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:batch_submit:op_172_macro_call_1",
+          "order": 3,
+          "subjob": "m:batch_submit:s172",
+          "action": "add_component",
+          "operation_id": "op_172_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %dump_mvars",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "dump_mvars",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/batch_submit.sas:172",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "sas file path log lst",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/batch_submit.sas:172",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:batch_submit:op_169_os_command_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %dump_mvars (definida en real/ts-sas-legacy-analytics/Macro/batch_submit.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/batch_submit.sas",
+            "line": 172,
+            "end_line": 172
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:batch_submit:op_173_os_command_1",
+          "order": 4,
+          "subjob": "m:batch_submit:s173",
+          "action": "add_component",
+          "operation_id": "op_173_os_command_1",
+          "operation_type": "os_command",
+          "component_candidate": "tSystem",
+          "alternatives": [],
+          "purpose": "Comando del sistema operativo",
+          "properties": [
+            {
+              "name": "COMMAND",
+              "value": "systask command \" \"\"&sas\"\" -sysin \"\"&file\"\" -log \"\"&log\"\" -print \"\"&lst\"\" -sasinitialfolder \"\"&path\"\" \" nowait",
+              "origin": "SAS real/ts-sas-legacy-analytics/Macro/batch_submit.sas:173",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Command",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:batch_submit:op_172_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Comando del SO: mover a orquestación"
+          ],
+          "pending": [
+            "Moverlo a la orquestación o confirmar necesidad"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/ts-sas-legacy-analytics/Macro/batch_submit.sas",
+            "line": 173,
+            "end_line": 173
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/system/tsystem",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "config",
+      "sas_value": null,
+      "suggested": "context.config",
+      "origin": "&config en real/ts-sas-legacy-analytics/Macro/batch_submit.sas:169"
+    },
+    {
+      "name": "file",
+      "sas_value": null,
+      "suggested": "context.file",
+      "origin": "&file en real/ts-sas-legacy-analytics/Macro/batch_submit.sas:169"
+    },
+    {
+      "name": "log",
+      "sas_value": null,
+      "suggested": "context.log",
+      "origin": "&log en real/ts-sas-legacy-analytics/Macro/batch_submit.sas:173"
+    },
+    {
+      "name": "lst",
+      "sas_value": null,
+      "suggested": "context.lst",
+      "origin": "&lst en real/ts-sas-legacy-analytics/Macro/batch_submit.sas:173"
+    },
+    {
+      "name": "path",
+      "sas_value": null,
+      "suggested": "context.path",
+      "origin": "&path en real/ts-sas-legacy-analytics/Macro/batch_submit.sas:173"
+    },
+    {
+      "name": "sas",
+      "sas_value": null,
+      "suggested": "context.sas",
+      "origin": "&sas en real/ts-sas-legacy-analytics/Macro/batch_submit.sas:169"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": []
+}

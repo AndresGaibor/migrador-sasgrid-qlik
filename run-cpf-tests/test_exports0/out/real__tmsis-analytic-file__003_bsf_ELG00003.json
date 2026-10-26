@@ -1,0 +1,356 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/tmsis-analytic-file/003_bsf_ELG00003.sas",
+  "sha256": "3dfbcaa32ce1171a1911e1bc453c1df10f804af455e72c5bcbf2c7c13f244fbd",
+  "job_name": "job_003_bsf_elg00003",
+  "steps": [],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "create_prmry_lang_cd_table",
+      "params": [],
+      "steps": []
+    },
+    {
+      "name": "create_ELG00003",
+      "params": [
+        "tab_no",
+        "_2x_segment",
+        "eff_date",
+        "end_date"
+      ],
+      "steps": [
+        {
+          "id": "m:create_ELG00003:op_523_macro_call_1",
+          "order": 1,
+          "subjob": "m:create_ELG00003:s523",
+          "action": "add_component",
+          "operation_id": "op_523_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %create_prmry_lang_cd_table",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "create_prmry_lang_cd_table",
+              "origin": "SAS real/tmsis-analytic-file/003_bsf_ELG00003.sas:523",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Job o joblet hijo que implementa la macro",
+            "Crear/identificar el Job hijo para %create_prmry_lang_cd_table (definida en real/tmsis-analytic-file/003_bsf_ELG00003.sas)"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/003_bsf_ELG00003.sas",
+            "line": 523,
+            "end_line": 523
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:create_ELG00003:op_578_macro_call_1",
+          "order": 2,
+          "subjob": "m:create_ELG00003:s578",
+          "action": "add_component",
+          "operation_id": "op_578_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %multiids",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "multiids",
+              "origin": "SAS real/tmsis-analytic-file/003_bsf_ELG00003.sas:578",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "sort_key=%str(coalesce(mrtl_stus_cd,'xx') || coalesce(cast(ssn_num as char(10)),'xx') || coalesce(incm_cd,'xx') ||\r\n                        coalesce(vet_ind,'xx') ||coalesce(ctznshp_ind,'xx') || coalesce(imgrtn_stus_cd,'xx') || \r\n                        coalesce(upper(prmry_lang_cd),'xx') || coalesce(hsehld_size_cd,'xx') || coalesce(mdcr_hicn_num,'xx') ||\r\n                        coalesce(chip_cd,'xx') || coalesce(ENGLSH_PRFCNCY_CD,'xx')),suffix=,val=_v",
+              "origin": "SAS real/tmsis-analytic-file/003_bsf_ELG00003.sas:578",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_ELG00003:op_523_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/003_bsf_ELG00003.sas",
+            "line": 578,
+            "end_line": 581
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_ELG00003:op_626_macro_call_1",
+          "order": 3,
+          "subjob": "m:create_ELG00003:s626",
+          "action": "add_component",
+          "operation_id": "op_626_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %get_audt_counts",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "get_audt_counts",
+              "origin": "SAS real/tmsis-analytic-file/003_bsf_ELG00003.sas:626",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "&DA_SCHEMA.,&DA_RUN_ID., 003_bsf_ELG00003, 0.1. create_initial_table",
+              "origin": "SAS real/tmsis-analytic-file/003_bsf_ELG00003.sas:626",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_ELG00003:op_578_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/003_bsf_ELG00003.sas",
+            "line": 626,
+            "end_line": 626
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_ELG00003:op_627_macro_call_1",
+          "order": 4,
+          "subjob": "m:create_ELG00003:s627",
+          "action": "add_component",
+          "operation_id": "op_627_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %get_audt_counts",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "get_audt_counts",
+              "origin": "SAS real/tmsis-analytic-file/003_bsf_ELG00003.sas:627",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "&DA_SCHEMA.,&DA_RUN_ID., 003_bsf_ELG00003, 0.2. MultiIds",
+              "origin": "SAS real/tmsis-analytic-file/003_bsf_ELG00003.sas:627",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_ELG00003:op_626_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/003_bsf_ELG00003.sas",
+            "line": 627,
+            "end_line": 627
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:create_ELG00003:op_629_macro_call_1",
+          "order": 5,
+          "subjob": "m:create_ELG00003:s629",
+          "action": "add_component",
+          "operation_id": "op_629_macro_call_1",
+          "operation_type": "macro_call",
+          "component_candidate": "tRunJob",
+          "alternatives": [
+            "Joblet"
+          ],
+          "purpose": "Invocar macro %drop_table_multi",
+          "properties": [
+            {
+              "name": "PROCESS",
+              "value": "drop_table_multi",
+              "origin": "SAS real/tmsis-analytic-file/003_bsf_ELG00003.sas:629",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Job",
+              "options": []
+            },
+            {
+              "name": "CONTEXTPARAMS",
+              "value": "&tab_no. &tab_no._recCt &tab_no._uniq &tab_no.A &tab_no._multi &tab_no._multi_all &tab_no._multi_step2",
+              "origin": "SAS real/tmsis-analytic-file/003_bsf_ELG00003.sas:629",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Context Param",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "OnSubjobOk",
+              "from_step": "m:create_ELG00003:op_627_macro_call_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [
+            "Macro sin definición en el proyecto"
+          ],
+          "pending": [
+            "Job o joblet hijo que implementa la macro"
+          ],
+          "tests": [],
+          "evidence": {
+            "file": "real/tmsis-analytic-file/003_bsf_ELG00003.sas",
+            "line": 629,
+            "end_line": 629
+          },
+          "confidence": "low",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        }
+      ]
+    }
+  ],
+  "validation_cases": [],
+  "context_variables": [
+    {
+      "name": "DA_RUN_ID",
+      "sas_value": null,
+      "suggested": "context.DA_RUN_ID",
+      "origin": "&DA_RUN_ID en real/tmsis-analytic-file/003_bsf_ELG00003.sas:626"
+    },
+    {
+      "name": "DA_SCHEMA",
+      "sas_value": null,
+      "suggested": "context.DA_SCHEMA",
+      "origin": "&DA_SCHEMA en real/tmsis-analytic-file/003_bsf_ELG00003.sas:626"
+    },
+    {
+      "name": "tab_no",
+      "sas_value": null,
+      "suggested": "context.tab_no",
+      "origin": "&tab_no en real/tmsis-analytic-file/003_bsf_ELG00003.sas:629"
+    }
+  ],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "macro multiids (real/tmsis-analytic-file/003_bsf_ELG00003.sas:578) — sin definición en el proyecto",
+    "macro get_audt_counts (real/tmsis-analytic-file/003_bsf_ELG00003.sas:626) — sin definición en el proyecto",
+    "macro get_audt_counts (real/tmsis-analytic-file/003_bsf_ELG00003.sas:627) — sin definición en el proyecto",
+    "macro drop_table_multi (real/tmsis-analytic-file/003_bsf_ELG00003.sas:629) — sin definición en el proyecto"
+  ]
+}

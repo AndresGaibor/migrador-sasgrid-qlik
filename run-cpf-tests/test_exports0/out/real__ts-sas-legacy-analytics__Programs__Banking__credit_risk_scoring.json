@@ -1,0 +1,3655 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+  "sha256": "63efb866c88f64e957a9e10b4a38ddf75a9b4435dd03c4d77c9841243151a02d",
+  "job_name": "job_credit_risk_scoring",
+  "steps": [
+    {
+      "id": "m:credit_risk_scoring:op_20_macro_call_1",
+      "order": 1,
+      "subjob": "m:credit_risk_scoring:s20",
+      "action": "add_component",
+      "operation_id": "op_20_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %parmv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "parmv",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:20",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "score_date, _req=1",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:20",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 20,
+        "end_line": 20
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_21_macro_call_1",
+      "order": 2,
+      "subjob": "m:credit_risk_scoring:s21",
+      "action": "add_component",
+      "operation_id": "op_21_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %parmv",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "parmv",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:21",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "model_id, _req=1",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:21",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_20_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 21,
+        "end_line": 21
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_33_read_1",
+      "order": 3,
+      "subjob": "m:credit_risk_scoring:s32",
+      "action": "add_component",
+      "operation_id": "op_33_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer STG_BANK.CUST_ACCOUNTS_DAILY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "cust_accounts_daily",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_21_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería stg_bank es de tipo BASE en /data/sas/staging/banking: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_33_read_1_row_count",
+        "vc_m:credit_risk_scoring:op_33_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 33,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_33_read_2",
+      "order": 4,
+      "subjob": "m:credit_risk_scoring:s32",
+      "action": "add_component",
+      "operation_id": "op_33_read_2",
+      "operation_type": "read",
+      "component_candidate": "tOracleInput",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer ORA_DW.BUREAU_SCORES",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "bureau_scores",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Table Name",
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Query",
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Component List",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Librería ora_dw usa el motor oracle"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_33_read_2_row_count",
+        "vc_m:credit_risk_scoring:op_33_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 33,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toracleinput-standard-properties",
+      "variants": [
+        "tAS400Input",
+        "tAccessInput",
+        "tAmazonAuroraInput",
+        "tAmazonOracleInput",
+        "tApacheLogInput",
+        "tAzureSynapseInput",
+        "tBigQueryInput",
+        "tDB2Input",
+        "tExasolInput",
+        "tFirebirdInput",
+        "tGreenplumInput",
+        "tHSQLDbInput"
+      ],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_33_read_3",
+      "order": 5,
+      "subjob": "m:credit_risk_scoring:s32",
+      "action": "add_component",
+      "operation_id": "op_33_read_3",
+      "operation_type": "read",
+      "component_candidate": "tOracleInput",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer ORA_DW.PAYMENT_HISTORY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "payment_history",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Table Name",
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Query",
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Component List",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Librería ora_dw usa el motor oracle"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_33_read_3_row_count",
+        "vc_m:credit_risk_scoring:op_33_read_3_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 33,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toracleinput-standard-properties",
+      "variants": [
+        "tAS400Input",
+        "tAccessInput",
+        "tAmazonAuroraInput",
+        "tAmazonOracleInput",
+        "tApacheLogInput",
+        "tAzureSynapseInput",
+        "tBigQueryInput",
+        "tDB2Input",
+        "tExasolInput",
+        "tFirebirdInput",
+        "tGreenplumInput",
+        "tHSQLDbInput"
+      ],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_33_read_4",
+      "order": 6,
+      "subjob": "m:credit_risk_scoring:s32",
+      "action": "add_component",
+      "operation_id": "op_33_read_4",
+      "operation_type": "read",
+      "component_candidate": "tOracleInput",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer ORA_DW.COLLATERAL",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "collateral",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Table Name",
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Query",
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Component List",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Librería ora_dw usa el motor oracle"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_33_read_4_row_count",
+        "vc_m:credit_risk_scoring:op_33_read_4_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 33,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/oracle/toracleinput-standard-properties",
+      "variants": [
+        "tAS400Input",
+        "tAccessInput",
+        "tAmazonAuroraInput",
+        "tAmazonOracleInput",
+        "tApacheLogInput",
+        "tAzureSynapseInput",
+        "tBigQueryInput",
+        "tDB2Input",
+        "tExasolInput",
+        "tFirebirdInput",
+        "tGreenplumInput",
+        "tHSQLDbInput"
+      ],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_33_join_1",
+      "order": 7,
+      "subjob": "m:credit_risk_scoring:s32",
+      "action": "add_component",
+      "operation_id": "op_33_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (left join): stg_bank.cust_accounts_daily, ora_dw.bureau_scores, ora_dw.payment_history, ora_dw.collateral",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Left Outer Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "a.CUSTOMER_ID = b.CUSTOMER_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "CUSTOMER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_33_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:credit_risk_scoring:op_33_read_2",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:credit_risk_scoring:op_33_read_3",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:credit_risk_scoring:op_33_read_4",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on a.CUSTOMER_ID = b.CUSTOMER_ID and b.SCORE_DATE = (select max(SCORE_DATE) from ORA_DW.BUREAU_SCORES where CUSTOMER_ID = b.CUSTOMER_ID and SCORE_DATE <= \"&score_date\"d)",
+          "talend": null,
+          "line": 33,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_33_join_1_duplicates",
+        "vc_m:credit_risk_scoring:op_33_join_1_row_count",
+        "vc_m:credit_risk_scoring:op_33_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 33,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_33_join_2",
+      "order": 8,
+      "subjob": "m:credit_risk_scoring:s32",
+      "action": "add_component",
+      "operation_id": "op_33_join_2",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (left join): stg_bank.cust_accounts_daily, ora_dw.bureau_scores, ora_dw.payment_history, ora_dw.collateral",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Left Outer Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "a.ACCOUNT_ID = p.ACCOUNT_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_33_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on a.ACCOUNT_ID = p.ACCOUNT_ID",
+          "talend": null,
+          "line": 33,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_33_join_2_duplicates",
+        "vc_m:credit_risk_scoring:op_33_join_2_row_count",
+        "vc_m:credit_risk_scoring:op_33_join_2_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 33,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_33_join_3",
+      "order": 9,
+      "subjob": "m:credit_risk_scoring:s32",
+      "action": "add_component",
+      "operation_id": "op_33_join_3",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (left join): stg_bank.cust_accounts_daily, ora_dw.bureau_scores, ora_dw.payment_history, ora_dw.collateral",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Left Outer Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "a.ACCOUNT_ID = c.ACCOUNT_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_33_join_2",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on a.ACCOUNT_ID = c.ACCOUNT_ID",
+          "talend": null,
+          "line": 33,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_33_join_3_duplicates",
+        "vc_m:credit_risk_scoring:op_33_join_3_row_count",
+        "vc_m:credit_risk_scoring:op_33_join_3_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 33,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_33_filter_1",
+      "order": 10,
+      "subjob": "m:credit_risk_scoring:s32",
+      "action": "add_component",
+      "operation_id": "op_33_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): a.SNAPSHOT_DATE = \"&score_date\"d and a.ACCOUNT_TYPE in ('MTG','AUTO','PERS','CC'",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_33_join_3",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "a.SNAPSHOT_DATE = \"&score_date\"d and a.ACCOUNT_TYPE in ('MTG','AUTO','PERS','CC','LOC','HELC')",
+          "talend": null,
+          "line": 33,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_33_filter_1_row_count",
+        "vc_m:credit_risk_scoring:op_33_filter_1_nulls",
+        "vc_m:credit_risk_scoring:op_33_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 33,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_33_project_1",
+      "order": 11,
+      "subjob": "m:credit_risk_scoring:s32",
+      "action": "add_component",
+      "operation_id": "op_33_project_1",
+      "operation_type": "project",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Seleccionar/calcular columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "ACCOUNT_ID, CUSTOMER_ID, ACCOUNT_TYPE, CURRENT_BALANCE, CREDIT_LIMIT, ACCT_AGE_MONTHS, DAYS_INACTIVE, UTILIZATION_PCT, CUSTOMER_SEGMENT, REGION_CODE, FICO_SCORE, VANTAGE_SCORE, BUREAU_INQS_6MO, BUREAU_TRADES_OPEN, BUREAU_DEROGS, BUREAU_UTIL_PCT, BUREAU_OLDEST_TRADE_MO, PMT_ONTIME_12MO, PMT_LATE_30_12MO, PMT_LATE_60_12MO, PMT_LATE_90_12MO, MAX_DAYS_PAST_DUE_EVER, MONTHS_SINCE_LAST_DPD, AVG_PMT_RATIO_12MO, COLLATERAL_VALUE, LAST_APPRAISAL_DATE, case when c.COLLATERAL_VALUE > 0 then a.CURRENT_BALANCE / c.COLLATERAL_VALUE else . end as LTV format=8.4",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expressions",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "CUSTOMER_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "ACCOUNT_TYPE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "CURRENT_BALANCE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "CREDIT_LIMIT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "ACCT_AGE_MONTHS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "DAYS_INACTIVE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "UTILIZATION_PCT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "CUSTOMER_SEGMENT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "REGION_CODE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "FICO_SCORE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "VANTAGE_SCORE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "BUREAU_INQS_6MO",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "BUREAU_TRADES_OPEN",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "BUREAU_DEROGS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "BUREAU_UTIL_PCT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "BUREAU_OLDEST_TRADE_MO",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "PMT_ONTIME_12MO",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "PMT_LATE_30_12MO",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "PMT_LATE_60_12MO",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "PMT_LATE_90_12MO",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "MAX_DAYS_PAST_DUE_EVER",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "MONTHS_SINCE_LAST_DPD",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "AVG_PMT_RATIO_12MO",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "COLLATERAL_VALUE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        },
+        {
+          "name": "LAST_APPRAISAL_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_33_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "case when c.COLLATERAL_VALUE > 0 then a.CURRENT_BALANCE / c.COLLATERAL_VALUE else . end as LTV format=8.4",
+          "talend": null,
+          "line": 33,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: ' . end as LT'"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_33_project_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 33,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_33_write_1",
+      "order": 12,
+      "subjob": "m:credit_risk_scoring:s32",
+      "action": "add_component",
+      "operation_id": "op_33_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.SCORE_INPUT (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "score_input",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:33",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_33_project_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_33_write_1_row_count",
+        "vc_m:credit_risk_scoring:op_33_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 33,
+        "end_line": 85
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_92_read_1",
+      "order": 13,
+      "subjob": "m:credit_risk_scoring:s92",
+      "action": "add_component",
+      "operation_id": "op_92_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.SCORE_INPUT",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "score_input",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_33_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:credit_risk_scoring:op_33_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_92_read_1_row_count",
+        "vc_m:credit_risk_scoring:op_92_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 92,
+        "end_line": 197
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_92_compute_1",
+      "order": 14,
+      "subjob": "m:credit_risk_scoring:s92",
+      "action": "add_component",
+      "operation_id": "op_92_compute_1",
+      "operation_type": "compute",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJavaRow"
+      ],
+      "purpose": "Calcular columnas (asignaciones y condicionales)",
+      "properties": [
+        {
+          "name": "Expressions",
+          "value": "7 asignaciones, 49 condicionales",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Var table",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "INTERCEPT",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "WOE_AGE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "WOE_DPD",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "WOE_FICO",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "WOE_LTV",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "WOE_UTIL",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "LOG_ODDS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "PD",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "EAD",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "LGD",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "EXPECTED_LOSS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "SCORE_DATE",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "MODEL_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        },
+        {
+          "name": "SCORE_TIMESTAMP",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_92_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "-3.2145",
+          "talend": "-3.2145",
+          "line": 96,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "INTERCEPT\r\n      + 0.412 * WOE_FICO\r\n      + 0.198 * WOE_UTIL\r\n      + 0.289 * WOE_DPD\r\n      + 0.067 * WOE_AGE\r\n      + 0.134 * WOE_LTV",
+          "talend": "(((((input_row.INTERCEPT + (0.412 * input_row.WOE_FICO)) + (0.198 * input_row.WOE_UTIL)) + (0.289 * input_row.WOE_DPD)) + (0.067 * input_row.WOE_AGE)) + (0.134 * input_row.WOE_LTV))",
+          "line": 150,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "1 / (1 + exp(-LOG_ODDS))",
+          "talend": null,
+          "line": 157,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función exp"
+          ]
+        },
+        {
+          "sas": "PD * LGD * EAD",
+          "talend": "((input_row.PD * input_row.LGD) * input_row.EAD)",
+          "line": 179,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "\"&score_date\"d",
+          "talend": null,
+          "line": 191,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        },
+        {
+          "sas": "\"&model_id\"",
+          "talend": "\"&model_id\"",
+          "line": 192,
+          "requires_semantic_validation": true,
+          "warnings": []
+        },
+        {
+          "sas": "datetime()",
+          "talend": null,
+          "line": 193,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: función datetime"
+          ]
+        },
+        {
+          "sas": "if not missing(FICO_SCORE) then do",
+          "talend": null,
+          "line": 99,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if FICO_SCORE >= 760      then WOE_FICO = -1.204",
+          "talend": null,
+          "line": 100,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if FICO_SCORE >= 720 then WOE_FICO = -0.812",
+          "talend": null,
+          "line": 101,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if FICO_SCORE >= 680 then WOE_FICO = -0.356",
+          "talend": null,
+          "line": 102,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if FICO_SCORE >= 640 then WOE_FICO =  0.198",
+          "talend": null,
+          "line": 103,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if FICO_SCORE >= 600 then WOE_FICO =  0.654",
+          "talend": null,
+          "line": 104,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_FICO = 1.102",
+          "talend": null,
+          "line": 105,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_FICO = 0.198",
+          "talend": null,
+          "line": 107,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if not missing(UTILIZATION_PCT) then do",
+          "talend": null,
+          "line": 110,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if UTILIZATION_PCT <= 10      then WOE_UTIL = -0.956",
+          "talend": null,
+          "line": 111,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if UTILIZATION_PCT <= 30 then WOE_UTIL = -0.521",
+          "talend": null,
+          "line": 112,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if UTILIZATION_PCT <= 50 then WOE_UTIL = -0.102",
+          "talend": null,
+          "line": 113,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if UTILIZATION_PCT <= 70 then WOE_UTIL =  0.334",
+          "talend": null,
+          "line": 114,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if UTILIZATION_PCT <= 90 then WOE_UTIL =  0.789",
+          "talend": null,
+          "line": 115,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_UTIL = 1.245",
+          "talend": null,
+          "line": 116,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_UTIL = 0",
+          "talend": null,
+          "line": 118,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if not missing(PMT_LATE_90_12MO) then do",
+          "talend": null,
+          "line": 121,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if PMT_LATE_90_12MO = 0      then WOE_DPD = -0.678",
+          "talend": null,
+          "line": 122,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if PMT_LATE_90_12MO = 1  then WOE_DPD =  0.445",
+          "talend": null,
+          "line": 123,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_DPD = 1.567",
+          "talend": null,
+          "line": 124,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_DPD = 0",
+          "talend": null,
+          "line": 126,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if not missing(ACCT_AGE_MONTHS) then do",
+          "talend": null,
+          "line": 129,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if ACCT_AGE_MONTHS >= 120     then WOE_AGE = -0.534",
+          "talend": null,
+          "line": 130,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if ACCT_AGE_MONTHS >= 60 then WOE_AGE = -0.289",
+          "talend": null,
+          "line": 131,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if ACCT_AGE_MONTHS >= 24 then WOE_AGE =  0.045",
+          "talend": null,
+          "line": 132,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_AGE = 0.456",
+          "talend": null,
+          "line": 133,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_AGE = 0",
+          "talend": null,
+          "line": 135,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if ACCOUNT_TYPE in ('MTG','AUTO','HELC') then do",
+          "talend": null,
+          "line": 138,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if not missing(LTV) then do",
+          "talend": null,
+          "line": 139,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if LTV <= 0.60      then WOE_LTV = -0.712",
+          "talend": null,
+          "line": 140,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if LTV <= 0.80 then WOE_LTV = -0.234",
+          "talend": null,
+          "line": 141,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if LTV <= 1.00 then WOE_LTV =  0.356",
+          "talend": null,
+          "line": 142,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_LTV = 0.889",
+          "talend": null,
+          "line": 143,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_LTV = 0",
+          "talend": null,
+          "line": 145,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else WOE_LTV = 0",
+          "talend": null,
+          "line": 147,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if ACCOUNT_TYPE in ('MTG','AUTO','HELC') then do",
+          "talend": null,
+          "line": 161,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if not missing(LTV) then\r\n        LGD = max(0, min(1, (LTV - 0.5) * 0.8))",
+          "talend": null,
+          "line": 162,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else\r\n        LGD = 0.40",
+          "talend": null,
+          "line": 164,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if ACCOUNT_TYPE = 'CC' then LGD = 0.75",
+          "talend": null,
+          "line": 167,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else LGD = 0.50",
+          "talend": null,
+          "line": 168,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if ACCOUNT_TYPE in ('CC','LOC','HELC') then\r\n      EAD = CURRENT_BALANCE + 0.50 * (CREDIT_LIMIT - CURRENT_BALANCE)",
+          "talend": null,
+          "line": 172,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else\r\n      EAD = CURRENT_BALANCE",
+          "talend": null,
+          "line": 174,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "if PD < 0.005      then NEW_RISK_RATING = 1",
+          "talend": null,
+          "line": 183,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if PD < 0.01  then NEW_RISK_RATING = 2",
+          "talend": null,
+          "line": 184,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if PD < 0.03  then NEW_RISK_RATING = 3",
+          "talend": null,
+          "line": 185,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if PD < 0.07  then NEW_RISK_RATING = 4",
+          "talend": null,
+          "line": 186,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if PD < 0.15  then NEW_RISK_RATING = 5",
+          "talend": null,
+          "line": 187,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else if PD < 0.30  then NEW_RISK_RATING = 6",
+          "talend": null,
+          "line": 188,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        },
+        {
+          "sas": "else NEW_RISK_RATING = 7",
+          "talend": null,
+          "line": 189,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
+          ]
+        }
+      ],
+      "assumptions": [
+        "Lógica condicional: revisar orden de evaluación y valores missing"
+      ],
+      "pending": [
+        "Tipos de las columnas calculadas"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_92_compute_1_nulls",
+        "vc_m:credit_risk_scoring:op_92_compute_1_dates",
+        "vc_m:credit_risk_scoring:op_92_compute_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 92,
+        "end_line": 197
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_92_select_columns_1",
+      "order": 15,
+      "subjob": "m:credit_risk_scoring:s92",
+      "action": "add_component",
+      "operation_id": "op_92_select_columns_1",
+      "operation_type": "select_columns",
+      "component_candidate": "tFilterColumns",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Conservar/descartar columnas",
+      "properties": [
+        {
+          "name": "SCHEMA",
+          "value": "drop: INTERCEPT, WOE_FICO, WOE_UTIL, WOE_DPD, WOE_AGE, WOE_LTV, LOG_ODDS",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Schema",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_92_compute_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_92_select_columns_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 92,
+        "end_line": 197
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfiltercolumns-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_92_write_1",
+      "order": 16,
+      "subjob": "m:credit_risk_scoring:s92",
+      "action": "add_component",
+      "operation_id": "op_92_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.SCORED",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "scored",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:92",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_92_select_columns_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_92_write_1_row_count",
+        "vc_m:credit_risk_scoring:op_92_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 92,
+        "end_line": 197
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_203_read_1",
+      "order": 17,
+      "subjob": "m:credit_risk_scoring:s202",
+      "action": "add_component",
+      "operation_id": "op_203_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer WORK.SCORED",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "scored",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_92_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (m:credit_risk_scoring:op_92_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_203_read_1_row_count",
+        "vc_m:credit_risk_scoring:op_203_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 203,
+        "end_line": 223
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_203_read_2",
+      "order": 18,
+      "subjob": "m:credit_risk_scoring:s202",
+      "action": "add_component",
+      "operation_id": "op_203_read_2",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer STG_BANK.CUST_ACCOUNTS_DAILY",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "cust_accounts_daily",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas",
+        "Librería stg_bank es de tipo BASE en /data/sas/staging/banking: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_203_read_2_row_count",
+        "vc_m:credit_risk_scoring:op_203_read_2_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 203,
+        "end_line": 223
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_203_join_1",
+      "order": 19,
+      "subjob": "m:credit_risk_scoring:s202",
+      "action": "add_component",
+      "operation_id": "op_203_join_1",
+      "operation_type": "join",
+      "component_candidate": "tMap",
+      "alternatives": [
+        "tJoin"
+      ],
+      "purpose": "Unir (inner join): work.scored, stg_bank.cust_accounts_daily",
+      "properties": [
+        {
+          "name": "Join model",
+          "value": "Inner Join",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Match model",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expression key",
+          "value": "s.ACCOUNT_ID = a.ACCOUNT_ID",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_203_read_1",
+          "label": null
+        },
+        {
+          "type": "Lookup",
+          "from_step": "m:credit_risk_scoring:op_203_read_2",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "on s.ACCOUNT_ID = a.ACCOUNT_ID",
+          "talend": null,
+          "line": 203,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Mapear las claves del ON en la tabla de join de tMap"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Columnas clave y tipos en ambos lados"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_203_join_1_duplicates",
+        "vc_m:credit_risk_scoring:op_203_join_1_row_count",
+        "vc_m:credit_risk_scoring:op_203_join_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 203,
+        "end_line": 223
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_203_filter_1",
+      "order": 20,
+      "subjob": "m:credit_risk_scoring:s202",
+      "action": "add_component",
+      "operation_id": "op_203_filter_1",
+      "operation_type": "filter",
+      "component_candidate": "tFilterRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Filtrar filas (WHERE): a.SNAPSHOT_DATE = \"&score_date\"d and (a.RISK_RATING ne s.NEW_RISK_RATING or a.RI",
+      "properties": [
+        {
+          "name": "LOGICAL_OP",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Logical operator used to combine conditions",
+          "options": [
+            "OR",
+            "AND"
+          ]
+        },
+        {
+          "name": "CONDITIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Conditions",
+          "options": []
+        },
+        {
+          "name": "USE_ADVANCED",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Use advanced mode",
+          "options": []
+        },
+        {
+          "name": "ADVANCED_COND",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Advanced",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_203_join_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "a.SNAPSHOT_DATE = \"&score_date\"d and (a.RISK_RATING ne s.NEW_RISK_RATING or a.RISK_RATING is null)",
+          "talend": null,
+          "line": 203,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [
+        "Traducir la condición manualmente (no hay traducción automática segura)"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_203_filter_1_row_count",
+        "vc_m:credit_risk_scoring:op_203_filter_1_nulls",
+        "vc_m:credit_risk_scoring:op_203_filter_1_empty"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 203,
+        "end_line": 223
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_203_project_1",
+      "order": 21,
+      "subjob": "m:credit_risk_scoring:s202",
+      "action": "add_component",
+      "operation_id": "op_203_project_1",
+      "operation_type": "project",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Seleccionar/calcular columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "\"&score_date\"d as SCORE_DATE format=date9., ACCOUNT_ID, PREV_RATING, CURR_RATING, case when a.RISK_RATING is null then 'NEW' when s.NEW_RISK_RATING < a.RISK_RATING then 'UPGRADE' when s.NEW_RISK_RATING > a.RISK_RATING then 'DOWNGRADE' else 'STABLE' end as MIGRATION_DIRECTION length=10, PD, EXPECTED_LOSS",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expressions",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [
+        {
+          "name": "ACCOUNT_ID",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203"
+        },
+        {
+          "name": "PREV_RATING",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203"
+        },
+        {
+          "name": "CURR_RATING",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203"
+        },
+        {
+          "name": "PD",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203"
+        },
+        {
+          "name": "EXPECTED_LOSS",
+          "talend_type": null,
+          "nullable": null,
+          "length": null,
+          "precision": null,
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203"
+        }
+      ],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_203_filter_1",
+          "label": null
+        }
+      ],
+      "expressions": [
+        {
+          "sas": "\"&score_date\"d as SCORE_DATE format=date9.",
+          "talend": null,
+          "line": 203,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: token no soportado: '.'"
+          ]
+        },
+        {
+          "sas": "case when a.RISK_RATING is null then 'NEW' when s.NEW_RISK_RATING < a.RISK_RATING then 'UPGRADE' when s.NEW_RISK_RATING > a.RISK_RATING then 'DOWNGRADE' else 'STABLE' end as MIGRATION_DIRECTION length=10",
+          "talend": null,
+          "line": 203,
+          "requires_semantic_validation": true,
+          "warnings": [
+            "Sin traducción automática: texto sobrante"
+          ]
+        }
+      ],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_203_project_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 203,
+        "end_line": 223
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_203_write_1",
+      "order": 22,
+      "subjob": "m:credit_risk_scoring:s202",
+      "action": "add_component",
+      "operation_id": "op_203_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir WORK.RISK_MIGRATION (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "risk_migration",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "m:credit_risk_scoring:op_203_project_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_203_write_1_row_count",
+        "vc_m:credit_risk_scoring:op_203_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 203,
+        "end_line": 223
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_229_macro_call_1",
+      "order": 23,
+      "subjob": "m:credit_risk_scoring:s229",
+      "action": "add_component",
+      "operation_id": "op_229_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %lock",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "lock",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:229",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "CURATED.RISK_SCORES",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:229",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_203_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 229,
+        "end_line": 229
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_231_append_1",
+      "order": 24,
+      "subjob": "m:credit_risk_scoring:s231",
+      "action": "add_component",
+      "operation_id": "op_231_append_1",
+      "operation_type": "append",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tDBOutput"
+      ],
+      "purpose": "Añadir filas a una tabla existente",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "scored",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:231",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:231",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "NONE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:231",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_229_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Tabla base destino",
+        "Librería curated es de tipo BASE en /data/sas/curated: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_231_append_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 231,
+        "end_line": 232
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_234_macro_call_1",
+      "order": 25,
+      "subjob": "m:credit_risk_scoring:s234",
+      "action": "add_component",
+      "operation_id": "op_234_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %lock",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "lock",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:234",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "CURATED.RISK_SCORES, unlock",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:234",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_231_append_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 234,
+        "end_line": 234
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_236_macro_call_1",
+      "order": 26,
+      "subjob": "m:credit_risk_scoring:s236",
+      "action": "add_component",
+      "operation_id": "op_236_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %lock",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "lock",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:236",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "CURATED.RISK_MIGRATION",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:236",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_234_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 236,
+        "end_line": 236
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_238_append_1",
+      "order": 27,
+      "subjob": "m:credit_risk_scoring:s238",
+      "action": "add_component",
+      "operation_id": "op_238_append_1",
+      "operation_type": "append",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tDBOutput"
+      ],
+      "purpose": "Añadir filas a una tabla existente",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "risk_migration",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:238",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:238",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "NONE",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:238",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_236_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Tabla base destino",
+        "Librería curated es de tipo BASE en /data/sas/curated: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_238_append_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 238,
+        "end_line": 239
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "m:credit_risk_scoring:op_241_macro_call_1",
+      "order": 28,
+      "subjob": "m:credit_risk_scoring:s241",
+      "action": "add_component",
+      "operation_id": "op_241_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %lock",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "lock",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:241",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "CURATED.RISK_MIGRATION, unlock",
+          "origin": "SAS real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:241",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_238_append_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Macro sin definición en el proyecto"
+      ],
+      "pending": [
+        "Job o joblet hijo que implementa la macro"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 241,
+        "end_line": 241
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_246_aggregate_1",
+      "order": 29,
+      "subjob": "m:credit_risk_scoring:s246",
+      "action": "add_component",
+      "operation_id": "op_246_aggregate_1",
+      "operation_type": "aggregate",
+      "component_candidate": "tAggregateRow",
+      "alternatives": [
+        "tMap"
+      ],
+      "purpose": "Agregar",
+      "properties": [
+        {
+          "name": "GROUPBYS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Group by",
+          "options": []
+        },
+        {
+          "name": "OPERATIONS",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Operations",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_241_macro_call_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "PROC MEANS: mapear estadísticas concretas a tAggregateRow"
+      ],
+      "pending": [
+        "Mapear las estadísticas de PROC MEANS a operaciones de agregación"
+      ],
+      "tests": [
+        "vc_m:credit_risk_scoring:op_246_aggregate_1_aggregates",
+        "vc_m:credit_risk_scoring:op_246_aggregate_1_numeric"
+      ],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 246,
+        "end_line": 256
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/taggregaterow-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "m:credit_risk_scoring:op_264_maintenance_1",
+      "order": 30,
+      "subjob": "m:credit_risk_scoring:s264",
+      "action": "add_component",
+      "operation_id": "op_264_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "m:credit_risk_scoring:op_246_aggregate_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "line": 264,
+        "end_line": 266
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    }
+  ],
+  "entry_macro": {
+    "name": "credit_risk_scoring",
+    "params": [
+      "score_date",
+      "model_id"
+    ],
+    "arguments": {
+      "score_date": "&CURR_DT"
+    }
+  },
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_read_3_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_read_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_read_3_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_read_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_read_4_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_read_4"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_read_4_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_read_4"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_join_2_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_join_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_join_2_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_join_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_join_2_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_join_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_join_3_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_join_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_join_3_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_join_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_join_3_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_join_3"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_33_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:credit_risk_scoring:op_33_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_92_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:credit_risk_scoring:op_92_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_92_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:credit_risk_scoring:op_92_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_92_compute_1_nulls",
+      "kind": "nulls",
+      "description": "Cálculos con valores missing (SAS propaga missing en aritmética)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_92_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_92_compute_1_dates",
+      "kind": "dates",
+      "description": "Fechas calculadas (epoch 1960 vs 1970)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_92_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_92_compute_1_numeric",
+      "kind": "numeric",
+      "description": "Redondeo y precisión",
+      "applies_to": [
+        "m:credit_risk_scoring:op_92_compute_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_92_select_columns_1_schema",
+      "kind": "schema",
+      "description": "Solo las columnas esperadas",
+      "applies_to": [
+        "m:credit_risk_scoring:op_92_select_columns_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_92_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:credit_risk_scoring:op_92_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_92_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:credit_risk_scoring:op_92_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_read_2_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_read_2_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_read_2"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_join_1_duplicates",
+      "kind": "duplicates",
+      "description": "Claves duplicadas en ambos lados (MERGE y JOIN difieren)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_join_1_row_count",
+      "kind": "row_count",
+      "description": "Filas sin pareja en cada lado",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_join_1_nulls",
+      "kind": "nulls",
+      "description": "Claves nulas no deben emparejarse (o sí, según SAS)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_join_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_203_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:credit_risk_scoring:op_203_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_231_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:credit_risk_scoring:op_231_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_238_append_1_row_count",
+      "kind": "row_count",
+      "description": "Filas añadidas",
+      "applies_to": [
+        "m:credit_risk_scoring:op_238_append_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_246_aggregate_1_aggregates",
+      "kind": "aggregates",
+      "description": "Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS",
+      "applies_to": [
+        "m:credit_risk_scoring:op_246_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:credit_risk_scoring:op_246_aggregate_1_numeric",
+      "kind": "numeric",
+      "description": "Tolerancia numérica y redondeo",
+      "applies_to": [
+        "m:credit_risk_scoring:op_246_aggregate_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "CURR_DT",
+      "sas_value": null,
+      "suggested": "context.CURR_DT",
+      "origin": "Variable SAS referenciada por %credit_risk_scoring(score_date=...)"
+    },
+    {
+      "name": "model_id",
+      "sas_value": null,
+      "suggested": "context.model_id",
+      "origin": "Parámetro de la macro principal %credit_risk_scoring; argumento SAS: sin asignar"
+    },
+    {
+      "name": "score_date",
+      "sas_value": null,
+      "suggested": "context.score_date",
+      "origin": "&score_date en real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:203"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "CURATED",
+      "engine": null,
+      "path": "/data/sas/curated",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "ORA_DW",
+      "engine": "oracle",
+      "path": "FINPROD",
+      "suggested_connection": "tOracleConnection",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    },
+    {
+      "sas_name": "STG_BANK",
+      "engine": null,
+      "path": "/data/sas/staging/banking",
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [
+      "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#3"
+    ],
+    "grid_recommendations": [
+      {
+        "id": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas:127:sas_macro_step.include_dispatch",
+        "pattern_id": "sas_macro_step.include_dispatch",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Crea un Job hijo para cada programa resuelto y confirma sus parámetros antes de conectar la secuencia.",
+        "reason": "The analyzer resolves tested macro dispatches, but macro defaults and failure behavior require review.",
+        "component_candidate": "tRunJob",
+        "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+        "required": [
+          "Review macro dispatch semantics",
+          "Confirm child Job and context parameters"
+        ],
+        "dependencies": [
+          "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas#2"
+        ],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/BatchJobs/run_daily_banking.sas",
+          "line": 127,
+          "end_line": 127
+        },
+        "details": {
+          "kind": "sas_macro_step",
+          "program": "/opt/sas/custom/programs/Banking/credit_risk_scoring.sas",
+          "resolved_program": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+          "match_status": "resolved",
+          "job_name": null,
+          "queue": null,
+          "waits": true,
+          "params": {
+            "step_num": "3",
+            "step_name": "Credit Risk Scoring",
+            "program": "/opt/sas/custom/programs/Banking/credit_risk_scoring.sas"
+          },
+          "condition": null,
+          "unknown_options": [],
+          "incomplete_options": []
+        }
+      },
+      {
+        "id": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:11:scheduler.control_m",
+        "pattern_id": "scheduler.control_m",
+        "catalog_version": "1",
+        "status": "partial",
+        "instruction": "Obtén la definición real de Control-M y recrea calendario y dependencias en el planificador elegido.",
+        "reason": "Only a comment is captured; Control-M calendars, dependencies, and job definitions are not parsed.",
+        "component_candidate": null,
+        "doc_url": null,
+        "required": [
+          "Recreate the authoritative schedule in the chosen scheduler"
+        ],
+        "dependencies": [],
+        "target_program": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+        "evidence": {
+          "file": "real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas",
+          "line": 11,
+          "end_line": 11
+        },
+        "details": {
+          "schedule": "Weekly Sunday 02:00 via Control-M BANK_WEEKLY_01"
+        }
+      }
+    ],
+    "schedules": [
+      "Weekly Sunday 02:00 via Control-M BANK_WEEKLY_01"
+    ],
+    "upstream": [
+      "real/ts-sas-legacy-analytics/Programs/Banking/load_customer_accounts.sas"
+    ],
+    "downstream": []
+  },
+  "unresolved": [
+    "include /opt/sas/custom/macros/parmv.sas (real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:15) — external",
+    "include /opt/sas/custom/macros/nobs.sas (real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:16) — external",
+    "macro parmv (real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:20) — sin definición en el proyecto",
+    "macro parmv (real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:21) — sin definición en el proyecto",
+    "macro lock (real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:229) — sin definición en el proyecto",
+    "macro lock (real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:234) — sin definición en el proyecto",
+    "macro lock (real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:236) — sin definición en el proyecto",
+    "macro lock (real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:241) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:260) — sin definición en el proyecto",
+    "macro nobs (real/ts-sas-legacy-analytics/Programs/Banking/credit_risk_scoring.sas:261) — sin definición en el proyecto"
+  ]
+}

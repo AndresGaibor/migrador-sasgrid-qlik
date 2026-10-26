@@ -1,0 +1,860 @@
+{
+  "schema_version": "1",
+  "project_id": "a7841fdc2e35",
+  "rules_version": "1",
+  "program": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+  "sha256": "580355ec76b091db1c0b13ac22ea26cc6dd2025c5259045d22ab90a099c3bb0e",
+  "job_name": "job_bulkload",
+  "steps": [
+    {
+      "id": "op_36_maintenance_1",
+      "order": 1,
+      "subjob": "s36",
+      "action": "add_component",
+      "operation_id": "op_36_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+        "line": 36,
+        "end_line": 36
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_37_maintenance_1",
+      "order": 2,
+      "subjob": "s37",
+      "action": "add_component",
+      "operation_id": "op_37_maintenance_1",
+      "operation_type": "maintenance",
+      "component_candidate": "tDBRow",
+      "alternatives": [
+        "ninguno"
+      ],
+      "purpose": "Mantenimiento de datasets",
+      "properties": [
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_36_maintenance_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Decidir si la operación de mantenimiento aplica en el destino"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+        "line": 37,
+        "end_line": 37
+      },
+      "confidence": "low",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_41_read_file_1",
+      "order": 3,
+      "subjob": "s40",
+      "action": "add_component",
+      "operation_id": "op_41_read_file_1",
+      "operation_type": "read_file",
+      "component_candidate": "tFileInputDelimited",
+      "alternatives": [
+        "tFileInputPositional",
+        "tFileInputExcel"
+      ],
+      "purpose": "Leer archivo externo",
+      "properties": [
+        {
+          "name": "FILENAME",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "File name/Stream",
+          "options": []
+        },
+        {
+          "name": "FIELDSEPARATOR",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Field Separator",
+          "options": []
+        },
+        {
+          "name": "HEADER",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Header",
+          "options": []
+        },
+        {
+          "name": "ENCODING",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Encoding",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_37_maintenance_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Ruta del archivo, delimitador y codificación",
+        "Esquema (ancho fijo o delimitado)"
+      ],
+      "tests": [
+        "vc_op_41_read_file_1_row_count",
+        "vc_op_41_read_file_1_nulls"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+        "line": 41,
+        "end_line": 56
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/delimited/tfileinputdelimited-standard-properties",
+      "variants": [
+        "tFileInputARFF",
+        "tFileInputExcel",
+        "tFileInputFullRow",
+        "tFileInputJSON",
+        "tFileInputLDIF",
+        "tFileInputMail",
+        "tFileInputPositional",
+        "tFileInputProperties",
+        "tFileInputRaw",
+        "tFileInputRegex",
+        "tFileInputXML"
+      ],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_40_inline_data_1",
+      "order": 4,
+      "subjob": "s40",
+      "action": "add_component",
+      "operation_id": "op_40_inline_data_1",
+      "operation_type": "inline_data",
+      "component_candidate": "tFixedFlowInput",
+      "alternatives": [],
+      "purpose": "Datos incrustados (datalines)",
+      "properties": [
+        {
+          "name": "VALUES",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Values",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [
+        "Datos incrustados en el programa"
+      ],
+      "pending": [
+        "Confirmar los datos incrustados"
+      ],
+      "tests": [
+        "vc_op_40_inline_data_1_row_count"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+        "line": 40,
+        "end_line": 56
+      },
+      "confidence": "medium",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tfixedflowinput/tfixedflowinput-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": true
+    },
+    {
+      "id": "op_40_write_1",
+      "order": 5,
+      "subjob": "s40",
+      "action": "add_component",
+      "operation_id": "op_40_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir work.testblkld",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "testblkld",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:40",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:40",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:40",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_41_read_file_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal"
+      ],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_40_write_1_row_count",
+        "vc_op_40_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+        "line": 40,
+        "end_line": 56
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_68_read_1",
+      "order": 6,
+      "subjob": "s67",
+      "action": "add_component",
+      "operation_id": "op_68_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer work.testblkld",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "testblkld",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:68",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_40_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (op_40_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_op_68_read_1_row_count",
+        "vc_op_68_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+        "line": 68,
+        "end_line": 74
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_68_project_1",
+      "order": 7,
+      "subjob": "s67",
+      "action": "add_component",
+      "operation_id": "op_68_project_1",
+      "operation_type": "project",
+      "component_candidate": "tMap",
+      "alternatives": [],
+      "purpose": "Seleccionar/calcular columnas",
+      "properties": [
+        {
+          "name": "Output columns",
+          "value": "*",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:68",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        },
+        {
+          "name": "Expressions",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": "Editor del componente (no es un parámetro plano)",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_68_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [],
+      "tests": [
+        "vc_op_68_project_1_schema"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+        "line": 68,
+        "end_line": 74
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_68_write_1",
+      "order": 8,
+      "subjob": "s67",
+      "action": "add_component",
+      "operation_id": "op_68_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir mydblib.testblkld1 (reemplaza)",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "testblkld1",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:68",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:68",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:68",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_68_project_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería mydblib es de tipo BASE: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_68_write_1_row_count",
+        "vc_op_68_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+        "line": 68,
+        "end_line": 74
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_77_read_1",
+      "order": 9,
+      "subjob": "s77",
+      "action": "add_component",
+      "operation_id": "op_77_read_1",
+      "operation_type": "read",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileInputDelimited",
+        "tDBInput"
+      ],
+      "purpose": "Leer work.testblkld",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "testblkld",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:77",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "QUERY",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "OnSubjobOk",
+          "from_step": "op_68_write_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [
+        "Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal",
+        "Dataset producido antes en este programa (op_40_write_1): puede sustituirse por una conexión directa o un tHashOutput"
+      ],
+      "pending": [
+        "Formato físico o sistema de origen del dataset",
+        "Esquema y tipos de columnas"
+      ],
+      "tests": [
+        "vc_op_77_read_1_row_count",
+        "vc_op_77_read_1_schema"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+        "line": 77,
+        "end_line": 84
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    },
+    {
+      "id": "op_77_write_1",
+      "order": 10,
+      "subjob": "s77",
+      "action": "add_component",
+      "operation_id": "op_77_write_1",
+      "operation_type": "write",
+      "component_candidate": "por_determinar",
+      "alternatives": [
+        "tFileOutputDelimited",
+        "tDBOutput"
+      ],
+      "purpose": "Escribir mydblib.testblkld2",
+      "properties": [
+        {
+          "name": "TABLE",
+          "value": "testblkld2",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:77",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "TABLE_ACTION",
+          "value": "DROP_CREATE",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:77",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "DATA_ACTION",
+          "value": "INSERT",
+          "origin": "SAS real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas:77",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        },
+        {
+          "name": "CONNECTION",
+          "value": null,
+          "origin": "regla mappings",
+          "verified": false,
+          "in_catalog": null,
+          "label": null,
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [
+        {
+          "type": "Main",
+          "from_step": "op_77_read_1",
+          "label": null
+        }
+      ],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Sistema y tabla/archivo de destino",
+        "Librería mydblib es de tipo BASE: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo",
+        "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+      ],
+      "tests": [
+        "vc_op_77_write_1_row_count",
+        "vc_op_77_write_1_schema"
+      ],
+      "evidence": {
+        "file": "real/sas-access-samples/SAS_Foundation/HAWQ/bulkload.sas",
+        "line": 77,
+        "end_line": 84
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": null,
+      "doc_url": null,
+      "variants": [],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": null,
+  "children": [],
+  "validation_cases": [
+    {
+      "id": "vc_op_41_read_file_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas leídas, incluidas filas inválidas",
+      "applies_to": [
+        "op_41_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_41_read_file_1_nulls",
+      "kind": "nulls",
+      "description": "Campos vacíos y missing se cargan igual que en SAS",
+      "applies_to": [
+        "op_41_read_file_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_40_inline_data_1_row_count",
+      "kind": "row_count",
+      "description": "Mismas filas",
+      "applies_to": [
+        "op_40_inline_data_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_40_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_40_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_40_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_40_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_68_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_68_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_68_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_68_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_68_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "op_68_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_68_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_68_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_68_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_68_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_77_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "op_77_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_77_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "op_77_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_77_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "op_77_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_op_77_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "op_77_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [
+    {
+      "name": "HOST",
+      "sas_value": "",
+      "suggested": "context.HOST",
+      "origin": "%LET de primer nivel"
+    },
+    {
+      "name": "PORT",
+      "sas_value": "",
+      "suggested": "context.PORT",
+      "origin": "%LET de primer nivel"
+    }
+  ],
+  "libraries_needed": [
+    {
+      "sas_name": "mydblib",
+      "engine": null,
+      "path": null,
+      "suggested_connection": "por_determinar (metadatos de archivo o base de datos)",
+      "note": "Crear la conexión en Talend; no se copian credenciales"
+    }
+  ],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [
+      "real/sas-access-samples/SAS_Foundation/Greenplum/bulkload.sas",
+      "real/sas-access-samples/SAS_Foundation/Impala/bulkload.sas"
+    ],
+    "downstream": [
+      "real/sas-access-samples/SAS_Foundation/Greenplum/bulkload.sas",
+      "real/sas-access-samples/SAS_Foundation/Impala/bulkload.sas"
+    ]
+  },
+  "unresolved": []
+}

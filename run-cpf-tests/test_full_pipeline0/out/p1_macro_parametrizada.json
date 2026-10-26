@@ -1,0 +1,461 @@
+{
+  "schema_version": "1",
+  "project_id": "5f8a983f6dfe",
+  "rules_version": "1",
+  "program": "p1_macro_parametrizada.sas",
+  "sha256": "2b04d3a17bfad948ab2822c57a5f8ceac9c6205402ccacdf6ba094c5b19e597b",
+  "job_name": "job_p1_macro_parametrizada",
+  "steps": [
+    {
+      "id": "op_13_macro_call_1",
+      "order": 1,
+      "subjob": "s13",
+      "action": "add_component",
+      "operation_id": "op_13_macro_call_1",
+      "operation_type": "macro_call",
+      "component_candidate": "tRunJob",
+      "alternatives": [
+        "Joblet"
+      ],
+      "purpose": "Invocar macro %extraer_mes",
+      "properties": [
+        {
+          "name": "PROCESS",
+          "value": "extraer_mes",
+          "origin": "SAS p1_macro_parametrizada.sas:13",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Job",
+          "options": []
+        },
+        {
+          "name": "CONTEXTPARAMS",
+          "value": "tabla=ventas, desde=1, hasta=12",
+          "origin": "SAS p1_macro_parametrizada.sas:13",
+          "verified": false,
+          "in_catalog": true,
+          "label": "Context Param",
+          "options": []
+        }
+      ],
+      "schema_columns": [],
+      "connections": [],
+      "expressions": [],
+      "assumptions": [],
+      "pending": [
+        "Job o joblet hijo que implementa la macro",
+        "Crear/identificar el Job hijo para %extraer_mes (definida en p1_macro_parametrizada.sas)"
+      ],
+      "tests": [],
+      "evidence": {
+        "file": "p1_macro_parametrizada.sas",
+        "line": 13,
+        "end_line": 13
+      },
+      "confidence": "high",
+      "verified": false,
+      "in_catalog": true,
+      "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties",
+      "variants": [],
+      "requires_semantic_validation": false
+    }
+  ],
+  "entry_macro": null,
+  "children": [
+    {
+      "name": "extraer_mes",
+      "params": [
+        "tabla",
+        "desde",
+        "hasta"
+      ],
+      "steps": [
+        {
+          "id": "m:extraer_mes:op_6_read_1",
+          "order": 1,
+          "subjob": "m:extraer_mes:s5",
+          "action": "add_component",
+          "operation_id": "op_6_read_1",
+          "operation_type": "read",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileInputDelimited",
+            "tDBInput"
+          ],
+          "purpose": "Leer dwh.&tabla.",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "QUERY",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Formato físico o sistema de origen del dataset",
+            "Esquema y tipos de columnas",
+            "Librería o sistema de origen no determinable (nombre dinámico)"
+          ],
+          "tests": [
+            "vc_m:extraer_mes:op_6_read_1_row_count",
+            "vc_m:extraer_mes:op_6_read_1_schema"
+          ],
+          "evidence": {
+            "file": "p1_macro_parametrizada.sas",
+            "line": 6,
+            "end_line": 8
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:extraer_mes:op_6_filter_1",
+          "order": 2,
+          "subjob": "m:extraer_mes:s5",
+          "action": "add_component",
+          "operation_id": "op_6_filter_1",
+          "operation_type": "filter",
+          "component_candidate": "tFilterRow",
+          "alternatives": [
+            "tMap"
+          ],
+          "purpose": "Filtrar filas (WHERE): month(fecha) = &m.",
+          "properties": [
+            {
+              "name": "LOGICAL_OP",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Logical operator used to combine conditions",
+              "options": [
+                "OR",
+                "AND"
+              ]
+            },
+            {
+              "name": "CONDITIONS",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Conditions",
+              "options": []
+            },
+            {
+              "name": "USE_ADVANCED",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Use advanced mode",
+              "options": []
+            },
+            {
+              "name": "ADVANCED_COND",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": true,
+              "label": "Advanced",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:extraer_mes:op_6_read_1",
+              "label": null
+            }
+          ],
+          "expressions": [
+            {
+              "sas": "month(fecha) = &m.",
+              "talend": null,
+              "line": 6,
+              "requires_semantic_validation": true,
+              "warnings": [
+                "Sin traducción automática: función month"
+              ]
+            }
+          ],
+          "assumptions": [],
+          "pending": [
+            "Traducir la condición manualmente (no hay traducción automática segura)"
+          ],
+          "tests": [
+            "vc_m:extraer_mes:op_6_filter_1_row_count",
+            "vc_m:extraer_mes:op_6_filter_1_nulls",
+            "vc_m:extraer_mes:op_6_filter_1_empty"
+          ],
+          "evidence": {
+            "file": "p1_macro_parametrizada.sas",
+            "line": 6,
+            "end_line": 8
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": true
+        },
+        {
+          "id": "m:extraer_mes:op_6_project_1",
+          "order": 3,
+          "subjob": "m:extraer_mes:s5",
+          "action": "add_component",
+          "operation_id": "op_6_project_1",
+          "operation_type": "project",
+          "component_candidate": "tMap",
+          "alternatives": [],
+          "purpose": "Seleccionar/calcular columnas",
+          "properties": [
+            {
+              "name": "Output columns",
+              "value": "*",
+              "origin": "SAS p1_macro_parametrizada.sas:6",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            },
+            {
+              "name": "Expressions",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": "Editor del componente (no es un parámetro plano)",
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:extraer_mes:op_6_filter_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [],
+          "tests": [
+            "vc_m:extraer_mes:op_6_project_1_schema"
+          ],
+          "evidence": {
+            "file": "p1_macro_parametrizada.sas",
+            "line": 6,
+            "end_line": 8
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": true,
+          "doc_url": "https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties",
+          "variants": [],
+          "requires_semantic_validation": false
+        },
+        {
+          "id": "m:extraer_mes:op_6_write_1",
+          "order": 4,
+          "subjob": "m:extraer_mes:s5",
+          "action": "add_component",
+          "operation_id": "op_6_write_1",
+          "operation_type": "write",
+          "component_candidate": "por_determinar",
+          "alternatives": [
+            "tFileOutputDelimited",
+            "tDBOutput"
+          ],
+          "purpose": "Escribir work.&tabla._&mm. (reemplaza)",
+          "properties": [
+            {
+              "name": "TABLE",
+              "value": "",
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "TABLE_ACTION",
+              "value": "DROP_CREATE",
+              "origin": "SAS p1_macro_parametrizada.sas:6",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "DATA_ACTION",
+              "value": "INSERT",
+              "origin": "SAS p1_macro_parametrizada.sas:6",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            },
+            {
+              "name": "CONNECTION",
+              "value": null,
+              "origin": "regla mappings",
+              "verified": false,
+              "in_catalog": null,
+              "label": null,
+              "options": []
+            }
+          ],
+          "schema_columns": [],
+          "connections": [
+            {
+              "type": "Main",
+              "from_step": "m:extraer_mes:op_6_project_1",
+              "label": null
+            }
+          ],
+          "expressions": [],
+          "assumptions": [],
+          "pending": [
+            "Sistema y tabla/archivo de destino",
+            "Librería o sistema de origen no determinable (nombre dinámico)",
+            "Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo"
+          ],
+          "tests": [
+            "vc_m:extraer_mes:op_6_write_1_row_count",
+            "vc_m:extraer_mes:op_6_write_1_schema"
+          ],
+          "evidence": {
+            "file": "p1_macro_parametrizada.sas",
+            "line": 6,
+            "end_line": 8
+          },
+          "confidence": "high",
+          "verified": false,
+          "in_catalog": null,
+          "doc_url": null,
+          "variants": [],
+          "requires_semantic_validation": false
+        }
+      ]
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "vc_m:extraer_mes:op_6_read_1_row_count",
+      "kind": "row_count",
+      "description": "Mismo número de filas leídas que en SAS",
+      "applies_to": [
+        "m:extraer_mes:op_6_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:extraer_mes:op_6_read_1_schema",
+      "kind": "schema",
+      "description": "Mismos nombres y tipos de columna",
+      "applies_to": [
+        "m:extraer_mes:op_6_read_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:extraer_mes:op_6_filter_1_row_count",
+      "kind": "row_count",
+      "description": "Filas que cumplen el filtro igual a SAS",
+      "applies_to": [
+        "m:extraer_mes:op_6_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:extraer_mes:op_6_filter_1_nulls",
+      "kind": "nulls",
+      "description": "Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)",
+      "applies_to": [
+        "m:extraer_mes:op_6_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:extraer_mes:op_6_filter_1_empty",
+      "kind": "empty",
+      "description": "Entrada vacía produce salida vacía",
+      "applies_to": [
+        "m:extraer_mes:op_6_filter_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:extraer_mes:op_6_project_1_schema",
+      "kind": "schema",
+      "description": "Columnas y tipos de salida",
+      "applies_to": [
+        "m:extraer_mes:op_6_project_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:extraer_mes:op_6_write_1_row_count",
+      "kind": "row_count",
+      "description": "Filas escritas iguales",
+      "applies_to": [
+        "m:extraer_mes:op_6_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    },
+    {
+      "id": "vc_m:extraer_mes:op_6_write_1_schema",
+      "kind": "schema",
+      "description": "Esquema destino",
+      "applies_to": [
+        "m:extraer_mes:op_6_write_1"
+      ],
+      "expected": "Resultado igual al de SAS"
+    }
+  ],
+  "context_variables": [],
+  "libraries_needed": [],
+  "orchestration": {
+    "grid_tasks": [],
+    "grid_recommendations": [],
+    "schedules": [],
+    "upstream": [],
+    "downstream": []
+  },
+  "unresolved": [
+    "dataset_dynamic dwh.&tabla. (p1_macro_parametrizada.sas:5) — nombre de dataset con macrovariables",
+    "dataset_dynamic work.&tabla._&mm. (p1_macro_parametrizada.sas:5) — nombre de dataset con macrovariables"
+  ]
+}

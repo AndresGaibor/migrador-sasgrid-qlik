@@ -2,7 +2,7 @@
 
 import hashlib
 import re
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -133,6 +133,50 @@ def _safe_folder_path(folder_path: str) -> str:
     if any(part in {".", ".."} or not re.fullmatch(r"[\w .-]+", part) for part in parts):
         raise ValueError("La carpeta Talend contiene una ruta no permitida.")
     return "/".join(parts)
+
+
+def _load_context_file(path: Path) -> dict[str, str]:
+    """Read the portal's UTF-8 .cpf format: one contextName=value per line."""
+    if path.suffix.casefold() != ".cpf":
+        raise ValueError("El archivo de parámetros debe tener extensión .cpf.")
+    try:
+        lines = path.read_text(encoding="utf-8-sig").splitlines()
+    except FileNotFoundError as e:
+        raise ValueError(f"No existe el archivo de parámetros: {path}") from e
+    except (OSError, UnicodeError) as e:
+        raise ValueError(f"No se pudo leer el archivo .cpf: {e}") from e
+
+    values: dict[str, str] = {}
+    for number, line in enumerate(lines, 1):
+        line = line.strip()
+        if not line or line.startswith(("#", "!")):
+            continue
+        name, separator, value = line.partition("=")
+        name, value = name.strip(), value.strip()
+        if not separator or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+            raise ValueError(f"Línea {number} inválida en .cpf; se esperaba nombre=valor.")
+        if not value:
+            raise ValueError(f"El parámetro {name} está vacío (línea {number} del .cpf).")
+        if name.casefold() in {item.casefold() for item in values}:
+            raise ValueError(f"Parámetro duplicado en .cpf: {name}.")
+        values[name] = value
+    return values
+
+
+def _apply_context_file(contexts: list[ApplyContext], path: Path | None) -> list[ApplyContext]:
+    if path is None:
+        return contexts
+    values = _load_context_file(path)
+    by_name = {item.name.casefold(): item for item in contexts}
+    for name, value in values.items():
+        existing = by_name.get(name.casefold())
+        if existing:
+            existing.value = value
+        else:
+            context = ApplyContext(name=name, value=value, comment="Parámetro proporcionado por archivo .cpf.")
+            contexts.append(context)
+            by_name[name.casefold()] = context
+    return contexts
 
 
 def _instruction_step(step: PlanStep) -> dict[str, Any]:
@@ -458,6 +502,7 @@ def build_apply_spec(
     plan: JobPlan,
     folder_path: str = "Process",
     *,
+    context_file: Path | None = None,
     related_plans: list[JobPlan] | None = None,
     related_folder_paths: dict[str, str] | None = None,
     _visited_programs: set[str] | None = None,
@@ -512,8 +557,12 @@ def build_apply_spec(
 
     def include_step(step: PlanStep) -> None:
         reason = _step_block_reason(step)
+        mapper_pending = step.component_candidate == "tMap" and step.operation_type in {
+            "join", "project", "compute", "rename"
+        }
         needs_draft = (
             bool(step.pending)
+            or mapper_pending
             or step.action == "manual_decision"
             or not step.verified
             or step.confidence != "high"
@@ -532,6 +581,8 @@ def build_apply_spec(
         )
         if can_create_draft:
             pending = [*step.pending]
+            if mapper_pending:
+                pending.append("El plan propone tMap, pero el motor aún no genera su configuración de mapper; completar y validar en Studio.")
             if any(not prop.verified or prop.value is None for prop in step.properties):
                 pending.append("Hay propiedades sin valor confirmado; se conservarán en el contexto del Job.")
             if any(expression.talend is None or expression.requires_semantic_validation for expression in step.expressions):
@@ -700,6 +751,7 @@ def build_apply_spec(
             context_names.add(parameter)
     pending_contexts = _pending_contexts(plan, context_names, set(resolved_children_by_step))
     contexts.extend(pending_contexts)
+    contexts = _apply_context_file(contexts, context_file)
     pending_details = [context.comment for context in pending_contexts]
     if not components and not contexts:
         contexts.append(
