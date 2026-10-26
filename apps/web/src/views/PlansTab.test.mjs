@@ -29,6 +29,24 @@ test("the ZIP-level operation shows durable progress, current job, and each resu
   assert.match(source, /result\?\.result\.itemPath/);
 });
 
+test("the ZIP-level action checks current Talend destinations and shows create/update/conflict decisions", () => {
+  assert.match(source, /api\.talendApplyBatchPreflight\(id\)/);
+  assert.match(source, /preflightReady/);
+  assert.match(source, /create_count/);
+  assert.match(source, /update_count/);
+  assert.match(source, /conflict_count/);
+  assert.match(source, /existing_path/);
+  assert.match(source, /Volver a comprobar/);
+  assert.match(source, /Recrear Jobs faltantes/);
+});
+
+test("a saved conflict cleared by live Talend inventory is presented as retryable, not current", () => {
+  assert.match(source, /staleConflictResolved/);
+  assert.match(source, /El conflicto anterior ya no está en Talend/);
+  assert.match(source, /Aplicar según inventario actual/);
+  assert.match(source, /!staleConflictResolved && batchState\.error/);
+});
+
 test("transient batch polling errors retain the last state and report automatic retries", () => {
   assert.match(hooksSource, /preserveDataOnError\s*\?\s*\{ \.\.\.s, error: e\.message, loading: false \}/);
   assert.match(source, /preserveDataOnError: true/);

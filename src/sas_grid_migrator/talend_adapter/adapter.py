@@ -91,10 +91,10 @@ class TalendAdapter:
 
     async def health_check(self) -> dict[str, Any]:
         try:
-            data = await self._data("talend_jobs_list")
+            jobs = await self.list_jobs()
         except TalendError as e:
             return {"available": False, "mcp_available": False, "error": str(e)}
-        jobs = len(data.get("jobs", []))
+        job_count = len(jobs)
         try:
             bridge = await self._data("talend_bridge_ping")
         except TalendError as e:
@@ -102,7 +102,7 @@ class TalendAdapter:
                 "available": False,
                 "mcp_available": True,
                 "bridge_available": False,
-                "jobs": jobs,
+                "jobs": job_count,
                 "error": str(e),
             }
         if bridge.get("ok") is not True:
@@ -110,7 +110,7 @@ class TalendAdapter:
                 "available": False,
                 "mcp_available": True,
                 "bridge_available": False,
-                "jobs": jobs,
+                "jobs": job_count,
                 "error": "Talend Studio Bridge no está disponible.",
             }
         return {
@@ -119,12 +119,65 @@ class TalendAdapter:
             "bridge_available": True,
             "bridge_mode": bridge.get("mode"),
             "unsafe_actions": bridge.get("unsafeActions", False),
-            "jobs": jobs,
+            "jobs": job_count,
         }
 
-    async def list_jobs(self) -> list[str]:
-        jobs = (await self._data("talend_jobs_list")).get("jobs", [])
-        return [job for job in jobs if isinstance(job, str)]
+    async def list_jobs(self) -> list[dict[str, Any]]:
+        """Return the complete Job inventory, failing if MCP cannot page it fully."""
+        page_size = 100
+        jobs: list[dict[str, Any]] = []
+        seen: set[tuple[str, str]] = set()
+        expected_total: int | None = None
+        offset = 0
+
+        for _ in range(1000):
+            data = await self._data(
+                "talend_jobs_list", {"limit": page_size, "offset": offset}
+            )
+            page = data.get("jobs")
+            if not isinstance(page, list) or len(page) > page_size:
+                raise TalendError("talend_jobs_list devolvió una página inválida; preflight incompleto.")
+
+            reported_total = data.get("total")
+            if reported_total is not None:
+                if not isinstance(reported_total, int) or reported_total < 0:
+                    raise TalendError("talend_jobs_list devolvió un total inválido; preflight incompleto.")
+                if expected_total is not None and reported_total != expected_total:
+                    raise TalendError("talend_jobs_list cambió el total entre páginas; preflight incompleto.")
+                expected_total = reported_total
+
+            if not page:
+                if expected_total is not None and len(jobs) < expected_total:
+                    raise TalendError("talend_jobs_list devolvió un inventario incompleto.")
+                return jobs
+
+            for job in page:
+                if (
+                    not isinstance(job, dict)
+                    or not isinstance(job.get("name"), str)
+                    or not job["name"].strip()
+                    or not isinstance(job.get("path"), str)
+                    or not job["path"].strip()
+                ):
+                    raise TalendError("talend_jobs_list devolvió un Job sin nombre o ruta; preflight incompleto.")
+                key = (job["name"].casefold(), job["path"].replace("\\", "/").casefold())
+                if key in seen:
+                    raise TalendError("talend_jobs_list repitió una página; preflight incompleto.")
+                seen.add(key)
+                jobs.append(job)
+
+            offset += len(page)
+            if expected_total is not None:
+                if len(jobs) > expected_total:
+                    raise TalendError("talend_jobs_list devolvió más Jobs que el total informado.")
+                if len(jobs) == expected_total:
+                    return jobs
+            if len(page) < page_size:
+                if expected_total is not None and len(jobs) < expected_total:
+                    raise TalendError("talend_jobs_list devolvió un inventario incompleto.")
+                return jobs
+
+        raise TalendError("talend_jobs_list excedió el límite de páginas; preflight incompleto.")
 
     async def read_contexts(self, job_name: str) -> list[dict[str, Any]]:
         return (await self._data("talend_read_contexts", {"jobName": job_name})).get("contexts", [])

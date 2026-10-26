@@ -1,4 +1,4 @@
-import type { CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, ProjectUploadResponse, Summary, TalendApplyBatchState, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing } from "./types";
+import type { CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, ProjectUploadResponse, Summary, TalendApplyBatchPreflight, TalendApplyBatchState, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -25,6 +25,11 @@ const enc = encodeURI;
 export const api = {
   projects: () => req<Project[]>("/projects"),
   createProject: (name: string) => post<Project>("/projects", { name }),
+  deleteProject: (id: string, confirmation: string) =>
+    req<{ deleted: boolean; project_id: string; name: string; talend_jobs_untouched: boolean }>(
+      `/projects/${id}`,
+      { method: "DELETE", body: JSON.stringify({ confirmation }) },
+    ),
   createProjectFromZip: async (file: File, name?: string) => {
     const body = new FormData();
     body.append("file", file);
@@ -69,6 +74,7 @@ export const api = {
     req<TalendApplyState>(`/projects/${id}/plans/${enc(file)}/talend-apply`),
   talendApplyBatch: (id: string) => post<TalendApplyBatchState>(`/projects/${id}/talend-apply-batch`),
   talendApplyBatchStatus: (id: string) => req<TalendApplyBatchState>(`/projects/${id}/talend-apply-batch`),
+  talendApplyBatchPreflight: (id: string) => req<TalendApplyBatchPreflight>(`/projects/${id}/talend-apply-batch/preflight`),
   exportAll: (id: string) => post<{ directory: string; files: string[] }>(`/projects/${id}/exports`),
   exportFile: (id: string, name: string) => `/api/projects/${id}/exports/${encodeURIComponent(name)}`,
   catalog: (q: string, family: string) =>

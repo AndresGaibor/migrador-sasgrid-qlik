@@ -131,11 +131,18 @@ def test_grid_recommendations_use_versioned_catalog_and_keep_unsupported_evidenc
     store, pid = project(tmp_path)
     ps = generate_plans(store, pid)
     assert ps.grid_recommendations
-    patterns = {r.pattern_id: r for r in ps.grid_recommendations}
+    all_patterns = {r.pattern_id: r for r in ps.grid_recommendations}
+    # Mantén las aserciones de línea ligadas al fixture que define estos casos.
+    # Otros proyectos sintéticos pueden incluir los mismos patrones con evidencia distinta.
+    coverage_recommendations = [
+        r for r in ps.grid_recommendations if r.evidence.file == "grid/coverage_variants.sh"
+    ]
+    patterns = {r.pattern_id: r for r in coverage_recommendations}
     catalog = json.loads((ROOT / "rules/sas/grid_catalog.json").read_text(encoding="utf-8"))
-    assert {entry["id"] for entry in catalog["patterns"]} <= patterns.keys()
+    assert {entry["id"] for entry in catalog["patterns"]} <= all_patterns.keys()
     assert all(r.reason and r.evidence.file and r.evidence.line > 0 for r in ps.grid_recommendations)
-    assert {"sasgsub.submit", "sasgsub.job_options", "sasgsub.set_parameters"} <= patterns.keys()
+    assert {"sasgsub.submit", "sasgsub.job_options"} <= patterns.keys()
+    assert "sasgsub.set_parameters" in all_patterns
     submit = patterns["sasgsub.submit"]
     assert submit.status == "partial" and submit.component_candidate == "tRunJob"
     assert submit.catalog_version == "1" and submit.doc_url and submit.evidence.line == 7

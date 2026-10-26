@@ -3,7 +3,7 @@ import { Icon } from "../components/Icon";
 import { api } from "../api";
 import { useAsync } from "../hooks";
 import { ComponentIcon } from "../components/ComponentIcon";
-import type { GridRecommendation, Step, TalendApplyBatchJob, TalendApplyBatchState, TalendApplyState } from "../types";
+import type { GridRecommendation, Step, TalendApplyBatchJob, TalendApplyBatchPreflight, TalendApplyBatchState, TalendApplyState } from "../types";
 import { Badge, Load, link } from "./common";
 import { orderSteps } from "../guided";
 import { catalogAudit } from "../catalog-explorer";
@@ -18,19 +18,26 @@ function PlanList({ id, projectName, archiveName }: { id: string; projectName?: 
   const grid = useAsync(() => api.gridRecommendations(id), [id]);
   const health = useAsync(() => api.talendHealth(), [id]);
   const batch = useAsync(() => api.talendApplyBatchStatus(id), [id], { preserveDataOnError: true });
+  const preflight = useAsync(() => api.talendApplyBatchPreflight(id), [id, q.data?.length ?? 0], { preserveDataOnError: true });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string>();
   const [batchBusy, setBatchBusy] = useState(false);
   const [batchError, setBatchError] = useState<string>();
   const batchState = batch.data;
   const batchActive = batchState?.status === "queued" || batchState?.status === "running";
-  const batchFinished = batchState?.status === "applied" || batchState?.status === "conflict";
-  const canStartBatch = Boolean(q.data?.length && health.data?.available && health.data.write_enabled && !batchBusy && !batchActive && !batchFinished);
+  const preflightReady = Boolean(!preflight.loading && !preflight.error && preflight.data?.available && preflight.data.conflict_count === 0);
+  const staleConflictResolved = Boolean(batchState?.status === "conflict" && preflightReady);
+  const missingJobCount = preflight.data?.create_count ?? 0;
+  const batchFinished = batchState?.status === "applied" && missingJobCount === 0 || batchState?.status === "conflict" && !preflightReady;
+  const canStartBatch = Boolean(q.data?.length && health.data?.available && health.data.write_enabled && preflightReady && !batchBusy && !batchActive && !batchFinished);
   useEffect(() => {
     if (!batchActive && !batch.error) return;
     const timer = window.setInterval(batch.reload, 1200);
     return () => window.clearInterval(timer);
   }, [batchActive, batch.error, batch.reload]);
+  useEffect(() => {
+    if (batchState && ["applied", "partially_applied", "failed", "conflict"].includes(batchState.status)) preflight.reload();
+  }, [batchState?.status, preflight.reload]);
   const gen = async () => {
     setBusy(true);
     setErr(undefined);
@@ -38,6 +45,7 @@ function PlanList({ id, projectName, archiveName }: { id: string; projectName?: 
       await api.generatePlans(id);
       q.reload();
       grid.reload();
+      preflight.reload();
     } catch (x) {
       setErr((x as Error).message);
     } finally {
@@ -52,6 +60,7 @@ function PlanList({ id, projectName, archiveName }: { id: string; projectName?: 
       batch.reload();
     } catch (x) {
       setBatchError((x as Error).message);
+      preflight.reload();
     } finally {
       setBatchBusy(false);
     }
@@ -67,8 +76,9 @@ function PlanList({ id, projectName, archiveName }: { id: string; projectName?: 
           <span className={`talend-mcp-status ${health.data?.available ? health.data.write_enabled ? "online" : "readonly" : "offline"}`} role="status" aria-live="polite">{health.loading ? "Consultando MCP…" : health.data?.available ? health.data.write_enabled ? "MCP y Bridge listos" : "MCP en solo lectura" : health.data?.mcp_available ? "Bridge sin conexión" : "MCP sin conexión"}</span>
         </div>
         <div className="talend-batch-project"><Icon name="folder" size={18} /><span><strong>{archiveName ?? projectName ?? `Proyecto ${id}`}</strong><small>{q.data.length} Jobs · destino raíz <code>{health.data?.apply_folder ?? "Process/PruebasWebSAS"}</code></small></span></div>
+        <TalendPreflightPanel preflight={preflight} />
         <button type="button" className="talend-implement-button talend-batch-button" onClick={() => void implementProject()} disabled={!canStartBatch}>
-          <Icon name="flow" size={20} />{batchBusy || batchActive ? "Implementando lote en Talend…" : batchState?.status === "applied" ? "Todos los Jobs implementados" : batchState && ["failed", "partially_applied", "interrupted"].includes(batchState.status) ? "Reintentar Jobs pendientes" : "Implementar todos los flujos del ZIP en Talend"}
+          <Icon name="flow" size={20} />{batchBusy || batchActive ? "Implementando lote en Talend…" : preflight.loading ? "Verificando destino en Talend…" : preflight.error ? "Destino sin verificar" : preflight.data?.conflict_count ? "Resolver conflictos de destino" : batchState?.status === "applied" && missingJobCount > 0 ? "Recrear Jobs faltantes en Talend" : staleConflictResolved ? "Aplicar según inventario actual" : batchState?.status === "applied" ? "Todos los Jobs implementados" : batchState && ["failed", "partially_applied", "interrupted"].includes(batchState.status) ? "Reintentar Jobs pendientes" : "Implementar todos los flujos del ZIP en Talend"}
         </button>
         {health.data?.error && <p className="error" role="alert">{health.data.error}</p>}
         {health.error && <p className="error" role="alert">{health.error}</p>}
@@ -76,14 +86,15 @@ function PlanList({ id, projectName, archiveName }: { id: string; projectName?: 
         {batch.error && <p className="error" role="alert">No se pudo actualizar el progreso del lote: {batch.error}. Se volverá a intentar automáticamente.</p>}
         {health.data?.available && !health.data.write_enabled && <p className="muted">Activa <code>TALEND_MCP_READONLY=false</code> en la API y reiníciala para permitir la creación.</p>}
         {!health.loading && !health.data?.available && <p className="muted">Abre Talend Studio con el Bridge activo y verifica la conexión MCP antes de iniciar.</p>}
-        {batchState && batchState.status !== "not_started" && <div className={`talend-batch-state ${batchState.status}`} role="status" aria-live="polite">
-          <div className="talend-batch-state-heading"><strong>{talendApplyBatchLabel(batchState.status)}</strong><span>{batchState.completed_jobs} / {batchState.total_jobs} Jobs resueltos</span></div>
+        {batchState && batchState.status !== "not_started" && <div className={`talend-batch-state ${staleConflictResolved ? "preflight-ready" : batchState.status}`} role="status" aria-live="polite">
+          <div className="talend-batch-state-heading"><strong>{staleConflictResolved ? "El conflicto anterior ya no está en Talend" : talendApplyBatchLabel(batchState.status)}</strong><span>{staleConflictResolved && preflight.data ? `${preflight.data.create_count} por crear · ${preflight.data.update_count} por actualizar · 0 conflictos actuales` : `${batchState.completed_jobs} / ${batchState.total_jobs} Jobs resueltos`}</span></div>
+          {staleConflictResolved && preflight.data && <p>El portal actualizó la comprobación con el inventario de Studio ({preflight.data.inventory_count} Jobs). Al aplicar, creará los Jobs que faltan y actualizará los que ya estén en su carpeta destino.</p>}
           {batchActive && batchState.total_jobs > 0 && <div className="talend-batch-progress" role="progressbar" aria-label="Progreso de implementación del proyecto" aria-valuemin={0} aria-valuemax={batchState.total_jobs} aria-valuenow={batchState.completed_jobs}><span style={{ width: `${Math.round((batchState.completed_jobs / batchState.total_jobs) * 100)}%` }} /></div>}
           {batchActive && <p>{batchState.current_program ? <>MCP trabajando en <code>{batchState.current_program}</code></> : "El MCP está preparando el primer Job…"} Talend no ejecutará los Jobs.</p>}
-          {batchState.error && <p className="error">{batchState.error}</p>}
+          {!staleConflictResolved && batchState.error && <p className="error">{batchState.error}</p>}
           {batchState.warnings.map((warning, index) => <p className="notice warning" key={`batch-warning-${index}`}>{warning}</p>)}
-          {batchState.jobs.length > 0 && <ArchivePathTree entries={batchState.jobs.map((job) => ({ path: job.program, value: job }))} renderEntry={({ path, value: job }) => <BatchJobRow key={path} projectId={id} path={path} job={job} />} />}
-          {!batchActive && batchState.jobs.length > 0 && <p className="muted">El lote terminó. Revisa los resultados por programa; esta acción crea los Jobs pero no los ejecuta.</p>}
+          {!staleConflictResolved && batchState.jobs.length > 0 && <ArchivePathTree entries={batchState.jobs.map((job) => ({ path: job.program, value: job }))} renderEntry={({ path, value: job }) => <BatchJobRow key={path} projectId={id} path={path} job={job} />} />}
+          {!staleConflictResolved && !batchActive && batchState.jobs.length > 0 && <p className="muted">El lote terminó. Revisa los resultados por programa; esta acción crea los Jobs pero no los ejecuta.</p>}
         </div>}
       </section> : null}
       {grid.data && <GridRecommendations id={id} items={grid.data} />}
@@ -100,6 +111,33 @@ function PlanList({ id, projectName, archiveName }: { id: string; projectName?: 
       )}
     </>
   );
+}
+
+function TalendPreflightPanel({ preflight }: { preflight: { data?: TalendApplyBatchPreflight; error?: string; loading: boolean; reload: () => void } }) {
+  const report = preflight.data;
+  return <section className={`talend-preflight ${preflight.error ? "error" : report?.conflict_count ? "conflict" : "ready"}`} aria-label="Comprobación del destino Talend" aria-live="polite">
+    <div className="talend-preflight-heading">
+      <div><strong>{preflight.loading ? "Comprobando el destino en Talend…" : preflight.error ? "No se pudo verificar el destino" : report ? "Destino comprobado en Talend" : "Esperando comprobación del destino"}</strong>
+        {report && !preflight.error && <small>{report.create_count} se crearán · {report.update_count} se actualizarán · {report.conflict_count} conflictos · {report.inventory_count} Jobs revisados{report.checked_at ? ` · ${new Date(report.checked_at).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" })}` : ""}</small>}
+      </div>
+      <button type="button" className="secondary" onClick={preflight.reload} disabled={preflight.loading}>Volver a comprobar</button>
+    </div>
+    {preflight.error && <p className="error" role="alert">No se iniciará ninguna escritura hasta verificar MCP y el inventario completo: {preflight.error}</p>}
+    {report && !preflight.error && <details open={report.conflict_count > 0}>
+      <summary>Ver acciones para los {report.total_jobs} Jobs</summary>
+      <ul>{report.jobs.map((job) => <li key={job.program} className={`talend-preflight-job ${job.action}`}>
+        <div><strong>{preflightActionLabel(job.action)}:</strong> <code>{job.job_name}</code> · <code>{job.program}</code></div>
+        <small>Destino: <code>{job.folder_path}</code></small>
+        {job.existing_path && <small>Job existente: <code>{job.existing_path}</code></small>}
+        {job.reason && <small className="error">{job.reason}</small>}
+      </li>)}</ul>
+    </details>}
+  </section>;
+}
+
+function preflightActionLabel(action: TalendApplyBatchPreflight["jobs"][number]["action"]): string {
+  const labels = { create: "Se creará", update: "Se actualizará en esta carpeta", conflict: "Conflicto" };
+  return labels[action];
 }
 
 function BatchJobRow({ projectId, path, job }: { projectId: string; path: string; job: TalendApplyBatchJob }) {

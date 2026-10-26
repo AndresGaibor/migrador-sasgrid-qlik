@@ -168,6 +168,26 @@ export type TalendApplyBatchState = {
   started_at: string | null;
   updated_at: string | null;
 };
+export type TalendApplyPreflightJob = {
+  program: string;
+  job_name: string;
+  folder_path: string;
+  action: "create" | "update" | "conflict";
+  existing_path: string | null;
+  reason: string | null;
+};
+export type TalendApplyBatchPreflight = {
+  project_id: string;
+  revision_hash: string;
+  checked_at: string;
+  available: boolean;
+  inventory_count: number;
+  total_jobs: number;
+  jobs: TalendApplyPreflightJob[];
+  create_count: number;
+  update_count: number;
+  conflict_count: number;
+};
 export type CatalogItem = { name: string; description: string; families: string[]; parameters: number };
 export type CatalogList = {
   count: number;

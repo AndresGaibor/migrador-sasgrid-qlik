@@ -80,7 +80,7 @@ def test_health_unavailable_does_not_raise():
     ad = TalendAdapter(Fake({"talend_jobs_list": TalendError("caído")}))
     assert run(ad.health_check()) == {"available": False, "mcp_available": False, "error": "caído"}
     ok = TalendAdapter(Fake({
-        "talend_jobs_list": {"ok": True, "data": {"jobs": [{}]}},
+        "talend_jobs_list": {"ok": True, "data": {"jobs": [{"name": "job", "path": "/process/job/job_0.1.item"}], "total": 1}},
         "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readOnly", "unsafeActions": False}},
     }))
     assert run(ok.health_check()) == {
@@ -106,6 +106,45 @@ def test_health_reports_bridge_offline_even_when_mcp_server_is_reachable():
         "jobs": 0,
         "error": "Talend Studio Bridge no está disponible.",
     }
+
+
+def test_list_jobs_reads_every_mcp_page_when_inventory_exceeds_default_page_size():
+    jobs = [
+        {"name": f"job_{index}", "path": f"C:/workspace/process/job_{index}/job_{index}_0.1.item"}
+        for index in range(101)
+    ]
+
+    class PagedCaller:
+        def __init__(self):
+            self.offsets = []
+
+        async def call(self, tool, args):
+            self.offsets.append(args["offset"])
+            start = args["offset"]
+            page = jobs[start : start + args["limit"]]
+            return {"ok": True, "data": {"jobs": page, "count": len(page), "total": len(jobs)}}
+
+    caller = PagedCaller()
+    result = run(TalendAdapter(caller).list_jobs())
+
+    assert caller.offsets == [0, 100]
+    assert result == jobs
+
+
+def test_list_jobs_rejects_an_incomplete_mcp_inventory():
+    page = [
+        {"name": f"job_{index}", "path": f"C:/workspace/process/job_{index}/job_{index}_0.1.item"}
+        for index in range(100)
+    ]
+
+    class IncompleteCaller:
+        async def call(self, _tool, args):
+            if args["offset"] == 0:
+                return {"ok": True, "data": {"jobs": page, "total": 101}}
+            return {"ok": True, "data": {"jobs": [], "total": 101}}
+
+    with pytest.raises(TalendError, match="inventario incompleto"):
+        run(TalendAdapter(IncompleteCaller()).list_jobs())
 
 
 def test_verify_plans_is_conservative(tmp_path):

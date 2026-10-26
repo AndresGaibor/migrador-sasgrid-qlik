@@ -68,7 +68,7 @@ def test_build_apply_spec_maps_verified_steps_to_mcp_custom_job_spec():
             "componentName": "tFileInputDelimited",
             "posX": 160,
             "posY": 96,
-            "label": "Aplicar tFileInputDelimited [read_1]",
+            "label": "Aplicar tFileInputDelimited · SAS 1",
             "parameters": {"HEADER": "1"},
             "schema": {
                 "name": "tFileInputDelimited_1_schema",
@@ -426,6 +426,18 @@ def test_empty_plan_keeps_source_identity_in_context_so_each_guide_can_create_it
             "comment": "Programa SAS de origen incluido en esta guía.",
         }
     ]
+
+
+def test_component_labels_are_short_and_keep_a_compact_sas_operation_reference():
+    migration = plan(step("op_27_load_customers_1", "tFileInputDelimited"))
+    migration.steps[0].purpose = "Leer registros de clientes activos desde el archivo de origen mensual"
+
+    result = build_apply_spec(migration, "Process/PruebasWebSAS")
+    label = result.components[0].label
+
+    assert label.endswith("· SAS 27")
+    assert "op_27_load_customers_1" not in label
+    assert len(label) <= 64
 
 
 def test_talend_destination_folder_follows_the_zip_program_directories(monkeypatch):

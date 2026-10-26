@@ -125,6 +125,22 @@ _CONNECTORS = {
     "Iterate": "ITERATE",
 }
 
+
+def _component_label(purpose: str, operation_identity: str, fallback_order: int) -> str:
+    """Crea una etiqueta corta sin perder la referencia al paso SAS."""
+    match = re.match(r"op_(\d+)_", operation_identity, flags=re.IGNORECASE)
+    sas_reference = match.group(1) if match else str(fallback_order)
+    suffix = f" · SAS {sas_reference}"
+    compact_purpose = " ".join(purpose.split()).strip() or "Paso SAS"
+    max_purpose_length = 64 - len(suffix)
+    if len(compact_purpose) > max_purpose_length:
+        compact_purpose = compact_purpose[: max_purpose_length - 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
+        if not compact_purpose:
+            compact_purpose = purpose[: max_purpose_length - 1].rstrip()
+        compact_purpose += "…"
+    return f"{compact_purpose}{suffix}"
+
+
 def _safe_folder_path(folder_path: str) -> str:
     normalized = folder_path.replace("\\", "/").strip("/")
     parts = normalized.split("/") if normalized else []
@@ -621,7 +637,7 @@ def build_apply_spec(
                 componentName=step.component_candidate,
                 posX=160 + positions[step.id] * 280,
                 posY=96,
-                label=f"{step.purpose} [{operation_identity}]",
+                label=_component_label(step.purpose, operation_identity, step.order),
                 parameters=verified_parameters,
                 tables=component_tables.get(step.id),
                 schema_=schema,

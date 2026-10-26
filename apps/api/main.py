@@ -4,6 +4,7 @@ import os
 import re
 import tempfile
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 from threading import Condition
 
@@ -29,7 +30,7 @@ from sas_grid_migrator.migration_planner.service import (
     load_plans,
     set_decision,
 )
-from sas_grid_migrator.persistence.store import Store
+from sas_grid_migrator.persistence.store import ProjectDeletionBlockedError, Store
 from sas_grid_migrator.reporting.exports import render_plan_md, steps_csv
 from sas_grid_migrator.sas_parser.analyze import (
     AnalysisSummary,
@@ -60,6 +61,10 @@ def store() -> Store:
 
 class NewProject(BaseModel):
     name: str
+
+
+class DeleteProjectConfirmation(BaseModel):
+    confirmation: str
 
 
 class NewImport(BaseModel):
@@ -194,6 +199,30 @@ def create_project(body: NewProject) -> Project:
 @app.get("/api/projects")
 def list_projects() -> list[Project]:
     return store().list_projects()
+
+
+@app.delete("/api/projects/{project_id}")
+def delete_project(project_id: str, body: DeleteProjectConfirmation) -> dict[str, object]:
+    s = store()
+    project = s.get_project(project_id)
+    if project is None:
+        raise HTTPException(404, "proyecto no encontrado")
+    if body.confirmation != project.name:
+        raise HTTPException(422, "escribe el nombre exacto del proyecto para confirmar")
+    try:
+        deleted = s.delete_project(project_id)
+    except ProjectDeletionBlockedError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    if not deleted:
+        raise HTTPException(404, "proyecto no encontrado")
+    return {
+        "deleted": True,
+        "project_id": project_id,
+        "name": project.name,
+        "talend_jobs_untouched": True,
+    }
 
 
 @app.post("/api/projects/uploads", status_code=201)
@@ -663,7 +692,13 @@ def preview_talend_apply(project_id: str, program: str) -> dict:
     }
 
 
-async def _apply_talend_plan(project_id: str, program: str) -> dict:
+async def _apply_talend_plan(
+    project_id: str,
+    program: str,
+    *,
+    allow_conflict_retry: bool = False,
+    allow_missing_retry: bool = False,
+) -> dict:
     from sas_grid_migrator.talend_adapter.adapter import TalendError
 
     plans = _plans(project_id)
@@ -688,9 +723,9 @@ async def _apply_talend_plan(project_id: str, program: str) -> dict:
                 409,
                 "El Job ya tiene una implementación con otra revisión; crea un nuevo ZIP/proyecto para evitar sobrescribirlo.",
             )
-        if previous["status"] == "applied":
+        if previous["status"] == "applied" and not allow_missing_retry:
             return previous["result"]
-        if previous["status"] == "conflict":
+        if previous["status"] == "conflict" and not allow_conflict_retry:
             raise HTTPException(409, previous["error"] or "El destino Talend tiene un conflicto pendiente.")
         if previous["status"] == "running":
             raise HTTPException(409, "La implementación de este Job ya está en curso.")
@@ -714,7 +749,7 @@ async def _apply_talend_plan(project_id: str, program: str) -> dict:
                     409,
                     f"El Job hijo {related_plan.program} ya tiene una implementación con otra revisión; crea un nuevo ZIP/proyecto para evitar sobrescribirlo.",
                 )
-            if child_previous["status"] == "conflict":
+            if child_previous["status"] == "conflict" and not allow_conflict_retry:
                 raise HTTPException(
                     409,
                     child_previous["error"] or f"El Job hijo {related_plan.program} tiene un conflicto pendiente.",
@@ -781,16 +816,71 @@ async def _apply_talend_plan(project_id: str, program: str) -> dict:
     return outcome
 
 
+async def _talend_batch_preflight(project_id: str) -> dict:
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+    from sas_grid_migrator.talend_adapter.preflight import classify_jobs
+
+    ordered, specs, revision_hash = _talend_batch_bundle(project_id)
+    try:
+        inventory = await _talend().list_jobs()
+    except TalendError as e:
+        raise HTTPException(502, f"No se pudo comprobar el destino Talend: {e}") from e
+
+    classified = classify_jobs([specs[plan.program] for plan in ordered], inventory)
+    return {
+        "project_id": project_id,
+        "revision_hash": revision_hash,
+        "checked_at": datetime.now(UTC).isoformat(),
+        "available": True,
+        "inventory_count": len(inventory),
+        "total_jobs": len(ordered),
+        **classified,
+    }
+
+
+@app.get("/api/projects/{project_id}/talend-apply-batch/preflight")
+async def talend_apply_batch_preflight(project_id: str) -> dict:
+    s = store()
+    _require(s, project_id)
+    return await _talend_batch_preflight(project_id)
+
+
 @app.post("/api/projects/{project_id}/talend-apply-batch", status_code=202)
 async def start_talend_apply_batch(project_id: str, background_tasks: BackgroundTasks) -> dict:
     s = store()
     _require(s, project_id)
     if not _talend_write_enabled():
         raise HTTPException(403, "El MCP está en solo lectura. Configura TALEND_MCP_READONLY=false para habilitar la creación.")
+    preflight = await _talend_batch_preflight(project_id)
+    if preflight["conflict_count"]:
+        collisions = [
+            f"{item['job_name']}: {item['reason']} {item['existing_path'] or ''}".strip()
+            for item in preflight["jobs"]
+            if item["action"] == "conflict"
+        ]
+        raise HTTPException(
+            409,
+            "La comprobación encontró conflictos en el destino Talend; no se modificó ningún Job. "
+            + "; ".join(collisions),
+        )
     ordered, _specs, revision_hash = _talend_batch_bundle(project_id)
+    if preflight["revision_hash"] != revision_hash:
+        raise HTTPException(
+            409,
+            "El plan del proyecto cambió durante la comprobación del destino; vuelve a revisar el proyecto.",
+        )
     programs = [plan.program for plan in ordered]
+    missing_programs = {
+        item["program"] for item in preflight["jobs"] if item["action"] == "create"
+    }
     try:
-        snapshot, started = s.begin_talend_apply_batch(project_id, revision_hash, programs)
+        snapshot, started = s.begin_talend_apply_batch(
+            project_id,
+            revision_hash,
+            programs,
+            retry_conflicts=True,
+            retry_programs=missing_programs,
+        )
     except ValueError as e:
         raise HTTPException(409, str(e)) from e
     if started:
@@ -823,6 +913,9 @@ def talend_apply_batch_status(project_id: str) -> dict:
 
 
 async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_programs: list[str]) -> None:
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+    from sas_grid_migrator.talend_adapter.preflight import classify_jobs
+
     s = store()
     snapshot = s.get_talend_apply_batch_state(project_id)
     if snapshot is None or snapshot["revision_hash"] != revision_hash:
@@ -879,6 +972,33 @@ async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_p
             warnings=cycle_warnings,
         )
 
+    try:
+        inventory = await _talend().list_jobs()
+    except TalendError as e:
+        error = f"No se pudo volver a comprobar el destino Talend; no se escribió ningún Job: {e}"
+        for job in jobs:
+            if job["status"] != "applied":
+                job.update(status="failed", result=None, error=error)
+        persist("failed", error=error)
+        return
+
+    preflight = classify_jobs([specs[program] for program in ordered_programs], inventory)
+    if preflight["conflict_count"]:
+        actions = {item["program"]: item for item in preflight["jobs"]}
+        for job in jobs:
+            action = actions[job["program"]]
+            if action["action"] == "conflict":
+                job.update(status="conflict", result=None, error=action["reason"])
+            elif job["status"] != "applied":
+                job.update(status="pending", result=None, error=None)
+        error = "La comprobación del destino encontró conflictos nuevos; no se modificó ningún Job."
+        persist("conflict", error=error)
+        return
+
+    missing_programs = {
+        item["program"] for item in preflight["jobs"] if item["action"] == "create"
+    }
+
     persist("running")
     for index, program in enumerate(ordered_programs):
         job = jobs[index]
@@ -897,12 +1017,17 @@ async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_p
             )
             persist("conflict", error=job["error"])
             return
-        if job["status"] == "applied" or program in confirmed_children:
+        if (job["status"] == "applied" and program not in missing_programs) or program in confirmed_children:
             continue
         job.update(status="running", error=None)
         persist("running", program)
         try:
-            outcome = await _apply_talend_plan(project_id, program)
+            outcome = await _apply_talend_plan(
+                project_id,
+                program,
+                allow_conflict_retry=True,
+                allow_missing_retry=program in missing_programs,
+            )
         except HTTPException as e:
             message = str(e.detail)
             is_conflict = e.status_code == 409 and bool(
