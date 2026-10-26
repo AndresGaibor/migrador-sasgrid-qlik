@@ -90,6 +90,9 @@ def _project_with_plans(
 
 
 class FakeTalend:
+    async def custom_spec_status(self):
+        return {"spec_supported": True, "spec_error": None}
+
     def __init__(
         self,
         *,
@@ -103,6 +106,8 @@ class FakeTalend:
         self.conflicts = conflicts or set()
         self.warning_programs = warnings or set()
         self.calls: list[dict] = []
+        self.last_arguments: dict | None = None
+        self.inspection_job_names: list[str] = []
         self.job_inventory = job_inventory or []
         self.inventory_error = inventory_error
 
@@ -133,24 +138,31 @@ class FakeTalend:
             "childJobs": children,
         }
 
-    def _record_created_jobs(self, arguments: dict) -> None:
-        name = arguments["jobName"]
-        folder = arguments["folderPath"].replace("\\", "/").strip("/")
-        path = f"C:/Talend/PRJ/{folder}/{name}/{name}_0.1.item"
-        self.job_inventory = [
-            item
-            for item in self.job_inventory
-            if not (
-                item.get("name", "").casefold() == name.casefold()
-                and item.get("path", "").replace("\\", "/").casefold() == path.casefold()
-            )
+    async def inspect_job(self, job_path: str):
+        from sas_grid_migrator.talend_adapter.adapter import ComponentRef, JobInspection
+
+        names = [
+            component.get("uniqueName", "")
+            for component in (self.last_arguments or {}).get("components", [])
         ]
-        self.job_inventory.append({"name": name, "path": path})
-        for child in arguments.get("childJobs", []):
-            self._record_created_jobs(child)
+        self.inspection_job_names.append(job_path)
+        return JobInspection(
+            job_path=job_path,
+            components=[
+                ComponentRef(unique_name=name, component="tComponent", parameters=[])
+                for name in names
+                if name
+            ],
+            connections=0,
+            contexts=[],
+        )
+
+    async def job_problems(self, job_name: str) -> dict:
+        return {"clean": True, "problems": []}
 
     async def apply_custom_spec(self, arguments: dict) -> dict:
         self.calls.append(arguments)
+        self.last_arguments = arguments
         source = arguments["instructions"]["source"]["program"]
         if source in self.conflicts:
             from sas_grid_migrator.talend_adapter.adapter import TalendError
@@ -160,8 +172,9 @@ class FakeTalend:
             from sas_grid_migrator.talend_adapter.adapter import TalendError
 
             raise TalendError(f"Bridge error for {source}")
-        self._record_created_jobs(arguments)
-        return self._result(arguments)
+        result = self._result(arguments)
+        self.job_inventory.append({"name": arguments["jobName"], "path": result["itemPath"]})
+        return result
 
 
 def _set_env(monkeypatch, tmp_path: Path) -> None:
@@ -562,69 +575,221 @@ def test_batch_state_is_scoped_to_project(tmp_path, monkeypatch):
     assert second_state.json()["jobs"] == []
 
 
-def test_preflight_classifies_exact_destination_missing_and_external_jobs(tmp_path, monkeypatch):
+def test_batch_summary_reports_totals_and_human_review(tmp_path, monkeypatch):
     _set_env(monkeypatch, tmp_path)
-    fake = FakeTalend()
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Summary",
+            [_plan("x", "alpha.sas", "job_alpha"), _plan("x", "beta.sas", "job_beta")],
+        )
+        summary = client.get(f"/api/projects/{project_id}/talend-apply-batch/summary")
+
+    assert summary.status_code == 200, summary.text
+    body = summary.json()
+    assert body["total_jobs"] == 2
+    assert [item["program"] for item in body["programs"]] == ["alpha.sas", "beta.sas"]
+    assert body["total_contexts"] == sum(item["contexts"] for item in body["programs"])
+    assert body["destination_root"].startswith("Process/")
+    for item in body["programs"]:
+        assert item["job_name"]
+        assert item["folder_path"]
+        assert isinstance(item["draft_components"], list)
+        assert isinstance(item["pending"], list)
+
+
+def test_batch_persists_each_phase_while_running_and_clears_it(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    phases: list[tuple[str, str | None]] = []
+
+    class PhaseRecorder(FakeTalend):
+        project_id: str = ""
+
+        def _running_phase(self) -> str | None:
+            state = api_module.store().get_talend_apply_batch_state(self.project_id)
+            running = next((item for item in state["jobs"] if item["status"] == "running"), None)
+            return running.get("phase") if running else None
+
+        async def apply_custom_spec(self, arguments: dict) -> dict:
+            phases.append(("apply", self._running_phase()))
+            return await super().apply_custom_spec(arguments)
+
+        async def job_problems(self, job_name: str) -> dict:
+            phases.append(("problems", self._running_phase()))
+            return await super().job_problems(job_name)
+
+    fake = PhaseRecorder()
     monkeypatch.setattr(api_module, "_talend", lambda: fake)
     with TestClient(api_module.app) as client:
         project_id = _project_with_plans(
             client,
-            "Preflight actions",
-            [
-                _plan("pending", "update.sas", "job_update"),
-                _plan("pending", "create.sas", "job_create"),
-                _plan("pending", "conflict.sas", "job_conflict"),
-            ],
+            "Phases",
+            [_plan("x", "alpha.sas", "job_alpha"), _plan("x", "beta.sas", "job_beta")],
         )
-        _ordered, specs, _revision = api_module._talend_batch_bundle(project_id)
-        exact_folder = specs["update.sas"].folder_path.removeprefix("Process/")
-        fake.job_inventory = [
-            {
-                "name": "job_update",
-                "path": f"C:/Talend/PRJ/process/{exact_folder}/job_update/job_update_0.1.item",
-            },
-            {
-                "name": "job_conflict",
-                "path": "C:/Talend/PRJ/process/OtherProject/job_conflict/job_conflict_0.1.item",
-            },
-        ]
+        fake.project_id = project_id
+        start = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        assert start.status_code == 202, start.text
+        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
 
-        response = client.get(f"/api/projects/{project_id}/talend-apply-batch/preflight")
+    assert phases == [
+        ("apply", "applying"),
+        ("problems", "inspecting"),
+        ("apply", "applying"),
+        ("problems", "inspecting"),
+    ]
+    assert [job["phase"] for job in state["jobs"]] == [None, None]
+
+
+def test_preflight_uses_project_destination_and_dependency_order_without_mcp(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+
+    def no_mcp():
+        raise AssertionError("A preview must not contact or modify Talend Studio")
+
+    monkeypatch.setattr(api_module, "_talend", no_mcp)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Preflight",
+            [_plan("x", "first.sas", "job_first"), _plan("x", "last.sas", "job_last")],
+            [["last.sas"], ["first.sas"]],
+            cycles=[["first.sas", "last.sas"]],
+        )
+        response = client.get(f"/api/projects/{project_id}/talend-apply-batch/summary")
+        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
 
     assert response.status_code == 200, response.text
-    payload = response.json()
-    assert payload["available"] is True
-    assert (payload["create_count"], payload["update_count"], payload["conflict_count"]) == (1, 1, 1)
-    assert {item["program"]: item["action"] for item in payload["jobs"]} == {
-        "update.sas": "update",
-        "create.sas": "create",
-        "conflict.sas": "conflict",
-    }
+    body = response.json()
+    assert project_id in body["destination_root"]
+    assert [item["program"] for item in body["programs"]] == ["last.sas", "first.sas"]
+    assert all(item["folder_path"].startswith(body["destination_root"]) for item in body["programs"])
+    assert body["creatable_jobs"] == 2
+    assert all(item["ready_for_creation"] for item in body["programs"])
+    assert body["cycles"] == [["first.sas", "last.sas"]]
+    assert state["status"] == "not_started"
 
 
-def test_batch_updates_existing_job_in_exact_destination_folder(tmp_path, monkeypatch):
+def test_preflight_distinguishes_context_only_jobs_from_generated_components(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    plan = _plan("x", "manual.sas", "job_manual")
+    plan.context_variables = []
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Manual only", [plan])
+        response = client.get(f"/api/projects/{project_id}/talend-apply-batch/summary")
+
+    assert response.status_code == 200, response.text
+    item = response.json()["programs"][0]
+    assert item["components"] == 0
+    assert item["contexts"] == 1
+    assert item["creation_kind"] == "context_only"
+
+
+def test_batch_rejects_outdated_confirmation_before_any_mcp_write(tmp_path, monkeypatch):
     _set_env(monkeypatch, tmp_path)
     fake = FakeTalend()
     monkeypatch.setattr(api_module, "_talend", lambda: fake)
     with TestClient(api_module.app) as client:
-        project_id = _project_with_plans(client, "Update in place", [_plan("pending", "a.sas", "job_alpha")])
-        _ordered, specs, _revision = api_module._talend_batch_bundle(project_id)
-        spec = specs["a.sas"]
-        exact_folder = spec.folder_path.removeprefix("Process/")
-        fake.job_inventory = [{
-            "name": "job_alpha",
-            "path": f"C:/Talend/PRJ/process/{exact_folder}/job_alpha/job_alpha_0.1.item",
-        }]
+        project_id = _project_with_plans(client, "Confirmed preview", [_plan("x", "a.sas", "job_a")])
+        summary = client.get(f"/api/projects/{project_id}/talend-apply-batch/summary").json()
+        s = Store(Settings.from_env())
+        plans = PlanSet.model_validate_json(s.plans_path(project_id).read_text(encoding="utf-8"))
+        plans.plans[0].job_name = "job_updated"
+        s.plans_path(project_id).write_text(plans.model_dump_json(), encoding="utf-8")
 
-        preflight = client.get(f"/api/projects/{project_id}/talend-apply-batch/preflight")
+        stale = client.post(
+            f"/api/projects/{project_id}/talend-apply-batch",
+            json={"expected_revision": summary["revision_hash"]},
+        )
+        assert stale.status_code == 409, stale.text
+        assert fake.calls == []
+        assert client.get(f"/api/projects/{project_id}/talend-apply-batch").json()["status"] == "not_started"
+
+        fresh = client.get(f"/api/projects/{project_id}/talend-apply-batch/summary").json()
+        accepted = client.post(
+            f"/api/projects/{project_id}/talend-apply-batch",
+            json={"expected_revision": fresh["revision_hash"]},
+        )
+        assert accepted.status_code == 202, accepted.text
+        assert len(fake.calls) == 1
+
+
+def test_studio_problems_prevent_a_clean_application_status(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+
+    class StudioProblems(FakeTalend):
+        async def job_problems(self, job_name: str) -> dict:
+            return {"clean": False, "problems": [{"severity": "ERROR", "message": "Missing schema"}]}
+
+    monkeypatch.setattr(api_module, "_talend", lambda: StudioProblems())
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Studio issues", [_plan("x", "a.sas", "job_a")])
+        result = client.post(f"/api/projects/{project_id}/plans/a.sas/talend-apply")
+
+    assert result.status_code == 200, result.text
+    assert result.json()["status"] == "partially_applied"
+    assert any("Studio" in warning for warning in result.json()["warnings"])
+
+
+def test_nested_draft_job_remains_pending_human_review_after_mcp_creation(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    child = _plan("x", "child.sas", "job_child")
+    child.steps = [PlanStep(
+        id="draft", order=1, subjob="default", action="add_component",
+        component_candidate="tRowGenerator", purpose="Generar filas",
+        pending=["Confirmar esquema"], evidence=Loc(file="child.sas", line=1, end_line=1),
+    )]
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client, "Draft child", [_plan("x", "parent.sas", "job_parent", child_call=True), child],
+            [["parent.sas"], ["child.sas"]],
+        )
+        client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        child_state = client.get(f"/api/projects/{project_id}/plans/child.sas/talend-apply").json()
+
+    assert child_state["status"] == "applied"
+    assert child_state["result"]["review_required"] is True
+    assert any("borrador" in warning for warning in child_state["result"]["review_warnings"])
+
+
+def test_incompatible_mcp_is_rejected_before_scheduling_a_batch(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+
+    class LegacyMcp(FakeTalend):
+        async def custom_spec_status(self):
+            return {"spec_supported": False, "spec_error": "MCP incompatible: falta childJobs"}
+
+    fake = LegacyMcp()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Legacy MCP", [_plan("x", "a.sas", "job_a")])
         response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
+    assert response.status_code == 409
+    assert "incompatible" in response.json()["detail"]
+    assert state["status"] == "not_started"
+    assert fake.calls == []
 
-    assert preflight.status_code == 200, preflight.text
-    assert preflight.json()["update_count"] == 1
-    assert preflight.json()["conflict_count"] == 0
-    assert response.status_code == 202, response.text
-    assert len(fake.calls) == 1
-    assert fake.calls[0]["folderPath"].casefold() == spec.folder_path.casefold()
+
+def test_write_permission_is_configured_and_persisted_through_the_api(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "UI permissions", [_plan("x", "a.sas", "job_a")])
+        blocked = client.patch("/api/integrations/talend/permissions", json={"write_enabled": False})
+        assert blocked.status_code == 200, blocked.text
+        assert client.post(f"/api/projects/{project_id}/talend-apply-batch").status_code == 403
+        assert fake.calls == []
+    with TestClient(api_module.app) as client:
+        assert client.get("/api/integrations/talend/permissions").json()["write_enabled"] is False
+        # La variable antigua no decide el permiso de la interfaz.
+        monkeypatch.setenv("TALEND_MCP_READONLY", "true")
+        allowed = client.patch("/api/integrations/talend/permissions", json={"write_enabled": True})
+        assert allowed.json()["write_enabled"] is True
+        assert client.post(f"/api/projects/{project_id}/talend-apply-batch").status_code == 202
+        assert len(fake.calls) == 1
 
 
 def test_batch_blocks_all_writes_when_preflight_finds_external_homonym(tmp_path, monkeypatch):
@@ -641,30 +806,6 @@ def test_batch_blocks_all_writes_when_preflight_finds_external_homonym(tmp_path,
 
     assert response.status_code == 409
     assert "conflicto" in response.json()["detail"].lower()
-    assert fake.calls == []
-    assert state["status"] == "not_started"
-
-
-def test_batch_rejects_plan_change_between_preflight_and_batch_snapshot(tmp_path, monkeypatch):
-    _set_env(monkeypatch, tmp_path)
-    fake = FakeTalend()
-    monkeypatch.setattr(api_module, "_talend", lambda: fake)
-    original_preflight = api_module._talend_batch_preflight
-
-    async def stale_preflight(project_id: str) -> dict:
-        result = await original_preflight(project_id)
-        result["revision_hash"] = "stale-revision"
-        return result
-
-    monkeypatch.setattr(api_module, "_talend_batch_preflight", stale_preflight)
-    with TestClient(api_module.app) as client:
-        project_id = _project_with_plans(client, "Plan changed", [_plan("pending", "a.sas", "job_alpha")])
-
-        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
-        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
-
-    assert response.status_code == 409
-    assert "cambió" in response.json()["detail"].lower()
     assert fake.calls == []
     assert state["status"] == "not_started"
 
@@ -711,21 +852,6 @@ def test_batch_rechecks_stored_conflict_and_retries_after_job_disappears(tmp_pat
     assert state["status"] == "applied"
     assert state["attempt_count"] == 2
     assert len(fake.calls) == 1
-
-
-def test_preflight_fails_closed_when_mcp_inventory_is_unavailable(tmp_path, monkeypatch):
-    from sas_grid_migrator.talend_adapter.adapter import TalendError
-
-    _set_env(monkeypatch, tmp_path)
-    fake = FakeTalend(inventory_error=TalendError("MCP caído"))
-    monkeypatch.setattr(api_module, "_talend", lambda: fake)
-    with TestClient(api_module.app) as client:
-        project_id = _project_with_plans(client, "Offline preflight", [_plan("pending", "a.sas", "job_alpha")])
-
-        response = client.get(f"/api/projects/{project_id}/talend-apply-batch/preflight")
-
-    assert response.status_code == 502
-    assert "mcp caído" in response.json()["detail"].lower()
 
 
 def test_batch_recreates_a_deleted_job_without_reapplying_other_completed_jobs(tmp_path, monkeypatch):
@@ -790,3 +916,107 @@ def test_batch_recreates_a_deleted_job_without_reapplying_other_completed_jobs(t
     assert state["status"] == "applied"
     assert state["jobs"][0]["status"] == "applied"
     assert state["jobs"][1]["status"] == "applied"
+
+
+def test_batch_rejects_plan_change_between_preflight_and_batch_snapshot(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    original_preflight = api_module._talend_batch_preflight
+
+    async def stale_preflight(project_id: str) -> dict:
+        result = await original_preflight(project_id)
+        result["revision_hash"] = "stale-revision"
+        return result
+
+    monkeypatch.setattr(api_module, "_talend_batch_preflight", stale_preflight)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Plan changed", [_plan("pending", "a.sas", "job_alpha")])
+
+        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
+
+    assert response.status_code == 409
+    assert "cambió" in response.json()["detail"].lower()
+    assert fake.calls == []
+    assert state["status"] == "not_started"
+
+
+def test_batch_updates_existing_job_in_exact_destination_folder(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Update in place", [_plan("pending", "a.sas", "job_alpha")])
+        _ordered, specs, _revision = api_module._talend_batch_bundle(project_id)
+        spec = specs["a.sas"]
+        exact_folder = spec.folder_path.removeprefix("Process/")
+        fake.job_inventory = [{
+            "name": "job_alpha",
+            "path": f"C:/Talend/PRJ/process/{exact_folder}/job_alpha/job_alpha_0.1.item",
+        }]
+
+        preflight = client.get(f"/api/projects/{project_id}/talend-apply-batch/preflight")
+        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+
+    assert preflight.status_code == 200, preflight.text
+    assert preflight.json()["update_count"] == 1
+    assert preflight.json()["conflict_count"] == 0
+    assert response.status_code == 202, response.text
+    assert len(fake.calls) == 1
+    assert fake.calls[0]["folderPath"].casefold() == spec.folder_path.casefold()
+
+
+def test_preflight_classifies_exact_destination_missing_and_external_jobs(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Preflight actions",
+            [
+                _plan("pending", "update.sas", "job_update"),
+                _plan("pending", "create.sas", "job_create"),
+                _plan("pending", "conflict.sas", "job_conflict"),
+            ],
+        )
+        _ordered, specs, _revision = api_module._talend_batch_bundle(project_id)
+        exact_folder = specs["update.sas"].folder_path.removeprefix("Process/")
+        fake.job_inventory = [
+            {
+                "name": "job_update",
+                "path": f"C:/Talend/PRJ/process/{exact_folder}/job_update/job_update_0.1.item",
+            },
+            {
+                "name": "job_conflict",
+                "path": "C:/Talend/PRJ/process/OtherProject/job_conflict/job_conflict_0.1.item",
+            },
+        ]
+
+        response = client.get(f"/api/projects/{project_id}/talend-apply-batch/preflight")
+
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["available"] is True
+    assert (payload["create_count"], payload["update_count"], payload["conflict_count"]) == (1, 1, 1)
+    assert {item["program"]: item["action"] for item in payload["jobs"]} == {
+        "update.sas": "update",
+        "create.sas": "create",
+        "conflict.sas": "conflict",
+    }
+
+
+def test_preflight_fails_closed_when_mcp_inventory_is_unavailable(tmp_path, monkeypatch):
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend(inventory_error=TalendError("MCP caído"))
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Offline preflight", [_plan("pending", "a.sas", "job_alpha")])
+
+        response = client.get(f"/api/projects/{project_id}/talend-apply-batch/preflight")
+
+    assert response.status_code == 502
+    assert "mcp caído" in response.json()["detail"].lower()

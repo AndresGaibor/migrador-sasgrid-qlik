@@ -292,7 +292,7 @@
           "type": "string"
         },
         "note": {
-          "default": "Crear la conexión en Talend; no se copian credenciales",
+          "default": "Crear la conexi\u00f3n en Talend; no se copian credenciales",
           "title": "Note",
           "type": "string"
         }

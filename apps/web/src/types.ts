@@ -79,7 +79,7 @@ export type Deps = {
   unresolved: { kind: string; name: string; file: string; line: number; detail: string }[];
   orchestration: { tasks: GridTask[]; schedules: { file: string; line: number; text: string }[]; order: string[] };
 };
-export type PlanRow = { program: string; job_name: string; steps: number };
+export type PlanRow = { program: string; job_name: string; job_status: string; steps: number; pending: number; done: number };
 export type Step = {
   id: string;
   order: number;
@@ -90,10 +90,15 @@ export type Step = {
   purpose: string;
   properties: { name: string; value: string | null; origin: string; verified: boolean; in_catalog?: boolean | null; label?: string | null; options?: string[] }[];
   connections: { type: string; from_step: string | null }[];
+  operation_id?: string | null;
+  operation_type?: string | null;
+  schema_columns?: { name: string; talend_type: string | null }[];
   expressions: { sas: string; talend: string | null; line: number; warnings: string[] }[];
   assumptions: string[];
   pending: string[];
   tests: string[];
+  status: string;
+  note: string | null;
   evidence: { file: string; line: number };
   confidence: string;
   verified: boolean;
@@ -114,11 +119,33 @@ export type JobPlan = {
   orchestration: { grid_tasks: string[]; grid_recommendations: GridRecommendation[]; schedules: string[]; upstream: string[]; downstream: string[] };
   unresolved: string[];
 };
+export type TalendLicenseProfile = { code: string; label: string };
+export type CatalogItem = {
+  name: string;
+  description: string;
+  families: string[];
+  documentation_status: string;
+  lifecycle_status: string;
+  frameworks: string[];
+  license_profile: TalendLicenseProfile;
+  search_terms?: string[];
+};
+export type TalendApplyVerification = {
+  status: "unavailable" | "inspected";
+  reason: string | null;
+  components_requested: number;
+  components_created: number | null;
+  missing_components: string[];
+  studio_problems: { clean: boolean; items: { severity?: string; message?: string }[] } | null;
+};
 export type TalendApplyResult = {
   status: "applied" | "partially_applied";
   identity: { project_id: string; program: string; source_sha256: string | null; rules_version: string; job_name: string; folder_path: string };
   blocked_steps: { step_id: string; reason: string }[];
   warnings: string[];
+  verification?: TalendApplyVerification;
+  review_required?: boolean;
+  review_warnings?: string[];
   result: { jobName?: string; itemPath?: string; propertiesPath?: string; generatedComponents?: number; reusedComponents?: number; generatedConnections?: number; reusedConnections?: number; totalComponents?: number; generatedContexts?: number; updatedContexts?: number; reusedContexts?: number; removedContexts?: number; reusedExisting?: boolean; bridgeRefreshed?: boolean; bridgeOpened?: boolean; problems?: unknown };
 };
 export type TalendApplyPreview = {
@@ -150,8 +177,34 @@ export type TalendApplyState = {
 export type TalendApplyBatchJob = {
   program: string;
   status: "pending" | "running" | "applied" | "partially_applied" | "failed" | "conflict" | "interrupted";
+  phase: "applying" | "inspecting" | null;
   result: TalendApplyResult | null;
   error: string | null;
+};
+export type TalendApplyBatchSummary = {
+  project_id: string;
+  revision_hash: string;
+  destination_root: string;
+  total_jobs: number;
+  creatable_jobs: number;
+  cycles: string[][];
+  total_components: number;
+  total_connections: number;
+  total_contexts: number;
+  programs: {
+    program: string;
+    job_name: string;
+    folder_path: string;
+    ready_for_creation: boolean;
+    creation_kind: "components" | "context_only";
+    components: number;
+    connections: number;
+    contexts: number;
+    child_jobs: number;
+    blocked_steps: { step_id: string; reason: string }[];
+    pending: string[];
+    draft_components: { unique_name: string; reason: string }[];
+  }[];
 };
 export type TalendApplyBatchState = {
   project_id: string;
@@ -188,16 +241,21 @@ export type TalendApplyBatchPreflight = {
   update_count: number;
   conflict_count: number;
 };
-export type CatalogItem = { name: string; description: string; families: string[]; parameters: number };
 export type CatalogList = {
   count: number;
+  result_count: number;
+  has_more: boolean;
   families: Record<string, number>;
   components: CatalogItem[];
-  official_inventory: {
-    release: string;
+  official_component_names: string[];
+  official_documentation_inventory: {
+    target: string;
+    snapshot_version: string;
     source: string;
+    license_profile: TalendLicenseProfile;
     count: number;
-    components: { name: string; connectivity?: string; available_from?: string; note?: string }[];
+    documented: number;
+    exception: number;
   };
 };
 export type CatalogParam = {
@@ -220,4 +278,31 @@ export type CatalogComponent = CatalogItem & {
   imports?: { module?: string; mvn?: string; required_if?: string }[];
   variants: string[];
   doc_markdown: string | null;
+  official_availability?: {
+    source: string;
+    snapshot_version: string;
+    license_profile: TalendLicenseProfile;
+    records: {
+      family: string;
+      framework_code: string;
+      documentation_route: string;
+      license_branding_codes: string[];
+      license_branding_labels: string[];
+    }[];
+    frameworks: { code: string; label: string }[];
+  } | null;
+  official_documentation?: {
+    target: string;
+    framework_codes: string[];
+    lifecycle_status: string;
+    status: string;
+    issues?: string[];
+    routes?: {
+      route: string;
+      status: string;
+      pages: { url: string; title?: string; status: string }[];
+    }[];
+    configuration_pages: { url: string; title?: string; status: string }[];
+    configuration_sections: { url: string; heading: string }[];
+  } | null;
 };

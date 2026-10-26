@@ -1,0 +1,68 @@
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/hdfs/thdfsconnection · versión 8.0 -->
+# tHDFSConnection
+
+Last updated: 9/30/2026
+
+Connects to a given HDFS so that the other Hadoop components can reuse the
+connection it creates to communicate with this HDFS.
+
+tHDFSConnection provides
+connection to the Hadoop distributed file system (HDFS) of interest
+at runtime.
+
+This component is not shipped with your Talend Studio by
+default. You need to install it using the Feature Manager. For more information, see [Installing features using the Feature Manager](/talend/r/en-US/8.0/studio-user-guide/install-features-to-talend-studio).
+
+## tHDFSConnection Standard properties
+
+These properties are used to configure tHDFSConnection running in the Standard Job framework.
+
+The Standard
+tHDFSConnection component belongs to the Big Data and the File families.
+
+The component in this framework is available in all Talend products
+with Big Data and in Talend Data Fabric.
+
+## Basic settings
+
+| Properties | Description |
+| --- | --- |
+| Property Type | Select the way the connection details will be set.   * Built-In: The connection details will be set   locally for this component. You need to specify the values for all   related connection properties manually. * Repository: The connection details stored   centrally in Repository > Metadata will be reused by this component.  You need to click   the [...] button next to it and in the pop-up   Repository Content dialog box, select the   connection details to be reused, and all related connection   properties will be automatically filled in. |
+| Hadoop version | Select the Hadoop version of the distribution you are using. |
+| Scheme | Select the URI scheme of the file system to be used from the Scheme drop-down list. This scheme could be  * HDFS * WebHDFS. WebHDFS with SSL is not supported yet. * ADLS. Only Azure Data Lake Storage Gen1 is supported.   The schemes present on this list vary depending on the distribution you are using and only the scheme that appears on this list with a given distribution is officially supported by Talend.  Once a scheme is selected, the corresponding syntax such as webhdfs://localhost:50070/ for WebHDFS is displayed in the field for the NameNode location of your cluster.  If you have selected ADLS, the connection parameters to be defined become:  * In the Client   ID and the Client   key fields, enter, respectively, the authentication   ID and the authentication key generated upon the registration of the   application that the current Job you are developing uses to access   Azure Data Lake Storage.  Ensure that the application to be used   has appropriate permissions to access Azure Data Lake. You can check   this on the Required permissions view of this application on Azure. For   further information, see Azure documentation [Assign the Azure AD application to   the Azure Data Lake Storage account file or folder](https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-using-active-directory#step-3-assign-the-azure-ad-application-to-the-azure-data-lake-store-account-file-or-folder). * In the Token   endpoint field, copy-paste the OAuth 2.0 token   endpoint that you can obtain from the Endpoints list accessible on the App registrations page on your   Azure portal.  For a video demonstration, see [Configure and use Azure in a Job](https://www.youtube.com/watch?v=Ww9-sp5Kd1o). |
+| Use Knox | Select this check box to enable support for Apache Knox when the Scheme is set to WebHDFS. When selected, additional Knox-specific options become available for secure gateway access.  * Knox Gateway: Enter the URL of the Knox gateway. * User: Enter the Knox username for authentication. * Password: Enter the Knox password for authentication. * Set Knox timeout (s): Option to define a custom connection   timeout. When enabled, the Knox timeout field appears.  The following options are hidden when Use Knox is selected:   * NameNode URI * Inspect the classpath for configurations * Use kerberos authentication * Use MapR Ticket authentication * User name * Hadoop properties * Use Datanode Hostname * Setup HDFS Encryption Configurations |
+| NameNode URI | Type in the URI of the Hadoop NameNode, the master node of a Hadoop system. For example, we assume that you have chosen a machine called *masternode* as the NameNode, then the location is `hdfs://masternode:portnumber`. If you are using WebHDFS, the location should be webhdfs://masternode:portnumber; WebHDFS with SSL is not supported yet. |
+| Inspect the classpath for configurations | Select this check box to allow the component to check the configuration files in the directory you have set with the *$HADOOP\_CONF\_DIR* variable and directly read parameters from these files in this directory. This feature allows you to easily change the Hadoop configuration for the component to switch between different environments, for example, from a test environment to a production environment.  In this situation, the fields or options used to configure Hadoop connection and/or Kerberos security are hidden.  If you want to use certain parameters such as the Kerberos parameters but these parameters are not included in these Hadoop configuration files, you need to create a file called *talend-site.xml* and put this file into the same directory defined with *$HADOOP\_CONF\_DIR*. This *talend-site.xml* file should read as follows:  ``` <!-- Put site-specific property overrides in this file. -->  <configuration>      <property>          <name>talend.kerberos.authentication </name>          <value>kinit </value>          <description> Set the Kerberos authentication method to use. Valid values are: kinit or keytab.  </description>      </property>      <property>          <name>talend.kerberos.keytab.principal </name>         <value>user@BIGDATA.COM </value>         <description> Set the keytab's principal name.  </description>     </property>      <property>            <name>talend.kerberos.keytab.path </name>          <value>/kdc/user.keytab </value>          <description> Set the keytab's path.  </description>      </property>      <property>          <name>talend.encryption </name>          <value>none </value>          <description> Set the encryption method to use. Valid values are: none or ssl.  </description>      </property>      <property>          <name>talend.ssl.trustStore.path </name>          <value>ssl </value>          <description> Set SSL trust store path.  </description>      </property>      <property>          <name>talend.ssl.trustStore.password </name>          <value>ssl </value>          <description> Set SSL trust store password.  </description>      </property>  </configuration> ```  The parameters read from these configuration files override the default ones used by Talend Studio. When a parameter does not exist in these configuration files, the default one is used. |
+| Use kerberos authentication | If you are accessing the Hadoop cluster running with Kerberos security, select this checkbox, then, enter the Kerberos principal name for the NameNode in the field displayed. This enables you to use your username to authenticate against the credentials stored in Kerberos.  This check box is available depending on the Hadoop distribution you are connecting to. |
+| Use MapR Ticket authentication | Select this checkbox to authenticate using MapR Ticket, and enter the following information:  * User name: Enter your username. * Group: Enter the name of the group. * Password: Enter your password to authenticate to   MapR Ticket. * Cluster name: Enter the name of the cluster you want   to use. * Ticket duration: Enter the duration of the ticket in seconds. For example:   86400L, where L corresponds to a   long integer. |
+| Use a keytab to authenticate | Select the Use a keytab to authenticate checkbox to log into a Kerberos-enabled system using a given keytab file. A keytab file contains pairs of Kerberos principals and encrypted keys. You need to enter the principal to be used in the Principal field and the access path to the keytab file itself in the Keytab field. This keytab file must be stored in the machine in which your Job actually runs, for example, on a Talend JobServer.  Note that the user that executes a keytab-enabled Job is not necessarily the one a principal designates but must have the right to read the keytab file being used. For example, the username you are using to execute a Job is *user1* and the principal to be used is *guest*; in this situation, ensure that *user1* has the right to read the keytab file to be used. |
+| User name | User authentication name of HDFS. |
+| Group | Enter the membership including the authentication user under which the HDFS instances were started. This field is available depending on the distribution you are using. |
+| Hadoop properties | *Talend Studio* uses a default configuration for its engine to perform operations in a Hadoop distribution. If you need to use a custom configuration in a specific situation, complete this table with the property or properties to be customized. Then at runtime, the customized property or properties will override those default ones.  * Note that if you are using the centrally stored metadata from the Repository, this table automatically inherits the   properties defined in that metadata and becomes uneditable unless you change the   Property type from Repository to Built-in.  For further information about the properties required by Hadoop and its related systems such as HDFS and Hive, see the documentation of the Hadoop distribution you are using or see [Apache's Hadoop documentation](http://hadoop.apache.org/docs) and then select the version of the documentation you want. For demonstration purposes, the links to some properties are listed below:  * Typically, the HDFS-related properties can be found in the *hdfs-default.xml* file of your distribution, such as <http://hadoop.apache.org/docs/r2.6.0/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml>. * Apache also provides a page to list the [Hive-related properties](https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties). |
+| Use datanode hostname | Select the Use datanode hostname check box to allow the Job to access datanodes via their hostnames. This actually sets the *dfs.client.use.datanode.hostname* property to *true*. |
+| Setup HDFS encryption configurations | If the HDFS transparent encryption has been enabled in your cluster, select the Setup HDFS encryption configurations check box and in the HDFS encryption key provider field that is displayed, enter the location of the KMS proxy.  For further information about the HDFS transparent encryption and its KMS proxy, see [Transparent Encryption in HDFS](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/TransparentEncryption.html). |
+
+## Advanced settings
+
+| Properties | Description |
+| --- | --- |
+| tStatCatcher Statistics | Select this check box to collect log data at the component level. |
+
+## Global Variables
+
+| Variables | Description |
+| --- | --- |
+| Global Variables | ERROR\_MESSAGE: the error message generated by the component when an error occurs. This is an After variable and it returns a string. This variable functions only if the Die on error checkbox is cleared, if the component has this checkbox.  A Flow variable functions during the execution of a component while an After variable functions after the execution of the component.  To fill up a field or expression with a variable, press Ctrl+Space to access the variable list and choose the variable to use from it.  For more information about variables, see [Using contexts and variables](/talend/r/en-US/8.0/studio-user-guide/contexts-and-variables). |
+
+## Usage
+
+| Usage guidance | Description |
+| --- | --- |
+| **Usage rule** | This component is generally used with other Hadoop components. |
+| Prerequisites | The Hadoop distribution must be properly installed, so as to guarantee the interaction with *Talend Studio*. The following list presents MapR related information for example.   * Ensure that you have installed the MapR client in the machine where   Talend Studio is,   and added the MapR client library to the PATH variable of that machine. According to   MapR's documentation, the library or libraries of a MapR client corresponding to each   OS version can be found under *MAPR\_INSTALL\   hadoop\hadoop-VERSION\lib\native*. For example, the library for Windows is *\lib\native\MapRClient.dll* in the MapR client jar file.  Without adding the specified library or libraries, you may encounter the following   error: no MapRClient in java.library.path. * Set the -Djava.library.path argument,   for example, in the Job Run VM arguments area   of the Run/Debug view in the Preferences dialog box in the Window menu. This argument provides to Talend Studio the   path to the native library of that MapR client. This allows the subscription-based   users to make full use of the Data viewer to   view locally in Talend Studio the   data stored in MapR.   For further information about how to install a Hadoop distribution, see the manuals corresponding to the Hadoop distribution you are using. |
+| Limitations | JRE 1.6+ is required. |
+
+**Related concepts**  
+
+* [Checking the existence of a file in HDFS](thdfsexist-thdfsconnection-tmsgbox-thdfsconnection-tmsgbox-checking-existence-of-file-in-hdfs-standard-component-bigdata-in-this)
+* [Iterating on a HDFS directory](thdfslist-thdfsget-thdfsconnection-iterating-on-hdfs-directory-standard-component-bigdata-this)

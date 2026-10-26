@@ -64,7 +64,7 @@
 
 - **Acción:** add_component · **Componente:** `tRunJob` ![Icono Talend](/talend-icons/tRunJob_icon32.png) (sin verificar) · alternativas: `Joblet`
 - **Subjob:** `s17` · **Confianza:** high · **Origen SAS:** `p2_codigo_dinamico.sas:17`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/system/trunjob-standard-properties)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties)
 - **Conexiones:** OnSubjobOk desde `op_8_os_command_1`
 - **Propiedades:**
   - `PROCESS` (Job) = `bucle` — SAS p2_codigo_dinamico.sas:17 · nombre oficial

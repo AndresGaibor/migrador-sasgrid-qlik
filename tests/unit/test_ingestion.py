@@ -77,6 +77,20 @@ def test_zip_bomb_entry_skipped(tmp_path):
     assert not files and skipped[0].reason == "supera max_file_bytes"
 
 
+def test_zip_appledouble_metadata_is_skipped(tmp_path):
+    z = tmp_path / "mac.zip"
+    with zipfile.ZipFile(z, "w") as zf:
+        zf.writestr("daily.sas", "data x; run;")
+        zf.writestr("._daily.sas", "metadata")
+        zf.writestr("__MACOSX/._daily.sas", "metadata")
+    files, skipped = import_source(z, tmp_path / "dest", cfg(tmp_path))
+    assert [f.path for f in files] == ["daily.sas"]
+    assert {s.path: s.reason for s in skipped} == {
+        "._daily.sas": "metadatos auxiliares de macOS; no son código fuente",
+        "__MACOSX/._daily.sas": "metadatos auxiliares de macOS; no son código fuente",
+    }
+
+
 def test_global_limits_reject_batch(tmp_path):
     src = tmp_path / "src"
     src.mkdir()
@@ -88,13 +102,36 @@ def test_global_limits_reject_batch(tmp_path):
         import_source(tmp_path / "nope", tmp_path / "dest", cfg(tmp_path))
 
 
+def test_rejected_reimport_preserves_existing_snapshot(tmp_path):
+    store = Store(cfg(tmp_path))
+    project = store.create_project("demo")
+    original = tmp_path / "original"
+    original.mkdir()
+    (original / "old.sas").write_text("data old; run;")
+    manifest = store.import_batch(project.id, original)
+    store.analysis_path(project.id).write_text("cached analysis")
+
+    replacement = tmp_path / "replacement"
+    replacement.mkdir()
+    (replacement / "a.sas").write_text("data a; run;")
+    (replacement / "b.sas").write_text("data b; run;")
+    store.settings = cfg(tmp_path, max_files=1)
+    with pytest.raises(ImportError_):
+        store.import_batch(project.id, replacement)
+
+    assert store.get_manifest(project.id) == manifest
+    assert (store.source_dir(project.id) / "old.sas").exists()
+    assert store.analysis_path(project.id).read_text() == "cached analysis"
+
+
 def test_store_roundtrip_is_reproducible(tmp_path):
     s = Store(cfg(tmp_path))
     p = s.create_project("demo")
     m1 = s.import_batch(p.id, FIXTURES)
     m2 = s.import_batch(p.id, FIXTURES)  # reimportar reemplaza, no duplica
     assert m1 == m2 == s.get_manifest(p.id)
-    assert s.get_project(p.id).name == "demo"
+    project = s.get_project(p.id)
+    assert project is not None and project.name == "demo"
     assert any(f.path == "real/ts-sas-legacy-analytics/Config/autoexec.sas" for f in m1.files)
 
 

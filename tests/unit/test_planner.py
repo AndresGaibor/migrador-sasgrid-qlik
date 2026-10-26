@@ -19,7 +19,7 @@ from sas_grid_migrator.migration_planner.service import (
 )
 from sas_grid_migrator.persistence.store import Store
 from sas_grid_migrator.reporting.exports import render_plan_md, steps_csv, write_exports
-from sas_grid_migrator.sas_parser.ast import Loc
+from sas_grid_migrator.sas_parser.ast import Loc, ProcStep
 from sas_grid_migrator.sas_parser.parser import parse_program
 
 FIXTURES = Path(__file__).parent.parent / "fixtures" / "sas"
@@ -148,13 +148,19 @@ def test_grid_recommendations_use_versioned_catalog_and_keep_unsupported_evidenc
     assert submit.catalog_version == "1" and submit.doc_url and submit.evidence.line == 7
     assert submit.required and submit.reason and submit.instruction
 
-    unknown = next(r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.unverified_options")
+    unknown = next(
+        r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.unverified_options"
+    )
     assert unknown.status == "unsupported" and unknown.evidence.line == 4
     assert unknown.details["unknown_options"] == ["-grid", "-queue", "-name", "-wait"]
     lsf = [r for r in ps.grid_recommendations if r.pattern_id == "scheduler.lsf"]
     assert [(r.status, r.evidence.line) for r in lsf] == [("unsupported", 5), ("unsupported", 6)]
-    missing = next(r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.missing_option_value")
-    assert missing.status == "unsupported" and missing.details["incomplete_options"] == ["-gridqueue"]
+    missing = next(
+        r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.missing_option_value"
+    )
+    assert missing.status == "unsupported" and missing.details["incomplete_options"] == [
+        "-gridqueue"
+    ]
     batch = next(r for r in ps.grid_recommendations if r.pattern_id == "sas_batch.sysin")
     assert batch.evidence.line == 3 and batch.details["program"].endswith("program with spaces.sas")
 
@@ -248,3 +254,62 @@ def test_api_plans(tmp_path, monkeypatch):
     assert c.get(f"/api/projects/{pid}/plans/nada.sas").status_code == 404
     e = c.post(f"/api/projects/{pid}/exports")
     assert e.status_code == 201 and "steps.csv" in e.json()["files"]
+
+
+def test_format_rows_extracts_value_tables():
+    from sas_grid_migrator.migration_planner.planner import _format_rows
+
+    rows = _format_rows(
+        [
+            "value $ACCTTYPE\n    'CHK'  = 'Checking'\n    OTHER  = 'Unknown'\n  ",
+            "value RISK\n 1 = 'Low'",
+        ]
+    )
+    assert rows == [
+        ("ACCTTYPE", "CHK", "Checking"),
+        ("ACCTTYPE", "OTHER", "Unknown"),
+        ("RISK", "1", "Low"),
+    ]
+
+
+def test_long_proc_format_statement_reaches_format_row_parser():
+    from sas_grid_migrator.migration_planner.planner import _format_rows
+
+    entries = [f"'{i:03}' = 'Label {i:03}'" for i in range(50)]
+    source = "proc format;\nvalue $LONG\n" + "\n".join(entries) + ";\nrun;"
+    proc = next(
+        n for n in parse_program(source, "long-format.sas").nodes if isinstance(n, ProcStep)
+    )
+    statement = next(s.text for s in proc.statements if s.kw == "value")
+    rows = _format_rows([statement])
+
+    assert len(statement) > 600
+    assert len(rows) == 50
+    assert rows[0] == ("LONG", "000", "Label 000")
+    assert rows[-1] == ("LONG", "049", "Label 049")
+
+
+def test_banking_format_uses_documented_inline_table_mapping_with_all_rows(tmp_path):
+    store, pid = project(tmp_path)
+    plans = generate_plans(store, pid)
+    plan = next(
+        p
+        for p in plans.plans
+        if p.program == "real/ts-sas-legacy-analytics/Formats/banking_formats.sas"
+    )
+    step = next(s for s in plan.steps if s.operation_type == "format_definition")
+    properties = {p.name: p for p in step.properties}
+
+    assert properties["USE_INTABLE"].value == "true"
+    assert properties["USE_INTABLE"].label == "Use Inline Table"
+    assert properties["INTABLE"].label == "Inline Table"
+    table = properties["INTABLE"].value
+    assert table is not None
+    rows = table.splitlines()
+    assert len(rows) == 79
+    assert all(len(row.split(" | ")) == 3 for row in rows)
+    assert "BALRANGE | LOW-<0 | Negative" in rows
+    assert "ACCTTYPE | OTHER | Unknown" in rows
+    assert [c.name for c in step.schema_columns] == ["FORMAT", "CODE", "LABEL"]
+    assert all(c.talend_type == "String" for c in step.schema_columns)
+    assert any("rangos y OTHER" in item for item in step.pending)

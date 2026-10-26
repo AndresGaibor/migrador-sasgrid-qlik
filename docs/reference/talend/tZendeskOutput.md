@@ -1,0 +1,61 @@
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/zendesk/tzendeskoutput · versión 8.0 -->
+# tZendeskOutput
+
+Last updated: 9/30/2026
+
+Writes tickets or requests to Zendesk server.
+
+Information noteNote:
+
+This component is not shipped with your Talend Studio by
+default. You need to install it using the Feature Manager. For more information, see [Installing features using the Feature Manager](/talend/r/en-US/8.0/studio-user-guide/install-features-to-talend-studio).
+
+## tZendeskOutput Standard properties
+
+These properties are used to configure tZendeskOutput running in
+the Standard Job framework.
+
+The Standard
+tZendeskOutput component belongs to the Cloud
+family.
+
+The component in this framework is available in all
+subscription-based Talend
+products.
+
+## Basic settings
+
+| Properties | Description |
+| --- | --- |
+| Property type | Either Built-in or Repository .  * Built-in: No property data stored   centrally. * Repository: Select the repository   file in which the properties are stored. The fields that follow are   completed automatically using the data retrieved. |
+| Schema and Edit Schema | A schema is a row description. It defines the number of fields (columns) to be processed and passed on to the next component. When you create a Spark Job, avoid the reserved word `line` when naming the fields.  This component offers the advantage of the dynamic schema feature. This allows you to retrieve unknown columns from source files or to copy batches of columns from a source without mapping each column individually. For further information about dynamic schemas, see [Dynamic schema](/talend/r/en-US/8.0/studio-user-guide/dynamic-schema).  This dynamic schema feature is designed for the purpose of retrieving unknown columns of a table and is recommended to be used for this purpose only; it is not recommended for the use of creating tables.   * Built-In: You create and store the schema locally for this component   only. * Repository: You have already created the schema and stored it in the   Repository. You can reuse it in various projects and Job designs.   Click Edit schema to make changes to the schema. If the current schema is of the Repository type, three options are available:   * View schema: choose this   option to view the schema only. * Change to built-in property:   choose this option to change the schema to Built-in for local changes. * Update repository connection:   choose this option to change the schema stored in the repository and decide whether   to propagate the changes to all the Jobs upon completion.  If you just want to   propagate the changes to the current Job, you can select No upon completion and choose this schema metadata   again in the Repository Content   window.   By default, this component generates HTTP requests using the incoming data. To send your own HTTP requests to Zendesk server, create a column named JSON\_String and send your JSON-format HTTP request body to this column; if you want the component to generate HTTP requests using existing tickets or requests that are in JSON format, create a column named tickets or request and pass the tickets or requests to the column.  Column names are case-sensitive. |
+| Server URL | Enter the server URL (that is, subdomain URL) in the format of `https://<your-account>.zendesk.com`. |
+| Username | Enter the username. |
+| Token | Enter the token that is generated in the Zendesk management page.  To enter the token, click the [...] button next to the Token field to bring out the Enter a new password dialog box, enter the token in the text field, and click OK. Note that you can enter the token either in a JSON string in the pure password mode or as a Java expression in the Java mode. You can toggle between the two modes by clicking switch to Java mode or switch to pure password mode on the top of the text field. Information noteNote:  * The two password modes are available only when you have installed the   8.0.1-R2022-05 Talend Studio   monthly update or a later one delivered by Talend. For more information, check with your administrator. * If the 8.0.1-R2022-05 Talend Studio   monthly update or a later one delivered by Talend   is not installed, you can enter tokens in the Java mode only.  This component requires that API Token access being enabled and you have an active API token. For information about enabling API Token access and generating an API token, refer to [Generating a new API token](https://support.zendesk.com/hc/en-us/articles/4408889192858-Generating-a-new-API-token). |
+| Selection type | Select the data type to write data as, `Tickets` or `Requests`. |
+| Data action | Select the action to perform on the data on Zendesk server, `Create`, `Update`, or `Delete`. |
+
+## Advanced settings
+
+| Properties | Description |
+| --- | --- |
+| tStatCatcher Statistics | Select this check box to collect log data at the component level. |
+| Max batch size | Specify the maximum number of tickets or requests that can be processed in a batch. |
+
+## Global Variables
+
+| Variables | Description |
+| --- | --- |
+| Global Variables | NB\_LINE: the number of rows processed. This is an After variable and it returns an integer.  ERROR\_MESSAGE: the error message generated by the component when an error occurs. This is an After variable and it returns a string. This variable functions only if the Die on error checkbox is cleared, if the component has this checkbox.  A Flow variable functions during the execution of a component while an After variable functions after the execution of the component.  To fill up a field or expression with a variable, press Ctrl+Space to access the variable list and choose the variable to use from it.  For more information about variables, see [Using contexts and variables](/talend/r/en-US/8.0/studio-user-guide/contexts-and-variables). |
+
+## Usage
+
+| Usage guidance | Description |
+| --- | --- |
+| **Usage rule** | This component must be used as an output component. It allows you to carry out actions on data on a Zendesk server. |
+| Dynamic settings | Click the [+] button to add a row in the table and fill the Code field with a context variable to choose your database connection dynamically from multiple connections planned in your Job. This feature is useful when you need to access database tables having the same data structure but in different databases, especially when you are working in an environment where you cannot change your Job settings, for example, when your Job has to be deployed and executed independent of Talend Studio.  The Dynamic settings table is available only when the Use an existing connection check box is selected in the Basic settings view. Once a dynamic parameter is defined, the Component List box in the Basic settings view becomes unusable.  For examples on using dynamic parameters, see [Reading data from databases through context-based dynamic connections](/talend/r/en-US/8.0/components/defining-context-groups/reading-data-from-databases-through-context-based-dynamic-connections) and [Reading data from different MySQL databases using dynamically loaded connection parameters](/talend/r/en-US/8.0/components/context/reading-data-from-different-mysql-databases-using-dynamically-loaded-connection-parameters). For more information on Dynamic settings and context variables, see [Dynamic schema](/talend/r/en-US/8.0/studio-user-guide/dynamic-schema) and [Creating a context group and define context variables in it](/talend/r/en-US/8.0/studio-user-guide/creating-context-group-and-define-context-variables-in-it). |
+
+**Related concepts**  
+
+* [Creating a Zendesk ticket](creating-a-zendesk-ticket "This scenario creates a Zendesk ticket on the Zendesk server and displays specified fields of the ticket on the console. This scenario assumes that you have a Zendesk user account, have API Token access enabled, and have an active API token. For information about enabling API Token access and generating an API token, refer to Generating a new API token.")
+* [Updating/removing a Zendesk ticket](maintaining-zendesk-tickets "This scenario demonstrates how to update some fields in a ticket and remove a ticket. To update or remove a Zendesk ticket, you need to provide the ticket ID, specify the operation to carry out (that is, update or delete), and, for update operations, specify the desired fields and the new field values. This scenario assumes that you have a Zendesk user account, have API Token access enabled, and have an active API token. For information about enabling API Token access and generating an API token, refer to Generating a new API token.")

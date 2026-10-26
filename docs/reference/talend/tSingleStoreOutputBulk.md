@@ -1,0 +1,65 @@
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/singlestore/tsinglestoreoutputbulk · versión 8.0 -->
+# tSingleStoreOutputBulk
+
+Last updated: 9/30/2026
+
+Prepares the bulk file to be used as a parameter to feed the database
+connected.
+
+The tSingleStoreOutputBulk and
+tSingleStoreBulkExec components are used together in a two step
+process. In the first step, a bulk file is generated. In the second step, the bulk file is
+used to feed the database connected. These two steps are fused together in the
+tSingleStoreOutputBulkExec component, detailed in a separate section.
+The advantage of using a two-step process is that the data can be transformed before it is
+loaded in the database.
+
+tSingleStoreOutputBulk writes a file with columns based on the defined
+delimiter.
+
+## tSingleStoreOutputBulk Standard properties
+
+These properties are used to configure tSingleStoreOutputBulk running in the Standard Job framework.
+
+The Standard
+tSingleStoreOutputBulk component belongs to the Databases family.
+
+The component in this framework is available in all
+subscription-based Talend
+products.
+
+Information noteNote: This component is a specific version of a dynamic database
+connector. The properties related to database settings vary depending on your database
+type selection. For more information about dynamic database connectors, see [DB Generic components](/talend/r/en-US/8.0/components/db-generic/db-generic-component).
+
+## Basic settings
+
+| Properties | Description |
+| --- | --- |
+| Database | Select the desired database type from the list and click Apply. |
+| Schema and Edit schema | A schema is a row description. It defines the number of fields (columns) to be processed and passed on to the next component. When you create a Spark Job, avoid the reserved word `line` when naming the fields.   * Built-In: You create and store the schema locally for this component   only. * Repository: You have already created the schema and stored it in the   Repository. You can reuse it in various projects and Job designs.   Click Edit schema to make changes to the schema. If you make changes, the schema automatically becomes built-in.   * View schema: choose this   option to view the schema only. * Change to built-in property:   choose this option to change the schema to Built-in for local changes. * Update repository connection:   choose this option to change the schema stored in the repository and decide whether   to propagate the changes to all the Jobs upon completion.  If you just want to   propagate the changes to the current Job, you can select No upon completion and choose this schema metadata   again in the Repository Content   window.   This component offers the advantage of the dynamic schema feature. This allows you to retrieve unknown columns from source files or to copy batches of columns from a source without mapping each column individually. For further information about dynamic schemas, see [Dynamic schema](/talend/r/en-US/8.0/studio-user-guide/dynamic-schema).  This dynamic schema feature is designed for the purpose of retrieving unknown columns of a table and is recommended to be used for this purpose only; it is not recommended for the use of creating tables. |
+| Table | Enter the name of the table into which data will be written. |
+| Bulk file | Name of the bulk file to write data into. |
+| Append | Select this option if you want to append the incoming data to an existing bulk file.  This option prevents the data in an exisitng file from being overwritten. |
+
+## Advanced settings
+
+| Properties | Description |
+| --- | --- |
+| Row Separator | The separator used to identify the end of a row. |
+| Field separator | Enter a character, a string, or a regular expression to separate fields for the transferred data. |
+| Set text enclosure | Select this option to set the text enclosure. You can enter the enclosure character (only one character) between double quotation marks in the text field to the right. For example, to use double quotation mark (") as the enclosure character, enter `"""` in this field.  It is recommended to use standard escape character, that is `"\"`. Otherwise, you should set the same character for Escape char and Text enclosure. If the escape character is set to `"\"`, the text enclosure can be set to any other character; if the escape character is set to a character other rather than `"\"`, it will be changed to the same character as the text enclosure. For example, with the escape character set to `"#"` and the text enclosure set to `"@"`, the escape character will be changed to `"@"`. |
+| Set null value | Select this option to set the null value. You can set the null value in the field to the right. |
+| tStatCatcher Statistics | Select this checkbox to gather the Job processing metadata at the Job level as well as at each component level. |
+
+## Global Variables
+
+| Variables | Description |
+| --- | --- |
+| ERROR\_MESSAGE | The error message generated by the component when an error occurs. This is an After variable and it returns a string. |
+
+## Usage
+
+| Usage guidance | Description |
+| --- | --- |
+| **Usage rule** | This component is used along with the tSingleStoreBulkExec. They provide performance gains when feeding a database. |

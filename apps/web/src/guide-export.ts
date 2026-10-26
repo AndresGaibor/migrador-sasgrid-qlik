@@ -1,10 +1,8 @@
 import type { JobPlan, Step } from "./types";
 import { orderSteps } from "./guided.ts";
-import { catalogAudit } from "./catalog-explorer.ts";
 
 function officialUrl(step: Step): string | null {
-  const name = step.component_candidate.split(" ")[0];
-  return step.doc_url ?? catalogAudit.recommended_components[name]?.official_url ?? null;
+  return step.doc_url ?? null;
 }
 
 function evidenceHref(projectId: string, step: Step): string {
@@ -12,9 +10,7 @@ function evidenceHref(projectId: string, step: Step): string {
 }
 
 function exportStep(step: Step, projectId: string) {
-  const technicalStep = { ...step } as Step & { status?: string; note?: string | null };
-  delete technicalStep.status;
-  delete technicalStep.note;
+  const technicalStep = { ...step, status: undefined, note: undefined };
   return {
     ...technicalStep,
     references: {
@@ -25,8 +21,7 @@ function exportStep(step: Step, projectId: string) {
 }
 
 export function guideJson(plan: JobPlan, projectId: string): string {
-  const technicalPlan = { ...plan } as JobPlan & { job_status?: string };
-  delete technicalPlan.job_status;
+  const technicalPlan = { ...plan, job_status: undefined };
   const enriched = {
     ...technicalPlan,
     guide_format: "byron-guided-talend-v2",

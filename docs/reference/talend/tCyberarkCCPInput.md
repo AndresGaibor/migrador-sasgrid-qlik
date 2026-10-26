@@ -1,0 +1,63 @@
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/cyberark/tcyberarkccpinput · versión 8.0 -->
+# tCyberarkCCPInput
+
+Last updated: 9/30/2026
+
+Establishes a connection to the Central Credential Provider web service and
+retrieves CyberArk vault secrets at runtime.
+
+Information noteNote:
+
+* This component is not shipped with your Talend Studio by
+  default. You need to install it using the Feature Manager. For more information, see [Installing features using the Feature Manager](/talend/r/en-US/8.0/studio-user-guide/install-features-to-talend-studio).
+* From the 8.0.1-R2024-06 Talend Studio
+  monthly update onwards, CyberArk components become standalone and do not support
+  output rows. If you previously used CyberArk components as input components, you need
+  to update your Job manually and remove the subsequent components in order to avoid
+  errors.
+
+## tCyberarkCCPInput Standard properties
+
+These properties are used to configure tCyberarkCCPInput running in
+the Standard Job framework.
+
+The Standard
+tCyberarkCCPInput component belongs to the Internet family.
+
+The component in this framework is available in all
+subscription-based Talend
+products.
+
+## Basic settings
+
+| Properties | Description |
+| --- | --- |
+| Property type | Either Built-in or Repository .  * Built-in: No property data stored   centrally. * Repository: Select the repository   file in which the properties are stored. The fields that follow are   completed automatically using the data retrieved. |
+| Schema and Edit Schema | A schema is a row description. It defines the number of fields (columns) to be processed and passed on to the next component. When you create a Spark Job, avoid the reserved word `line` when naming the fields.  This component offers the advantage of the dynamic schema feature. This allows you to retrieve unknown columns from source files or to copy batches of columns from a source without mapping each column individually. For further information about dynamic schemas, see [Dynamic schema](/talend/r/en-US/8.0/studio-user-guide/dynamic-schema).  This dynamic schema feature is designed for the purpose of retrieving unknown columns of a table and is recommended to be used for this purpose only; it is not recommended for the use of creating tables.   * Built-In: You create and store the schema locally for this component   only. * Repository: You have already created the schema and stored it in the   Repository. You can reuse it in various projects and Job designs.   Click Edit schema to make changes to the schema. If the current schema is of the Repository type, three options are available:   * View schema: choose this   option to view the schema only. * Change to built-in property:   choose this option to change the schema to Built-in for local changes. * Update repository connection:   choose this option to change the schema stored in the repository and decide whether   to propagate the changes to all the Jobs upon completion.  If you just want to   propagate the changes to the current Job, you can select No upon completion and choose this schema metadata   again in the Repository Content   window. |
+| Central credential provider URL | Enter the URL address of the Central credential provider service. The expected format is `https://<CCPserver_hostname>:<CCPserver_port>`. See [Central Credential Provider](https://docs.cyberark.com/credential-providers/10.10/en/Content/CCP/lp_euCentralCredentialProvider.htm?TocPath=Administration%7CCentral%20Credential%20Provider%7C_____0) for related information. |
+| Application ID | Enter the unique name of your application. Make sure your machine is an allowed machine of the application. See [Manage applications](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-CP/Latest/en/Content/Common/Managing-Applications.htm) for related information. |
+| Safe | Enter the name of the Safe that contains the configuration file used by the Central credential provider. See [Safes and Safe members](https://docs.cyberark.com/Product-Doc/OnlineHelp/PAS/Latest/en/Content/PASIMP/Safes-concept.htm) for related information. |
+| Folder | Enter the name of the folder where the secret object resides. You can create multiple folders under a Safe. |
+| Secret object name | Enter the name of the password object. A password is stored in a safe in the form of secret object. |
+
+## Advanced settings
+
+| Properties | Description |
+| --- | --- |
+| tStatCatcher Statistics | Select this check box to collect log data at the component level. |
+| Connection timeout | Specify the timeout value (in ms) for the connection. A value of 0 or any negative values will be ignored. |
+| Bypass server certificate validation | Select this option to prevent the client from validating the server certificate. This option is not recommended in production environments. |
+| The reason for performing secret retrieve operation | Enter a string message in this field for logging purposes. |
+
+## Global Variables
+
+| Variables | Description |
+| --- | --- |
+| Global Variables | NB\_LINE: the number of rows processed. This is an After variable and it returns an integer.  ERROR\_MESSAGE: the error message generated by the component when an error occurs. This is an After variable and it returns a string. This variable functions only if the Die on error checkbox is cleared, if the component has this checkbox.  SECRET: The password retrieved. This is a After variable and it returns a string.  A Flow variable functions during the execution of a component while an After variable functions after the execution of the component.  To fill up a field or expression with a variable, press Ctrl+Space to access the variable list and choose the variable to use from it.  For more information about variables, see [Using contexts and variables](/talend/r/en-US/8.0/studio-user-guide/contexts-and-variables). |
+
+## Usage
+
+| Usage guidance | Description |
+| --- | --- |
+| **Usage rule** | This component retrieves passwords from CyberArk vaults, and stores the retrieved passwords in the SECRET variable for being referenced by other components. |
+| Dynamic settings | Click the [+] button to add a row in the table and fill the Code field with a context variable to choose your database connection dynamically from multiple connections planned in your Job. This feature is useful when you need to access database tables having the same data structure but in different databases, especially when you are working in an environment where you cannot change your Job settings, for example, when your Job has to be deployed and executed independent of Talend Studio.  The Dynamic settings table is available only when the Use an existing connection check box is selected in the Basic settings view. Once a dynamic parameter is defined, the Component List box in the Basic settings view becomes unusable.  For examples on using dynamic parameters, see [Reading data from databases through context-based dynamic connections](/talend/r/en-US/8.0/components/defining-context-groups/reading-data-from-databases-through-context-based-dynamic-connections) and [Reading data from different MySQL databases using dynamically loaded connection parameters](/talend/r/en-US/8.0/components/context/reading-data-from-different-mysql-databases-using-dynamically-loaded-connection-parameters). For more information on Dynamic settings and context variables, see [Dynamic schema](/talend/r/en-US/8.0/studio-user-guide/dynamic-schema) and [Creating a context group and define context variables in it](/talend/r/en-US/8.0/studio-user-guide/creating-context-group-and-define-context-variables-in-it). |

@@ -1,0 +1,72 @@
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/singlestore/tsinglestoreoutput · versión 8.0 -->
+# tSingleStoreOutput
+
+Last updated: 9/30/2026
+
+Executes the action defined on the data contained in the table, based on the flow
+incoming from the preceding component in the Job.
+
+tSingleStoreOutput writes, updates, makes changes or suppresses
+entries in any type of database connected to a JDBC API.
+
+## tSingleStoreOutput Standard properties
+
+These properties are used to configure tSingleStoreOutput running in the Standard Job framework.
+
+The Standard
+tSingleStoreOutput component belongs to the Databases family.
+
+The component in this framework is available in all
+subscription-based Talend
+products.
+
+## Basic settings
+
+| Properties | Description |
+| --- | --- |
+| Database | Select the desired database type from the list and click Apply. |
+| Property Type | Select the way the connection details will be set.   * Built-In: The connection details will be set   locally for this component. You need to specify the values for all   related connection properties manually. * Repository: The connection details stored   centrally in Repository > Metadata will be reused by this component.  You need to click   the [...] button next to it and in the pop-up   Repository Content dialog box, select the   connection details to be reused, and all related connection   properties will be automatically filled in.   This property is not available when other connection component is selected from the Connection Component dropdown list. |
+|  | Click this icon to open a database connection wizard and store the database connection parameters you set in the component Basic settings view.  For more information about setting up and storing database connection parameters, see [Centralizing database metadata](/talend/r/en-US/8.0/studio-user-guide/centralizing-database-metadata). |
+| Component list | Select the component that opens the database connection to be reused by this component. |
+| JDBC URL | The JDBC URL of the database to be used. For example, the JDBC URL for the Amazon Redshift database is `jdbc:redshift://endpoint:port/database`. |
+| Drivers | Complete this table to load the driver JARs needed. To do this, click the [+] button under the table to add as many rows as needed, each row for a driver JAR, then select the cell and click the [...] button at the right side of the cell to open the Module dialog box from which you can select the driver JAR to be used. For example, the driver jar `RedshiftJDBC41-1.1.13.1013.jar` for the Redshift database.  For more information, see [Importing a database driver](/talend/r/en-US/8.0/components/jdbc/importing-database-driver). |
+| Driver Class | Enter the class name for the specified driver between double quotation marks. For example, for the `RedshiftJDBC41-1.1.13.1013.jar` driver, the name to be entered is `com.amazon.redshift.jdbc41.Driver`. |
+| User Id and Password | The database user authentication data.  To enter the password, click the [...] button next to the password field, enter the password in double quotes in the pop-up dialog box, and click OK to save the settings. |
+| Table | Enter the name of the table into which data will be written. |
+| Data Action | Select an action to be performed on data of the table defined.   * Insert: Add   new entries to the table. If duplicates are found, the Job stops. * Update:   Make changes to existing entries. * Insert or   update: Insert a new record in the index pool. If the record with the   given reference already exists, an update would be made. * Update or   insert: Update the record with the given reference. If the record does   not exist in the index pool, a new record would be inserted. * Delete:   Remove entries corresponding to the input flow.   Information noteWarning: It is necessary to specify at least one column as a primary key on which the Update and Delete operations are based. You can do that by clicking Edit Schema and selecting the check box(es) next to the column(s) you want to set as primary key(s). For an advanced use, click the Advanced settings view where you can simultaneously define primary keys for the Update and Delete operations. To do that: Select the Use field options check box and then in the Key in update column, select the check boxes next to the column names you want to use as a base for the Update operation. Do the same in the Key in delete column for the Delete operation. |
+| Clear data in table | Select this check box to clear data in the table before performing the action defined. |
+| Schema and Edit schema | A schema is a row description. It defines the number of fields (columns) to be processed and passed on to the next component. When you create a Spark Job, avoid the reserved word `line` when naming the fields.   * Built-In: You create and store the schema locally for this component   only. * Repository: You have already created the schema and stored it in the   Repository. You can reuse it in various projects and Job designs.   When the schema to be reused has default values that are integers or functions, ensure that these default values are not enclosed within quotation marks. If they are, you must remove the quotation marks manually.  For more information, see [Retrieving table schemas](/talend/r/en-US/8.0/studio-user-guide/retrieving-table-schemas?tocId=_C1%7EeFOlN%7EGM_JR2qkBYZg).  Click Edit schema to make changes to the schema. If you make changes, the schema automatically becomes built-in.   * View schema: choose this   option to view the schema only. * Change to built-in property:   choose this option to change the schema to Built-in for local changes. * Update repository connection:   choose this option to change the schema stored in the repository and decide whether   to propagate the changes to all the Jobs upon completion.  If you just want to   propagate the changes to the current Job, you can select No upon completion and choose this schema metadata   again in the Repository Content   window. |
+| Guess Schema | Click this button to generate schema columns based on the settings of database table columns. |
+| Die on error | Select the checkbox to stop the execution of the Job when an error occurs.  Clear the checkbox to skip any rows on error and complete the process for error-free rows.  When errors are skipped, you can collect the rows on error using a Row > Reject connection. |
+| Specify a data source alias | Select this checkbox and in the Data source alias field displayed, specify the alias of a data source created on Talend Runtime side to use the shared connection pool defined in the data source configuration. This option works only when you deploy and run your Job in Talend Runtime.  If you use the component's own DB configuration, your data source connection will be closed at the end of the component. To prevent this from happening, use a shared DB connection with the data source alias specified.  This property is not available when other connection component is selected from the Connection Component dropdown list. |
+
+## Advanced settings
+
+| Properties | Description |
+| --- | --- |
+| Commit every | Specify the number of rows to be processed before committing batches of rows together into the database.  This option ensures transaction quality (but not rollback) and, above all, better performance at executions. |
+| Additional Columns | This option allows you to call SQL functions to perform actions on columns, which are not insert, update or delete actions, or actions that require particular preprocessing. It is not offered if you create (with or without drop) the database table.   * Name: The name of the schema column to be inserted, or the   name of the schema column used to replace an existing column. * SQL expression: The SQL statement to be executed in order to   insert or replace relevant column. * Position: Select `Before`,   `After`, or `Replace` according to the   action to be performed on the reference column. * Reference column: The name of the reference column that can   be used to locate the new column to be inserted or that will be replaced. |
+| Use field options | Select this check box and in the Fields options table displayed, select the check box for the corresponding column to customize a request, particularly if multiple actions are being carried out on the data.   * Key in update: Select the check box for the   corresponding column based on which data is updated. * Key in delete: Select the check box for the   corresponding column based on which data is deleted. * Updatable: Select the check box if data in the   corresponding column can be updated. * Insertable: Select the check box if data in   the corresponding column can be inserted. |
+| Debug query mode | Select this check box to display each step during processing entries in a database. |
+| Use batch | Select this check box to activate the batch mode for data processing, and in the Batch Size field displayed, specify the number of records to be processed in each batch. |
+| tStatCatcher Statistics | Select this checkbox to gather the Job processing metadata at the Job level as well as at each component level. |
+| Enable parallel execution | Select this check box to perform high-speed data processing by treating multiple data flows simultaneously. This feature depends on the database or the application ability to handle multiple inserts in parallel as well as the number of CPU affected. With this check box selected, you need to specify the number of parallel executions desired in the Number of parallel executions field displayed.  Information noteNote: When parallel execution is enabled, it is not possible to use global variables to retrieve return values. |
+
+## Global Variables
+
+| Variables | Description |
+| --- | --- |
+| ERROR\_MESSAGE | The error message generated by the component when an error occurs. This is an After variable and it returns a string. |
+| NB\_LINE | The number of rows processed. This is an After variable and it returns an integer. |
+| NB\_LINE\_INSERTED | The number of rows inserted. This is an After variable and it returns an integer. |
+| NB\_LINE\_UPDATED | The number of rows updated. This is an After variable and it returns an integer. |
+| NB\_LINE\_DELETED | The number of rows deleted. This is an After variable and it returns an integer. |
+| NB\_LINE\_REJECTED | The number of rows rejected. This is an After variable and it returns an integer. |
+| QUERY | The query statement being processed. This is a Flow variable and it returns a string. |
+
+## Usage
+
+| Usage guidance | Description |
+| --- | --- |
+| **Usage rule** | This component offers the flexibility benefit of the database query and covers all of the SQL queries possible.  This component must be used as an output component. It allows you to carry out actions on a table or on the data of a table in a SingleStore database. It also allows you to create a reject flow using a Row > Rejects link to filter data in error. For an example of tMysqlOutput in use, see [Retrieving data in error with a Reject link](/talend/en-US/components/8.0/mysql/tmysqloutput-tmap-tfileoutputdelimited-tfileinputdelimited-retrieving-data-in-error-with-reject-link-standard-component-this). |
+| Dynamic settings | Click the [+] button to add a row in the table and fill the Code field with a context variable to choose your database connection dynamically from multiple connections planned in your Job. This feature is useful when you need to access database tables having the same data structure but in different databases, especially when you are working in an environment where you cannot change your Job settings, for example, when your Job has to be deployed and executed independent of Talend Studio.  For examples on using dynamic parameters, see [Reading data from databases through context-based dynamic connections](/talend/r/en-US/8.0/components/defining-context-groups/reading-data-from-databases-through-context-based-dynamic-connections) and [Reading data from different MySQL databases using dynamically loaded connection parameters](/talend/r/en-US/8.0/components/context/reading-data-from-different-mysql-databases-using-dynamically-loaded-connection-parameters). For more information on Dynamic settings and context variables, see [Dynamic schema](/talend/r/en-US/8.0/studio-user-guide/dynamic-schema) and [Creating a context group and define context variables in it](/talend/r/en-US/8.0/studio-user-guide/creating-context-group-and-define-context-variables-in-it). |

@@ -1,0 +1,497 @@
+{
+ "schema_version": 1,
+ "documentation_target": "Talend Studio 8.0 R2026-09",
+ "availability_snapshot_version": "8.0.1.20261015_1208-patch",
+ "source": "https://help.qlik.com/talend/en-US/studio-components-availability/8.0/",
+ "active_component_count": 1148,
+ "archived_component_count": 44,
+ "components": [
+  {
+   "name": "tAvroStreamInput",
+   "families": [
+    "File/Input"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tBoundedStreamInput",
+   "families": [
+    "Technical"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tCassandraLookupInput",
+   "families": [
+    "Databases/Cassandra"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tDynamoDBLookupInput",
+   "families": [
+    "Databases/DynamoDB"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tDynamoDBV1Input",
+   "families": [
+    "Big Data/DynamoDB (Deprecated)",
+    "Databases NoSQL/DynamoDB (Deprecated)"
+   ],
+   "framework_codes": [
+    "DI"
+   ],
+   "status": "deprecated_component",
+   "reason": "Qlik marca el componente/familia como deprecated."
+  },
+  {
+   "name": "tDynamoDBV1Output",
+   "families": [
+    "Big Data/DynamoDB (Deprecated)",
+    "Databases NoSQL/DynamoDB (Deprecated)"
+   ],
+   "framework_codes": [
+    "DI"
+   ],
+   "status": "deprecated_component",
+   "reason": "Qlik marca el componente/familia como deprecated."
+  },
+  {
+   "name": "tElasticSearchLookupInput",
+   "families": [
+    "ElasticSearch"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tFileStreamInputDelimited",
+   "families": [
+    "File/Input"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tFileStreamInputFullRow",
+   "families": [
+    "File/Input"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tFileStreamInputJSON",
+   "families": [
+    "File/Input"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tFileStreamInputParquet",
+   "families": [
+    "File/Input"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tFileStreamInputPositional",
+   "families": [
+    "File/Input"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tFileStreamInputRegex",
+   "families": [
+    "File/Input"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tFileStreamInputXML",
+   "families": [
+    "File/Input"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tGoogleCloudConfiguration",
+   "families": [
+    "Cloud",
+    "Cloud/GoogleCloudPlatform"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tHBaseLookupInput",
+   "families": [
+    "Databases/HBase"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tHMapRecord",
+   "families": [
+    "Processing/Data Mapper"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tJDBCLookupInput",
+   "families": [
+    "Databases/DB_JDBC"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tKafkaConfiguration",
+   "families": [
+    "Messaging/Kafka"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tKafkaInputAvro",
+   "families": [
+    "Messaging/Kafka"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tKinesisInput",
+   "families": [
+    "Messaging/Kinesis"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tKinesisInputAvro",
+   "families": [
+    "Messaging/Kinesis"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tKinesisOutput",
+   "families": [
+    "Messaging/Kinesis"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tKMeansStrModel",
+   "families": [
+    "Machine Learning/Clustering"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tMapRDBLookupInput",
+   "families": [
+    "Databases/MapRDB"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tMapRStreamsInputAvro",
+   "families": [
+    "Messaging/MapR Streams"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tMongoDBLookupInput",
+   "families": [
+    "Databases/MongoDB"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tMQTTInput",
+   "families": [
+    "Messaging/MQTT"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tMQTTOutput",
+   "families": [
+    "Messaging/MQTT"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tMysqlLookupInput",
+   "families": [
+    "Databases/MySQL"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tOracleLookupInput",
+   "families": [
+    "Databases/Oracle"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tPubSubInput",
+   "families": [
+    "Messaging/PubSub"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tPubSubInputAvro",
+   "families": [
+    "Messaging/PubSub"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tPubSubOutput",
+   "families": [
+    "Messaging/PubSub"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tRedshiftLookupInput",
+   "families": [
+    "Databases/Redshift"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tRestWebServiceLookupInput",
+   "families": [
+    "Webservice"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tRestWebServiceOutput",
+   "families": [
+    "Webservice"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tSocketTextStreamInput",
+   "families": [
+    "Misc"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tTeradataLookupInput",
+   "families": [
+    "Databases/Teradata"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tWindow",
+   "families": [
+    "Processing"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tWriteAvroFields",
+   "families": [
+    "Processing/Fields"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tWriteDelimitedFields",
+   "families": [
+    "Processing/Fields"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tWritePositionalFields",
+   "families": [
+    "Processing/Fields"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  },
+  {
+   "name": "tWriteXMLFields",
+   "families": [
+    "Processing/Fields"
+   ],
+   "framework_codes": [
+    "SPARKSTREAMING"
+   ],
+   "status": "deprecated_framework_only",
+   "reason": "Solo disponible en Spark Streaming, retirado del alcance vigente de Studio 8 R2026-09."
+  }
+ ]
+}

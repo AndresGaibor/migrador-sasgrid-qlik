@@ -1,0 +1,118 @@
+/* Orden de capas: el reset de Tailwind (base) va antes que los estilos de Byron,
+   y las utilidades de los componentes de shadcn van al final. Sin esta línea el
+   reset de Tailwind apagaría h1, botones y tablas de styles.css. */
+@layer theme, base, byron, components, utilities;
+@import "./styles.css" layer(byron);
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Los mismos tokens que styles.css: verde de marca, lienzo gris claro, esquinas de 5px.
+   Así los componentes de shadcn se ven igual que el resto de la interfaz de Byron. */
+:root {
+  --radius: 5px;
+  --background: #f7f8fa;
+  --foreground: #30363a;
+  --card: #ffffff;
+  --card-foreground: #30363a;
+  --popover: #ffffff;
+  --popover-foreground: #30363a;
+  --primary: #00873e;
+  --primary-foreground: #ffffff;
+  --secondary: #ffffff;
+  --secondary-foreground: #30363a;
+  --sh-muted: #f1f3f4;
+  --sh-muted-foreground: #697279;
+  --sh-accent: #edf1ee;
+  --sh-accent-foreground: #30363a;
+  --destructive: #b53030;
+  --border: #e0e4e6;
+  --input: #cbd2d5;
+  --ring: #00873e;
+  --warning: #936000;
+  --success: #08733d;
+}
+
+@theme inline {
+  --font-sans: "Segoe UI", Arial, sans-serif;
+  --font-mono: ui-monospace, Consolas, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--sh-muted);
+  --color-muted-foreground: var(--sh-muted-foreground);
+  --color-accent: var(--sh-accent);
+  --color-accent-foreground: var(--sh-accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
+  --radius-sm: calc(var(--radius) - 1px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 1px);
+  --radius-xl: calc(var(--radius) + 2px);
+}
+
+/* shadcn asume controles de 32-36px; aquí se igualan a los 40px de styles.css. */
+[data-slot="button"] { min-height: 40px; padding: 9px 17px; border-radius: var(--radius); font-weight: 600; font-size: 14px; }
+  [data-slot="button"][data-size="sm"] { min-height: 34px; padding: 7px 12px; }
+  [data-slot="button"][data-size="xs"] { min-height: 28px; padding: 4px 8px; font-size: 12px; font-weight: 500; }
+  [data-slot="button"][data-size="icon"], [data-slot="button"][data-size="icon-sm"] { min-height: 34px; min-width: 34px; padding: 7px; }
+  [data-slot="input"], [data-slot="select-trigger"] { min-height: 41px; padding: 8px 11px; border-radius: var(--radius); background: #fff; font-size: 14px; }
+  [data-slot="select-trigger"][data-size="sm"] { min-height: 34px; padding: 6px 10px; }
+  [data-slot="input"][data-size="sm"] { min-height: 34px; padding: 6px 10px; }
+  [data-slot="badge"] { border-radius: 4px; }
+  [data-slot="dialog-content"] { border-radius: var(--radius); }
+
+/* Los botones de shadcn toman la forma de los de Byron: blanco con borde, o texto verde. */
+[data-slot="button"][data-variant="outline"] { background: #fff; border-color: #cdd3d6; color: var(--fg); }
+[data-slot="button"][data-variant="outline"]:hover { background: #f1f4f2; border-color: #99a89f; }
+[data-slot="button"][data-variant="link"] { color: var(--accent); text-decoration: none; }
+[data-slot="button"][data-variant="link"]:hover { text-decoration: underline; }
+[data-slot="dialog-content"] { background: #fff; }
+/* La «X» de Radix no es un botón de acción: sin el verde de styles.css. */
+[data-slot="dialog-close"] { background: transparent; border: 0; min-height: 0; padding: 3px; color: var(--muted); }
+[data-slot="dialog-close"]:hover { background: #edf1ee; color: var(--accent); }
+[data-slot="label"] { align-items: flex-start; }
+/* La casilla de Radix también nace como <button>: recupera su tamaño y su caja de 18px. */
+[data-slot="checkbox"] { width: 18px; height: 18px; min-width: 18px; min-height: 18px; padding: 0; margin-top: 2px; border: 1px solid #cbd2d5; border-radius: 4px; background: #fff; }
+[data-slot="checkbox"][data-state="checked"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+/* La misma ventana de siempre, ahora sobre Radix: manda la forma de styles.css, no la de shadcn. */
+[data-slot="dialog-overlay"] { background: #23352d55; backdrop-filter: blur(2px); }
+[data-slot="dialog-content"].dialog { width: min(540px, calc(100vw - 32px)); max-width: none; padding: 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--fg); box-shadow: 0 20px 80px #182b2930; max-height: 90vh; overflow: auto; gap: 0; }
+.dialog-heading [data-slot="dialog-title"] { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.3; }
+
+/* Tablas de valores de los pasos (filas de tFixedFlowInput, columnas del esquema). */
+.do-table-wrap { max-height: 320px; overflow: auto; margin: 6px 0 2px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); }
+.do-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.do-table th { position: sticky; top: 0; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); background: #f1f4f3; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+.do-table td { padding: 6px 10px; border-bottom: 1px solid #eef1f0; font-family: ui-monospace, Consolas, monospace; }
+.do-table tbody tr:nth-child(even) { background: #fafbfa; }
+.do-table tbody tr:last-child td { border-bottom: 0; }
+.step-component { font-size: 12px; white-space: nowrap; color: var(--muted); }
+.step-head { display: flex; flex: 1; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.step-head h3 { margin: 0; }
+
+/* Desplegables: sin el triángulo nativo (parece un emoji), con un chevron que gira. */
+details > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::marker { content: ""; }
+details > summary::after { content: ""; width: 7px; height: 7px; margin-left: auto; flex: none; border-right: 1.6px solid var(--muted); border-bottom: 1.6px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .15s ease; }
+details[open] > summary::after { transform: rotate(-135deg) translateY(-2px); }
+
+/* Grafo de dependencias (SVG), con los colores del tema. */
+.graph { overflow: auto; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); }
+.graph svg text { fill: var(--fg); font-size: 12px; font-family: "Segoe UI", Arial, sans-serif; }
+.graph svg .node-caption { fill: var(--muted); font-size: 11px; }
+.graph svg .node { fill: var(--panel); stroke: var(--line); }
+.graph svg a:hover .node { stroke: var(--accent); }
+.graph svg .edge { fill: none; stroke: var(--line); stroke-width: 1.2; }
+.graph svg .node-port { fill: var(--accent); }

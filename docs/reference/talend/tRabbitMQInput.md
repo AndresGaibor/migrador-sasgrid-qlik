@@ -1,0 +1,58 @@
+<!-- fuente: https://help.qlik.com/talend/en-US/components/8.0/rabbitmq/trabbitmqinput · versión 8.0 -->
+# tRabbitMQInput
+
+Last updated: 9/30/2026
+
+Reads messages from a message queue and passes the messages in the output
+Talend
+ flow.
+
+This component is not shipped with your Talend Studio by
+default. You need to install it using the Feature Manager. For more information, see [Installing features using the Feature Manager](/talend/r/en-US/8.0/studio-user-guide/install-features-to-talend-studio).
+
+## tRabbitMQInput Standard properties
+
+These properties are used to configure tRabbitMQInput running in the Standard Job framework.
+
+The Standard
+tRabbitMQInput component belongs to the Internet family.
+
+The component in this framework is available in all
+subscription-based Talend
+products.
+
+## Basic settings
+
+| Properties | Description |
+| --- | --- |
+| Property Type | Either Built-In or Repository.  Built-In: No property data stored centrally.  Repository: Select the repository file in which the properties are stored. The database connection related fields that follow are completed automatically using the data retrieved. |
+| Use an existing connection | Select this check box and in the Component List click the relevant connection component to reuse the connection details you already defined. |
+| Host name | Enter the host name, for example, `localhost`. |
+| Port | Enter the port number. The default is `5672`. |
+| Username and Password | Enter the username and the password for accessing the message queue.  To enter the password, click the [...] button next to the Password field to bring out the Enter a new password dialog box, enter the password in the text field, and click OK. Note that you can enter the password either in a JSON string in the pure password mode or as a Java expression in the Java mode. You can toggle between the two modes by clicking switch to Java mode or switch to pure password mode on the top of the text field. Information noteNote:  * The two password modes are available only when you have installed the   8.0.1-R2022-05 Talend Studio   monthly update or a later one delivered by Talend. For more information, check with your administrator. * If the 8.0.1-R2022-05 Talend Studio   monthly update or a later one delivered by Talend   is not installed, you can enter passwords in the Java mode   only. |
+| Use TLS | Select this option to use TLS for the connection. |
+| Schema and Edit Schema | A schema is a row description. It defines the number of fields (columns) to be processed and passed on to the next component. When you create a Spark Job, avoid the reserved word `line` when naming the fields.  Click Edit schema to make changes to the schema. If the current schema is of the Repository type, three options are available:   * View schema: choose this   option to view the schema only. * Change to built-in property:   choose this option to change the schema to Built-in for local changes. * Update repository connection:   choose this option to change the schema stored in the repository and decide whether   to propagate the changes to all the Jobs upon completion.  If you just want to   propagate the changes to the current Job, you can select No upon completion and choose this schema metadata   again in the Repository Content   window. |
+| Guess schema | Click this button to retrieve the schema from the document. |
+| Queue | Enter the name of the queue in double quotation marks to read messages from. |
+
+## Advanced settings
+
+| Properties | Description |
+| --- | --- |
+| tStatCatcher Statistics | Select this check box to gather the Job processing metadata at the Job level as well as at each component level. |
+| Use virtual host | Select this option to use a virtual host for receiving messages. Specify the virtual host to be used by entering the virtual host name in the Virtual host name field.  Information noteNote: This option is available only when you have installed the 8.0.1-R2023-01 Talend Studio Monthly update or a later one delivered by Talend. For more information, check with your administrator. |
+| Auto acknowledge | Select this option to automatically acknowledge each message received. If the option is not selected, received messages are not acknowledged and will be added to the queue again. |
+| Return headers | Select this option to retrieve header information from the received messages. Retrieved header information will be stored in the `headers` column. If you select this option, you need to make sure the last column in the schema has the name of `headers` and type of `string`. You can add the `headers` column in the schema manually or by clicking Guess schema in the Basic settings view. |
+
+## Global Variables
+
+| Variables | Description |
+| --- | --- |
+| Global Variables | NB\_LINE: the number of rows read by an input component or transferred to an output component. This is an After variable and it returns an integer.  ERROR\_MESSAGE: the error message generated by the component when an error occurs. This is an After variable and it returns a string. This variable functions only if the Die on error checkbox is cleared, if the component has this checkbox.  A Flow variable functions during the execution of a component while an After variable functions after the execution of the component.  To fill up a field or expression with a variable, press Ctrl+Space to access the variable list and choose the variable to use from it.  For more information about variables, see [Using contexts and variables](/talend/r/en-US/8.0/studio-user-guide/contexts-and-variables). |
+
+## Usage
+
+| Usage guidance | Description |
+| --- | --- |
+| **Usage rule** | This component always needs an output link. |
+| Limitation | Normally, this component works in the streaming mode and will not stop unless an error or an exception occurs. So, when you add this component to a Job, make sure that the Job has a mechanism that can interrupt the execution of this component. |

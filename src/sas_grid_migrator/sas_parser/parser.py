@@ -370,7 +370,7 @@ def _proc_step(stmts: list[Stmt], ctx: _Ctx) -> ProcStep:
     )
     ps.constructs = [f"proc:{name}"]
     ps.statements = [
-        StepStmt(line=s.line, kw=_kw(s.text), text=s.text[:600])
+        StepStmt(line=s.line, kw=_kw(s.text), text=s.text if name == "format" else s.text[:600])
         for s in stmts[1:]
         if s.text != "<datalines>"
     ]
@@ -416,18 +416,22 @@ def _proc_step(stmts: list[Stmt], ctx: _Ctx) -> ProcStep:
 _PCALL = re.compile(r"%([A-Za-z_]\w*)")
 
 
+def _macro_calls(stmts: list[Stmt]) -> list[MacroCall]:
+    calls, seen = [], set()
+    for stmt in stmts:
+        for match in _PCALL.finditer(stmt.text):
+            name = match.group(1).lower()
+            if name not in MACRO_KEYWORDS and (name, stmt.line) not in seen:
+                seen.add((name, stmt.line))
+                calls.append(MacroCall(name=name, line=stmt.line))
+    return calls
+
+
 def parse_program(text: str, file: str, sha256: str | None = None) -> ParsedProgram:
     stmts = split_statements(text)
     ctx = _Ctx(file)
     nodes = _build(stmts, ctx)
-    calls: list[MacroCall] = []
-    seen: set[tuple[str, int]] = set()
-    for s in stmts:
-        for m in _PCALL.finditer(s.text):
-            n = m.group(1).lower()
-            if n not in MACRO_KEYWORDS and (n, s.line) not in seen:
-                seen.add((n, s.line))
-                calls.append(MacroCall(name=n, line=s.line))
+    calls = _macro_calls(stmts)
     return ParsedProgram(
         file=file,
         sha256=sha256,

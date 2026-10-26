@@ -10,7 +10,7 @@
 
 - **Acción:** add_component · **Componente:** `tRunJob` ![Icono Talend](/talend-icons/tRunJob_icon32.png) (sin verificar) · alternativas: `Joblet`
 - **Subjob:** `s13` · **Confianza:** high · **Origen SAS:** `p1_macro_parametrizada.sas:13`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/system/trunjob-standard-properties)
+- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/orchestration/trunjob-standard-properties)
 - **Propiedades:**
   - `PROCESS` (Job) = `extraer_mes` — SAS p1_macro_parametrizada.sas:13 · nombre oficial
   - `CONTEXTPARAMS` (Context Param) = `tabla=ventas, desde=1, hasta=12` — SAS p1_macro_parametrizada.sas:13 · nombre oficial

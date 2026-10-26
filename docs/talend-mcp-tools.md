@@ -29,7 +29,13 @@ TALEND_APPLY_FOLDER=Process/PruebasWebSAS
 
 El MCP configura su propio host y puerto con `TALEND_MCP_HOST` y `TALEND_MCP_PORT`. La URL de la API debe coincidir con esos valores. Mantén los procesos en el mismo Windows que Talend Studio para que MCP pueda comunicarse con el Bridge.
 
-`TALEND_MCP_READONLY=true` deshabilita la escritura desde el portal. `TALEND_APPLY_FOLDER` debe estar bajo `Process/`. La carpeta destino por ZIP es `<TALEND_APPLY_FOLDER>/<slug-del-ZIP>-<project_id>/<subcarpeta-del-programa>`; así dos ZIP con el mismo nombre se mantienen aislados y cada programa conserva su subcarpeta. La guía muestra la ruta exacta que se enviará al MCP.
+### Diagnóstico de la conexión
+
+El MCP expone `GET /healthz` en su puerto para comprobar si el servidor responde sin invocar tools. La vista **Configuración** del portal consulta `GET /api/integrations/talend/health` y muestra el estado por etapas: servidor MCP, Bridge de Studio y escritura de Jobs, junto con la URL, el timeout y la carpeta de aplicación activos. `mcp_available` y `bridge_available` separan los dos fallos habituales (servidor caído frente a Studio cerrado), y el estado general es `Conectado`, `Parcial` (MCP responde pero no hay Bridge) o `Sin conexión`. Los `outputSchema` de las tools deben mantenerse consistentes con lo que devuelven: un cliente MCP con validación estricta rechaza cualquier respuesta que no cumpla el schema publicado.
+
+La misma comprobación de salud lista las tools publicadas y devuelve `tools` (número de tools) y `write_tool` (si `talend_job_apply_custom_spec` está publicada). Así el portal distingue tres casos: el MCP no publica la tool de creación (servidor desactualizado), la tool existe pero su `inputSchema` no trae `childJobs`, `instructions`, `replaceManagedTodoContexts`, `draftOnly`, `draftReason` y `tables`, o el contrato está completo y solo falta el permiso de escritura.
+
+`TALEND_MCP_READONLY=true` hace arrancar el portal en solo lectura; el permiso definitivo lo decide el interruptor de la vista **Configuración**, guardado en la base. `TALEND_APPLY_FOLDER` debe estar bajo `Process/`. La carpeta destino por ZIP es `<TALEND_APPLY_FOLDER>/<slug-del-ZIP>-<project_id>/<subcarpeta-del-programa>`; así dos ZIP con el mismo nombre se mantienen aislados y cada programa conserva su subcarpeta. La guía muestra la ruta exacta que se enviará al MCP.
 
 `TALEND_MCP_TIMEOUT_SECONDS` limita cuánto espera la API cada respuesta del MCP. Antes de implementar, la API recorre el inventario completo de `talend_jobs_list`, incluso si excede el límite predeterminado de 50, y compara nombre y carpeta. Un Job ausente se crea; un Job que ya está en la carpeta exacta se actualiza; un homónimo que solo existe en otra carpeta bloquea el lote. El portal publica el endpoint de solo lectura `GET /api/projects/{id}/talend-apply-batch/preflight` para mostrar esas acciones. Una lectura MCP incompleta o fallida detiene la escritura.
 

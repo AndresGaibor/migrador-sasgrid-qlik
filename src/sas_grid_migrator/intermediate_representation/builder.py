@@ -422,7 +422,7 @@ def _proc_step(n: ProcStep, c: _Ctx) -> list[IROperation]:
     elif n.name == "format":
         add(
             "format_definition",
-            details={"statements": [s.text for s in n.statements][:20]},
+            details={"statements": [s.text for s in n.statements][:500]},
             confidence="medium",
         )
     elif n.name in ("import", "export"):
@@ -525,30 +525,34 @@ def _nodes(nodes: list[Node], c: _Ctx) -> list[IROperation]:
     return ops
 
 
-def build_ir(program: ParsedProgram, macro_files: dict[str, str] | None = None) -> ProgramIR:
-    c = _Ctx(program.file, macro_files or {})
-    ir = ProgramIR(file=program.file, sha256=program.sha256, operations=_nodes(program.nodes, c))
-    for n in program.nodes:
-        if isinstance(n, GlobalStmt):
-            if n.kind == "let" and n.fields:
-                ir.parameters[n.fields["name"]] = n.fields["value"]
-            elif n.kind == "libname" and n.fields.get("action") is None:
+def _collect_metadata(program: ParsedProgram, ir: ProgramIR, ctx: _Ctx) -> None:
+    for node in program.nodes:
+        if isinstance(node, GlobalStmt):
+            if node.kind == "let" and node.fields:
+                ir.parameters[node.fields["name"]] = node.fields["value"]
+            elif node.kind == "libname" and node.fields.get("action") is None:
                 ir.libraries.append(
                     LibraryRef(
-                        name=n.fields["name"],
-                        engine=n.fields.get("engine"),
-                        path=n.fields.get("path"),
+                        name=node.fields["name"],
+                        engine=node.fields.get("engine"),
+                        path=node.fields.get("path"),
                     )
                 )
-            elif n.kind == "include":
-                ir.includes.append(n.fields.get("path", ""))
-        elif isinstance(n, MacroDef):
+            elif node.kind == "include":
+                ir.includes.append(node.fields.get("path", ""))
+        elif isinstance(node, MacroDef):
             ir.macros.append(
                 MacroIR(
-                    name=n.name,
-                    params=[p.name for p in n.params],
-                    loc=n.loc,
-                    operations=_nodes(n.body, c),
+                    name=node.name,
+                    params=[param.name for param in node.params],
+                    loc=node.loc,
+                    operations=_nodes(node.body, ctx),
                 )
             )
+
+
+def build_ir(program: ParsedProgram, macro_files: dict[str, str] | None = None) -> ProgramIR:
+    ctx = _Ctx(program.file, macro_files or {})
+    ir = ProgramIR(file=program.file, sha256=program.sha256, operations=_nodes(program.nodes, ctx))
+    _collect_metadata(program, ir, ctx)
     return ir

@@ -6,9 +6,10 @@ const source = await readFile(new URL("./PlansTab.tsx", import.meta.url), "utf8"
 const hooksSource = await readFile(new URL("../hooks.ts", import.meta.url), "utf8");
 
 test("project plans expose one ZIP-level Talend action and no per-guide write action", () => {
-  assert.match(source, /Implementar todos los flujos del ZIP en Talend/);
-  assert.match(source, /api\.talendApplyBatch\(id\)/);
+  assert.match(source, /Crear Jobs en Talend Studio/);
+  assert.match(source, /api\.talendApplyBatch\(id, confirmation\.revision_hash\)/);
   assert.match(source, /no ejecutará los Jobs/i);
+  assert.match(source, /no se ejecutan ni se publican en Qlik Talend Cloud/);
   assert.match(source, /canStartBatch/);
   assert.match(source, /!health\.data\.write_enabled/);
   assert.match(source, /disabled=\{!canStartBatch\}/);
@@ -48,7 +49,7 @@ test("a saved conflict cleared by live Talend inventory is presented as retryabl
 });
 
 test("transient batch polling errors retain the last state and report automatic retries", () => {
-  assert.match(hooksSource, /preserveDataOnError\s*\?\s*\{ \.\.\.s, error: e\.message, loading: false \}/);
+  assert.match(hooksSource, /preserveDataOnError\s*\?\s*\{ \.\.\.s, error: message, errorStatus: status, loading: false \}/);
   assert.match(source, /preserveDataOnError: true/);
   assert.match(source, /setInterval\(batch\.reload, 1200\)/);
   assert.match(source, /No se pudo actualizar el progreso del lote/);
@@ -67,4 +68,30 @@ test("individual guides show only their batch or legacy result and retain the re
   assert.doesNotMatch(source, /api\.applyTalend\(/);
   assert.match(source, /Información técnica pendiente/);
   assert.match(source, /Talend no ejecutará los Jobs/);
+});
+
+test("the project batch asks for confirmation with a human-review summary before writing", () => {
+  assert.match(source, /api\.talendApplyBatchSummary\(id\)/);
+  assert.match(source, /setConfirmation\(summary\.data\)/);
+  assert.match(source, /TalendPreflight/);
+  assert.match(source, /Confirmar creación en Talend Studio/);
+  assert.match(source, /api\.talendApplyBatch\(id, confirmation\.revision_hash\)/);
+  assert.match(source, /review_required|review_warnings/);
+  assert.match(source, /Cancelar/);
+  assert.doesNotMatch(
+    source,
+    /className="talend-implement-button talend-batch-button" onClick=\{\(\) => void implementProject\(\)\}/,
+    "the main button must open the confirmation instead of starting the batch directly",
+  );
+});
+
+test("each job reports its creation phase and the Studio verification result", () => {
+  assert.match(source, /phase === "applying"/);
+  assert.match(source, /phase === "inspecting"/);
+  assert.match(source, /Fase: creando componentes/);
+  assert.match(source, /Fase: verificando el Job en Studio/);
+  assert.match(source, /Inspeccionado en Studio/);
+  assert.match(source, /verification\.missing_components/);
+  assert.match(source, /verification\.studio_problems/);
+  assert.match(source, /Verificación no disponible/);
 });
