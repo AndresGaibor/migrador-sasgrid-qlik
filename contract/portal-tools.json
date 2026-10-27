@@ -1,0 +1,29 @@
+{
+  "read_tools": [
+    "talend_detect_open_jobs",
+    "talend_jobs_list",
+    "talend_jobs_read",
+    "talend_read_contexts",
+    "talend_list_project_contexts",
+    "talend_list_repository_contexts",
+    "talend_read_repository_context",
+    "talend_list_components",
+    "talend_show_flow",
+    "talend_analyze_tdboutput",
+    "talend_read_run_log",
+    "talend_summarize_open_job",
+    "talend_inspect_component",
+    "talend_inspect_job",
+    "talend_preview_component_parameter",
+    "talend_preview_schema_column",
+    "talend_repo_status",
+    "talend_repo_sources",
+    "talend_job_info",
+    "talend_job_problems",
+    "talend_job_list_nodes",
+    "talend_bridge_ping"
+  ],
+  "write_tool": "talend_job_apply_custom_spec",
+  "required_top_fields": ["childJobs", "instructions", "replaceManagedTodoContexts"],
+  "required_component_fields": ["draftOnly", "draftReason", "tables"]
+}

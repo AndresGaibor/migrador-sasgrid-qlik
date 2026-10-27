@@ -1,40 +1,15 @@
 """Allowlist de lectura y aplicación de guías para tools de talend-mcp.
 
 La aplicación solo invoca writers tipados tras una confirmación del usuario.
+Los nombres viven en `contract/portal-tools.json`; aquí se derivan.
 """
 
-READ_TOOLS = frozenset(
-    {
-        "talend_detect_open_jobs",
-        "talend_jobs_list",
-        "talend_jobs_read",
-        "talend_read_contexts",
-        "talend_list_project_contexts",
-        "talend_list_repository_contexts",
-        "talend_read_repository_context",
-        "talend_list_components",
-        "talend_show_flow",
-        "talend_analyze_tdboutput",
-        "talend_read_run_log",
-        "talend_summarize_open_job",
-        "talend_inspect_component",
-        "talend_inspect_job",
-        "talend_preview_component_parameter",
-        "talend_preview_schema_column",
-        "talend_repo_status",
-        "talend_repo_sources",
-        "talend_job_info",
-        "talend_job_problems",
-        "talend_job_list_nodes",
-        "talend_bridge_ping",
-    }
-)
+from sas_grid_migrator.talend_adapter.contract import load_contract
 
-WRITE_TOOLS = frozenset(
-    {
-        "talend_job_apply_custom_spec",
-    }
-)
+_CONTRACT = load_contract()
+
+READ_TOOLS = _CONTRACT.read_tools
+WRITE_TOOLS = frozenset({_CONTRACT.write_tool})
 
 
 class ToolNotAllowed(PermissionError):

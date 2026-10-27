@@ -9,6 +9,7 @@ from typing import Any, Protocol
 
 from pydantic import BaseModel
 
+from sas_grid_migrator.talend_adapter.contract import load_contract
 from sas_grid_migrator.talend_adapter.policy import assert_allowed
 
 
@@ -303,8 +304,9 @@ class TalendAdapter:
                 return status
         properties = schema.get("properties", {})
         component = properties.get("components", {}).get("items", {}).get("properties", {})
-        missing = sorted({"childJobs", "instructions", "replaceManagedTodoContexts"} - properties.keys())
-        missing += sorted({"draftOnly", "draftReason", "tables"} - component.keys())
+        contract = load_contract()
+        missing = sorted(contract.required_top_fields - properties.keys())
+        missing += sorted(contract.required_component_fields - component.keys())
         if missing:
             status["spec_error"] = (
                 f"MCP incompatible con la migración: faltan {', '.join(missing)}. "
