@@ -17,3 +17,6 @@ docs/reference/sas/*.md
 # Documentación de Talend (copyright de Qlik): solo local; el catálogo estructurado sí se versiona
 docs/reference/talend/*
 !docs/reference/talend/README.md
+
+mcp/talend-mcp/workspace/
+mcp/talend-mcp/docs/media/video/out/

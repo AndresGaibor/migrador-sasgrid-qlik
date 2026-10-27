@@ -16,6 +16,7 @@ F1–F7 completas: importación segura, parser P0/P1/P2, dependencias y Grid, IR
 uv sync
 uv run pytest
 uv run sgm version
+uv run sgm dev                                 # API + UI con un solo comando (Ctrl+C detiene ambos)
 uv run sgm import tests/fixtures/sas -n corpus   # crea proyecto e importa el lote
 uv run sgm inventory <project_id>
 uv run sgm analyze <project_id>               # parseo + cobertura P0/P1/P2
@@ -50,9 +51,9 @@ SGM_MAX_PIPELINE_CONCURRENCY=2
 SGM_MAX_QUEUED_PIPELINES=20
 ```
 
-En el `.env.local` de `talend-mcp`, `TALEND_MCP_HOST` y `TALEND_MCP_PORT` configuran el servidor (por defecto `127.0.0.1` y `3927`). Si cambias alguno, ajusta `TALEND_MCP_URL` para que coincida. Mantén el MCP en loopback y reinicia los dos procesos después de cambiar su configuración.
+En el `.env.local` de `mcp/talend-mcp`, `TALEND_MCP_HOST` y `TALEND_MCP_PORT` configuran el servidor (por defecto `127.0.0.1` y `3927`). Si cambias alguno, ajusta `TALEND_MCP_URL` para que coincida. Mantén el MCP en loopback y reinicia los dos procesos después de cambiar su configuración.
 
-Arranca el MCP con `bun run start:server`, la API con `uv run uvicorn apps.api.main:app --host 127.0.0.1 --port 8000` y la UI con `cd apps/web && bun run dev`. Al subir un ZIP, el portal conserva la estructura de carpetas y muestra el estado de cada etapa. En «Plan de migración», pulsa **Implementar todos los flujos del ZIP en Talend**. La API llama secuencialmente a `talend_job_apply_custom_spec` una vez por Job que no haya sido confirmado dentro de un Job padre. El estado y los resultados se guardan por proyecto; el portal consulta el avance al recargar. Los Jobs no se ejecutan.
+El código del MCP vive en `mcp/talend-mcp/` (subtree de [AndresGaibor/talend-mcp](https://github.com/AndresGaibor/talend-mcp)). Para levantar MCP, API y UI con la configuración correcta, usa `scripts/dev.ps1`; el MCP arranca con el preset `portal`. Al subir un ZIP, el portal conserva la estructura de carpetas y muestra el estado de cada etapa. En «Plan de migración», pulsa **Implementar todos los flujos del ZIP en Talend**. La API llama secuencialmente a `talend_job_apply_custom_spec` una vez por Job que no haya sido confirmado dentro de un Job padre. El estado y los resultados se guardan por proyecto; el portal consulta el avance al recargar. Los Jobs no se ejecutan.
 
 El permiso de escritura se administra únicamente con el interruptor de «Configuración» y se guarda en la base; por defecto permite crear. No depende de variables de entorno. El destino por ZIP combina la raíz configurada, un nombre seguro del ZIP, el id estable del proyecto y la subcarpeta del programa. Un Job ausente se crea; uno que ya existe en esa carpeta exacta se actualiza mediante la API de Talend Studio; un homónimo de otra carpeta bloquea el lote. El portal vuelve a comprobar MCP antes de reintentar conflictos guardados o restaurar Jobs borrados. `TALEND_APPLY_FOLDER` debe estar dentro de `Process/`.
 
