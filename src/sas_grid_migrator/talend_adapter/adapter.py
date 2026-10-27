@@ -23,6 +23,44 @@ class McpClientUnavailable(TalendError):
 
 CLIENT_HINT = "Falta el cliente MCP 2.x: ejecuta «uv sync» (mcp>=2.3)"
 
+#: Qué hacer con cada diagnóstico. `ok` no lleva pista.
+FIX_HINTS: dict[str, str | None] = {
+    "ok": None,
+    "mcp_down": "Arranca talend-mcp con «bun run start:server» en mcp/talend-mcp y vuelve a comprobar la conexión.",
+    "client_incompatible": CLIENT_HINT,
+    "tools_missing": (
+        "Arranca el MCP con TALEND_MCP_FILTER=portal y vuelve a comprobar; si sigue faltando, "
+        "actualiza el preset del servidor."
+    ),
+    "contract_incomplete": (
+        "Actualiza mcp/talend-mcp: el contrato de talend_job_apply_custom_spec no trae los campos "
+        "que el portal necesita."
+    ),
+    "bridge_down": (
+        "Abre Talend Studio con el proyecto y el plugin del bridge instalado; luego vuelve a comprobar."
+    ),
+}
+
+
+def _spec_status(
+    diagnosis: str,
+    error: str | None,
+    *,
+    tools: int | None,
+    write_tool: bool | None,
+    missing: tuple[str, ...] | list[str] = (),
+) -> dict[str, Any]:
+    """Estado del contrato con el diagnóstico y la pista de arreglo."""
+    return {
+        "spec_supported": diagnosis == "ok",
+        "spec_error": error,
+        "tools": tools,
+        "write_tool": write_tool,
+        "missing_tools": sorted(missing),
+        "diagnosis": diagnosis,
+        "fix_hint": FIX_HINTS[diagnosis],
+    }
+
 
 def _import_client() -> Any:
     """`from mcp import Client`, pero con un mensaje accionable si la versión es 1.x."""
@@ -170,8 +208,22 @@ class TalendAdapter:
         config = self._connection_config()
         try:
             jobs = await self.list_jobs()
+        except McpClientUnavailable as e:
+            return {
+                "available": False,
+                "mcp_available": False,
+                "error": str(e),
+                **_spec_status("client_incompatible", str(e), tools=None, write_tool=None),
+                **config,
+            }
         except TalendError as e:
-            return {"available": False, "mcp_available": False, "error": str(e), **config}
+            return {
+                "available": False,
+                "mcp_available": False,
+                "error": str(e),
+                **_spec_status("mcp_down", str(e), tools=None, write_tool=None),
+                **config,
+            }
         job_count = len(jobs)
         try:
             bridge = await self._data("talend_bridge_ping")
@@ -182,6 +234,9 @@ class TalendAdapter:
                 "bridge_available": False,
                 "jobs": job_count,
                 "error": str(e),
+                "diagnosis": "bridge_down",
+                "fix_hint": FIX_HINTS["bridge_down"],
+                "missing_tools": [],
                 **config,
             }
         if bridge.get("ok") is not True:
@@ -192,6 +247,9 @@ class TalendAdapter:
                 "jobs": job_count,
                 "error": "Talend Studio Bridge no está disponible. Instala el plugin en Studio "
                 "(bun run scripts/start.ts --install-bridge) y abre un proyecto.",
+                "diagnosis": "bridge_down",
+                "fix_hint": FIX_HINTS["bridge_down"],
+                "missing_tools": [],
                 **config,
             }
         return {
@@ -273,48 +331,51 @@ class TalendAdapter:
         """
         try:
             tools = await self._published_tools()
+        except McpClientUnavailable as e:
+            return _spec_status("client_incompatible", str(e), tools=None, write_tool=None)
         except TalendError as e:
-            return {
-                "spec_supported": False,
-                "spec_error": str(e),
-                "tools": None,
-                "write_tool": None,
-            }
-        status: dict[str, Any] = {
-            "spec_supported": False,
-            "spec_error": None,
-            "tools": len(tools) if tools is not None else None,
-            "write_tool": None,
-        }
+            return _spec_status("mcp_down", str(e), tools=None, write_tool=None)
+
+        contract = load_contract()
         if tools is not None:
-            tool = next((item for item in tools if item.get("name") == SPEC_TOOL), None)
-            status["write_tool"] = tool is not None
-            if tool is None:
-                status["spec_error"] = (
-                    f"MCP incompatible con la migración: no publica {SPEC_TOOL}. "
-                    "Actualiza el MCP antes de crear Jobs."
+            published = {item.get("name") for item in tools}
+            missing = sorted((contract.read_tools | {contract.write_tool}) - published)
+            write_tool = contract.write_tool in published
+            if missing:
+                return _spec_status(
+                    "tools_missing",
+                    "MCP incompatible con la migración: no publica "
+                    f"{', '.join(missing)}. Arranca el MCP con TALEND_MCP_FILTER=portal.",
+                    tools=len(tools),
+                    write_tool=write_tool,
+                    missing=missing,
                 )
-                return status
+            tool = next(item for item in tools if item.get("name") == SPEC_TOOL)
             schema = tool.get("inputSchema") or tool.get("input_schema") or {}
         else:
+            write_tool = None
             try:
                 schema = await self.caller.describe_tool(SPEC_TOOL) or {}
+            except McpClientUnavailable as e:
+                return _spec_status("client_incompatible", str(e), tools=None, write_tool=None)
             except TalendError as e:
-                status["spec_error"] = str(e)
-                return status
+                return _spec_status("mcp_down", str(e), tools=None, write_tool=None)
+
         properties = schema.get("properties", {})
         component = properties.get("components", {}).get("items", {}).get("properties", {})
-        contract = load_contract()
-        missing = sorted(contract.required_top_fields - properties.keys())
-        missing += sorted(contract.required_component_fields - component.keys())
-        if missing:
-            status["spec_error"] = (
-                f"MCP incompatible con la migración: faltan {', '.join(missing)}. "
-                "Actualiza el MCP antes de crear Jobs."
+        missing_fields = sorted(contract.required_top_fields - properties.keys())
+        missing_fields += sorted(contract.required_component_fields - component.keys())
+        if missing_fields:
+            return _spec_status(
+                "contract_incomplete",
+                f"MCP incompatible con la migración: faltan {', '.join(missing_fields)}. "
+                "Actualiza el MCP antes de crear Jobs.",
+                tools=len(tools) if tools is not None else None,
+                write_tool=write_tool,
             )
-            return status
-        status["spec_supported"] = True
-        return status
+        return _spec_status(
+            "ok", None, tools=len(tools) if tools is not None else None, write_tool=write_tool
+        )
 
     async def read_contexts(self, job_name: str) -> list[dict[str, Any]]:
         return (await self._data("talend_read_contexts", {"jobName": job_name})).get("contexts", [])

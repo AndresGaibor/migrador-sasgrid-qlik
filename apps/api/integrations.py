@@ -4,9 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
 
-from sas_grid_migrator.talend_adapter.adapter import TalendError
 from sas_grid_migrator.talend_adapter.catalog import (
     LICENSE_PROFILE_CODE,
     LICENSE_PROFILE_LABEL,
@@ -14,13 +12,7 @@ from sas_grid_migrator.talend_adapter.catalog import (
     profile_availability_records,
 )
 
-from . import common
-
 router = APIRouter(prefix="/api")
-
-
-class TalendInspect(BaseModel):
-    job_path: str
 
 
 @lru_cache(maxsize=1)
@@ -100,19 +92,6 @@ def _official_component_description(root: Path, name: str, status: str) -> str:
     if paragraph:
         return " ".join(paragraph)
     return "Consulta la referencia oficial de este componente en Talend Studio 8."
-
-
-@router.get("/integrations/talend/health")
-async def talend_health() -> dict:
-    return await common.talend().health_check()
-
-
-@router.post("/integrations/talend/inspect")
-async def talend_inspect(body: TalendInspect):
-    try:
-        return await common.talend().inspect_job(body.job_path)
-    except TalendError as e:
-        raise HTTPException(502, str(e)) from e
 
 
 @router.get("/talend/catalog")

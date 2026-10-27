@@ -7,7 +7,15 @@ from apps.api.main import app as api
 from fastapi.testclient import TestClient
 
 from sas_grid_migrator.migration_planner.service import generate_plans
-from sas_grid_migrator.talend_adapter.adapter import SPEC_TOOL, McpCaller, TalendAdapter, TalendError
+from sas_grid_migrator.talend_adapter.adapter import (
+    CLIENT_HINT,
+    SPEC_TOOL,
+    McpCaller,
+    McpClientUnavailable,
+    TalendAdapter,
+    TalendError,
+)
+from sas_grid_migrator.talend_adapter.contract import load_contract
 from sas_grid_migrator.talend_adapter.policy import ToolNotAllowed
 from sas_grid_migrator.talend_adapter.verification import Catalog, verify_plans
 from tests.unit.test_planner import project
@@ -52,6 +60,16 @@ class ListingFake(Fake):
 
     async def describe_tool(self, tool):
         raise AssertionError("list_tools es el camino esperado; describe_tool no debe usarse")
+
+
+def listing(*, without=(), write_schema=SPEC_SCHEMA):
+    """Inventario completo del contrato, con las tools indicadas fuera."""
+    contract = load_contract()
+    names = sorted((contract.read_tools | {contract.write_tool}) - set(without))
+    return [
+        {"name": name, "inputSchema": write_schema if name == contract.write_tool else {}}
+        for name in names
+    ]
 
 
 JOB = {
@@ -173,62 +191,91 @@ def test_policy_blocks_mutating_tools():
 
 def test_health_unavailable_does_not_raise():
     ad = TalendAdapter(Fake({"talend_jobs_list": TalendError("caído")}))
-    assert run(ad.health_check()) == {"available": False, "mcp_available": False, "error": "caído"}
+    health = run(ad.health_check())
+    assert health["available"] is False and health["mcp_available"] is False
+    assert health["error"] == "caído"
+    assert health["diagnosis"] == "mcp_down"
+    assert "bun run start:server" in health["fix_hint"]
     ok = TalendAdapter(Fake({
         "talend_jobs_list": {"ok": True, "data": {"jobs": [{"name": "job", "path": "/process/job/job_0.1.item"}], "total": 1}},
         "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readOnly", "unsafeActions": False}},
     }))
-    assert run(ok.health_check()) == {
-        "available": True,
-        "mcp_available": True,
-        "bridge_available": True,
-        "bridge_mode": "readOnly",
-        "unsafe_actions": False,
-        "jobs": 1,
-        "spec_supported": True,
-        "spec_error": None,
-        "tools": None,
-        "write_tool": None,
-    }
+    health = run(ok.health_check())
+    assert health["available"] is True
+    assert health["mcp_available"] is True and health["bridge_available"] is True
+    assert health["bridge_mode"] == "readOnly" and health["unsafe_actions"] is False
+    assert health["jobs"] == 1
+    assert health["spec_supported"] is True and health["spec_error"] is None
+    assert health["tools"] is None and health["write_tool"] is None
+    assert health["diagnosis"] == "ok" and health["fix_hint"] is None
+    assert health["missing_tools"] == []
 
 
 def test_spec_status_validates_the_contract_from_the_published_listing():
-    listing = [
-        {"name": "talend_jobs_list", "inputSchema": {}},
-        {"name": SPEC_TOOL, "inputSchema": SPEC_SCHEMA},
-    ]
-    ad = TalendAdapter(ListingFake({}, listing))
+    ad = TalendAdapter(ListingFake({}, listing()))
 
     status = run(ad.custom_spec_status())
 
     assert status == {
         "spec_supported": True,
         "spec_error": None,
-        "tools": 2,
+        "tools": len(load_contract().read_tools) + 1,
         "write_tool": True,
+        "missing_tools": [],
+        "diagnosis": "ok",
+        "fix_hint": None,
     }
 
 
 def test_spec_status_reports_when_the_write_tool_is_not_published():
-    ad = TalendAdapter(ListingFake({}, [{"name": "talend_jobs_list", "inputSchema": {}}]))
+    ad = TalendAdapter(ListingFake({}, listing(without=(SPEC_TOOL,))))
 
     status = run(ad.custom_spec_status())
 
     assert status["spec_supported"] is False
     assert status["write_tool"] is False
-    assert SPEC_TOOL in status["spec_error"]
+    assert status["missing_tools"] == [SPEC_TOOL]
+    assert status["diagnosis"] == "tools_missing"
 
 
 def test_spec_status_reports_missing_contract_fields_from_the_listing():
-    outdated = {SPEC_TOOL: {}}
-    listing = [{"name": name, "inputSchema": {}} for name in outdated]
-    ad = TalendAdapter(ListingFake({}, listing))
+    outdated = {"properties": {
+        "instructions": {},
+        "replaceManagedTodoContexts": {},
+        "components": {"items": {"properties": {"draftOnly": {}, "draftReason": {}, "tables": {}}}},
+    }}
+    ad = TalendAdapter(ListingFake({}, listing(write_schema=outdated)))
 
     status = run(ad.custom_spec_status())
 
     assert status["spec_supported"] is False
     assert status["write_tool"] is True
+    assert status["missing_tools"] == []
+    assert status["diagnosis"] == "contract_incomplete"
     assert "faltan" in status["spec_error"] and "childJobs" in status["spec_error"]
+    assert "Actualiza" in status["fix_hint"]
+
+
+def test_diagnosis_names_the_tool_missing_from_the_portal_preset():
+    ad = TalendAdapter(ListingFake({}, listing(without=("talend_job_problems",))))
+
+    status = run(ad.custom_spec_status())
+
+    assert status["diagnosis"] == "tools_missing"
+    assert status["missing_tools"] == ["talend_job_problems"]
+    assert "TALEND_MCP_FILTER=portal" in status["fix_hint"]
+
+
+def test_diagnosis_blames_the_client_when_the_mcp_package_is_old():
+    class OldClient(ListingFake):
+        async def list_tools(self):
+            raise McpClientUnavailable(CLIENT_HINT)
+
+    status = run(TalendAdapter(OldClient({}, [])).custom_spec_status())
+
+    assert status["diagnosis"] == "client_incompatible"
+    assert status["tools"] is None and status["write_tool"] is None
+    assert "uv sync" in status["fix_hint"]
 
 
 def test_health_reports_the_published_tool_inventory():
@@ -237,27 +284,49 @@ def test_health_reports_the_published_tool_inventory():
             "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
             "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readWrite", "unsafeActions": False}},
         },
-        [{"name": SPEC_TOOL, "inputSchema": SPEC_SCHEMA}],
+        listing(),
     ))
 
     health = run(adapter.health_check())
 
     assert health["available"] is True
-    assert health["tools"] == 1
+    assert health["tools"] == len(load_contract().read_tools) + 1
     assert health["write_tool"] is True
     assert health["spec_supported"] is True
+    assert health["diagnosis"] == "ok"
+
+
+def test_health_propagates_the_missing_tools_diagnosis():
+    adapter = TalendAdapter(ListingFake(
+        {
+            "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
+            "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readWrite", "unsafeActions": False}},
+        },
+        listing(without=("talend_job_problems",)),
+    ))
+
+    health = run(adapter.health_check())
+
+    assert health["diagnosis"] == "tools_missing"
+    assert health["missing_tools"] == ["talend_job_problems"]
+    assert "TALEND_MCP_FILTER=portal" in health["fix_hint"]
 
 
 def test_health_reports_bridge_offline_even_when_mcp_server_is_reachable():
-    adapter = TalendAdapter(Fake({
-        "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
-        "talend_bridge_ping": {"ok": True, "data": {"ok": False}},
-    }))
+    adapter = TalendAdapter(ListingFake(
+        {
+            "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
+            "talend_bridge_ping": {"ok": True, "data": {"ok": False}},
+        },
+        listing(),
+    ))
 
     health = run(adapter.health_check())
     assert health["available"] is False
     assert health["mcp_available"] is True and health["bridge_available"] is False
     assert health["jobs"] == 0
+    assert health["diagnosis"] == "bridge_down"
+    assert "Talend Studio" in health["fix_hint"]
     assert health["error"].startswith("Talend Studio Bridge no está disponible.")
 
 

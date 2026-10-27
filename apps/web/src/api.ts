@@ -110,6 +110,9 @@ export const api = {
     spec_error?: string | null;
     tools?: number | null;
     write_tool?: boolean | null;
+    missing_tools?: string[];
+    diagnosis?: "ok" | "mcp_down" | "client_incompatible" | "tools_missing" | "contract_incomplete" | "bridge_down";
+    fix_hint?: string | null;
     apply_folder: string;
     mcp_url?: string;
     timeout_seconds?: number;

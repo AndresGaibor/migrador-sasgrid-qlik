@@ -43,3 +43,10 @@ test("the published tool inventory drives the diagnostics", () => {
   assert.match(source, /h\.write_tool === false/);
   assert.match(source, /talend_job_apply_custom_spec/);
 });
+
+test("a broken diagnosis shows its fix hint and the missing tools", () => {
+  assert.match(source, /h\.diagnosis !== "ok"/);
+  assert.match(source, /h\.fix_hint/);
+  assert.match(source, /h\.missing_tools/);
+  assert.match(source, /Faltan tools del portal/);
+});

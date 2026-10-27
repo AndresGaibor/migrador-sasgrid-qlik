@@ -7,6 +7,14 @@ import { notifyError, notifySuccess } from "../errors";
 
 type Health = Awaited<ReturnType<typeof api.talendHealth>>;
 
+const DIAGNOSIS_LABELS: Record<string, string> = {
+  mcp_down: "MCP sin respuesta",
+  client_incompatible: "Cliente MCP desactualizado",
+  tools_missing: "Faltan tools del portal",
+  contract_incomplete: "Contrato MCP incompatible",
+  bridge_down: "Bridge sin conexión",
+};
+
 function Stage({ tone, title, detail }: { tone: string; title: string; detail: string }) {
   return (
     <div className="health-stage">
@@ -17,6 +25,7 @@ function Stage({ tone, title, detail }: { tone: string; title: string; detail: s
 }
 
 function overall(h: Health) {
+  if (h.diagnosis && h.diagnosis !== "ok") return { tone: "warn", label: DIAGNOSIS_LABELS[h.diagnosis] ?? "Revisar" };
   if (h.available && h.spec_supported === false) return { tone: "warn", label: "Contrato MCP incompatible" };
   if (h.available) return { tone: "ok", label: "Conectado" };
   if (h.mcp_available) return { tone: "warn", label: "Parcial" };
@@ -88,6 +97,12 @@ export function SettingsView() {
             />
             <Stage tone={h.spec_supported ? "ok" : "warn"} title="Contrato de creación" detail={h.spec_supported ? "Compatible con Jobs hijos, borradores y tablas de configuración." : h.spec_error ?? "No se pudo comprobar la compatibilidad del MCP."} />
           </div>
+          {h.diagnosis && h.diagnosis !== "ok" && h.fix_hint && (
+            <div className="notice" role="alert">
+              <Icon name="info" />
+              <span>{h.fix_hint}{h.missing_tools?.length ? ` Faltan: ${h.missing_tools.join(", ")}.` : ""}</span>
+            </div>
+          )}
           {h.error && <details><summary>Detalles para el equipo técnico</summary><p className="mono">{h.error}</p></details>}
           <dl className="health-config">
             <div><dt>URL del MCP</dt><dd className="mono">{h.mcp_url ?? "—"}</dd></div>
