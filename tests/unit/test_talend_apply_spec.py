@@ -70,7 +70,7 @@ def test_build_apply_spec_maps_verified_steps_to_mcp_custom_job_spec():
             "componentName": "tFileInputDelimited",
             "posX": 160,
             "posY": 96,
-            "label": "Aplicar tFileInputDelimited [read_1]",
+            "label": "Aplicar tFileInputDelimited · SAS 1",
             "parameters": {"HEADER": "1"},
             "schema": {
                 "name": "tFileInputDelimited_1_schema",
@@ -136,16 +136,77 @@ def test_build_apply_spec_marks_unverified_steps_as_drafts_without_blocking_pend
     assert all(component.draft_only for component in result.components)
 
 
-def test_transforming_tmap_is_a_draft_until_mapper_configuration_is_generated():
-    mapping = step("project_1", "tMap")
-    mapping.operation_type = "project"
-    mapping.expressions = [Expression(sas="amount * 2", talend="row1.amount * 2", line=8, requires_semantic_validation=False)]
+def test_compute_tmap_generates_a_verified_direct_and_arithmetic_mapper():
+    source = step("read_1", "tFileInputDelimited")
+    source.schema_columns = [SchemaColumn(name="amount", talend_type="id_BigDecimal", nullable=False)]
+    mapping = step("compute_1", "tMap", from_step="read_1")
+    mapping.order = 2
+    mapping.operation_type = "compute"
+    mapping.schema_columns = [
+        SchemaColumn(name="amount", talend_type="id_BigDecimal", nullable=False),
+        SchemaColumn(name="service_fee", talend_type="id_BigDecimal", nullable=False),
+    ]
+    mapping.expressions = [Expression(
+        sas="amount * 0.005", talend="(input_row.amount * 0.005)", line=8,
+        requires_semantic_validation=False, target="service_fee",
+    )]
+    target = step("write_1", "tFileOutputDelimited", from_step="compute_1")
+    target.order = 3
 
-    component = build_apply_spec(plan(mapping)).components[0]
+    arguments = build_apply_spec(plan(source, mapping, target)).to_mcp_arguments()
+    component = next(item for item in arguments["components"] if item["componentName"] == "tMap")
+    instruction = next(item for item in arguments["instructions"]["steps"] if item["id"] == "compute_1")
+
+    assert component["draftOnly"] is False
+    assert component["mapper"] == {
+        "inputs": [{"name": "row_2_1", "columns": [{"name": "amount", "type": "id_BigDecimal", "nullable": False}]}],
+        "outputs": [{"name": "row_3_1", "columns": [
+            {"name": "amount", "type": "id_BigDecimal", "nullable": False, "expression": "row_2_1.amount"},
+          {"name": "service_fee", "type": "id_BigDecimal", "nullable": False, "expression": '((new java.math.BigDecimal(String.valueOf(row_2_1.amount))).multiply(new java.math.BigDecimal("0.005")))'},
+        ]}],
+    }
+    assert instruction["talendUniqueName"] == component["uniqueName"]
+
+
+def test_tmap_with_unsupported_function_remains_a_draft():
+    source = step("read_1", "tFileInputDelimited")
+    source.schema_columns = [SchemaColumn(name="amount", talend_type="id_BigDecimal", nullable=False)]
+    mapping = step("compute_1", "tMap", from_step="read_1")
+    mapping.order = 2
+    mapping.operation_type = "compute"
+    mapping.expressions = [Expression(
+        sas="lowcase(amount)", talend="input_row.amount.toLowerCase()", line=8,
+        requires_semantic_validation=False, target="normalized_amount",
+    )]
+    mapping.schema_columns = [SchemaColumn(name="normalized_amount", talend_type="id_String", nullable=False)]
+    result = build_apply_spec(plan(source, mapping))
+    component = next(item for item in result.components if item.component_name == "tMap")
 
     assert component.draft_only is True
     assert component.mapper is None
-    assert "no genera su configuración de mapper" in component.draft_reason
+    assert "aritmética" in component.draft_reason
+
+
+def test_tmap_decimal_division_stays_pending_until_rounding_is_defined():
+    source = step("read_1", "tFileInputDelimited")
+    source.schema_columns = [SchemaColumn(name="amount", talend_type="id_BigDecimal", nullable=False)]
+    mapping = step("compute_1", "tMap", from_step="read_1")
+    mapping.order = 2
+    mapping.operation_type = "compute"
+    mapping.expressions = [Expression(
+        sas="amount / 3", talend="(input_row.amount / 3)", line=8,
+        requires_semantic_validation=False, target="installment",
+    )]
+    mapping.schema_columns = [SchemaColumn(name="installment", talend_type="id_BigDecimal", nullable=False)]
+    target = step("write_1", "tFileOutputDelimited", from_step="compute_1")
+    target.order = 3
+    target.schema_columns = [SchemaColumn(name="installment", talend_type="id_BigDecimal", nullable=False)]
+    result = build_apply_spec(plan(source, mapping, target))
+    component = next(item for item in result.components if item.component_name == "tMap")
+
+    assert component.draft_only is True
+    assert component.mapper is None
+    assert "precisión/escala" in component.draft_reason
 
 
 def test_build_apply_spec_keeps_known_downstream_component_connected_to_draft_source():
@@ -171,6 +232,19 @@ def test_build_apply_spec_keeps_known_downstream_component_connected_to_draft_so
         }
     ]
     assert result.blocked_steps == []
+
+
+def test_filter_row_success_output_uses_filter_connector():
+    result = build_apply_spec(
+        plan(
+            step("filter", "tFilterRow"),
+            step("target", "tFileOutputDelimited", from_step="filter"),
+        )
+    )
+
+    connection = result.to_mcp_arguments()["connections"][0]
+    assert connection["connectorName"] == "FILTER"
+    assert connection["uniqueName"] == "filter_1_1"
 
 
 def test_lookup_relationship_uses_the_source_data_connector_and_preserves_join_instruction():
@@ -473,6 +547,18 @@ def test_empty_plan_keeps_source_identity_in_context_so_each_guide_can_create_it
             "comment": "Programa SAS de origen incluido en esta guía.",
         }
     ]
+
+
+def test_component_labels_are_short_and_keep_a_compact_sas_operation_reference():
+    migration = plan(step("op_27_load_customers_1", "tFileInputDelimited"))
+    migration.steps[0].purpose = "Leer registros de clientes activos desde el archivo de origen mensual"
+
+    result = build_apply_spec(migration, "Process/PruebasWebSAS")
+    label = result.components[0].label
+
+    assert label.endswith("· SAS 27")
+    assert "op_27_load_customers_1" not in label
+    assert len(label) <= 64
 
 
 def test_talend_destination_folder_follows_the_zip_program_directories(monkeypatch):

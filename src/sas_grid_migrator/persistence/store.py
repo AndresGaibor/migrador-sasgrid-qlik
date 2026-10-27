@@ -54,6 +54,10 @@ create table if not exists talend_apply_batches(
 """
 
 
+class ProjectDeletionBlockedError(RuntimeError):
+    """Indica que no se puede retirar un proyecto mientras sigue trabajando."""
+
+
 class Store:
     def __init__(self, settings: Settings):
         self.settings = settings
@@ -269,6 +273,75 @@ class Store:
             ).fetchall()
         return [self._project_from_row(row) for row in rows]
 
+    def delete_project(self, project_id: str) -> bool:
+        """Elimina el estado del portal y sus archivos, sin tocar Talend Studio."""
+        projects_dir = self.settings.data_dir / "projects"
+        project_dir = projects_dir / project_id
+        quarantine: Path | None = None
+
+        with closing(self._conn()) as connection:
+            connection.execute("begin immediate")
+            try:
+                project = connection.execute(
+                    "select id from projects where id=?", (project_id,)
+                ).fetchone()
+                if project is None:
+                    connection.rollback()
+                    return False
+
+                processing = connection.execute(
+                    "select status from project_processing where project_id=?", (project_id,)
+                ).fetchone()
+                if processing and processing[0] in {"queued", "running"}:
+                    raise ProjectDeletionBlockedError(
+                        "No se puede eliminar el proyecto mientras su análisis esté activo."
+                    )
+
+                batch = connection.execute(
+                    "select status from talend_apply_batches where project_id=?", (project_id,)
+                ).fetchone()
+                operation = connection.execute(
+                    "select 1 from talend_apply_operations where project_id=? and status='running' limit 1",
+                    (project_id,),
+                ).fetchone()
+                if (batch and batch[0] in {"queued", "running"}) or operation:
+                    raise ProjectDeletionBlockedError(
+                        "No se puede eliminar el proyecto mientras haya una implementación Talend activa."
+                    )
+
+                projects_dir_resolved = projects_dir.resolve()
+                if project_dir.parent.resolve() != projects_dir_resolved:
+                    raise ValueError("La carpeta del proyecto está fuera del directorio administrado.")
+                if project_dir.is_symlink():
+                    raise ValueError("La carpeta del proyecto es un enlace y no se eliminará.")
+                if project_dir.exists():
+                    quarantine = projects_dir / f".deleting-{project_id}-{uuid.uuid4().hex}"
+                    project_dir.replace(quarantine)
+
+                for table in (
+                    "source_files",
+                    "step_state",
+                    "skipped",
+                    "project_processing",
+                    "talend_apply_operations",
+                    "talend_apply_batches",
+                ):
+                    connection.execute(f"delete from {table} where project_id=?", (project_id,))
+                connection.execute("delete from projects where id=?", (project_id,))
+                connection.commit()
+            except BaseException:
+                connection.rollback()
+                if quarantine is not None and quarantine.exists() and not project_dir.exists():
+                    quarantine.replace(project_dir)
+                raise
+
+        if quarantine is not None:
+            if quarantine.is_dir() and not quarantine.is_symlink():
+                shutil.rmtree(quarantine, ignore_errors=True)
+            else:
+                quarantine.unlink(missing_ok=True)
+        return True
+
     def get_processing(self, project_id: str) -> ProjectProcessing | None:
         with closing(self._conn()) as c:
             row = c.execute(
@@ -403,7 +476,14 @@ class Store:
         return self._talend_apply_batch_from_row(row) if row else None
 
     def begin_talend_apply_batch(
-        self, project_id: str, revision_hash: str, programs: list[str]
+        self,
+        project_id: str,
+        revision_hash: str,
+        programs: list[str],
+        *,
+        retry_conflicts: bool = False,
+        retry_programs: set[str] | None = None,
+        allow_revision_reset: bool = False,
     ) -> tuple[dict, bool]:
         now = datetime.now(UTC).isoformat()
         encoded_programs = json.dumps(programs, ensure_ascii=False)
@@ -412,6 +492,9 @@ class Store:
             for program in programs
         ]
         encoded_jobs = json.dumps(initial_jobs, ensure_ascii=False, sort_keys=True)
+        retry_programs = retry_programs or set()
+        if not retry_programs.issubset(programs):
+            raise ValueError("El lote recibió programas de reintento que no pertenecen al proyecto.")
         with closing(self._conn()) as c, c:
             c.execute("begin immediate")
             row = c.execute(
@@ -437,11 +520,29 @@ class Store:
                 return self._talend_apply_batch_from_row(row), True
 
             if row[1] != revision_hash:
-                raise ValueError(
-                    "El proyecto ya tiene un lote Talend con otra revisión; crea un nuevo ZIP para evitar sobrescribir Jobs."
+                previous_programs = json.loads(row[3])
+                previous_jobs = json.loads(row[4])
+                safe_to_reset = (
+                    allow_revision_reset
+                    and row[2] in {"failed", "conflict"}
+                    and previous_programs == programs
+                    and len(previous_jobs) == len(programs)
+                    and all(
+                        item.get("status") in {"failed", "conflict"}
+                        and item.get("result") is None
+                        for item in previous_jobs
+                    )
                 )
+                if not safe_to_reset:
+                    raise ValueError(
+                        "El proyecto ya tiene un lote Talend con otra revisión; crea un nuevo ZIP para evitar sobrescribir Jobs."
+                    )
 
-            if row[2] in {"queued", "running", "applied", "conflict"}:
+            if row[2] in {"queued", "running"} or (
+                row[2] == "applied" and not retry_programs
+            ) or (
+                row[2] == "conflict" and not retry_conflicts
+            ):
                 return self._talend_apply_batch_from_row(row), False
 
             previous_jobs = json.loads(row[4])
@@ -449,7 +550,7 @@ class Store:
             retry_jobs = []
             for program in programs:
                 previous_job = previous_by_program.get(program, {})
-                if previous_job.get("status") == "applied":
+                if previous_job.get("status") == "applied" and program not in retry_programs:
                     retry_jobs.append(previous_job)
                 else:
                     retry_jobs.append(
@@ -459,10 +560,10 @@ class Store:
             completed_jobs = sum(item["status"] == "applied" for item in retry_jobs)
 
             c.execute(
-                """update talend_apply_batches set status='queued',jobs_json=?,current_program=null,
+                """update talend_apply_batches set revision_hash=?,programs_json=?,status='queued',jobs_json=?,current_program=null,
                 completed_jobs=?,error=null,attempt_count=attempt_count+1,started_at=?,updated_at=?
                 where project_id=?""",
-                (encoded_retry_jobs, completed_jobs, now, now, project_id),
+                (revision_hash, encoded_programs, encoded_retry_jobs, completed_jobs, now, now, project_id),
             )
             row = c.execute(
                 """select project_id,revision_hash,status,programs_json,jobs_json,current_program,

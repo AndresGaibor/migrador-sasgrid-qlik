@@ -7,10 +7,12 @@ from sas_grid_migrator.config import Settings
 from sas_grid_migrator.dependency_graph.builder import DependencyReport
 from sas_grid_migrator.migration_planner.models import (
     ContextVariable,
+    Expression,
     JobPlan,
     PlanSet,
     PlanStep,
     Property,
+    SchemaColumn,
 )
 from sas_grid_migrator.persistence.store import Store
 from sas_grid_migrator.sas_parser.ast import Loc
@@ -99,18 +101,28 @@ class FakeTalend:
         failures: set[str] | None = None,
         conflicts: set[str] | None = None,
         warnings: set[str] | None = None,
+        job_inventory: list[dict] | None = None,
+        inventory_error: Exception | None = None,
     ):
         self.failures = failures or set()
         self.conflicts = conflicts or set()
         self.warning_programs = warnings or set()
         self.calls: list[dict] = []
         self.last_arguments: dict | None = None
+        self.arguments_by_path: dict[str, dict] = {}
         self.inspection_job_names: list[str] = []
+        self.job_inventory = job_inventory or []
+        self.inventory_error = inventory_error
+
+    async def list_jobs(self) -> list[dict]:
+        if self.inventory_error is not None:
+            raise self.inventory_error
+        return self.job_inventory
 
     def _result(self, arguments: dict) -> dict:
         children = [self._result(child) for child in arguments.get("childJobs", [])]
         program = arguments["instructions"]["source"]["program"]
-        return {
+        result = {
             "jobName": arguments["jobName"],
             "folderPath": arguments["folderPath"],
             "itemPath": f"{arguments['folderPath']}/{arguments['jobName']}_0.1.item",
@@ -128,24 +140,44 @@ class FakeTalend:
             "warnings": ["resultado parcial de prueba"] if program in self.warning_programs else [],
             "childJobs": children,
         }
+        self.arguments_by_path[result["itemPath"]] = arguments
+        return result
 
     async def inspect_job(self, job_path: str):
         from sas_grid_migrator.talend_adapter.adapter import ComponentRef, JobInspection
 
-        names = [
-            component.get("uniqueName", "")
-            for component in (self.last_arguments or {}).get("components", [])
-        ]
+        arguments = self.arguments_by_path.get(job_path, self.last_arguments or {})
         self.inspection_job_names.append(job_path)
+        components = [
+            ComponentRef(
+                unique_name=component.get("uniqueName", ""),
+                component=component.get("componentName", ""),
+                parameters=sorted((parameters := component.get("parameters") or {}).keys()),
+                parameter_values=parameters,
+                schemas=[component["schema"]] if component.get("schema") else [],
+            )
+            for component in arguments.get("components", [])
+        ]
+        mapper_entries = [
+            {
+                "componentUniqueName": component["uniqueName"],
+                "table": table["name"],
+                "name": column["name"],
+                "expression": column["expression"],
+                "type": column["type"],
+                "nullable": column.get("nullable"),
+            }
+            for component in arguments.get("components", [])
+            for table in (component.get("mapper") or {}).get("outputs", [])
+            for column in table.get("columns", [])
+        ]
         return JobInspection(
             job_path=job_path,
-            components=[
-                ComponentRef(unique_name=name, component="tComponent", parameters=[])
-                for name in names
-                if name
-            ],
-            connections=0,
+            components=components,
+            connections=len(arguments.get("connections", [])),
+            connection_details=arguments.get("connections", []),
             contexts=[],
+            mapper_entries=mapper_entries,
         )
 
     async def job_problems(self, job_name: str) -> dict:
@@ -163,7 +195,9 @@ class FakeTalend:
             from sas_grid_migrator.talend_adapter.adapter import TalendError
 
             raise TalendError(f"Bridge error for {source}")
-        return self._result(arguments)
+        result = self._result(arguments)
+        self.job_inventory.append({"name": arguments["jobName"], "path": result["itemPath"]})
+        return result
 
 
 def _set_env(monkeypatch, tmp_path: Path) -> None:
@@ -267,6 +301,176 @@ def test_orchestrator_child_result_is_recorded_and_not_applied_again(tmp_path, m
     assert child_status.json()["status"] == "applied"
     assert child_apply.status_code == 200
     assert child_apply.json()["status"] == "applied"
+    assert len(fake.calls) == 1
+
+
+def test_apply_reads_back_component_schema_and_connections_and_can_reverify(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+
+    class ReadbackTalend(FakeTalend):
+        def __init__(self):
+            super().__init__()
+            self.bad_schema = False
+            self.aliases: dict[str, str] = {}
+
+        async def apply_custom_spec(self, arguments: dict) -> dict:
+            result = await super().apply_custom_spec(arguments)
+            self.aliases = {
+                component["uniqueName"]: f"{component['uniqueName']}_studio"
+                for component in arguments.get("components", [])
+            }
+            result["componentAliases"] = self.aliases
+            return result
+
+        async def inspect_job(self, job_path: str):
+            from sas_grid_migrator.talend_adapter.adapter import ComponentRef, JobInspection
+
+            arguments = self.last_arguments or {}
+            components = []
+            for component in arguments.get("components", []):
+                schema = component.get("schema")
+                if schema and self.bad_schema and component["componentName"] == "tFileOutputDelimited":
+                    schema = {**schema, "columns": [{**schema["columns"][0], "name": "tampered"}]}
+                components.append(ComponentRef(
+                    unique_name=self.aliases.get(component["uniqueName"], component["uniqueName"]),
+                    component=component["componentName"],
+                    parameters=sorted(component.get("parameters", {})),
+                    parameter_values=component.get("parameters", {}),
+                    schemas=[schema] if schema else [],
+                ))
+            mapper_entries = [
+                {
+                    "componentUniqueName": self.aliases.get(component["uniqueName"], component["uniqueName"]),
+                    "table": table["name"],
+                    "name": column["name"],
+                    "expression": column["expression"],
+                    "type": column["type"],
+                    "nullable": column.get("nullable"),
+                }
+                for component in arguments.get("components", [])
+                for table in (component.get("mapper") or {}).get("outputs", [])
+                for column in table.get("columns", [])
+            ]
+            connections = [
+                {
+                    **connection,
+                    "source": self.aliases.get(connection["source"], connection["source"]),
+                    "target": self.aliases.get(connection["target"], connection["target"]),
+                }
+                for connection in arguments.get("connections", [])
+            ]
+            return JobInspection(
+                job_path=job_path,
+                components=components,
+                connections=len(arguments.get("connections", [])),
+                connection_details=connections,
+                contexts=[],
+                mapper_entries=mapper_entries,
+            )
+
+    source = PlanStep(
+        id="read_accounts", order=1, subjob="main", action="add_component",
+        operation_type="read_file", component_candidate="tFileInputDelimited",
+        purpose="Leer cuentas", properties=[Property(name="HEADER", value="1", origin="test", verified=True)],
+        schema_columns=[SchemaColumn(name="amount", talend_type="id_BigDecimal", nullable=False)],
+        evidence=Loc(file="daily.sas", line=1, end_line=1), verified=True,
+    )
+    mapping = PlanStep(
+        id="compute_fee", order=2, subjob="main", action="add_component",
+        operation_type="compute", component_candidate="tMap", purpose="Calcular comisión",
+        connections=[{"type": "Main", "from_step": "read_accounts"}],
+        expressions=[Expression(sas="amount * 0.005", talend="(input_row.amount * 0.005)", target="service_fee", line=2, requires_semantic_validation=False)],
+        schema_columns=[
+            SchemaColumn(name="amount", talend_type="id_BigDecimal", nullable=False),
+            SchemaColumn(name="service_fee", talend_type="id_BigDecimal", nullable=False),
+        ],
+        evidence=Loc(file="daily.sas", line=2, end_line=2),
+    )
+    target = PlanStep(
+        id="write_accounts", order=3, subjob="main", action="add_component",
+        operation_type="write_file", component_candidate="tFileOutputDelimited",
+        purpose="Escribir cuentas", properties=[Property(name="ROWSEPARATOR", value="\\n", origin="test", verified=True)],
+        schema_columns=[SchemaColumn(name="amount", talend_type="id_BigDecimal", nullable=False), SchemaColumn(name="service_fee", talend_type="id_BigDecimal", nullable=False)],
+        connections=[{"type": "Main", "from_step": "compute_fee"}],
+        evidence=Loc(file="daily.sas", line=3, end_line=3), verified=True,
+    )
+    migration = JobPlan(
+        project_id="pending", rules_version="rules-1", program="daily.sas",
+        job_name="job_daily", steps=[source, mapping, target],
+    )
+    fake = ReadbackTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Readback", [migration])
+        applied = client.post(f"/api/projects/{project_id}/plans/daily.sas/talend-apply")
+        plan = client.get(f"/api/projects/{project_id}/plans/daily.sas")
+        rows = client.get(f"/api/projects/{project_id}/plans")
+        fake.bad_schema = True
+        checked_again = client.post(f"/api/projects/{project_id}/plans/daily.sas/talend-apply/verify")
+        updated_plan = client.get(f"/api/projects/{project_id}/plans/daily.sas")
+        updated_rows = client.get(f"/api/projects/{project_id}/plans")
+
+    assert applied.status_code == 200, applied.text
+    assert applied.json()["verification"]["configured_steps"] == 3
+    assert applied.json()["verification"]["pending_steps"] == 0
+    assert applied.json()["verification"]["steps"][1]["checks"]["mapper"]["status"] == "verified"
+    assert applied.json()["verification"]["steps"][0]["studio_unique_name"].endswith("_studio")
+    assert [item["studio_verification"]["status"] for item in plan.json()["steps"]] == ["verified", "verified", "verified"]
+    assert rows.json()[0]["studio_verified"] == 3
+    assert rows.json()[0]["done"] == 0  # la comprobación de Studio no modifica el avance manual
+    assert checked_again.status_code == 200, checked_again.text
+    assert checked_again.json()["verification"]["configured_steps"] == 2
+    assert checked_again.json()["verification"]["pending_steps"] == 1
+    assert updated_plan.json()["steps"][2]["studio_verification"]["checks"]["schema"]["status"] == "pending"
+    assert updated_rows.json()[0]["studio_verified"] == 2
+    assert len(fake.calls) == 1  # volver a comprobar no vuelve a aplicar ni ejecutar el Job
+
+
+def test_unavailable_readback_is_retryable_and_stale_revision_is_not_reused(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+
+    class TransientReadback(FakeTalend):
+        fail_inspection = True
+
+        async def inspect_job(self, job_path: str):
+            if self.fail_inspection:
+                from sas_grid_migrator.talend_adapter.adapter import TalendError
+
+                raise TalendError("Bridge temporalmente sin respuesta")
+            return await super().inspect_job(job_path)
+
+    migration = _plan("pending", "daily.sas", "job_daily")
+    migration.steps = [PlanStep(
+        id="read_accounts", order=1, subjob="main", action="add_component",
+        component_candidate="tFileInputDelimited", purpose="Leer cuentas",
+        properties=[Property(name="HEADER", value="1", origin="SAS", verified=True)],
+        schema_columns=[SchemaColumn(name="account_id", talend_type="id_String", nullable=False)],
+        evidence=Loc(file="daily.sas", line=1, end_line=1), verified=True,
+    )]
+    fake = TransientReadback()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Retry readback", [migration])
+        applied = client.post(f"/api/projects/{project_id}/plans/daily.sas/talend-apply")
+        unavailable_plan = client.get(f"/api/projects/{project_id}/plans/daily.sas")
+        fake.fail_inspection = False
+        retried = client.post(f"/api/projects/{project_id}/plans/daily.sas/talend-apply/verify")
+        verified_plan = client.get(f"/api/projects/{project_id}/plans/daily.sas")
+        store = Store(Settings.from_env())
+        saved = PlanSet.model_validate_json(store.plans_path(project_id).read_text(encoding="utf-8"))
+        saved.plans[0].steps[0].properties[0].value = "0"
+        store.plans_path(project_id).write_text(saved.model_dump_json(), encoding="utf-8")
+        stale = client.post(f"/api/projects/{project_id}/plans/daily.sas/talend-apply/verify")
+        stale_rows = client.get(f"/api/projects/{project_id}/plans")
+
+    assert applied.status_code == 200, applied.text
+    assert applied.json()["verification"]["status"] == "unavailable"
+    assert unavailable_plan.json()["steps"][0]["studio_verification"]["status"] == "unavailable"
+    assert retried.status_code == 200, retried.text
+    assert retried.json()["verification"]["configured_steps"] == 1
+    assert verified_plan.json()["steps"][0]["studio_verification"]["status"] == "verified"
+    assert stale.status_code == 409
+    assert stale_rows.json()[0]["studio_status"] == "not_checked"
     assert len(fake.calls) == 1
 
 
@@ -549,6 +753,132 @@ def test_batch_retries_failures_but_conflicts_after_plan_revision_changes(tmp_pa
     assert len(fake.calls) == 2
 
 
+def test_failed_unapplied_batch_can_retry_after_connector_revision_is_fixed(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Retry fixed connector",
+            [_plan("pending", "daily.sas", "job_daily")],
+        )
+        store = Store(Settings.from_env())
+        store.begin_talend_apply_batch(project_id, "old-revision", ["daily.sas"])
+        store.update_talend_apply_batch_state(
+            project_id,
+            status="failed",
+            jobs=[
+                {
+                    "program": "daily.sas",
+                    "status": "failed",
+                    "result": None,
+                    "error": "El conector FLOW no admite salidas de tFilterRow.",
+                }
+            ],
+            current_program=None,
+            completed_count=1,
+        )
+
+        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
+
+    assert response.status_code == 202, response.text
+    assert state["status"] == "applied"
+    assert state["revision_hash"] != "old-revision"
+    assert state["attempt_count"] == 2
+    assert len(fake.calls) == 1
+
+
+def test_conflicted_batch_with_failed_unapplied_job_can_retry_new_revision(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Retry stale operation revision",
+            [_plan("pending", "daily.sas", "job_daily")],
+        )
+        store = Store(Settings.from_env())
+        store.begin_talend_apply_batch(project_id, "old-batch-revision", ["daily.sas"])
+        store.update_talend_apply_batch_state(
+            project_id,
+            status="conflict",
+            jobs=[
+                {
+                    "program": "daily.sas",
+                    "status": "conflict",
+                    "result": None,
+                    "error": "La revisión anterior quedó pendiente.",
+                }
+            ],
+            current_program=None,
+            completed_count=1,
+        )
+        store.save_talend_apply_state(
+            project_id,
+            "daily.sas",
+            revision_hash="old-operation-revision",
+            status="failed",
+            identity={"program": "daily.sas"},
+            error="Falló antes de crear el Job.",
+        )
+
+        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
+
+    assert response.status_code == 202, response.text
+    assert state["status"] == "applied"
+    assert state["revision_hash"] != "old-batch-revision"
+    assert state["jobs"][0]["status"] == "applied"
+    assert len(fake.calls) == 1
+
+
+def test_failed_job_with_prior_result_cannot_reset_revision_even_if_inventory_is_empty(
+    tmp_path, monkeypatch
+):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Keep applied operation revision",
+            [_plan("pending", "daily.sas", "job_daily")],
+        )
+        store = Store(Settings.from_env())
+        store.begin_talend_apply_batch(project_id, "old-batch-revision", ["daily.sas"])
+        store.update_talend_apply_batch_state(
+            project_id,
+            status="conflict",
+            jobs=[
+                {
+                    "program": "daily.sas",
+                    "status": "conflict",
+                    "result": None,
+                    "error": "La revisión anterior quedó pendiente.",
+                }
+            ],
+            current_program=None,
+            completed_count=1,
+        )
+        store.save_talend_apply_state(
+            project_id,
+            "daily.sas",
+            revision_hash="old-operation-revision",
+            status="failed",
+            identity={"program": "daily.sas"},
+            result={"itemPath": "Process/previous/job_daily_0.1.item"},
+            error="Falló una operación posterior.",
+        )
+
+        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+
+    assert response.status_code == 409
+    assert len(fake.calls) == 0
+
+
 def test_batch_state_is_scoped_to_project(tmp_path, monkeypatch):
     _set_env(monkeypatch, tmp_path)
     fake = FakeTalend()
@@ -779,3 +1109,233 @@ def test_write_permission_is_configured_and_persisted_through_the_api(tmp_path, 
         assert allowed.json()["write_enabled"] is True
         assert client.post(f"/api/projects/{project_id}/talend-apply-batch").status_code == 202
         assert len(fake.calls) == 1
+
+
+def test_batch_blocks_all_writes_when_preflight_finds_external_homonym(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend(job_inventory=[
+        {"name": "job_alpha", "path": "C:/Talend/PRJ/process/OtherProject/job_alpha/job_alpha_0.1.item"}
+    ])
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Collision", [_plan("pending", "a.sas", "job_alpha")])
+
+        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
+
+    assert response.status_code == 409
+    assert "conflicto" in response.json()["detail"].lower()
+    assert fake.calls == []
+    assert state["status"] == "not_started"
+
+
+def test_batch_rechecks_stored_conflict_and_retries_after_job_disappears(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Removed collision", [_plan("pending", "a.sas", "job_alpha")])
+        ordered, specs, revision_hash = api_module._talend_batch_bundle(project_id)
+        program = ordered[0].program
+        store = Store(Settings.from_env())
+        _batch, _started = store.begin_talend_apply_batch(project_id, revision_hash, [program])
+        store.update_talend_apply_batch_state(
+            project_id,
+            status="conflict",
+            jobs=[{"program": program, "status": "conflict", "result": None, "error": "old collision"}],
+            current_program=None,
+            completed_count=1,
+        )
+        spec = specs[program]
+        identity = {
+            "project_id": spec.project_id,
+            "program": spec.program,
+            "source_sha256": spec.source_sha256,
+            "rules_version": spec.rules_version,
+            "job_name": spec.job_name,
+            "folder_path": spec.folder_path,
+        }
+        store.save_talend_apply_state(
+            project_id,
+            program,
+            revision_hash=api_module._talend_apply_preview_id(spec),
+            status="conflict",
+            identity=identity,
+            error="old collision",
+        )
+
+        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
+
+    assert response.status_code == 202
+    assert state["status"] == "applied"
+    assert state["attempt_count"] == 2
+    assert len(fake.calls) == 1
+
+
+def test_batch_recreates_a_deleted_job_without_reapplying_other_completed_jobs(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Restore missing Job",
+            [
+                _plan("pending", "present.sas", "job_present"),
+                _plan("pending", "deleted.sas", "job_deleted"),
+            ],
+            [["present.sas"], ["deleted.sas"]],
+        )
+        ordered, specs, revision_hash = api_module._talend_batch_bundle(project_id)
+        programs = [plan.program for plan in ordered]
+        store = Store(Settings.from_env())
+        store.begin_talend_apply_batch(project_id, revision_hash, programs)
+        completed_jobs = []
+        for program in programs:
+            spec = specs[program]
+            identity = {
+                "project_id": spec.project_id,
+                "program": spec.program,
+                "source_sha256": spec.source_sha256,
+                "rules_version": spec.rules_version,
+                "job_name": spec.job_name,
+                "folder_path": spec.folder_path,
+            }
+            result = {"status": "applied", "identity": identity, "result": {"itemPath": f"old/{spec.job_name}.item"}}
+            store.save_talend_apply_state(
+                project_id,
+                program,
+                revision_hash=api_module._talend_apply_preview_id(spec),
+                status="applied",
+                identity=identity,
+                result=result,
+            )
+            completed_jobs.append({"program": program, "status": "applied", "result": result, "error": None})
+        store.update_talend_apply_batch_state(
+            project_id,
+            status="applied",
+            jobs=completed_jobs,
+            current_program=None,
+            completed_count=len(completed_jobs),
+        )
+
+        result_folder = specs["present.sas"].folder_path.removeprefix("Process/")
+        fake.job_inventory = [
+            {
+                "name": "job_present",
+                "path": f"C:/Talend/PRJ/process/{result_folder}/job_present/job_present_0.1.item",
+            }
+        ]
+        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
+
+    assert response.status_code == 202
+    assert [call["instructions"]["source"]["program"] for call in fake.calls] == ["deleted.sas"]
+    assert state["status"] == "applied"
+    assert state["jobs"][0]["status"] == "applied"
+    assert state["jobs"][1]["status"] == "applied"
+
+
+def test_batch_rejects_plan_change_between_preflight_and_batch_snapshot(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    original_preflight = api_module._talend_batch_preflight
+
+    async def stale_preflight(project_id: str) -> dict:
+        result = await original_preflight(project_id)
+        result["revision_hash"] = "stale-revision"
+        return result
+
+    monkeypatch.setattr(api_module, "_talend_batch_preflight", stale_preflight)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Plan changed", [_plan("pending", "a.sas", "job_alpha")])
+
+        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        state = client.get(f"/api/projects/{project_id}/talend-apply-batch").json()
+
+    assert response.status_code == 409
+    assert "cambió" in response.json()["detail"].lower()
+    assert fake.calls == []
+    assert state["status"] == "not_started"
+
+
+def test_batch_updates_existing_job_in_exact_destination_folder(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Update in place", [_plan("pending", "a.sas", "job_alpha")])
+        _ordered, specs, _revision = api_module._talend_batch_bundle(project_id)
+        spec = specs["a.sas"]
+        exact_folder = spec.folder_path.removeprefix("Process/")
+        fake.job_inventory = [{
+            "name": "job_alpha",
+            "path": f"C:/Talend/PRJ/process/{exact_folder}/job_alpha/job_alpha_0.1.item",
+        }]
+
+        preflight = client.get(f"/api/projects/{project_id}/talend-apply-batch/preflight")
+        response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
+
+    assert preflight.status_code == 200, preflight.text
+    assert preflight.json()["update_count"] == 1
+    assert preflight.json()["conflict_count"] == 0
+    assert response.status_code == 202, response.text
+    assert len(fake.calls) == 1
+    assert fake.calls[0]["folderPath"].casefold() == spec.folder_path.casefold()
+
+
+def test_preflight_classifies_exact_destination_missing_and_external_jobs(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Preflight actions",
+            [
+                _plan("pending", "update.sas", "job_update"),
+                _plan("pending", "create.sas", "job_create"),
+                _plan("pending", "conflict.sas", "job_conflict"),
+            ],
+        )
+        _ordered, specs, _revision = api_module._talend_batch_bundle(project_id)
+        exact_folder = specs["update.sas"].folder_path.removeprefix("Process/")
+        fake.job_inventory = [
+            {
+                "name": "job_update",
+                "path": f"C:/Talend/PRJ/process/{exact_folder}/job_update/job_update_0.1.item",
+            },
+            {
+                "name": "job_conflict",
+                "path": "C:/Talend/PRJ/process/OtherProject/job_conflict/job_conflict_0.1.item",
+            },
+        ]
+
+        response = client.get(f"/api/projects/{project_id}/talend-apply-batch/preflight")
+
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["available"] is True
+    assert (payload["create_count"], payload["update_count"], payload["conflict_count"]) == (1, 1, 1)
+    assert {item["program"]: item["action"] for item in payload["jobs"]} == {
+        "update.sas": "update",
+        "create.sas": "create",
+        "conflict.sas": "conflict",
+    }
+
+
+def test_preflight_fails_closed_when_mcp_inventory_is_unavailable(tmp_path, monkeypatch):
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend(inventory_error=TalendError("MCP caído"))
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Offline preflight", [_plan("pending", "a.sas", "job_alpha")])
+
+        response = client.get(f"/api/projects/{project_id}/talend-apply-batch/preflight")
+
+    assert response.status_code == 502
+    assert "mcp caído" in response.json()["detail"].lower()

@@ -27,6 +27,26 @@ test("ZIP upload creates a project in one multipart request", async () => {
   assert.equal(request.init.headers, undefined);
 });
 
+test("project deletion sends the typed project name to its scoped DELETE route", async () => {
+  const originalFetch = globalThis.fetch;
+  let request;
+  globalThis.fetch = async (input, init) => {
+    request = { input: String(input), init };
+    return new Response(JSON.stringify({ deleted: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+  try {
+    await api.deleteProject("project-1", "Banking project");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  assert.equal(request.input, "/api/projects/project-1");
+  assert.equal(request.init.method, "DELETE");
+  assert.deepEqual(JSON.parse(request.init.body), { confirmation: "Banking project" });
+});
+
 test("project processing and Talend batch APIs use project-scoped routes", async () => {
   const originalFetch = globalThis.fetch;
   const requests = [];
@@ -43,6 +63,7 @@ test("project processing and Talend batch APIs use project-scoped routes", async
     await api.analysis("project-1");
     await api.talendApplyPreview("project-1", "Banking/daily.sas");
     await api.talendApplyStatus("project-1", "Banking/daily.sas");
+    await api.talendApplyBatchPreflight("project-1");
     await api.talendApplyBatch("project-1");
     await api.talendApplyBatchStatus("project-1");
   } finally {
@@ -54,6 +75,7 @@ test("project processing and Talend batch APIs use project-scoped routes", async
     "/api/projects/project-1/analyses",
     "/api/projects/project-1/plans/Banking/daily.sas/talend-apply/preview",
     "/api/projects/project-1/plans/Banking/daily.sas/talend-apply",
+    "/api/projects/project-1/talend-apply-batch/preflight",
     "/api/projects/project-1/talend-apply-batch",
     "/api/projects/project-1/talend-apply-batch",
   ]);
@@ -62,8 +84,9 @@ test("project processing and Talend batch APIs use project-scoped routes", async
   assert.equal(requests[2].init.method, undefined);
   assert.equal(requests[3].init.method, "POST");
   assert.equal(requests[4].init.method, undefined);
-  assert.equal(requests[5].init.method, "POST");
-  assert.equal(requests[6].init.method, undefined);
+  assert.equal(requests[5].init.method, undefined);
+  assert.equal(requests[6].init.method, "POST");
+  assert.equal(requests[7].init.method, undefined);
 });
 
 test("the batch summary endpoint is exposed for the pre-flight confirmation", async () => {

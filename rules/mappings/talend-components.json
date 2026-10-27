@@ -379,6 +379,7 @@
         "FILENAME",
         "FIELDSEPARATOR",
         "INCLUDEHEADER",
+        "FILE_EXIST_EXCEPTION",
         "ENCODING"
       ],
       "required": [
@@ -621,6 +622,9 @@
       "Output columns",
       "Expressions",
       "Var table"
+    ],
+    "tFileOutputDelimited": [
+      "INCLUDEHEADER"
     ]
   },
   "generic_components": [

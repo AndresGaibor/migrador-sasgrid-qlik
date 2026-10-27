@@ -30,6 +30,24 @@ test("the ZIP-level operation shows durable progress, current job, and each resu
   assert.match(source, /result\?\.result\.itemPath/);
 });
 
+test("the ZIP-level action checks current Talend destinations and shows create/update/conflict decisions", () => {
+  assert.match(source, /api\.talendApplyBatchPreflight\(id\)/);
+  assert.match(source, /preflightReady/);
+  assert.match(source, /create_count/);
+  assert.match(source, /update_count/);
+  assert.match(source, /conflict_count/);
+  assert.match(source, /existing_path/);
+  assert.match(source, /Volver a comprobar/);
+  assert.match(source, /Recrear Jobs faltantes/);
+});
+
+test("a saved conflict cleared by live Talend inventory is presented as retryable, not current", () => {
+  assert.match(source, /staleConflictResolved/);
+  assert.match(source, /El conflicto anterior ya no está en Talend/);
+  assert.match(source, /Aplicar según inventario actual/);
+  assert.match(source, /!staleConflictResolved && batchState\.error/);
+});
+
 test("transient batch polling errors retain the last state and report automatic retries", () => {
   assert.match(hooksSource, /preserveDataOnError\s*\?\s*\{ \.\.\.s, error: message, errorStatus: status, loading: false \}/);
   assert.match(source, /preserveDataOnError: true/);
@@ -76,4 +94,13 @@ test("each job reports its creation phase and the Studio verification result", (
   assert.match(source, /verification\.missing_components/);
   assert.match(source, /verification\.studio_problems/);
   assert.match(source, /Verificación no disponible/);
+});
+
+test("each generated step displays readback checks and exposes a read-only retry", () => {
+  assert.match(source, /studioCheck.status === "verified"/);
+  assert.match(source, /Configurado en Studio/);
+  assert.match(source, /verificationCheckLabel/);
+  assert.match(source, /api\.talendApplyVerify\(id, file\)/);
+  assert.match(source, /Volver a comprobar pasos en Studio/);
+  assert.match(source, /Comprobación actualizada/);
 });

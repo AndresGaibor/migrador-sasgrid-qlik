@@ -5,7 +5,7 @@ import { api, ApiError } from "../api";
 import { formatErrorMessage, notifyError, notifySuccess } from "../errors";
 import { useAsync } from "../hooks";
 import { ComponentIcon } from "../components/ComponentIcon";
-import type { GridRecommendation, JobPlan, PlanRow, Step, TalendApplyBatchJob, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyState } from "../types";
+import type { GridRecommendation, JobPlan, PlanRow, Step, TalendApplyBatchJob, TalendApplyBatchPreflight, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyState } from "../types";
 import { Badge, Load, link } from "./common";
 import { orderSteps } from "../guided";
 import { buildGridGuides } from "../grid-guide";
@@ -47,6 +47,7 @@ function PlanList({ id }: { id: string }) {
   const grid = useAsync(() => api.gridRecommendations(id), [id]);
   const health = useAsync(() => api.talendHealth(), [id]);
   const batch = useAsync(() => api.talendApplyBatchStatus(id), [id], { preserveDataOnError: true });
+  const preflight = useAsync(() => api.talendApplyBatchPreflight(id), [id, q.data?.length ?? 0], { preserveDataOnError: true });
   const summary = useAsync(() => api.talendApplyBatchSummary(id), [id]);
   const isDesktop = useDesktopLayout();
   const [busy, setBusy] = useState(false);
@@ -56,8 +57,11 @@ function PlanList({ id }: { id: string }) {
   const [confirmation, setConfirmation] = useState<TalendApplyBatchSummary>();
   const batchState = batch.data;
   const batchActive = batchState?.status === "queued" || batchState?.status === "running";
-  const batchFinished = batchState?.status === "applied" || batchState?.status === "conflict";
-  const canStartBatch = Boolean(q.data?.length && summary.data?.creatable_jobs && !summary.loading && !summary.error && batch.data && !batch.error && health.data?.available && health.data.write_enabled && !health.loading && !busy && !batchBusy && !batchActive && !batchFinished);
+  const preflightReady = Boolean(!preflight.loading && !preflight.error && preflight.data?.available && preflight.data.conflict_count === 0);
+  const staleConflictResolved = Boolean(batchState?.status === "conflict" && preflightReady);
+  const missingJobCount = preflight.data?.create_count ?? 0;
+  const batchFinished = batchState?.status === "applied" && missingJobCount === 0 || batchState?.status === "conflict" && !preflightReady;
+  const canStartBatch = Boolean(q.data?.length && summary.data?.creatable_jobs && !summary.loading && !summary.error && preflightReady && batch.data && !batch.error && health.data?.available && health.data.write_enabled && !health.loading && !busy && !batchBusy && !batchActive && !batchFinished);
   const gridGuides = grid.data && <GridRecommendations id={id} items={grid.data} isDesktop={isDesktop} staged />;
   const planContent = q.error?.includes("generados") ? (
     <div className="notice"><Icon name="info" /><span>Todavía no hay guías preparadas para este proyecto. Usa «Preparar guías de migración» para empezar.</span></div>
@@ -71,6 +75,15 @@ function PlanList({ id }: { id: string }) {
     const timer = window.setInterval(batch.reload, 1200);
     return () => window.clearInterval(timer);
   }, [batchActive, batch.error, batch.reload]);
+  useEffect(() => {
+    if (batchState && ["applied", "partially_applied", "failed", "conflict"].includes(batchState.status)) preflight.reload();
+  }, [batchState?.status, preflight.reload]);
+  useEffect(() => {
+    if (batchState && (batchState.completed_jobs > 0 || ["applied", "partially_applied", "failed", "conflict"].includes(batchState.status))) q.reload();
+  }, [batchState?.status, batchState?.completed_jobs, q.reload]);
+  useEffect(() => {
+    if (batchState && ["applied", "partially_applied", "failed", "conflict"].includes(batchState.status)) summary.reload();
+  }, [batchState?.status, summary.reload]);
   const gen = async () => {
     setBusy(true);
     setErr(undefined);
@@ -79,6 +92,7 @@ function PlanList({ id }: { id: string }) {
       notifySuccess("Guías preparadas", `${result.plans} guías listas para revisar.`);
       q.reload();
       grid.reload();
+      preflight.reload();
       summary.reload();
     } catch (x) {
       setErr(notifyError(x, "No se pudieron preparar las guías"));
@@ -97,6 +111,7 @@ function PlanList({ id }: { id: string }) {
       batch.reload();
     } catch (x) {
       setBatchError(notifyError(x, "No se pudo iniciar la creación en Talend Studio"));
+      preflight.reload();
       if (x instanceof ApiError && x.status === 409) {
         setConfirmation(undefined);
         summary.reload();
@@ -116,9 +131,10 @@ function PlanList({ id }: { id: string }) {
         <div className="talend-batch-heading"><div><h2 id="talend-batch-title">1. Crea la estructura de los Jobs</h2><p>El MCP crea componentes y conexiones en Talend Studio; no se ejecutan ni se publican en Qlik Talend Cloud.</p></div>
           <span className={`talend-mcp-status ${health.loading ? "readonly" : health.data?.available ? health.data.write_enabled ? "online" : "readonly" : "offline"}`} role="status" aria-live="polite">{health.loading ? "Consultando MCP…" : health.data?.available ? health.data.write_enabled ? "MCP y Bridge listos" : "MCP en solo lectura" : health.data?.mcp_available ? "Bridge sin conexión" : "MCP sin conexión"}</span>
         </div>
+        <TalendPreflightPanel preflight={preflight} />
         {summary.loading ? <p className="muted" role="status">Preparando vista previa del proyecto…</p> : summary.data ? <TalendPreflight id={id} summary={summary.data} /> : <div className="preflight-unavailable" role="alert"><p>No se pudo preparar la vista previa: {formatErrorMessage(summary.error, undefined, summary.errorStatus)}</p><button type="button" className="secondary" onClick={summary.reload}>Reintentar vista previa</button></div>}
         <button type="button" className="talend-implement-button talend-batch-button" onClick={() => { setBatchError(undefined); setConfirmation(summary.data); }} disabled={!canStartBatch}>
-          <Icon name="flow" size={20} />{batchBusy || batchActive ? "Creando Jobs en Talend Studio…" : batchState?.status === "applied" ? "Estructura creada; continúa con las guías" : batchState && ["failed", "partially_applied", "interrupted"].includes(batchState.status) ? "Revisar reintento de Jobs" : "Revisar creación en Studio"}
+          <Icon name="flow" size={20} />{batchBusy || batchActive ? "Creando Jobs en Talend Studio…" : preflight.loading ? "Comprobando destino…" : preflight.error ? "Destino sin verificar" : preflight.data?.conflict_count ? "Resolver conflictos de destino" : batchState?.status === "applied" && missingJobCount > 0 ? "Recrear Jobs faltantes" : staleConflictResolved ? "Aplicar según inventario actual" : batchState?.status === "applied" ? "Estructura creada; continúa con las guías" : batchState && ["failed", "partially_applied", "interrupted"].includes(batchState.status) ? "Revisar reintento de Jobs" : "Revisar creación en Studio"}
         </button>
         <p className="muted talend-batch-followup">Después de crear la estructura, continúa con el paso 2. Para construirla manualmente, empieza directamente por sus guías.</p>
         {health.data?.error && <p className="error" role="alert">{formatErrorMessage(health.data.error)}</p>}
@@ -127,14 +143,15 @@ function PlanList({ id }: { id: string }) {
         {batch.error && <p className="error" role="alert">No se pudo actualizar el progreso del lote: {formatErrorMessage(batch.error, undefined, batch.errorStatus)} Se volverá a intentar automáticamente.</p>}
         {health.data?.available && !health.data.write_enabled && <p className="muted">Activa la escritura en <a href="#/settings">Configuración</a> (o fija <code>TALEND_MCP_READONLY=false</code> en la API) para permitir la creación.</p>}
         {!health.loading && !health.data?.available && <div className="preflight-unavailable"><p>Abre Talend Studio con el Bridge activo. Puedes continuar con las guías sin conexión.</p><button type="button" className="secondary" onClick={health.reload}>Comprobar conexión</button><a href="#/settings">Diagnóstico MCP</a></div>}
-        {batchState && batchState.status !== "not_started" && <div className={`talend-batch-state ${batchState.status}`} role="status" aria-live="polite">
-          <div className="talend-batch-state-heading"><strong>{talendApplyBatchLabel(batchState.status)}</strong><span>{batchState.completed_jobs} / {batchState.total_jobs} Jobs resueltos</span></div>
-          {batchActive && batchState.total_jobs > 0 && <div className="talend-batch-progress" role="progressbar" aria-label="Progreso de creación de Jobs" aria-valuemin={0} aria-valuemax={batchState.total_jobs} aria-valuenow={batchState.completed_jobs}><span style={{ width: `${Math.round((batchState.completed_jobs / batchState.total_jobs) * 100)}%` }} /></div>}
-          {batchActive && <p>{batchState.current_program ? <>MCP trabajando en <code>{batchState.current_program}</code></> : "El MCP está preparando el primer Job…"} {batchState.current_program === null ? "" : batchState.jobs.find((item) => item.program === batchState.current_program)?.phase === "applying" ? "Fase: creando componentes." : batchState.jobs.find((item) => item.program === batchState.current_program)?.phase === "inspecting" ? "Fase: verificando el Job en Studio." : ""} Talend no ejecutará los Jobs.</p>}
-          {batchState.error && <p className="error" role="alert">{formatErrorMessage(batchState.error)}</p>}
+        {batchState && batchState.status !== "not_started" && <div className={`talend-batch-state ${staleConflictResolved ? "preflight-ready" : batchState.status}`} role="status" aria-live="polite">
+          <div className="talend-batch-state-heading"><strong>{staleConflictResolved ? "El conflicto anterior ya no está en Talend" : talendApplyBatchLabel(batchState.status)}</strong><span>{staleConflictResolved && preflight.data ? `${preflight.data.create_count} por crear · ${preflight.data.update_count} por actualizar · 0 conflictos actuales` : `${batchState.completed_jobs} / ${batchState.total_jobs} Jobs resueltos`}</span></div>
+          {staleConflictResolved && preflight.data && <p>El portal actualizó la comprobación con el inventario de Studio ({preflight.data.inventory_count} Jobs). Al aplicar, creará los Jobs que faltan y actualizará los que ya estén en su carpeta destino.</p>}
+          {batchActive && batchState.total_jobs > 0 && <div className="talend-batch-progress" role="progressbar" aria-label="Progreso de implementación del proyecto" aria-valuemin={0} aria-valuemax={batchState.total_jobs} aria-valuenow={batchState.completed_jobs}><span style={{ width: `${Math.round((batchState.completed_jobs / batchState.total_jobs) * 100)}%` }} /></div>}
+          {batchActive && <p>{batchState.current_program ? <>MCP trabajando en <code>{batchState.current_program}</code></> : "El MCP está preparando el primer Job…"} Talend no ejecutará los Jobs.</p>}
+          {!staleConflictResolved && batchState.error && <p className="error">{batchState.error}</p>}
           {batchState.warnings.map((warning, index) => <p className="notice warning" key={`batch-warning-${index}`}>{warning}</p>)}
-          {batchState.jobs.length > 0 && <ArchivePathTree entries={batchState.jobs.map((job) => ({ path: job.program, value: job }))} renderEntry={({ path, value: job }) => <BatchJobRow key={path} projectId={id} path={path} job={job} />} />}
-          {!batchActive && batchState.jobs.length > 0 && <p className="muted">El lote terminó. Revisa los resultados por programa; esta acción crea los Jobs pero no los ejecuta.</p>}
+          {!staleConflictResolved && batchState.jobs.length > 0 && <ArchivePathTree entries={batchState.jobs.map((job) => ({ path: job.program, value: job }))} renderEntry={({ path, value: job }) => <BatchJobRow key={path} projectId={id} path={path} job={job} />} />}
+          {!staleConflictResolved && !batchActive && batchState.jobs.length > 0 && <p className="muted">El lote terminó. Revisa los resultados por programa; esta acción crea los Jobs pero no los ejecuta.</p>}
         </div>}
       </section> : null}
       <section className="migration-guides" aria-labelledby="migration-guides-title"><h2 id="migration-guides-title">2. Completa y prueba los Jobs</h2><p className="migration-stage-description">Revisa cada Job y marca los pasos terminados. Si usaste MCP, completa los pendientes sin volver a crear lo que ya existe.</p>{planContent}</section>
@@ -150,23 +167,52 @@ function PlanList({ id }: { id: string }) {
   );
 }
 
+function TalendPreflightPanel({ preflight }: { preflight: { data?: TalendApplyBatchPreflight; error?: string; loading: boolean; reload: () => void } }) {
+  const report = preflight.data;
+  return <section className={`talend-preflight ${preflight.error ? "error" : report?.conflict_count ? "conflict" : "ready"}`} aria-label="Comprobación del destino Talend" aria-live="polite">
+    <div className="talend-preflight-heading">
+      <div><strong>{preflight.loading ? "Comprobando el destino en Talend…" : preflight.error ? "No se pudo verificar el destino" : report ? "Destino comprobado en Talend" : "Esperando comprobación del destino"}</strong>
+        {report && !preflight.error && <small>{report.create_count} se crearán · {report.update_count} se actualizarán · {report.conflict_count} conflictos · {report.inventory_count} Jobs revisados{report.checked_at ? ` · ${new Date(report.checked_at).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" })}` : ""}</small>}
+      </div>
+      <button type="button" className="secondary" onClick={preflight.reload} disabled={preflight.loading}>Volver a comprobar</button>
+    </div>
+    {preflight.error && <p className="error" role="alert">No se iniciará ninguna escritura hasta verificar MCP y el inventario completo: {preflight.error}</p>}
+    {report && !preflight.error && <details open={report.conflict_count > 0}>
+      <summary>Ver acciones para los {report.total_jobs} Jobs</summary>
+      <ul>{report.jobs.map((job) => <li key={job.program} className={`talend-preflight-job ${job.action}`}>
+        <div><strong>{preflightActionLabel(job.action)}:</strong> <code>{job.job_name}</code> · <code>{job.program}</code></div>
+        <small>Destino: <code>{job.folder_path}</code></small>
+        {job.existing_path && <small>Job existente: <code>{job.existing_path}</code></small>}
+        {job.reason && <small className="error">{job.reason}</small>}
+      </li>)}</ul>
+    </details>}
+  </section>;
+}
+
+function preflightActionLabel(action: TalendApplyBatchPreflight["jobs"][number]["action"]): string {
+  const labels = { create: "Se creará", update: "Se actualizará en esta carpeta", conflict: "Conflicto" };
+  return labels[action];
+}
+
 export function BatchJobRow({ projectId, path, job }: { projectId: string; path: string; job: TalendApplyBatchJob }) {
   const result = job.result;
   const reviewRequired = Boolean(result?.review_required || result?.review_warnings?.length || result?.warnings.length || result?.blocked_steps.length);
   const warnings = [...(result?.warnings ?? []), ...(result?.review_warnings ?? [])];
   return <article className={`talend-batch-job ${job.status}`}>
     <div className="talend-batch-job-heading"><Icon name={reviewRequired ? "warning" : job.status === "applied" ? "check" : job.status === "running" ? "flow" : job.status === "pending" ? "info" : "warning"} size={17} /><strong>{result?.identity.job_name ?? path}</strong><span>{job.status === "applied" && reviewRequired ? "Estructura creada; revisión pendiente" : talendApplyJobLabel(job.status)}</span></div>
+    {job.phase && <p className="muted">{job.phase === "applying" ? "Fase: creando componentes" : job.phase === "inspecting" ? "Fase: verificando el Job en Studio" : "Fase: preparando el Job"}</p>}
     <p className="muted"><code>{path}</code>{result?.result.itemPath && <> · destino <code>{result.result.itemPath}</code></>}</p>
     {result && <p className="talend-batch-job-metrics">{result.result.totalComponents ?? (result.result.generatedComponents ?? 0) + (result.result.reusedComponents ?? 0)} componentes · {(result.result.generatedConnections ?? 0) + (result.result.reusedConnections ?? 0)} conexiones · {(result.result.generatedContexts ?? 0) + (result.result.updatedContexts ?? 0) + (result.result.reusedContexts ?? 0)} variables de contexto</p>}
     {job.error && <p className="error" role="alert">{formatErrorMessage(job.error)}</p>}
     {result?.verification && <p className="talend-batch-job-verification">{result.verification.status === "inspected"
-      ? <>Inspeccionado en Studio: {result.verification.components_created} componentes encontrados; {result.verification.components_requested} solicitados.</>
+      ? <>Inspeccionado en Studio: {result.verification.components_created} componentes encontrados; {result.verification.components_requested} solicitados. · {result.verification.configured_steps ?? 0} pasos configurados · {result.verification.pending_steps ?? 0} pendientes.</>
       : <>Verificación no disponible: {result.verification.reason ?? "el MCP no pudo inspeccionar el Job."}</>}
       {result.verification.studio_problems && (result.verification.studio_problems.clean
         ? <Badge tone="ok">Sin avisos de diseño</Badge>
         : <Badge tone="warn">Revisar avisos en Studio</Badge>)}
     </p>}
     {result?.verification && result.verification.missing_components.length > 0 && <details><summary>Componentes que no aparecen en Studio ({result.verification.missing_components.length})</summary><ul>{result.verification.missing_components.map((name) => <li key={name}><code>{name}</code></li>)}</ul></details>}
+    {result?.verification?.steps?.some((item) => item.status !== "verified") && <details><summary>Pasos que requieren revisión automática ({result.verification.pending_steps ?? 0})</summary><ul>{result.verification.steps.filter((item) => item.status !== "verified").map((item, index) => <li key={`${item.program}:${item.step_id}:${index}`}><strong>{item.program} · {item.step_id}:</strong> {item.reason ?? "No se confirmó el componente o su configuración."}</li>)}</ul></details>}
     {result?.verification?.studio_problems && !result.verification.studio_problems.clean && <details><summary>Avisos de la vista Problemas de Studio</summary><ul>{result.verification.studio_problems.items.map((item, index) => <li key={index}>{item.severity ? `[${item.severity}] ` : ""}{item.message ?? JSON.stringify(item)}</li>)}</ul></details>}
     {result && (warnings.length > 0 || result.blocked_steps.length > 0) && <details><summary>Información técnica pendiente</summary><ul>{warnings.map((warning, index) => <li key={`warning-${index}`}>{warning}</li>)}{result.blocked_steps.map((block) => <li key={block.step_id}><strong>{block.step_id === "job" ? "Job" : `Paso ${block.step_id}`}:</strong> {block.reason}</li>)}</ul></details>}
     <a className="talend-batch-job-link" href={link(projectId, "planes", path)}>Abrir guía</a>
@@ -184,6 +230,8 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
   const [override, setOverride] = useState<JobPlan>();
   const [saving, setSaving] = useState(false);
   const [navigationWarning, setNavigationWarning] = useState(false);
+  const [verifyBusy, setVerifyBusy] = useState(false);
+  const [verifyError, setVerifyError] = useState<string>();
   const saveFailed = useRef(false);
   const pendingSaves = useRef(0);
   const saveQueue = useRef<Promise<void>>(Promise.resolve());
@@ -196,6 +244,22 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
   const isBatchRunning = batch.data?.status === "queued" || batch.data?.status === "running";
   const batchJob = batch.data?.jobs.find((item) => item.program === file);
   const latestResult = applyStatus.data?.result ?? batchJob?.result ?? undefined;
+  const verifyStudio = async () => {
+    setVerifyBusy(true);
+    setVerifyError(undefined);
+    try {
+      await api.talendApplyVerify(id, file);
+      applyStatus.reload();
+      q.reload();
+      jobs.reload();
+      batch.reload();
+      notifySuccess("Comprobación actualizada", "Los pasos se contrastaron de nuevo con lo que Studio puede leer.");
+    } catch (error) {
+      setVerifyError(notifyError(error, "No se pudo comprobar el Job en Studio"));
+    } finally {
+      setVerifyBusy(false);
+    }
+  };
   useEffect(() => {
     if (!isApplyRunning && !isBatchRunning && !batch.error) return;
     const timer = window.setInterval(() => {
@@ -204,6 +268,12 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
     }, 1200);
     return () => window.clearInterval(timer);
   }, [isApplyRunning, isBatchRunning, batch.error, applyStatus.reload, batch.reload]);
+  useEffect(() => {
+    if (batch.data?.completed_jobs) q.reload();
+  }, [batch.data?.completed_jobs, q.reload]);
+  useEffect(() => {
+    if (applyStatus.data?.result?.verification) q.reload();
+  }, [applyStatus.data?.result?.verification?.configured_steps, applyStatus.data?.result?.verification?.pending_steps, q.reload]);
   const decide = async (s: Step, progress: GuideProgress, note: string, blockReason: string) => {
     const savedNote = encodeProgress(progress, note, blockReason);
     if (savedNote === null) throw new Error("Escribe el motivo para poder marcar el paso como bloqueado.");
@@ -242,6 +312,8 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
               {preview.data && <p className="muted">Destino: <code>{preview.data.identity.folder_path}</code> · {preview.data.components?.length ?? 0} componentes · {preview.data.connections?.length ?? 0} conexiones.</p>}
               {batchJob ? <BatchJobRow projectId={id} path={file} job={batchJob} /> : applyStatus.data && <p className="talend-persisted-status" role="status"><Icon name={isApplyRunning ? "flow" : applyStatus.data.status === "applied" ? "check" : "info"} size={17} /> {applyStatusLabel(applyStatus.data.status)}{applyStatus.data.error && `: ${formatErrorMessage(applyStatus.data.error)}`}</p>}
               {latestResult && <p className="muted">{latestResult.result.generatedComponents ?? 0} componentes · {latestResult.result.generatedConnections ?? 0} conexiones. {latestResult.warnings[0] ?? latestResult.blocked_steps[0]?.reason ?? ""}</p>}
+              {latestResult && <div className="studio-verification-actions"><button type="button" className="secondary" onClick={() => void verifyStudio()} disabled={verifyBusy || isApplyRunning || isBatchRunning}>{verifyBusy ? "Comprobando en Studio…" : "Volver a comprobar pasos en Studio"}</button>{latestResult.verification && <span role="status">{latestResult.verification.configured_steps ?? 0} verificados · {latestResult.verification.pending_steps ?? 0} pendientes</span>}</div>}
+              {verifyError && <p className="error" role="alert">{verifyError}</p>}
             </section>
             <p><strong>Programa SAS de origen:</strong> <a href={link(id, "programas", p.program)}><code>{p.program}</code></a></p>
             <PlanPreparation plan={p} />
@@ -397,10 +469,22 @@ function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step
     void save(value);
   };
   const officialUrl = s.doc_url;
+  const studioCheck = s.studio_verification;
+  const studioUniqueName = studioCheck?.studio_unique_name ?? studioCheck?.talend_unique_name;
   return <article className="guide-step" id={`step-${s.id}`}>
     <div className="guide-step-heading"><div className="step-head"><h3>{s.purpose}</h3><span className="step-component">Componente: <code>{s.component_candidate}</code></span></div></div>
+    {studioCheck && <div className={`studio-step-verification ${studioCheck.status}`} role="status"><Badge tone={studioCheck.status === "verified" ? "ok" : "warn"}>{studioCheck.status === "verified" ? "Configurado en Studio" : studioCheck.status === "unavailable" ? "Studio no disponible" : "Pendiente de configuración"}</Badge>{studioUniqueName && <code>{studioUniqueName}</code>}{studioCheck.checked_at && <small>Lectura de Studio: {new Date(studioCheck.checked_at).toLocaleString("es")}</small>}{studioCheck.reason && <span>{studioCheck.reason}</span>}{Object.keys(studioCheck.checks).length > 0 && <details><summary>Verificación automática</summary><ul>{Object.entries(studioCheck.checks).map(([name, check]) => <li key={name}><strong>{verificationCheckLabel(name)}:</strong> {verificationStatusLabel(check.status)}{check.reason ? ` · ${check.reason}` : ""}</li>)}</ul></details>}</div>}
     <StepInstructions id={id} step={s} allSteps={allSteps} officialUrl={officialUrl} />
     <StepProgressEditor progress={progress} note={note} blockReason={blockReason} previous={previous} error={err} onProgress={chooseProgress} onNoteChange={setNote} onNoteBlur={() => note !== saved.note && void save(progress)} onEditBlock={() => setDialog("blocked")} onJumpPrevious={(step) => jumpToStep(step.id)} />
     <StepDecisionDialogs step={s} dialog={dialog} setDialog={setDialog} confirmed={confirmed} setConfirmed={setConfirmed} blockReason={blockReason} setBlockReason={setBlockReason} onSave={(state) => void save(state)} />
   </article>;
+}
+
+function verificationCheckLabel(name: string): string {
+  const labels: Record<string, string> = { component: "Componente", parameters: "Parámetros", schema: "Esquema", mapper: "Mapper", connections: "Conexiones" };
+  return labels[name] ?? name;
+}
+
+function verificationStatusLabel(status: string): string {
+  return status === "verified" ? "confirmado" : status === "not_required" ? "no aplica" : status === "unavailable" ? "no disponible" : "pendiente";
 }

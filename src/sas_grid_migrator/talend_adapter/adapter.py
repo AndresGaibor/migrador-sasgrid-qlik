@@ -102,6 +102,8 @@ class ComponentRef(BaseModel):
     component: str
     label: str | None = None
     parameters: list[str] = []
+    parameter_values: dict[str, Any] = {}
+    schemas: list[dict[str, Any]] = []
     schema_columns: int = 0
 
 
@@ -109,7 +111,9 @@ class JobInspection(BaseModel):
     job_path: str
     components: list[ComponentRef]
     connections: int
+    connection_details: list[dict[str, Any]] = []
     contexts: list[str]
+    mapper_entries: list[dict[str, Any]] = []
 
 
 class TalendAdapter:
@@ -148,10 +152,10 @@ class TalendAdapter:
     async def health_check(self) -> dict[str, Any]:
         config = self._connection_config()
         try:
-            data = await self._data("talend_jobs_list")
+            jobs = await self.list_jobs()
         except TalendError as e:
             return {"available": False, "mcp_available": False, "error": str(e), **config}
-        jobs = len(data.get("jobs", []))
+        job_count = len(jobs)
         try:
             bridge = await self._data("talend_bridge_ping")
         except TalendError as e:
@@ -159,7 +163,7 @@ class TalendAdapter:
                 "available": False,
                 "mcp_available": True,
                 "bridge_available": False,
-                "jobs": jobs,
+                "jobs": job_count,
                 "error": str(e),
                 **config,
             }
@@ -168,7 +172,7 @@ class TalendAdapter:
                 "available": False,
                 "mcp_available": True,
                 "bridge_available": False,
-                "jobs": jobs,
+                "jobs": job_count,
                 "error": "Talend Studio Bridge no está disponible. Instala el plugin en Studio "
                 "(bun run scripts/start.ts --install-bridge) y abre un proyecto.",
                 **config,
@@ -179,11 +183,67 @@ class TalendAdapter:
             "bridge_available": True,
             "bridge_mode": bridge.get("mode"),
             "unsafe_actions": bridge.get("unsafeActions", False),
-            "jobs": jobs,
+            "jobs": job_count,
             **(await self.custom_spec_status()),
             **config,
         }
 
+    async def list_jobs(self) -> list[dict[str, Any]]:
+        """Return the complete Job inventory, failing if MCP cannot page it fully."""
+        page_size = 100
+        jobs: list[dict[str, Any]] = []
+        seen: set[tuple[str, str]] = set()
+        expected_total: int | None = None
+        offset = 0
+
+        for _ in range(1000):
+            data = await self._data(
+                "talend_jobs_list", {"limit": page_size, "offset": offset}
+            )
+            page = data.get("jobs")
+            if not isinstance(page, list) or len(page) > page_size:
+                raise TalendError("talend_jobs_list devolvió una página inválida; preflight incompleto.")
+
+            reported_total = data.get("total")
+            if reported_total is not None:
+                if not isinstance(reported_total, int) or reported_total < 0:
+                    raise TalendError("talend_jobs_list devolvió un total inválido; preflight incompleto.")
+                if expected_total is not None and reported_total != expected_total:
+                    raise TalendError("talend_jobs_list cambió el total entre páginas; preflight incompleto.")
+                expected_total = reported_total
+
+            if not page:
+                if expected_total is not None and len(jobs) < expected_total:
+                    raise TalendError("talend_jobs_list devolvió un inventario incompleto.")
+                return jobs
+
+            for job in page:
+                if (
+                    not isinstance(job, dict)
+                    or not isinstance(job.get("name"), str)
+                    or not job["name"].strip()
+                    or not isinstance(job.get("path"), str)
+                    or not job["path"].strip()
+                ):
+                    raise TalendError("talend_jobs_list devolvió un Job sin nombre o ruta; preflight incompleto.")
+                key = (job["name"].casefold(), job["path"].replace("\\", "/").casefold())
+                if key in seen:
+                    raise TalendError("talend_jobs_list repitió una página; preflight incompleto.")
+                seen.add(key)
+                jobs.append(job)
+
+            offset += len(page)
+            if expected_total is not None:
+                if len(jobs) > expected_total:
+                    raise TalendError("talend_jobs_list devolvió más Jobs que el total informado.")
+                if len(jobs) == expected_total:
+                    return jobs
+            if len(page) < page_size:
+                if expected_total is not None and len(jobs) < expected_total:
+                    raise TalendError("talend_jobs_list devolvió un inventario incompleto.")
+                return jobs
+
+        raise TalendError("talend_jobs_list excedió el límite de páginas; preflight incompleto.")
     async def _published_tools(self) -> list[dict[str, Any]] | None:
         """Inventario de tools publicadas; `None` si el caller no sabe listarlas."""
         lister = getattr(self.caller, "list_tools", None)
@@ -238,10 +298,6 @@ class TalendAdapter:
         status["spec_supported"] = True
         return status
 
-    async def list_jobs(self) -> list[str]:
-        jobs = (await self._data("talend_jobs_list")).get("jobs", [])
-        return [job for job in jobs if isinstance(job, str)]
-
     async def read_contexts(self, job_name: str) -> list[dict[str, Any]]:
         return (await self._data("talend_read_contexts", {"jobName": job_name})).get("contexts", [])
 
@@ -250,13 +306,17 @@ class TalendAdapter:
             raise TalendError("job_path debe apuntar a un archivo .item")
         data = (await self._data("talend_inspect_job", {"jobPath": job_path})).get("inspection", {})
         job = data.get("job") or {}
+        raw_connections = data.get("connections") or job.get("connections") or []
+        mapper_entries = data.get("mapperEntries") or job.get("mapperEntries") or []
         comps = [
             ComponentRef(
                 unique_name=c.get("uniqueName", ""),
                 component=c.get("componentName", ""),
                 label=c.get("label"),
-                parameters=sorted((c.get("parameters") or {}).keys()),
-                schema_columns=sum(len(s.get("columns", [])) for s in c.get("schemas") or []),
+                parameters=sorted((parameter_values := c.get("parameters") or {}).keys()),
+                parameter_values=parameter_values,
+                schemas=list(c.get("schemas") or []),
+                schema_columns=sum(len(schema.get("columns", [])) for schema in c.get("schemas") or []),
             )
             for c in (job.get("components") or data.get("components") or [])
             if c.get("componentName")
@@ -264,8 +324,10 @@ class TalendAdapter:
         return JobInspection(
             job_path=job_path,
             components=comps,
-            connections=len(data.get("connections") or job.get("connections") or []),
+            connections=len(raw_connections),
+            connection_details=list(raw_connections),
             contexts=[c.get("name", "") for c in data.get("contexts") or job.get("contexts") or []],
+            mapper_entries=list(mapper_entries),
         )
 
     async def job_problems(self, job_name: str) -> dict[str, Any]:

@@ -14,6 +14,7 @@ from sas_grid_migrator.migration_planner.models import (
     PlanStep,
     Property,
 )
+from sas_grid_migrator.migration_planner.expressions import is_simple_arithmetic_translation
 
 
 class ApplyBlock(BaseModel):
@@ -125,6 +126,208 @@ _CONNECTORS = {
     "Iterate": "ITERATE",
 }
 
+
+def _component_label(purpose: str, operation_identity: str, fallback_order: int) -> str:
+    """Crea una etiqueta corta sin perder la referencia al paso SAS."""
+    match = re.match(r"op_(\d+)_", operation_identity, flags=re.IGNORECASE)
+    sas_reference = match.group(1) if match else str(fallback_order)
+    suffix = f" · SAS {sas_reference}"
+    compact_purpose = " ".join(purpose.split()).strip() or "Paso SAS"
+    max_purpose_length = 64 - len(suffix)
+    if len(compact_purpose) > max_purpose_length:
+        compact_purpose = compact_purpose[: max_purpose_length - 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
+        if not compact_purpose:
+            compact_purpose = purpose[: max_purpose_length - 1].rstrip()
+        compact_purpose += "…"
+    return f"{compact_purpose}{suffix}"
+
+
+def _bigdecimal_expression(expression: str) -> str | None:
+    """Translate basic +, - and * into compilable BigDecimal calls; division stays pending."""
+    tokens = re.findall(r"[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?|[()+*/-]", expression)
+    if not tokens or "".join(tokens) != re.sub(r"\s+", "", expression) or "/" in tokens:
+        return None
+    index = 0
+
+    def primary() -> str | None:
+        nonlocal index
+        if index >= len(tokens):
+            return None
+        token = tokens[index]
+        if token in {"+", "-"}:
+            index += 1
+            child = primary()
+            if child is None:
+                return None
+            return child if token == "+" else f"({child}).negate()"
+        if token == "(":
+            index += 1
+            child = additive()
+            if child is None or index >= len(tokens) or tokens[index] != ")":
+                return None
+            index += 1
+            return f"({child})"
+        index += 1
+        if re.fullmatch(r"\d+(?:\.\d+)?", token):
+            return f'new java.math.BigDecimal("{token}")'
+        if "." in token:
+            return f"new java.math.BigDecimal(String.valueOf({token}))"
+        return None
+
+    def multiplicative() -> str | None:
+        nonlocal index
+        value = primary()
+        while value is not None and index < len(tokens) and tokens[index] in {"*", "/"}:
+            operator = tokens[index]
+            index += 1
+            right = primary()
+            if right is None or operator == "/":
+                return None
+            value = f"({value}).multiply({right})"
+        return value
+
+    def additive() -> str | None:
+        nonlocal index
+        value = multiplicative()
+        while value is not None and index < len(tokens) and tokens[index] in {"+", "-"}:
+            operator = tokens[index]
+            index += 1
+            right = multiplicative()
+            if right is None:
+                return None
+            method = "add" if operator == "+" else "subtract"
+            value = f"({value}).{method}({right})"
+        return value
+
+    value = additive()
+    return value if value is not None and index == len(tokens) else None
+
+
+def _build_tmap_mapper(
+    step: PlanStep, candidate_steps: dict[str, PlanStep]
+) -> tuple[dict[str, Any] | None, list[ApplySchemaColumn] | None, str | None]:
+    """Build a tMap for one main input and output with explicit typed columns."""
+    incoming = list(enumerate(step.connections, 1))
+    if len(incoming) != 1 or incoming[0][1].type != "Main" or not incoming[0][1].from_step:
+        return None, None, "El tMap requiere una sola conexión Main de entrada conocida."
+    source_step = candidate_steps.get(incoming[0][1].from_step or "")
+    if source_step is None:
+        return None, None, "No se encontró el componente que alimenta el tMap."
+    input_name = incoming[0][1].label or f"row_{step.order}_{incoming[0][0]}"
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", input_name):
+        return None, None, "El nombre de la conexión de entrada del tMap no es válido."
+    input_columns = {column.name: column for column in source_step.schema_columns if column.name}
+    if not input_columns or any(not column.talend_type for column in input_columns.values()):
+        return None, None, "El tMap requiere un esquema de entrada con tipos conocidos."
+    if any(
+        expression.requires_semantic_validation
+        or expression.warnings
+        or not is_simple_arithmetic_translation(expression.talend)
+        for expression in step.expressions
+    ):
+        return None, None, "La expresión no pertenece al subconjunto seguro de referencias directas y aritmética simple."
+
+    output_edges = [
+        (target, edge, edge_index)
+        for target in sorted(candidate_steps.values(), key=lambda item: (item.order, item.id))
+        for edge_index, edge in enumerate(target.connections, 1)
+        if edge.from_step == step.id
+    ]
+    if len(output_edges) != 1 or output_edges[0][1].type != "Main":
+        return None, None, "El tMap requiere una sola conexión Main de salida conocida."
+    output_target, output_edge, output_edge_index = output_edges[0]
+    output_name = output_edge.label or f"row_{output_target.order}_{output_edge_index}"
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", output_name):
+        return None, None, "El nombre de la conexión de salida del tMap no es válido."
+
+    assignments: dict[str, Any] = {}
+    for expression in step.expressions:
+        if not expression.target or expression.target in assignments:
+            return None, None, "Cada expresión del tMap debe tener una columna destino única."
+        if expression.requires_semantic_validation or expression.warnings or not is_simple_arithmetic_translation(expression.talend):
+            return None, None, "La expresión no pertenece al subconjunto seguro de referencias directas y aritmética simple."
+        translated = (expression.talend or "").replace("input_row.", f"{input_name}.")
+        references = re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\.([A-Za-z_][A-Za-z0-9_]*)", translated)
+        if not references or any(table != input_name or column not in input_columns for table, column in references):
+            return None, None, "La expresión del tMap usa una columna o tabla de entrada desconocida."
+        reference_names = list(dict.fromkeys(column for _, column in references))
+        target_column = next((item for item in step.schema_columns if item.name == expression.target), None)
+        tokens = re.findall(r"[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?|[()+*/-]", translated)
+        has_arithmetic = any(token in {"+", "-", "*", "/"} for token in tokens)
+        if has_arithmetic:
+            numeric_types = {"id_Byte", "id_Short", "id_Integer", "id_Long", "id_Float", "id_Double", "id_BigDecimal"}
+            if target_column is None or target_column.talend_type != "id_BigDecimal":
+                return None, None, "La aritmética automática se limita a columnas destino id_BigDecimal para conservar un tipo compilable."
+            if any(input_columns[name].talend_type not in numeric_types for name in reference_names):
+                return None, None, "La aritmética del tMap requiere columnas numéricas con tipo conocido."
+            if any(input_columns[name].nullable is not False for name in reference_names):
+                return None, None, "La aritmética del tMap requiere columnas de entrada no nulas para evitar diferencias con SAS."
+            compiled = _bigdecimal_expression(translated)
+            if compiled is None:
+                return None, None, "La división o la expresión requiere una regla de precisión/escala que debe confirmarse."
+            translated = compiled
+        assignments[expression.target] = (translated, reference_names)
+
+    if not assignments:
+        return None, None, "El plan no contiene asignaciones que se puedan mapear automáticamente."
+
+    output_schema: list[ApplySchemaColumn] = []
+    output_columns: list[dict[str, Any]] = []
+    for column in step.schema_columns:
+        if not column.name or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", column.name):
+            return None, None, "El esquema de salida del tMap contiene una columna sin nombre válido."
+        if column.name in assignments:
+            expression, references = assignments[column.name]
+        elif column.name in input_columns:
+            expression, references = f"{input_name}.{column.name}", [column.name]
+        else:
+            return None, None, f"Falta una expresión segura para la columna de salida {column.name}."
+        reference_types = {input_columns[name].talend_type for name in references}
+        talend_type = column.talend_type or (next(iter(reference_types)) if len(reference_types) == 1 else None)
+        if not talend_type:
+            return None, None, f"No se pudo determinar el tipo Talend de la columna {column.name}."
+        nullable = column.nullable
+        if nullable is None:
+            nullability = {input_columns[name].nullable for name in references}
+            nullable = True if True in nullability else False if nullability == {False} else None
+        output_schema.append(
+            ApplySchemaColumn(
+                name=column.name,
+                type=talend_type,
+                nullable=nullable,
+                length=column.length,
+                precision=column.precision,
+            )
+        )
+        output_columns.append(
+            {
+                "name": column.name,
+                "type": talend_type,
+                **({"nullable": nullable} if nullable is not None else {}),
+                "expression": expression,
+            }
+        )
+    if not output_schema:
+        return None, None, "El tMap requiere un esquema de salida explícito."
+
+    return (
+        {
+            "inputs": [
+                {
+                    "name": input_name,
+                    "columns": [
+                        {"name": column.name, "type": column.talend_type, **({"nullable": column.nullable} if column.nullable is not None else {})}
+                        for column in source_step.schema_columns
+                    ],
+                }
+            ],
+            "outputs": [{"name": output_name, "columns": output_columns}],
+        },
+        output_schema,
+        None,
+    )
+
+
 def _safe_folder_path(folder_path: str) -> str:
     normalized = folder_path.replace("\\", "/").strip("/")
     parts = normalized.split("/") if normalized else []
@@ -179,9 +382,14 @@ def _apply_context_file(contexts: list[ApplyContext], path: Path | None) -> list
     return contexts
 
 
-def _instruction_step(step: PlanStep) -> dict[str, Any]:
+def _instruction_step(
+    step: PlanStep,
+    *,
+    talend_unique_name: str | None = None,
+    configured_mapper: bool = False,
+) -> dict[str, Any]:
     """Describe the SAS step without copying legacy user progress or notes."""
-    return {
+    result = {
         "id": step.id,
         "order": step.order,
         "subjob": step.subjob,
@@ -194,33 +402,51 @@ def _instruction_step(step: PlanStep) -> dict[str, Any]:
         "properties": [item.model_dump(mode="json") for item in step.properties],
         "expressions": [item.model_dump(mode="json") for item in step.expressions],
         "schema": [item.model_dump(mode="json") for item in step.schema_columns],
+        "componentTables": step.component_tables,
         "dependencies": [
             {"type": item.type, "fromStep": item.from_step, "label": item.label}
             for item in step.connections
         ],
         "assumptions": step.assumptions,
-        "pending": step.pending,
+        "pending": [
+            item for item in step.pending
+            if not (configured_mapper and item == "Tipos de las columnas calculadas")
+        ],
         "tests": step.tests,
         "evidence": step.evidence.model_dump(mode="json"),
         "confidence": step.confidence,
         "verified": step.verified,
+        "mapperConfigured": configured_mapper,
+        "offlineConfigured": step.offline_configured,
         "inCatalog": step.in_catalog,
         "docUrl": step.doc_url,
         "variants": step.variants,
-        "requiresSemanticValidation": step.requires_semantic_validation,
+        "requiresSemanticValidation": step.requires_semantic_validation and not configured_mapper,
     }
+    if configured_mapper:
+        for expression in result["expressions"]:
+            expression["requires_semantic_validation"] = False
+    if talend_unique_name:
+        result["talendUniqueName"] = talend_unique_name
+    return result
 
 
 def _json_model(value: Any) -> Any:
     return value.model_dump(mode="json") if isinstance(value, BaseModel) else value
 
 
-def _pending_details(plan: JobPlan, resolved_program_steps: set[str] | None = None) -> list[str]:
+def _pending_details(
+    plan: JobPlan,
+    resolved_program_steps: set[str] | None = None,
+    configured_mapper_steps: set[str] | None = None,
+) -> list[str]:
     steps = [*plan.steps, *(step for child in plan.children for step in child.steps)]
     source_macro = PurePosixPath(plan.program.replace("\\", "/")).stem.casefold()
     resolved_steps = resolved_program_steps or set()
+    mapped_steps = configured_mapper_steps or set()
     details: list[str] = []
     for step in steps:
+        configured_mapper = step.id in mapped_steps
         if step.operation_type == "macro_call":
             called_macro = (_step_property_value(step, "PROCESS") or "").strip().strip("\"'").lstrip("%").casefold()
             if called_macro == source_macro or step.id in resolved_steps:
@@ -229,20 +455,30 @@ def _pending_details(plan: JobPlan, resolved_program_steps: set[str] | None = No
         block_reason = _step_block_reason(step)
         if block_reason:
             details.append(f"Paso {step.operation_id or step.id} ({location}): {block_reason}")
-        if not step.verified or step.confidence != "high":
+        if (not step.verified or step.confidence != "high") and not step.offline_configured and not configured_mapper:
             details.append(
                 f"Paso {step.operation_id or step.id} ({location}): componente o configuración pendiente de validación; completar en Talend."
             )
         for pending in step.pending:
+            if configured_mapper and pending == "Tipos de las columnas calculadas":
+                continue
             details.append(f"Paso {step.operation_id or step.id} ({location}): {pending}")
         for prop in step.properties:
-            if not prop.verified or prop.value is None:
+            if configured_mapper and prop.name in {"Expressions", "Var table"}:
+                continue
+            if (not prop.verified or prop.value is None) and not (
+                step.offline_configured and prop.value is not None
+            ):
                 details.append(
                     f"Paso {step.operation_id or step.id} ({location}): propiedad {prop.name} "
                     f"sin valor verificado; origen indicado por el portal: {prop.origin}."
                 )
         for expression in step.expressions:
-            if expression.talend is None or expression.requires_semantic_validation:
+            if configured_mapper:
+                continue
+            if (
+                expression.talend is None or expression.requires_semantic_validation
+            ) and not step.offline_configured:
                 details.append(
                     f"Paso {step.operation_id or step.id} ({location}): expresión SAS "
                     f"{expression.sas} sin traducción Talend verificada."
@@ -310,9 +546,10 @@ def _pending_contexts(
     plan: JobPlan,
     existing_names: set[str],
     resolved_program_steps: set[str] | None = None,
+    configured_mapper_steps: set[str] | None = None,
 ) -> list[ApplyContext]:
     groups: dict[str, list[str]] = {}
-    for detail in _pending_details(plan, resolved_program_steps):
+    for detail in _pending_details(plan, resolved_program_steps, configured_mapper_steps):
         step = re.match(r"^Paso ([^ ]+) \([^)]+\):", detail)
         if step:
             group = f"step:{step.group(1)}"
@@ -356,9 +593,16 @@ def _pending_contexts(
 
 
 def _portal_instructions(
-    plan: JobPlan, folder_path: str, blocked_steps: list[ApplyBlock], pending: list[str]
+    plan: JobPlan,
+    folder_path: str,
+    blocked_steps: list[ApplyBlock],
+    pending: list[str],
+    talend_unique_names: dict[str, str] | None = None,
+    configured_mapper_steps: set[str] | None = None,
 ) -> dict[str, Any]:
     all_steps = [*plan.steps, *(step for child in plan.children for step in child.steps)]
+    component_names = talend_unique_names or {}
+    mapped_steps = configured_mapper_steps or set()
     assumptions = list(dict.fromkeys(assumption for step in all_steps for assumption in step.assumptions))
     return {
         "source": {
@@ -368,13 +612,32 @@ def _portal_instructions(
             "rulesVersion": plan.rules_version,
         },
         "job": {"name": plan.job_name, "folderPath": folder_path},
+        "offlineConfiguration": {
+            "configuredFromProjectFiles": any(step.offline_configured for step in all_steps),
+            "verification": "pending-in-talend-studio",
+            "note": "Las rutas, esquemas y filtros simples se infieren de los archivos del proyecto; verificar y ejecutar el Job en Studio antes de usarlo con datos reales.",
+        },
         "entryMacro": _json_model(plan.entry_macro) if plan.entry_macro else None,
-        "steps": [_instruction_step(step) for step in sorted(plan.steps, key=lambda item: (item.order, item.id))],
+        "steps": [
+            _instruction_step(
+                step,
+                talend_unique_name=component_names.get(step.id),
+                configured_mapper=step.id in mapped_steps,
+            )
+            for step in sorted(plan.steps, key=lambda item: (item.order, item.id))
+        ],
         "macros": [
             {
                 "name": child.name,
                 "parameters": child.params,
-                "steps": [_instruction_step(step) for step in sorted(child.steps, key=lambda item: (item.order, item.id))],
+                "steps": [
+                    _instruction_step(
+                        step,
+                        talend_unique_name=component_names.get(step.id),
+                        configured_mapper=step.id in mapped_steps,
+                    )
+                    for step in sorted(child.steps, key=lambda item: (item.order, item.id))
+                ],
             }
             for child in plan.children
         ],
@@ -512,6 +775,8 @@ def build_apply_spec(
     eligible: dict[str, PlanStep] = {}
     draft_steps: dict[str, tuple[PlanStep, str]] = {}
     candidate_steps: dict[str, PlanStep] = {}
+    configured_mappers: dict[str, dict[str, Any]] = {}
+    configured_mapper_schemas: dict[str, list[ApplySchemaColumn]] = {}
 
     source_macro = PurePosixPath(plan.program.replace("\\", "/")).stem.casefold()
     inline_children = [
@@ -557,18 +822,44 @@ def build_apply_spec(
 
     def include_step(step: PlanStep) -> None:
         reason = _step_block_reason(step)
-        mapper_pending = step.component_candidate == "tMap" and step.operation_type in {
+        mapper_candidate = step.component_candidate == "tMap" and step.operation_type in {
             "join", "project", "compute", "rename"
         }
+        mapper = None
+        mapped_schema = None
+        mapper_reason = None
+        if mapper_candidate:
+            mapper, mapped_schema, mapper_reason = _build_tmap_mapper(step, candidate_steps)
+            if mapper is not None and mapped_schema is not None:
+                configured_mappers[step.id] = mapper
+                configured_mapper_schemas[step.id] = mapped_schema
+        configured_mapper = step.id in configured_mappers
+        mapper_pending = mapper_candidate and not configured_mapper
+        step_properties_pending = any(
+            (not prop.verified or prop.value is None)
+            and not (configured_mapper and prop.name in {"Expressions", "Var table"})
+            for prop in step.properties
+        )
+        step_expressions_pending = any(
+            (expression.talend is None or expression.requires_semantic_validation)
+            and not configured_mapper
+            for expression in step.expressions
+        )
         needs_draft = (
-            bool(step.pending)
+            bool([item for item in step.pending if not (configured_mapper and item == "Tipos de las columnas calculadas")])
             or mapper_pending
             or step.action == "manual_decision"
-            or not step.verified
-            or step.confidence != "high"
-            or any(not prop.verified or prop.value is None for prop in step.properties)
-            or any(expression.talend is None or expression.requires_semantic_validation for expression in step.expressions)
-            or any(not column.name or not column.talend_type for column in step.schema_columns)
+            or (not configured_mapper and not step.offline_configured and (not step.verified or step.confidence != "high"))
+            or (not step.offline_configured and step_properties_pending)
+            or (not step.offline_configured and step_expressions_pending)
+            or any(
+                not column.name or not column.type
+                for column in (mapped_schema or [])
+            )
+            or (
+                mapped_schema is None
+                and any(not column.name or not column.talend_type for column in step.schema_columns)
+            )
         )
         if reason is None and not needs_draft:
             eligible[step.id] = step
@@ -582,14 +873,14 @@ def build_apply_spec(
         if can_create_draft:
             pending = [*step.pending]
             if mapper_pending:
-                pending.append("El plan propone tMap, pero el motor aún no genera su configuración de mapper; completar y validar en Studio.")
-            if any(not prop.verified or prop.value is None for prop in step.properties):
+                pending.append(mapper_reason or "El plan propone tMap, pero su mapper no se pudo configurar automáticamente.")
+            if step_properties_pending:
                 pending.append("Hay propiedades sin valor confirmado; se conservarán en el contexto del Job.")
-            if any(expression.talend is None or expression.requires_semantic_validation for expression in step.expressions):
+            if step_expressions_pending:
                 pending.append("Hay expresiones SAS pendientes de traducción o validación semántica.")
-            if any(not column.name or not column.talend_type for column in step.schema_columns):
+            if any(not column.name or not column.talend_type for column in (mapped_schema or step.schema_columns)):
                 pending.append("Faltan nombres o tipos Talend para completar el esquema.")
-            if step.confidence != "high" or not step.verified:
+            if not configured_mapper and (step.confidence != "high" or not step.verified):
                 pending.append("El componente o su configuración aún no está verificado en Studio.")
             draft_reason = reason or f"Información técnica pendiente: {'; '.join(dict.fromkeys(pending)) or 'completar en Studio'}"
             draft_steps[step.id] = (step, draft_reason)
@@ -629,7 +920,7 @@ def build_apply_spec(
         unique_name = unique_names[step.id]
         is_draft = step.id in draft_steps
         draft_reason = draft_steps[step.id][1] if is_draft else None
-        columns = [
+        columns = configured_mapper_schemas.get(step.id) or [
             ApplySchemaColumn(
                 name=column.name,
                 type=column.talend_type or "",
@@ -648,8 +939,12 @@ def build_apply_spec(
         verified_parameters = {
             prop.name: prop.value
             for prop in step.properties
-            if prop.verified and prop.value is not None
+            if (prop.verified or step.offline_configured)
+            and prop.value is not None
+            and not (prop.name == "CONDITIONS" and "CONDITIONS" in step.component_tables)
         }
+        if step.component_tables:
+            component_tables[step.id] = dict(step.component_tables)
         child_plan = resolved_children_by_step.get(step.id)
         if child_plan:
             verified_parameters["PROCESS"] = child_plan.job_name
@@ -672,10 +967,11 @@ def build_apply_spec(
                 componentName=step.component_candidate,
                 posX=160 + positions[step.id] * 280,
                 posY=96,
-                label=f"{step.purpose} [{operation_identity}]",
+                label=_component_label(step.purpose, operation_identity, step.order),
                 parameters=verified_parameters,
                 tables=component_tables.get(step.id),
                 schema_=schema,
+                mapper=configured_mappers.get(step.id),
                 draftOnly=is_draft,
                 draftReason=draft_reason,
             )
@@ -683,7 +979,14 @@ def build_apply_spec(
         for edge_index, edge in enumerate(step.connections, 1):
             if edge.from_step not in unique_names or edge.type not in _CONNECTORS:
                 continue
-            connector = _CONNECTORS[edge.type]
+            source_step = candidate_steps.get(edge.from_step)
+            connector = (
+                "FILTER"
+                if edge.type == "Main"
+                and source_step is not None
+                and source_step.component_candidate.casefold() == "tfilterrow"
+                else _CONNECTORS[edge.type]
+            )
             connections.append(
                 ApplyConnection(
                     source=unique_names[edge.from_step],
@@ -749,7 +1052,10 @@ def build_apply_spec(
                 )
             )
             context_names.add(parameter)
-    pending_contexts = _pending_contexts(plan, context_names, set(resolved_children_by_step))
+    configured_mapper_steps = set(configured_mappers)
+    pending_contexts = _pending_contexts(
+        plan, context_names, set(resolved_children_by_step), configured_mapper_steps
+    )
     contexts.extend(pending_contexts)
     contexts = _apply_context_file(contexts, context_file)
     pending_details = [context.comment for context in pending_contexts]
@@ -774,5 +1080,12 @@ def build_apply_spec(
         contexts=contexts,
         child_jobs=child_jobs,
         blocked_steps=blocked_steps,
-        instructions=_portal_instructions(plan, safe_folder, blocked_steps, pending_details),
+        instructions=_portal_instructions(
+            plan,
+            safe_folder,
+            blocked_steps,
+            pending_details,
+            talend_unique_names=unique_names,
+            configured_mapper_steps=configured_mapper_steps,
+        ),
     )

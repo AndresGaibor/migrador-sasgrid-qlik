@@ -12,19 +12,25 @@ La herramienta de escritura recibe `jobName`, `version`, `defaultContext`, `fold
 
 Una aplicación crea el Job en la carpeta configurada o reabre el Job coincidente y reutiliza sus componentes. Agrega contextos que faltan, conserva un valor de contexto existente cuando la nueva instrucción lo deja vacío y sustituye una conexión solo cuando la guía solicita la misma pareja de componentes con otro conector. Los componentes marcados como borrador reciben las propiedades verificadas por el portal; no se rellenan los datos desconocidos.
 
-El planificador ya selecciona componentes por operación: por ejemplo, `tFilterRow` para filtros, `tMap` para joins/proyecciones/cálculos, `tAggregateRow` para agregaciones y componentes específicos de archivo o base de datos para entrada/salida. Las conexiones y esquemas viajan por separado. Sin embargo, el generador no construye `mapper`; por eso los `tMap` que ejecutan un join, proyección, cálculo o renombre ahora se envían como borrador con el motivo pendiente, aunque la expresión SAS tenga traducción candidata. Un componente `tMap` creado no significa que su transformación esté configurada.
+El planificador selecciona componentes por operación: por ejemplo, `tFilterRow` para filtros, `tMap` para joins/proyecciones/cálculos, `tAggregateRow` para agregaciones y componentes específicos de archivo o base de datos para entrada/salida. Para un `tMap` de una entrada Main y una salida Main, el portal genera el mapper si conoce los esquemas y puede traducir las columnas directas o una expresión aritmética segura. Las operaciones ambiguas, los joins sin definición inequívoca y las divisiones decimales sin regla de escala se conservan como borradores con su motivo; no se inventa una configuración.
 
-Ejemplo del estado enviado al MCP para una proyección con `amount * 2`:
+Ejemplo conceptual del mapper enviado al MCP para copiar `amount` y calcular una comisión decimal:
 
 ```json
 {
   "componentName": "tMap",
-  "draftOnly": true,
-  "draftReason": "...el motor aún no genera su configuración de mapper..."
+  "mapper": {
+    "inputs": [{ "name": "row_2_1", "columns": [{ "name": "amount", "type": "id_BigDecimal" }] }],
+    "outputs": [{ "name": "row_3_1", "columns": [
+      { "name": "service_fee", "type": "id_BigDecimal", "expression": "...BigDecimal.multiply(...)" }
+    ] }]
+  }
 }
 ```
 
-La expresión Talend candidata sigue disponible en `instructions.steps[].expressions`; se necesita completar y validar el mapper en Studio.
+El mapper aritmético usa `BigDecimal` para evitar una expresión Java inválida sobre importes decimales. La división queda pendiente hasta acordar escala y redondeo. Generar el mapper no cuenta como verificación de Studio: después de aplicarlo, la API lee el `.item` del Job y compara componente, parámetros, esquemas, mapper y conexiones, usando `componentAliases` para respetar los nombres reales de Studio.
+
+La evidencia aparece por paso en la guía y en el resumen del proyecto. Se guarda con la revisión actual de la especificación y no modifica los estados manuales ni sus notas. Si Studio no responde durante la lectura, los pasos quedan «No verificable»; el botón **Volver a comprobar pasos en Studio** reintenta solo la lectura y no vuelve a aplicar ni ejecutar el Job. El resultado significa «configurado y leído en Studio»; no compila ni ejecuta el Job.
 
 ## Contextos de migración
 
@@ -64,8 +70,10 @@ La misma comprobación de salud lista las tools publicadas y devuelve `tools` (n
 
 `TALEND_MCP_READONLY=true` hace arrancar el portal en solo lectura; el permiso definitivo lo decide el interruptor de la vista **Configuración**, guardado en la base. `TALEND_APPLY_FOLDER` debe estar bajo `Process/`. La carpeta destino por ZIP es `<TALEND_APPLY_FOLDER>/<slug-del-ZIP>-<project_id>/<subcarpeta-del-programa>`; así dos ZIP con el mismo nombre se mantienen aislados y cada programa conserva su subcarpeta. La guía muestra la ruta exacta que se enviará al MCP.
 
-`TALEND_MCP_TIMEOUT_SECONDS` limita cuánto espera la API cada respuesta del MCP. El resultado del lote se persiste por proyecto y programa y la vista consulta el estado mientras corre o al recargarse. Los estados del lote son `queued`, `running`, `applied`, `partially_applied`, `failed`, `conflict` e `interrupted`; cada programa conserva además su resultado y error. Una revisión idéntica que ya terminó devuelve el resultado guardado; una colisión no sobrescribe el Job encontrado.
+`TALEND_MCP_TIMEOUT_SECONDS` limita cuánto espera la API cada respuesta del MCP. Antes de implementar, la API recorre el inventario completo de `talend_jobs_list`, incluso si excede el límite predeterminado de 50, y compara nombre y carpeta. Un Job ausente se crea; un Job que ya está en la carpeta exacta se actualiza; un homónimo que solo existe en otra carpeta bloquea el lote. El portal publica el endpoint de solo lectura `GET /api/projects/{id}/talend-apply-batch/preflight` para mostrar esas acciones. Una lectura MCP incompleta o fallida detiene la escritura.
 
-El botón **Implementar todos los flujos del ZIP en Talend** inicia un lote de proyecto. La API ordena las guías por dependencias y hace llamadas secuenciales a `talend_job_apply_custom_spec`; el navegador nunca se conecta directamente al MCP. La vista de proyecto muestra el Job actual, el conteo terminado y los resultados de cada Job agrupados por las carpetas de origen. Un hijo que aparezca confirmado en la respuesta recursiva del MCP se registra en el lote y no se envía otra vez como Job independiente. Al fallar un Job, se conserva el error y se continúa con los siguientes.
+El resultado del lote se persiste por proyecto y programa y la vista consulta el estado mientras corre o al recargarse. Los estados del lote son `queued`, `running`, `applied`, `partially_applied`, `failed`, `conflict` e `interrupted`; cada programa conserva además su resultado y error. La comprobación se repite al iniciar el lote y antes de la primera escritura, y el hash de revisión debe seguir igual. Si un conflicto guardado ya no existe, se puede reintentar con el inventario actual; si se borró un Job de un lote completado, solo se vuelve a crear ese Job. Las colisiones fuera de la carpeta destino no se sobrescriben.
+
+El botón **Implementar todos los flujos del ZIP en Talend** inicia un lote de proyecto. La API ordena las guías por dependencias y hace llamadas secuenciales a `talend_job_apply_custom_spec`; el navegador nunca se conecta directamente al MCP. La vista de proyecto muestra el Job actual, el conteo terminado, la comprobación de destino y los resultados de cada Job agrupados por las carpetas de origen. Un hijo que aparezca confirmado en la respuesta recursiva del MCP se registra en el lote y no se envía otra vez como Job independiente. Al fallar un Job, se conserva el error y se continúa con los siguientes.
 
 Los valores técnicos no resueltos se agregan como contextos `migration_todo_*` con su descripción. El resultado de cada Job puede ser completo o parcial. El lote no compila ni ejecuta los Jobs. La vista individual de una guía permite consultar el destino y resultado, pero la escritura comienza desde el botón único del proyecto.

@@ -64,13 +64,18 @@ JOB = {
                         "uniqueName": "tFilterRow_1",
                         "componentName": "tFilterRow",
                         "parameters": {"LOGICAL_OP": "&&", "CONDITIONS": "[]"},
-                        "schemas": [{"columns": [{}, {}]}],
+                        "schemas": [{"name": "row1", "connector": "FLOW", "columns": [
+                            {"name": "account_id", "type": "id_Integer", "nullable": False},
+                            {"name": "balance", "type": "id_BigDecimal", "nullable": True},
+                        ]}],
                     },
                     {"uniqueName": "x", "componentName": ""},
                 ],
-                "connections": [{}],
+                "connections": [{"source": "tInput_1", "target": "tFilterRow_1", "connectorName": "FLOW", "label": "row1"}],
             },
             "contexts": [{"name": "anio"}],
+            "connections": [{"source": "tInput_1", "target": "tFilterRow_1", "connectorName": "FLOW", "label": "row1"}],
+            "mapperEntries": [{"componentUniqueName": "tMap_1", "table": "row2", "name": "fee", "expression": "row1.balance * 0.005", "type": "id_BigDecimal"}],
         }
     },
 }
@@ -133,6 +138,10 @@ def test_inspect_job_parses_and_skips_empty():
     insp = run(ad.inspect_job("/w/j_0.1.item"))
     assert [c.component for c in insp.components] == ["tFilterRow"]
     assert insp.components[0].schema_columns == 2 and insp.contexts == ["anio"]
+    assert insp.components[0].parameter_values["LOGICAL_OP"] == "&&"
+    assert insp.components[0].schemas[0]["columns"][0]["name"] == "account_id"
+    assert insp.connection_details[0]["label"] == "row1"
+    assert insp.mapper_entries[0]["componentUniqueName"] == "tMap_1"
 
 
 def test_inspect_rejects_non_item_and_error_envelope():
@@ -155,7 +164,7 @@ def test_health_unavailable_does_not_raise():
     ad = TalendAdapter(Fake({"talend_jobs_list": TalendError("caído")}))
     assert run(ad.health_check()) == {"available": False, "mcp_available": False, "error": "caído"}
     ok = TalendAdapter(Fake({
-        "talend_jobs_list": {"ok": True, "data": {"jobs": [{}]}},
+        "talend_jobs_list": {"ok": True, "data": {"jobs": [{"name": "job", "path": "/process/job/job_0.1.item"}], "total": 1}},
         "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readOnly", "unsafeActions": False}},
     }))
     assert run(ok.health_check()) == {
@@ -260,6 +269,45 @@ def test_health_exposes_active_connection_config_for_diagnostics():
     down = TalendAdapter(ConfiguredFake({"talend_jobs_list": TalendError("caído")}))
     health = run(down.health_check())
     assert health["available"] is False and health["mcp_url"] == "http://127.0.0.1:4927/mcp"
+
+
+def test_list_jobs_reads_every_mcp_page_when_inventory_exceeds_default_page_size():
+    jobs = [
+        {"name": f"job_{index}", "path": f"C:/workspace/process/job_{index}/job_{index}_0.1.item"}
+        for index in range(101)
+    ]
+
+    class PagedCaller:
+        def __init__(self):
+            self.offsets = []
+
+        async def call(self, tool, args):
+            self.offsets.append(args["offset"])
+            start = args["offset"]
+            page = jobs[start : start + args["limit"]]
+            return {"ok": True, "data": {"jobs": page, "count": len(page), "total": len(jobs)}}
+
+    caller = PagedCaller()
+    result = run(TalendAdapter(caller).list_jobs())
+
+    assert caller.offsets == [0, 100]
+    assert result == jobs
+
+
+def test_list_jobs_rejects_an_incomplete_mcp_inventory():
+    page = [
+        {"name": f"job_{index}", "path": f"C:/workspace/process/job_{index}/job_{index}_0.1.item"}
+        for index in range(100)
+    ]
+
+    class IncompleteCaller:
+        async def call(self, _tool, args):
+            if args["offset"] == 0:
+                return {"ok": True, "data": {"jobs": page, "total": 101}}
+            return {"ok": True, "data": {"jobs": [], "total": 101}}
+
+    with pytest.raises(TalendError, match="inventario incompleto"):
+        run(TalendAdapter(IncompleteCaller()).list_jobs())
 
 
 def test_verify_plans_is_conservative(tmp_path):

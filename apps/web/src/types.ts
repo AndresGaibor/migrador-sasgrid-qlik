@@ -79,7 +79,15 @@ export type Deps = {
   unresolved: { kind: string; name: string; file: string; line: number; detail: string }[];
   orchestration: { tasks: GridTask[]; schedules: { file: string; line: number; text: string }[]; order: string[] };
 };
-export type PlanRow = { program: string; job_name: string; job_status: string; steps: number; pending: number; done: number };
+export type PlanRow = { program: string; job_name: string; job_status: string; steps: number; pending: number; done: number; studio_verified?: number; studio_pending?: number; studio_status?: "not_checked" | "verified" | "pending" | "unavailable" };
+export type TalendStepVerification = {
+  status: "verified" | "pending" | "unavailable";
+  reason: string | null;
+  checked_at?: string;
+  talend_unique_name: string | null;
+  studio_unique_name?: string | null;
+  checks: Record<string, { status: "verified" | "pending" | "unavailable" | "not_required"; reason?: string | null; expected?: unknown; actual?: unknown }>;
+};
 export type Step = {
   id: string;
   order: number;
@@ -106,6 +114,7 @@ export type Step = {
   doc_url?: string | null;
   variants?: string[];
   requires_semantic_validation?: boolean;
+  studio_verification?: TalendStepVerification;
 };
 export type JobPlan = {
   program: string;
@@ -136,6 +145,12 @@ export type TalendApplyVerification = {
   components_requested: number;
   components_created: number | null;
   missing_components: string[];
+  configured_steps?: number;
+  pending_steps?: number;
+  checked_at?: string;
+  steps?: { step_id: string; talend_unique_name: string | null; studio_unique_name?: string | null; program: string; job_name: string; checked_at?: string; status: "verified" | "pending" | "unavailable"; reason: string | null; checks: Record<string, { status: "verified" | "pending" | "unavailable" | "not_required"; reason?: string | null; expected?: unknown; actual?: unknown }> }[];
+  jobs?: { job_name: string; folder_path?: string; status: "unavailable" | "inspected"; reason: string | null; steps: TalendApplyVerification["steps"] }[];
+  connections?: { status: "verified" | "pending"; expected: number; actual: number; missing: unknown[] };
   studio_problems: { clean: boolean; items: { severity?: string; message?: string }[] } | null;
 };
 export type TalendApplyResult = {
@@ -220,6 +235,26 @@ export type TalendApplyBatchState = {
   attempt_count: number;
   started_at: string | null;
   updated_at: string | null;
+};
+export type TalendApplyPreflightJob = {
+  program: string;
+  job_name: string;
+  folder_path: string;
+  action: "create" | "update" | "conflict";
+  existing_path: string | null;
+  reason: string | null;
+};
+export type TalendApplyBatchPreflight = {
+  project_id: string;
+  revision_hash: string;
+  checked_at: string;
+  available: boolean;
+  inventory_count: number;
+  total_jobs: number;
+  jobs: TalendApplyPreflightJob[];
+  create_count: number;
+  update_count: number;
+  conflict_count: number;
 };
 export type CatalogList = {
   count: number;

@@ -38,6 +38,7 @@ class Connection(BaseModel):
 class Expression(BaseModel):
     sas: str
     talend: str | None = None
+    target: str | None = None
     line: int
     requires_semantic_validation: bool = True
     warnings: list[str] = []
@@ -55,6 +56,8 @@ class PlanStep(BaseModel):
     purpose: str
     properties: list[Property] = []
     schema_columns: list[SchemaColumn] = []
+    component_tables: dict[str, object] = {}
+    offline_configured: bool = False
     connections: list[Connection] = []
     expressions: list[Expression] = []
     assumptions: list[str] = []

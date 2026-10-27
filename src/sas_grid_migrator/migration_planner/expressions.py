@@ -33,6 +33,7 @@ _TOKEN = re.compile(
     )""",
     re.VERBOSE,
 )
+_ARITHMETIC_TOKEN = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?|[()+*/-]")
 _CMP = {"=": "==", "eq": "==", "^=": "!=", "~=": "!=", "<>": "!=", "ne": "!=", ">": ">", "gt": ">",
         "<": "<", "lt": "<", ">=": ">=", "ge": ">=", "<=": "<=", "le": "<="}  # fmt: skip
 _FUNCS = {
@@ -236,3 +237,38 @@ def translate(sas: str) -> Translation:
         t.simple = p.simple
         t.logical = next(iter(p.ops), "&&")
     return t
+
+
+def is_simple_arithmetic_translation(expression: str | None) -> bool:
+    """Indica si la traducción solo contiene columnas, números y aritmética básica."""
+    if not expression:
+        return False
+    tokens = _ARITHMETIC_TOKEN.findall(expression)
+    if not tokens or "".join(tokens) != re.sub(r"\s+", "", expression):
+        return False
+
+    expecting_value = True
+    depth = 0
+    for token in tokens:
+        if token == "(":
+            if not expecting_value:
+                return False
+            depth += 1
+            continue
+        if token == ")":
+            if expecting_value or depth == 0:
+                return False
+            depth -= 1
+            expecting_value = False
+            continue
+        if token in {"+", "-", "*", "/"}:
+            if token in {"+", "-"} and expecting_value:
+                continue
+            if expecting_value:
+                return False
+            expecting_value = True
+            continue
+        if not expecting_value:
+            return False
+        expecting_value = False
+    return not expecting_value and depth == 0

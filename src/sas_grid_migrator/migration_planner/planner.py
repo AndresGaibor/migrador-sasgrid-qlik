@@ -11,7 +11,7 @@ from typing import Literal
 from pydantic import BaseModel
 
 from sas_grid_migrator.intermediate_representation.models import IROperation, LibraryRef, ProgramIR
-from sas_grid_migrator.migration_planner.expressions import translate
+from sas_grid_migrator.migration_planner.expressions import is_simple_arithmetic_translation, translate
 from sas_grid_migrator.migration_planner.models import (
     ChildJob,
     Connection,
@@ -257,9 +257,17 @@ class _Planner:
             if name and name != "*" and all(c.name != name for c in cols):
                 cols.append(SchemaColumn(name=name, origin=origin))
 
-        def expr(sas: str, ln: int | None = None) -> Expression:
+        def expr(sas: str, ln: int | None = None, target: str | None = None) -> Expression:
             t = translate(sas)
-            e = Expression(sas=sas, talend=t.talend, line=ln or line, warnings=t.warnings)
+            e = Expression(
+                sas=sas,
+                talend=t.talend,
+                target=target,
+                line=ln or line,
+                requires_semantic_validation=not is_simple_arithmetic_translation(t.talend)
+                or bool(t.warnings),
+                warnings=t.warnings,
+            )
             exprs.append(e)
             for c in t.columns:
                 col(c)
@@ -288,7 +296,7 @@ class _Planner:
             for c in t.columns:
                 col(c)
             if t.simple:
-                props["LOGICAL_OP"] = t.logical
+                props["LOGICAL_OP"] = "OR" if t.logical == "||" else "AND"
                 props["CONDITIONS"] = "; ".join(
                     f"{c['column']} {c['operator']} {c['value']}" for c in t.simple
                 )
@@ -412,7 +420,7 @@ class _Planner:
                 col(b)
         elif op.type == "compute":
             for a in d.get("assignments", []):
-                expr(a["expression"], a["line"])
+                expr(a["expression"], a["line"], a["target"])
                 col(a["target"])
             for cnd in d.get("conditionals", []):
                 exprs.append(
@@ -429,7 +437,41 @@ class _Planner:
                 f"{len(d.get('assignments', []))} asignaciones, {len(d.get('conditionals', []))} condicionales"
             )
         elif op.type == "read_file" or op.type == "write_file":
-            props["FILENAME"] = d.get("file")
+            file_config = d.get("offline_file_config")
+            if isinstance(file_config, dict):
+                props["FILENAME"] = file_config.get("filename")
+                props["FIELDSEPARATOR"] = file_config.get("delimiter")
+                if op.type == "read_file":
+                    props["HEADER"] = file_config.get("header")
+                else:
+                    props["INCLUDEHEADER"] = file_config.get("create_header") or "false"
+                    props["FILE_EXIST_EXCEPTION"] = "false"
+                props["ENCODING"] = file_config.get("encoding")
+                cols.extend(
+                    SchemaColumn(
+                        name=str(column.get("name", "")),
+                        talend_type=column.get("talend_type"),
+                        nullable=column.get("nullable"),
+                        origin=str(column.get("origin", origin)),
+                    )
+                    for column in file_config.get("schema", [])
+                )
+                if not file_config.get("ready"):
+                    pend.append(
+                        "No se pudo comprobar offline la ruta, el esquema o el formato del archivo; completar antes de ejecutar"
+                    )
+            else:
+                props["FILENAME"] = d.get("file")
+        if d.get("offline_schema") and op.type not in {"read_file", "write_file"}:
+            cols = [
+                SchemaColumn(
+                    name=str(column.get("name", "")),
+                    talend_type=column.get("talend_type"),
+                    nullable=column.get("nullable"),
+                    origin=str(column.get("origin", origin)),
+                )
+                for column in d["offline_schema"]
+            ]
         elif op.type == "set_variable":
             props["VARIABLES"] = f"KEY={d.get('macro_variable')}"
         elif op.type == "macro_call":
@@ -450,6 +492,47 @@ class _Planner:
         rule = self.rules.operations.get(op.type) or self.rules.operations["unsupported"]
         comp, alts, pend, assume = self.component(op, rule)
         values, exprs, cols, pend2 = self.fill(op, comp)
+        component_tables: dict[str, object] = {}
+        offline_configured = False
+        if op.type in {"read_file", "write_file"}:
+            file_config = op.details.get("offline_file_config")
+            offline_configured = bool(isinstance(file_config, dict) and file_config.get("ready"))
+        elif op.type == "filter" and op.details.get("offline_schema"):
+            translated = translate(str(op.details.get("expression", "")))
+            simple = translated.simple or []
+            if (
+                simple
+                and translated.talend
+                and not translated.warnings
+                and all(
+                    item.get("column") and item.get("operator") and item.get("value")
+                    for item in simple
+                )
+                and all(column.name and column.talend_type for column in cols)
+            ):
+                rows = []
+                for item in simple:
+                    raw_value = str(item["value"])
+                    if (
+                        len(raw_value) >= 2
+                        and raw_value[0] == raw_value[-1]
+                        and raw_value[0] in "'\""
+                    ):
+                        raw_value = raw_value[1:-1].replace(raw_value[0] * 2, raw_value[0])
+                    rows.append(
+                        {
+                            "INPUT_COLUMN": str(item["column"]),
+                            "FUNCTION": "",
+                            "OPERATOR": str(item["operator"]),
+                            "RVALUE": raw_value,
+                        }
+                    )
+                component_tables["CONDITIONS"] = {
+                    "columns": ["INPUT_COLUMN", "FUNCTION", "OPERATOR", "RVALUE"],
+                    "rows": rows,
+                }
+                values["LOGICAL_OP"] = "OR" if translated.logical == "||" else "AND"
+                offline_configured = True
         origin = f"SAS {op.evidence.file}:{op.evidence.line}"
         props = [
             Property(
@@ -483,12 +566,23 @@ class _Planner:
             )
             self.cases.append(vc)
             tests.append(vc.id)
-        pending = [*rule.required, *pend, *pend2]
+        pending = [*([] if offline_configured else rule.required), *pend, *pend2]
         sem = (
             op.type
             in ("filter", "join", "compute", "aggregate", "dedupe", "stateful", "union", "sort")
             or op.confidence != "high"
         )
+        if op.type == "compute":
+            assignments = op.details.get("assignments", [])
+            conditionals = op.details.get("conditionals", [])
+            safe_assignments = bool(assignments) and not conditionals and all(
+                expression.target and is_simple_arithmetic_translation(expression.talend)
+                and not expression.warnings
+                for expression in exprs
+            )
+            sem = not safe_assignments or op.confidence != "high"
+        if offline_configured and op.type in {"read_file", "write_file", "filter"}:
+            sem = False
         return PlanStep(
             id=sid,
             order=order,
@@ -513,6 +607,8 @@ class _Planner:
             purpose=self.purpose(op),
             properties=props,
             schema_columns=cols,
+            component_tables=component_tables,
+            offline_configured=offline_configured,
             expressions=exprs,
             assumptions=[*op.notes, *assume],
             pending=pending,

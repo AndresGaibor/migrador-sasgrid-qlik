@@ -1,4 +1,4 @@
-import type { CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, ProjectUploadResponse, Summary, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing } from "./types";
+import type { CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, ProjectUploadResponse, Summary, TalendApplyBatchPreflight, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -41,6 +41,11 @@ const enc = (path: string) => path.split("/").map(encodeURIComponent).join("/");
 export const api = {
   projects: () => req<Project[]>("/projects"),
   createProject: (name: string) => post<Project>("/projects", { name }),
+  deleteProject: (id: string, confirmation: string) =>
+    req<{ deleted: boolean; project_id: string; name: string; talend_jobs_untouched: boolean }>(
+      `/projects/${id}`,
+      { method: "DELETE", body: JSON.stringify({ confirmation }) },
+    ),
   createProjectFromZip: async (file: File, name?: string) => {
     const body = new FormData();
     body.append("file", file);
@@ -82,8 +87,11 @@ export const api = {
     post<TalendApplyPreview>(`/projects/${id}/plans/${enc(file)}/talend-apply/preview`),
   talendApplyStatus: (id: string, file: string) =>
     req<TalendApplyState>(`/projects/${id}/plans/${enc(file)}/talend-apply`),
+  talendApplyVerify: (id: string, file: string) =>
+    post<TalendApplyResult>(`/projects/${id}/plans/${enc(file)}/talend-apply/verify`),
   talendApplyBatch: (id: string, expectedRevision?: string) => post<TalendApplyBatchState>(`/projects/${id}/talend-apply-batch`, expectedRevision ? { expected_revision: expectedRevision } : undefined),
   talendApplyBatchStatus: (id: string) => req<TalendApplyBatchState>(`/projects/${id}/talend-apply-batch`),
+  talendApplyBatchPreflight: (id: string) => req<TalendApplyBatchPreflight>(`/projects/${id}/talend-apply-batch/preflight`),
   talendApplyBatchSummary: (id: string) => req<TalendApplyBatchSummary>(`/projects/${id}/talend-apply-batch/summary`),
   exportAll: (id: string) => post<{ directory: string; files: string[] }>(`/projects/${id}/exports`),
   exportFile: (id: string, name: string) => `/api/projects/${id}/exports/${encodeURIComponent(name)}`,

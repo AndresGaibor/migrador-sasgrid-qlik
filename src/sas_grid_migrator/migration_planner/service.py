@@ -8,6 +8,7 @@ from sas_grid_migrator.intermediate_representation.builder import build_ir
 from sas_grid_migrator.intermediate_representation.models import LibraryRef
 from sas_grid_migrator.macro_resolver.resolver import macro_index
 from sas_grid_migrator.migration_planner.models import JobPlan, Orchestration, PlanSet
+from sas_grid_migrator.migration_planner.offline_files import configure_offline_file_operations
 from sas_grid_migrator.migration_planner.planner import (
     grid_recommendation,
     load_grid_catalog,
@@ -113,6 +114,7 @@ def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSe
     plans = []
     for prog in analysis.programs:
         ir = build_ir(prog, macro_files)
+        configure_offline_file_operations(ir, store.source_dir(project_id))
         orch = Orchestration(
             grid_tasks=tasks[prog.file],
             schedules=scheds[prog.file],

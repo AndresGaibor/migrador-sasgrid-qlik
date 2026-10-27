@@ -43,7 +43,7 @@
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties)
 - **Conexiones:** Main desde `op_5_rename_1`
 - **Propiedades:**
-  - `LOGICAL_OP` (Logical operator used to combine conditions) = `&&` — SAS p0_clientes_activos.sas:7 · nombre oficial · opciones: OR, AND
+  - `LOGICAL_OP` (Logical operator used to combine conditions) = `AND` — SAS p0_clientes_activos.sas:7 · nombre oficial · opciones: OR, AND
   - `CONDITIONS` (Conditions) = `estado == 'A'; saldo > 0` — SAS p0_clientes_activos.sas:7 · nombre oficial
   - `USE_ADVANCED` (Use advanced mode) = `false` — SAS p0_clientes_activos.sas:7 · nombre oficial
   - `ADVANCED_COND` (Advanced) = _por configurar_ — regla mappings · nombre oficial

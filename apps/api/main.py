@@ -3,8 +3,10 @@ import json
 import os
 import re
 import tempfile
+from collections import Counter
 from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 from threading import Condition
 from typing import Any
@@ -31,7 +33,7 @@ from sas_grid_migrator.migration_planner.service import (
     load_plans,
     set_decision,
 )
-from sas_grid_migrator.persistence.store import Store
+from sas_grid_migrator.persistence.store import ProjectDeletionBlockedError, Store
 from sas_grid_migrator.reporting.exports import render_plan_md, steps_csv
 from sas_grid_migrator.sas_parser.analyze import (
     AnalysisSummary,
@@ -62,6 +64,10 @@ def store() -> Store:
 
 class NewProject(BaseModel):
     name: str
+
+
+class DeleteProjectConfirmation(BaseModel):
+    confirmation: str
 
 
 class NewImport(BaseModel):
@@ -196,6 +202,30 @@ def create_project(body: NewProject) -> Project:
 @app.get("/api/projects")
 def list_projects() -> list[Project]:
     return store().list_projects()
+
+
+@app.delete("/api/projects/{project_id}")
+def delete_project(project_id: str, body: DeleteProjectConfirmation) -> dict[str, object]:
+    s = store()
+    project = s.get_project(project_id)
+    if project is None:
+        raise HTTPException(404, "proyecto no encontrado")
+    if body.confirmation != project.name:
+        raise HTTPException(422, "escribe el nombre exacto del proyecto para confirmar")
+    try:
+        deleted = s.delete_project(project_id)
+    except ProjectDeletionBlockedError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    if not deleted:
+        raise HTTPException(404, "proyecto no encontrado")
+    return {
+        "deleted": True,
+        "project_id": project_id,
+        "name": project.name,
+        "talend_jobs_untouched": True,
+    }
 
 
 @app.post("/api/projects/uploads", status_code=201)
@@ -447,9 +477,27 @@ def _plans(project_id: str) -> PlanSet:
 
 @app.get("/api/projects/{project_id}/plans")
 def list_plans(project_id: str) -> list[dict]:
+    plans = _plans(project_id)
+    s = store()
     out = []
-    for p in _plans(project_id).plans:
+    for p in plans.plans:
         steps = p.steps + [x for c in p.children for x in c.steps]
+        state = s.get_talend_apply_state(project_id, p.program)
+        verification = None
+        if state and state.get("result"):
+            try:
+                current_spec = _talend_apply_spec(project_id, p.program, plans)[1]
+            except (HTTPException, ValueError):
+                current_spec = None
+            if current_spec is not None and state.get("revision_hash") == _talend_apply_preview_id(current_spec):
+                verification = state["result"].get("verification")
+        verified_step_ids = {
+            (item.get("program"), item.get("step_id"))
+            for item in (verification or {}).get("steps", [])
+            if item.get("status") == "verified"
+        }
+        studio_verified = sum((p.program, step.id) in verified_step_ids for step in steps)
+        has_verification = verification is not None
         out.append(
             {
                 "program": p.program,
@@ -458,6 +506,14 @@ def list_plans(project_id: str) -> list[dict]:
                 "steps": len(steps),
                 "pending": sum(1 for x in steps if x.pending),
                 "done": sum(1 for x in steps if x.status in ("verificado", "validado_manualmente")),
+                "studio_verified": studio_verified,
+                "studio_pending": max(0, len(steps) - studio_verified) if has_verification else 0,
+                "studio_status": (
+                    "unavailable" if verification and verification.get("status") == "unavailable"
+                    else "verified" if has_verification and studio_verified == len(steps)
+                    else "pending" if has_verification
+                    else "not_checked"
+                ),
             }
         )
     return out
@@ -595,7 +651,7 @@ def _spec_review_warnings(spec) -> list[str]:
     return warnings
 
 
-def _child_apply_outcome(child: dict, spec) -> dict:
+async def _child_apply_outcome(child: dict, spec) -> dict:
     child_arguments = spec.to_mcp_arguments()
     blocked_steps = [item.model_dump() for item in spec.blocked_steps]
     child_warnings = child.get("warnings", [])
@@ -610,6 +666,14 @@ def _child_apply_outcome(child: dict, spec) -> dict:
         partial = partial or component_count < len(components)
     if isinstance(connection_count, int) and isinstance(connections, list):
         partial = partial or connection_count < len(connections)
+    verification = await _verify_job_arguments(child_arguments, child)
+    if verification["status"] == "unavailable" or verification["pending_steps"]:
+        pending_count = verification["pending_steps"]
+        warnings.append(
+            f"La lectura de Studio dejó {pending_count} paso(s) sin comprobar en el Job hijo."
+            if verification["status"] != "unavailable"
+            else "No se pudo leer el Job hijo de vuelta desde Studio."
+        )
     return {
         "status": "partially_applied" if partial else "applied",
         "identity": {
@@ -622,8 +686,9 @@ def _child_apply_outcome(child: dict, spec) -> dict:
         },
         "blocked_steps": blocked_steps,
         "warnings": warnings if isinstance(warnings, list) else [],
-        "review_required": bool(review_warnings or blocked_steps or warnings),
+        "review_required": bool(review_warnings or blocked_steps or warnings or partial),
         "review_warnings": review_warnings,
+        "verification": verification,
         "result": {key: value for key, value in child.items() if key != "childJobs"},
     }
 
@@ -679,40 +744,328 @@ def preview_talend_apply(project_id: str, program: str) -> dict:
     }
 
 
-async def _verify_applied_job(spec, result: dict) -> dict:
-    """Inspecciona el Job recién creado y consulta los avisos de Studio.
+def _verification_check(status: str, expected: Any = None, actual: Any = None, reason: str | None = None) -> dict[str, Any]:
+    return {"status": status, "expected": expected, "actual": actual, "reason": reason}
 
-    `inspected` solo afirma que el MCP pudo leer el Job creado; los avisos de
-    la vista Problemas de Studio se reportan aparte. Nunca se ejecuta el Job.
-    """
-    requested = sorted({item.unique_name for item in spec.components})
+
+def _normalized_schema(schema: dict[str, Any]) -> tuple[str, tuple[tuple[str, str, bool | None], ...]]:
+    connector = str(schema.get("connector") or "FLOW").casefold()
+    columns = schema.get("columns") if isinstance(schema.get("columns"), list) else []
+    signature = tuple(sorted(
+        (
+            str(column.get("name") or "").casefold(),
+            str(column.get("type") or "").casefold(),
+            column.get("nullable") if isinstance(column.get("nullable"), bool) else None,
+        )
+        for column in columns if isinstance(column, dict)
+    ))
+    return connector, signature
+
+
+def _normalized_connection(connection: dict[str, Any]) -> tuple[str, str, str, str]:
+    return (
+        str(connection.get("connectorName") or connection.get("connector_name") or "").casefold(),
+        str(connection.get("source") or "").casefold(),
+        str(connection.get("target") or "").casefold(),
+        str(connection.get("label") or "").casefold(),
+    )
+
+
+def _expected_mapper_entries(component: dict[str, Any]) -> list[tuple[str, str, str, str, bool | None]]:
+    mapper = component.get("mapper") or {}
+    entries: list[tuple[str, str, str, str, bool | None]] = []
+    for table in mapper.get("outputs", []) if isinstance(mapper.get("outputs"), list) else []:
+        if not isinstance(table, dict):
+            continue
+        for column in table.get("columns", []) if isinstance(table.get("columns"), list) else []:
+            if not isinstance(column, dict):
+                continue
+            entries.append((
+                str(table.get("name") or "").casefold(),
+                str(column.get("name") or "").casefold(),
+                str(column.get("expression") or "").replace(" ", "").casefold(),
+                str(column.get("type") or "").casefold(),
+                column.get("nullable") if isinstance(column.get("nullable"), bool) else None,
+            ))
+    return entries
+
+
+async def _verify_job_arguments(arguments: dict[str, Any], result: dict[str, Any]) -> dict[str, Any]:
+    """Vuelve a leer un Job de Studio y compara los artefactos enviados por el portal."""
     from sas_grid_migrator.talend_adapter.adapter import TalendError
 
+    requested_components = [item for item in arguments.get("components", []) if isinstance(item, dict)]
+    aliases = result.get("componentAliases") if isinstance(result.get("componentAliases"), dict) else {}
+    actual_name_for = lambda name: str(aliases.get(name, name))
+    requested_names = {str(item.get("uniqueName") or "") for item in requested_components}
+    expected_edges = [
+        {
+            **connection,
+            "source": actual_name_for(str(connection.get("source") or "")),
+            "target": actual_name_for(str(connection.get("target") or "")),
+        }
+        for connection in arguments.get("connections", []) if isinstance(connection, dict)
+    ]
+    item_path = result.get("itemPath") or (result.get("result") or {}).get("itemPath")
+    job_name = str(arguments.get("jobName") or result.get("jobName") or "")
+    program = str((arguments.get("instructions") or {}).get("source", {}).get("program") or "")
     verification: dict[str, Any] = {
+        "job_name": job_name,
+        "program": program,
+        "checked_at": datetime.now(UTC).isoformat(),
+        "item_path": str(item_path) if item_path else None,
         "status": "unavailable",
         "reason": None,
-        "components_requested": len(requested),
+        "components_requested": len(requested_names),
         "components_created": None,
         "missing_components": [],
-        "studio_problems": None,
+        "steps": [],
+        "configured_steps": 0,
+        "pending_steps": 0,
     }
-    item_path = result.get("itemPath") or (result.get("result") or {}).get("itemPath")
-    talend = _talend()
-    if item_path:
-        try:
-            inspection = await talend.inspect_job(str(item_path))
-        except TalendError as e:
-            verification["reason"] = redact(str(e), "mcp-inspect-error.txt")
-        else:
-            created = {item.unique_name for item in inspection.components}
-            verification["status"] = "inspected"
-            verification["components_created"] = len(created)
-            verification["missing_components"] = [name for name in requested if name not in created]
+    instructions = arguments.get("instructions") or {}
+    all_steps = list(instructions.get("steps") or [])
+    for macro in instructions.get("macros") or []:
+        all_steps.extend(macro.get("steps") or [])
+
+    def mark_unavailable_steps(reason: str) -> list[dict[str, Any]]:
+        return [
+            {
+                "step_id": step.get("id"),
+                "talend_unique_name": step.get("talendUniqueName"),
+                "studio_unique_name": None,
+                "program": program,
+                "job_name": job_name,
+                "checked_at": verification["checked_at"],
+                "status": "unavailable",
+                "reason": reason,
+                "checks": {},
+            }
+            for step in all_steps if isinstance(step, dict)
+        ]
+    if not item_path:
+        verification["reason"] = "La respuesta de creación no incluyó la ruta del Job .item para inspeccionarlo."
+        verification["steps"] = mark_unavailable_steps(verification["reason"])
+        verification["pending_steps"] = len(verification["steps"])
+        return verification
     try:
-        problems = await talend.job_problems(spec.job_name)
+        inspection = await _talend().inspect_job(str(item_path))
     except TalendError as e:
-        if verification["status"] == "unavailable":
-            verification["reason"] = redact(str(e), "mcp-problems-error.txt")
+        verification["reason"] = redact(str(e), "mcp-inspect-error.txt")
+        verification["steps"] = mark_unavailable_steps(verification["reason"])
+        verification["pending_steps"] = len(verification["steps"])
+        return verification
+
+    actual_components = {item.unique_name: item for item in inspection.components}
+    verification["status"] = "inspected"
+    verification["components_created"] = len(actual_components)
+    verification["missing_components"] = sorted(
+        name for name in requested_names if actual_name_for(name) not in actual_components
+    )
+    actual_connections = Counter(_normalized_connection(item) for item in inspection.connection_details)
+    expected_connection_counts = Counter(
+        _normalized_connection(item)
+        for item in expected_edges
+    )
+    instruction_data = arguments.get("instructions") or {}
+    all_steps = list(instruction_data.get("steps") or [])
+    for macro in instruction_data.get("macros") or []:
+        all_steps.extend(macro.get("steps") or [])
+    components_by_name = {str(item.get("uniqueName") or ""): item for item in requested_components}
+    for step in all_steps:
+        if not isinstance(step, dict):
+            continue
+        unique_name = str(step.get("talendUniqueName") or "")
+        actual_unique_name = actual_name_for(unique_name) if unique_name else ""
+        expected_component = components_by_name.get(unique_name)
+        actual_component = actual_components.get(actual_unique_name)
+        reasons: list[str] = []
+        checks: dict[str, dict[str, Any]] = {}
+        if not unique_name or expected_component is None:
+            checks["component"] = _verification_check(
+                "pending", reason="El plan no asignó un componente Talend a este paso SAS."
+            )
+            reasons.append("No tiene componente Talend asociado.")
+        elif actual_component is None:
+            checks["component"] = _verification_check(
+                "pending", unique_name, None, "El componente solicitado no aparece en la lectura de Studio."
+            )
+            reasons.append("El componente no aparece en Studio.")
+        else:
+            component_matches = actual_component.component == expected_component.get("componentName")
+            checks["component"] = _verification_check(
+                "verified" if component_matches else "pending",
+                expected_component.get("componentName"), actual_component.component,
+                None if component_matches else "El tipo de componente leído difiere del solicitado.",
+            )
+            if not component_matches:
+                reasons.append("El tipo de componente no coincide.")
+            expected_parameters = expected_component.get("parameters") or {}
+            actual_parameters = actual_component.parameter_values or {}
+            parameter_mismatches = {
+                key: {"expected": value, "actual": actual_parameters.get(key)}
+                for key, value in expected_parameters.items()
+                if key not in actual_parameters or str(actual_parameters[key]) != str(value)
+            }
+            checks["parameters"] = _verification_check(
+                "verified" if not parameter_mismatches else "pending",
+                expected_parameters,
+                {key: actual_parameters.get(key) for key in expected_parameters},
+                None if not parameter_mismatches else "Uno o más parámetros no coinciden con la especificación aplicada.",
+            )
+            if parameter_mismatches:
+                reasons.append("Hay parámetros que no coinciden.")
+            expected_schema = expected_component.get("schema")
+            if expected_schema:
+                expected_signature = _normalized_schema(expected_schema)
+                actual_signatures = [_normalized_schema(item) for item in actual_component.schemas]
+                schema_matches = expected_signature in actual_signatures
+                checks["schema"] = _verification_check(
+                    "verified" if schema_matches else "pending",
+                    expected_signature,
+                    actual_signatures,
+                    None if schema_matches else "El esquema esperado no coincide con los esquemas leídos en Studio.",
+                )
+                if not schema_matches:
+                    reasons.append("El esquema no coincide.")
+            else:
+                checks["schema"] = _verification_check("not_required")
+            expected_mapper = _expected_mapper_entries(expected_component)
+            if expected_mapper:
+                actual_mapper = [
+                    (
+                        str(entry.get("table") or "").casefold(),
+                        str(entry.get("name") or "").casefold(),
+                        str(entry.get("expression") or "").replace(" ", "").casefold(),
+                        str(entry.get("type") or "").casefold(),
+                        entry.get("nullable") if isinstance(entry.get("nullable"), bool) else None,
+                    )
+                    for entry in inspection.mapper_entries
+                    if entry.get("componentUniqueName") == actual_unique_name
+                ]
+                mapper_matches = Counter(expected_mapper) == Counter(actual_mapper)
+                owner_known = all(
+                    entry.get("componentUniqueName")
+                    for entry in inspection.mapper_entries
+                ) or not inspection.mapper_entries
+                checks["mapper"] = _verification_check(
+                    "verified" if mapper_matches and owner_known else "pending",
+                    sorted(expected_mapper), sorted(actual_mapper),
+                    None if mapper_matches and owner_known else "El mapper no coincide o el MCP no identifica a qué componente pertenecen sus expresiones.",
+                )
+                if not mapper_matches or not owner_known:
+                    reasons.append("El mapper no coincide o no se pudo atribuir al componente.")
+            else:
+                checks["mapper"] = _verification_check("not_required")
+            actual_component_connections = Counter(
+                _normalized_connection(connection)
+                for connection in inspection.connection_details
+                if connection.get("target") == actual_unique_name
+                or connection.get("source") == actual_unique_name
+            )
+            expected_component_connections = Counter(
+                _normalized_connection(connection)
+                for connection in expected_edges
+                if connection.get("target") == actual_unique_name
+                or connection.get("source") == actual_unique_name
+            )
+            connections_match = expected_component_connections == actual_component_connections
+            checks["connections"] = _verification_check(
+                "verified" if connections_match else "pending",
+                sorted(expected_component_connections.elements()),
+                sorted(actual_component_connections.elements()),
+                None if connections_match else "Las conexiones de entrada no coinciden con el plan aplicado.",
+            )
+            if not connections_match:
+                reasons.append("Las conexiones no coinciden.")
+            if expected_component.get("draftOnly"):
+                reasons.append(expected_component.get("draftReason") or "El componente se creó como borrador.")
+        step_status = "verified" if not reasons else "pending"
+        verification["steps"].append({
+            "step_id": step.get("id"),
+            "talend_unique_name": unique_name or None,
+            "studio_unique_name": actual_unique_name or None,
+            "program": program,
+            "job_name": job_name,
+            "checked_at": verification["checked_at"],
+            "status": step_status,
+            "reason": "; ".join(dict.fromkeys(reasons)) or None,
+            "checks": checks,
+        })
+
+    missing_expected = expected_connection_counts - actual_connections
+    verification["connections"] = {
+        "status": "verified" if not missing_expected else "pending",
+        "expected": sum(expected_connection_counts.values()),
+        "actual": sum(actual_connections.values()),
+        "missing": list(missing_expected.elements()),
+    }
+    child_results = {
+        (str(child.get("jobName") or "").casefold(), str(child.get("folderPath") or "").replace("\\", "/").casefold()): child
+        for child in result.get("childJobs", []) if isinstance(child, dict)
+    }
+    verification["jobs"] = []
+    for child_arguments in arguments.get("childJobs", []) if isinstance(arguments.get("childJobs"), list) else []:
+        if not isinstance(child_arguments, dict):
+            continue
+        key = (
+            str(child_arguments.get("jobName") or "").casefold(),
+            str(child_arguments.get("folderPath") or "").replace("\\", "/").casefold(),
+        )
+        child_result = child_results.get(key)
+        if child_result is None:
+            child_instruction = child_arguments.get("instructions") or {}
+            child_steps = list(child_instruction.get("steps") or [])
+            for macro in child_instruction.get("macros") or []:
+                child_steps.extend(macro.get("steps") or [])
+            child_reason = "La respuesta del MCP no confirmó el Job hijo."
+            unavailable_steps = [
+                {
+                    "step_id": step.get("id"),
+                    "talend_unique_name": step.get("talendUniqueName"),
+                    "studio_unique_name": None,
+                    "program": str(child_instruction.get("source", {}).get("program") or ""),
+                    "job_name": child_arguments.get("jobName"),
+                    "checked_at": verification["checked_at"],
+                    "status": "unavailable",
+                    "reason": child_reason,
+                    "checks": {},
+                }
+                for step in child_steps if isinstance(step, dict)
+            ]
+            verification["steps"].extend(unavailable_steps)
+            verification["jobs"].append({
+                "job_name": child_arguments.get("jobName"),
+                "folder_path": child_arguments.get("folderPath"),
+                "status": "unavailable",
+                "reason": child_reason,
+                "steps": unavailable_steps,
+            })
+            continue
+        child_verification = await _verify_job_arguments(child_arguments, child_result)
+        verification["steps"].extend(child_verification["steps"])
+        verification["jobs"].append({
+            "job_name": child_verification["job_name"],
+            "folder_path": child_arguments.get("folderPath"),
+            "status": child_verification["status"],
+            "reason": child_verification["reason"],
+            "steps": child_verification["steps"],
+        })
+    verification["configured_steps"] = sum(item["status"] == "verified" for item in verification["steps"])
+    verification["pending_steps"] = sum(item["status"] != "verified" for item in verification["steps"])
+    return verification
+
+
+async def _verify_applied_job(spec, result: dict) -> dict:
+    """Inspecciona cada Job en Studio y consulta sus problemas; no ejecuta Jobs."""
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+
+    verification = await _verify_job_arguments(spec.to_mcp_arguments(), result)
+    try:
+        problems = await _talend().job_problems(spec.job_name)
+    except TalendError as e:
+        verification["problems_reason"] = redact(str(e), "mcp-problems-error.txt")
+        verification["studio_problems"] = None
     else:
         verification["studio_problems"] = {
             "clean": problems["clean"],
@@ -724,6 +1077,10 @@ async def _verify_applied_job(spec, result: dict) -> dict:
 async def _apply_talend_plan(
     project_id: str,
     program: str,
+    *,
+    allow_conflict_retry: bool = False,
+    allow_missing_retry: bool = False,
+    unapplied_revision_retry_programs: frozenset[str] = frozenset(),
     on_phase: Callable[[str], Awaitable[None]] | None = None,
 ) -> dict:
     from sas_grid_migrator.talend_adapter.adapter import TalendError
@@ -745,14 +1102,19 @@ async def _apply_talend_plan(
     persist_state = s.get_project(project_id) is not None
     previous = s.get_talend_apply_state(project_id, program) if persist_state else None
     if previous is not None:
-        if previous["revision_hash"] != revision_hash:
+        safe_revision_retry = (
+            program in unapplied_revision_retry_programs
+            and previous["status"] in {"failed", "conflict"}
+            and previous["result"] is None
+        )
+        if previous["revision_hash"] != revision_hash and not safe_revision_retry:
             raise HTTPException(
                 409,
                 "El Job ya tiene una implementación con otra revisión; crea un nuevo ZIP/proyecto para evitar sobrescribirlo.",
             )
-        if previous["status"] == "applied":
+        if previous["status"] == "applied" and not allow_missing_retry:
             return previous["result"]
-        if previous["status"] == "conflict":
+        if previous["status"] == "conflict" and not allow_conflict_retry:
             raise HTTPException(409, previous["error"] or "El destino Talend tiene un conflicto pendiente.")
         if previous["status"] == "running":
             raise HTTPException(409, "La implementación de este Job ya está en curso.")
@@ -771,12 +1133,20 @@ async def _apply_talend_plan(
             child_previous = s.get_talend_apply_state(project_id, related_plan.program)
             if child_previous is None:
                 continue
-            if child_previous["revision_hash"] != _talend_apply_preview_id(child_spec):
+            safe_child_revision_retry = (
+                related_plan.program in unapplied_revision_retry_programs
+                and child_previous["status"] in {"failed", "conflict"}
+                and child_previous["result"] is None
+            )
+            if (
+                child_previous["revision_hash"] != _talend_apply_preview_id(child_spec)
+                and not safe_child_revision_retry
+            ):
                 raise HTTPException(
                     409,
                     f"El Job hijo {related_plan.program} ya tiene una implementación con otra revisión; crea un nuevo ZIP/proyecto para evitar sobrescribirlo.",
                 )
-            if child_previous["status"] == "conflict":
+            if child_previous["status"] == "conflict" and not allow_conflict_retry:
                 raise HTTPException(
                     409,
                     child_previous["error"] or f"El Job hijo {related_plan.program} tiene un conflicto pendiente.",
@@ -831,10 +1201,21 @@ async def _apply_talend_plan(
         warnings.append(
             f"El Job creado no contiene {len(missing)} componente(s) solicitado(s): {preview_names}."
         )
+    if verification.get("status") == "unavailable":
+        warnings.append("No se pudo confirmar automáticamente la configuración de los flujos en Studio.")
+    elif verification.get("pending_steps"):
+        warnings.append(
+            f"Studio confirmó {verification.get('configured_steps', 0)} paso(s); "
+            f"{verification['pending_steps']} requieren revisión de componente, esquema, mapper o conexiones."
+        )
     studio_problems = verification.get("studio_problems")
     if studio_problems is not None and not studio_problems["clean"]:
         warnings.append("Talend Studio reporta problemas de diseño. Revísalos antes de probar o publicar el Job.")
-    partial = bool(spec.blocked_steps or warnings)
+    non_verification_warnings = [
+        warning for warning in warnings
+        if not warning.startswith(("No se pudo confirmar automáticamente", "Studio confirmó "))
+    ]
+    partial = bool(spec.blocked_steps or non_verification_warnings)
     if isinstance(applied_component_count, int):
         partial = partial or applied_component_count < len(spec.components)
     if isinstance(applied_connection_count, int):
@@ -861,6 +1242,35 @@ async def _apply_talend_plan(
     return outcome
 
 
+async def _talend_batch_preflight(project_id: str) -> dict:
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+    from sas_grid_migrator.talend_adapter.preflight import classify_jobs
+
+    ordered, specs, revision_hash = _talend_batch_bundle(project_id)
+    try:
+        inventory = await _talend().list_jobs()
+    except TalendError as e:
+        raise HTTPException(502, f"No se pudo comprobar el destino Talend: {e}") from e
+
+    classified = classify_jobs([specs[plan.program] for plan in ordered], inventory)
+    return {
+        "project_id": project_id,
+        "revision_hash": revision_hash,
+        "checked_at": datetime.now(UTC).isoformat(),
+        "available": True,
+        "inventory_count": len(inventory),
+        "total_jobs": len(ordered),
+        **classified,
+    }
+
+
+@app.get("/api/projects/{project_id}/talend-apply-batch/preflight")
+async def talend_apply_batch_preflight(project_id: str) -> dict:
+    s = store()
+    _require(s, project_id)
+    return await _talend_batch_preflight(project_id)
+
+
 class TalendBatchConfirmation(BaseModel):
     expected_revision: str = Field(pattern=r"^[0-9a-f]{64}$", min_length=64, max_length=64)
 
@@ -878,12 +1288,67 @@ async def start_talend_apply_batch(
     compatibility = await _talend().custom_spec_status()
     if not compatibility["spec_supported"]:
         raise HTTPException(409, compatibility["spec_error"])
+    preflight = await _talend_batch_preflight(project_id)
+    if preflight["conflict_count"]:
+        collisions = [
+            f"{item['job_name']}: {item['reason']} {item['existing_path'] or ''}".strip()
+            for item in preflight["jobs"]
+            if item["action"] == "conflict"
+        ]
+        raise HTTPException(
+            409,
+            "La comprobación encontró conflictos en el destino Talend; no se modificó ningún Job. "
+            + "; ".join(collisions),
+        )
     ordered, _specs, revision_hash = _talend_batch_bundle(project_id)
+    if preflight["revision_hash"] != revision_hash:
+        raise HTTPException(
+            409,
+            "El plan del proyecto cambió durante la comprobación del destino; vuelve a revisar el proyecto.",
+        )
     if body is not None and body.expected_revision != revision_hash:
         raise HTTPException(409, "El plan cambió desde la vista previa. Actualiza la revisión antes de crear los Jobs.")
     programs = [plan.program for plan in ordered]
+    missing_programs = {
+        item["program"] for item in preflight["jobs"] if item["action"] == "create"
+    }
+    previous_batch = s.get_talend_apply_batch_state(project_id)
+    previous_jobs = previous_batch.get("jobs", []) if previous_batch else []
+    previous_operations = {
+        program: s.get_talend_apply_state(project_id, program) for program in programs
+    }
+    prior_operations_unapplied = all(
+        operation is None
+        or (
+            operation.get("status") in {"failed", "conflict"}
+            and operation.get("result") is None
+        )
+        for operation in previous_operations.values()
+    )
+    allow_revision_reset = bool(
+        previous_batch
+        and previous_batch.get("status") in {"failed", "conflict"}
+        and previous_batch.get("programs") == programs
+        and len(previous_jobs) == len(programs)
+        and all(
+            job.get("status") in {"failed", "conflict"}
+            and job.get("result") is None
+            for job in previous_jobs
+        )
+        and prior_operations_unapplied
+        and preflight["create_count"] == len(programs)
+        and preflight["update_count"] == 0
+        and preflight["conflict_count"] == 0
+    )
     try:
-        snapshot, started = s.begin_talend_apply_batch(project_id, revision_hash, programs)
+        snapshot, started = s.begin_talend_apply_batch(
+            project_id,
+            revision_hash,
+            programs,
+            retry_conflicts=True,
+            retry_programs=missing_programs,
+            allow_revision_reset=allow_revision_reset,
+        )
     except ValueError as e:
         raise HTTPException(409, str(e)) from e
     if started:
@@ -963,6 +1428,9 @@ def talend_apply_batch_summary(project_id: str) -> dict:
 
 
 async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_programs: list[str]) -> None:
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+    from sas_grid_migrator.talend_adapter.preflight import classify_jobs
+
     s = store()
     snapshot = s.get_talend_apply_batch_state(project_id)
     if snapshot is None or snapshot["revision_hash"] != revision_hash:
@@ -1021,6 +1489,33 @@ async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_p
             warnings=cycle_warnings,
         )
 
+    try:
+        inventory = await _talend().list_jobs()
+    except TalendError as e:
+        error = f"No se pudo volver a comprobar el destino Talend; no se escribió ningún Job: {e}"
+        for job in jobs:
+            if job["status"] != "applied":
+                job.update(status="failed", result=None, error=error)
+        persist("failed", error=error)
+        return
+
+    preflight = classify_jobs([specs[program] for program in ordered_programs], inventory)
+    if preflight["conflict_count"]:
+        actions = {item["program"]: item for item in preflight["jobs"]}
+        for job in jobs:
+            action = actions[job["program"]]
+            if action["action"] == "conflict":
+                job.update(status="conflict", result=None, error=action["reason"])
+            elif job["status"] != "applied":
+                job.update(status="pending", result=None, error=None)
+        error = "La comprobación del destino encontró conflictos nuevos; no se modificó ningún Job."
+        persist("conflict", error=error)
+        return
+
+    missing_programs = {
+        item["program"] for item in preflight["jobs"] if item["action"] == "create"
+    }
+
     persist("running")
     for index, program in enumerate(ordered_programs):
         job = jobs[index]
@@ -1039,7 +1534,7 @@ async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_p
             )
             persist("conflict", error=job["error"])
             return
-        if job["status"] == "applied" or program in confirmed_children:
+        if (job["status"] == "applied" and program not in missing_programs) or program in confirmed_children:
             continue
         job.update(status="running", error=None)
         persist("running", program)
@@ -1049,7 +1544,14 @@ async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_p
             persist("running", current_program)
 
         try:
-            outcome = await _apply_talend_plan(project_id, program, on_phase=set_phase)
+            outcome = await _apply_talend_plan(
+                project_id,
+                program,
+                allow_conflict_retry=True,
+                allow_missing_retry=program in missing_programs,
+                unapplied_revision_retry_programs=frozenset(missing_programs),
+                on_phase=set_phase,
+            )
         except HTTPException as e:
             job["phase"] = None
             message = str(e.detail)
@@ -1079,7 +1581,7 @@ async def _run_talend_apply_batch(project_id: str, revision_hash: str, ordered_p
                 if child_job is None or child_job["status"] == "applied":
                     confirmed_children.add(child_program)
                     continue
-                child_outcome = _child_apply_outcome(child, specs[child_program])
+                child_outcome = await _child_apply_outcome(child, specs[child_program])
                 child_job.update(status=child_outcome["status"], result=child_outcome, error=None)
                 s.save_talend_apply_state(
                     project_id,
@@ -1111,6 +1613,56 @@ async def apply_talend_plan(project_id: str, program: str) -> dict:
     return await _apply_talend_plan(project_id, program)
 
 
+@app.post("/api/projects/{project_id}/plans/{program:path}/talend-apply/verify")
+async def verify_talend_plan(project_id: str, program: str) -> dict:
+    """Actualiza solo la evidencia de lectura de Studio; no aplica ni ejecuta Jobs."""
+    s = store()
+    _require(s, project_id)
+    plans = _plans(project_id)
+    try:
+        _plan, spec = _talend_apply_spec(project_id, program, plans)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from e
+    previous = s.get_talend_apply_state(project_id, program)
+    if previous is None or not isinstance(previous.get("result"), dict):
+        raise HTTPException(409, "Primero crea el Job en Talend Studio para poder volver a comprobarlo.")
+    revision_hash = _talend_apply_preview_id(spec)
+    if previous.get("revision_hash") != revision_hash:
+        raise HTTPException(409, "El plan cambió desde la creación; no se aplicará la verificación anterior a esta revisión.")
+    apply_result = previous["result"].get("result")
+    if not isinstance(apply_result, dict):
+        raise HTTPException(409, "La creación guardada no contiene el resultado del Job que se debe inspeccionar.")
+    verification = await _verify_applied_job(spec, apply_result)
+    outcome = {**previous["result"], "verification": verification}
+    warnings = [
+        warning for warning in outcome.get("warnings", [])
+        if not warning.startswith(("No se pudo confirmar automáticamente", "Studio confirmó "))
+    ]
+    if verification.get("status") == "unavailable":
+        warnings.append("No se pudo confirmar automáticamente la configuración de los flujos en Studio.")
+    elif verification.get("pending_steps"):
+        warnings.append(
+            f"Studio confirmó {verification.get('configured_steps', 0)} paso(s); "
+            f"{verification['pending_steps']} requieren revisión de componente, esquema, mapper o conexiones."
+        )
+    outcome["warnings"] = warnings
+    outcome["review_required"] = bool(
+        outcome.get("review_required")
+        or warnings
+        or verification.get("status") == "unavailable"
+        or verification.get("pending_steps")
+    )
+    s.save_talend_apply_state(
+        project_id,
+        program,
+        revision_hash=revision_hash,
+        status=previous["status"],
+        identity=previous["identity"],
+        result=outcome,
+    )
+    return outcome
+
+
 @app.get("/api/projects/{project_id}/plans/{program:path}/talend-apply")
 def talend_apply_status(project_id: str, program: str) -> dict:
     s = store()
@@ -1131,15 +1683,57 @@ def talend_apply_status(project_id: str, program: str) -> dict:
 @app.patch("/api/projects/{project_id}/plans/{program:path}/steps/{step_id}")
 def patch_step(project_id: str, program: str, step_id: str, body: Decision) -> JobPlan:
     s = store()
-    _plans(project_id)
+    plans = _plans(project_id)
     if not set_decision(s, project_id, program, step_id, body.status, body.note):
         raise HTTPException(422, "paso o estado inválido")
-    return get_plan(s, project_id, program)  # type: ignore[return-value]
+    plan = get_plan(s, project_id, program)
+    if plan is None:
+        raise HTTPException(404, "plan no encontrado")
+    return _annotate_plan_studio_checks(s, project_id, plan, plans)  # type: ignore[return-value]
+
+
+def _annotate_plan_studio_checks(s: Store, project_id: str, plan: JobPlan, plans: PlanSet) -> dict[str, Any]:
+    """Expose current apply evidence beside a step without changing its manual state."""
+    data = plan.model_dump(mode="json")
+    state = s.get_talend_apply_state(project_id, plan.program)
+    if not state or not isinstance(state.get("result"), dict):
+        return data
+    try:
+        spec = _talend_apply_spec(project_id, plan.program, plans)[1]
+    except (HTTPException, ValueError):
+        return data
+    if state.get("revision_hash") != _talend_apply_preview_id(spec):
+        return data
+    verification = state["result"].get("verification")
+    if not isinstance(verification, dict):
+        return data
+    by_step = {
+        (item.get("program"), item.get("step_id")): {
+            "status": item.get("status"),
+            "reason": item.get("reason"),
+            "checked_at": item.get("checked_at"),
+            "talend_unique_name": item.get("talend_unique_name"),
+            "studio_unique_name": item.get("studio_unique_name"),
+            "checks": item.get("checks", {}),
+        }
+        for item in verification.get("steps", [])
+        if isinstance(item, dict)
+    }
+    for step in data.get("steps", []):
+        check = by_step.get((plan.program, step.get("id")))
+        if check:
+            step["studio_verification"] = check
+    for child in data.get("children", []):
+        for step in child.get("steps", []):
+            check = by_step.get((plan.program, step.get("id")))
+            if check:
+                step["studio_verification"] = check
+    return data
 
 
 @app.get("/api/projects/{project_id}/plans/{program:path}")
 def get_job_plan(project_id: str, program: str, format: str = "json"):
-    _plans(project_id)
+    plans = _plans(project_id)
     plan = get_plan(store(), project_id, program)
     if plan is None:
         raise HTTPException(404, "plan no encontrado")
@@ -1147,7 +1741,7 @@ def get_job_plan(project_id: str, program: str, format: str = "json"):
         from fastapi.responses import PlainTextResponse
 
         return PlainTextResponse(render_plan_md(plan), media_type="text/markdown")
-    return plan
+    return _annotate_plan_studio_checks(store(), project_id, plan, plans)
 
 
 @app.post("/api/projects/{project_id}/exports", status_code=201)

@@ -1,6 +1,5 @@
-from pathlib import Path
-
 import sqlite3
+from pathlib import Path
 
 import pytest
 
@@ -78,6 +77,121 @@ def test_completed_batch_is_reused_and_changed_revision_is_conflict(tmp_path):
     with pytest.raises(ValueError, match="revisión"):
         store.begin_talend_apply_batch(project.id, "revision-2", ["a.sas"])
     assert store.get_talend_apply_batch_state(project.id)["revision_hash"] == "revision-1"
+
+
+def test_failed_batch_without_results_can_reset_revision_when_explicitly_allowed(tmp_path):
+    store = _store(tmp_path)
+    project = store.create_project("Retry failed revision")
+    store.begin_talend_apply_batch(project.id, "revision-1", ["a.sas"])
+    store.update_talend_apply_batch_state(
+        project.id,
+        status="failed",
+        jobs=[
+            {
+                "program": "a.sas",
+                "status": "failed",
+                "result": None,
+                "error": "bad connector",
+            }
+        ],
+        current_program=None,
+        completed_count=1,
+    )
+
+    retried, started = store.begin_talend_apply_batch(
+        project.id,
+        "revision-2",
+        ["a.sas"],
+        allow_revision_reset=True,
+    )
+
+    assert started is True
+    assert retried["revision_hash"] == "revision-2"
+    assert retried["status"] == "queued"
+    assert retried["attempt_count"] == 2
+    assert retried["jobs"] == [
+        {"program": "a.sas", "status": "pending", "result": None, "error": None}
+    ]
+
+
+def test_failed_batch_revision_reset_is_rejected_if_any_job_has_a_result(tmp_path):
+    store = _store(tmp_path)
+    project = store.create_project("Keep partial result")
+    store.begin_talend_apply_batch(project.id, "revision-1", ["a.sas"])
+    store.update_talend_apply_batch_state(
+        project.id,
+        status="failed",
+        jobs=[
+            {
+                "program": "a.sas",
+                "status": "failed",
+                "result": {"itemPath": "Process/a"},
+                "error": "later step failed",
+            }
+        ],
+        current_program=None,
+        completed_count=1,
+    )
+
+    with pytest.raises(ValueError, match="revisión"):
+        store.begin_talend_apply_batch(
+            project.id,
+            "revision-2",
+            ["a.sas"],
+            allow_revision_reset=True,
+        )
+
+
+def test_conflict_batch_is_retryable_only_after_explicit_fresh_preflight(tmp_path):
+    store = _store(tmp_path)
+    project = store.create_project("Fresh preflight")
+    _state, _ = store.begin_talend_apply_batch(project.id, "revision-1", ["a.sas"])
+    store.update_talend_apply_batch_state(
+        project.id,
+        status="conflict",
+        jobs=[{"program": "a.sas", "status": "conflict", "result": None, "error": "old collision"}],
+        current_program=None,
+        completed_count=1,
+    )
+
+    stale, stale_started = store.begin_talend_apply_batch(project.id, "revision-1", ["a.sas"])
+    fresh, fresh_started = store.begin_talend_apply_batch(
+        project.id, "revision-1", ["a.sas"], retry_conflicts=True
+    )
+
+    assert stale_started is False
+    assert stale["status"] == "conflict"
+    assert fresh_started is True
+    assert fresh["status"] == "queued"
+    assert fresh["attempt_count"] == 2
+    assert fresh["jobs"] == [{"program": "a.sas", "status": "pending", "result": None, "error": None}]
+
+
+def test_retry_programs_reopens_only_applied_jobs_missing_from_fresh_inventory(tmp_path):
+    store = _store(tmp_path)
+    project = store.create_project("Restore missing")
+    store.begin_talend_apply_batch(project.id, "revision-1", ["a.sas", "b.sas"])
+    store.update_talend_apply_batch_state(
+        project.id,
+        status="applied",
+        jobs=[
+            {"program": "a.sas", "status": "applied", "result": {"job": "a"}, "error": None},
+            {"program": "b.sas", "status": "applied", "result": {"job": "b"}, "error": None},
+        ],
+        current_program=None,
+        completed_count=2,
+    )
+
+    retried, started = store.begin_talend_apply_batch(
+        project.id,
+        "revision-1",
+        ["a.sas", "b.sas"],
+        retry_programs={"b.sas"},
+    )
+
+    assert started is True
+    assert [job["status"] for job in retried["jobs"]] == ["applied", "pending"]
+    assert retried["completed_jobs"] == 1
 
 
 def test_restarting_store_marks_queued_batch_interrupted(tmp_path):
