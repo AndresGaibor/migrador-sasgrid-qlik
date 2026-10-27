@@ -245,7 +245,7 @@ def test_exports(tmp_path):
 
 def test_plan_schema_in_sync():
     path = ROOT / "schemas" / "migration-plan.schema.json"
-    assert json.loads(path.read_text()) == JobPlan.model_json_schema()
+    assert json.loads(path.read_text(encoding="utf-8")) == JobPlan.model_json_schema()
 
 
 def test_api_plans(tmp_path, monkeypatch):
