@@ -60,8 +60,8 @@ function PlanList({ id }: { id: string }) {
   const preflightReady = Boolean(!preflight.loading && !preflight.error && preflight.data?.available && preflight.data.conflict_count === 0);
   const staleConflictResolved = Boolean(batchState?.status === "conflict" && preflightReady);
   const missingJobCount = preflight.data?.create_count ?? 0;
-  const batchFinished = batchState?.status === "applied" && missingJobCount === 0 || batchState?.status === "conflict" && !preflightReady;
-  const canStartBatch = Boolean(q.data?.length && summary.data?.creatable_jobs && !summary.loading && !summary.error && preflightReady && batch.data && !batch.error && health.data?.available && health.data.write_enabled && !health.loading && !busy && !batchBusy && !batchActive && !batchFinished);
+  const batchFinished = (batchState?.status === "applied" && missingJobCount === 0) || (batchState?.status === "conflict" && !preflightReady);
+  const canStartBatch = Boolean(q.data?.length && summary.data?.creatable_jobs && !summary.loading && !summary.error && preflightReady && batch.data && !batch.error && health.data?.available && health.data.spec_supported === true && health.data.write_enabled && !health.loading && !busy && !batchBusy && !batchActive && !batchFinished);
   const gridGuides = grid.data && <GridRecommendations id={id} items={grid.data} isDesktop={isDesktop} staged />;
   const planContent = q.error?.includes("generados") ? (
     <div className="notice"><Icon name="info" /><span>Todavía no hay guías preparadas para este proyecto. Usa «Preparar guías de migración» para empezar.</span></div>
@@ -141,7 +141,8 @@ function PlanList({ id }: { id: string }) {
         {health.error && <p className="error" role="alert">{formatErrorMessage(health.error, undefined, health.errorStatus)}</p>}
         {batchError && <p className="error" role="alert">{batchError}</p>}
         {batch.error && <p className="error" role="alert">No se pudo actualizar el progreso del lote: {formatErrorMessage(batch.error, undefined, batch.errorStatus)} Se volverá a intentar automáticamente.</p>}
-        {health.data?.available && !health.data.write_enabled && <p className="muted">Activa la escritura en <a href="#/settings">Configuración</a> (o fija <code>TALEND_MCP_READONLY=false</code> en la API) para permitir la creación.</p>}
+        {health.data?.available && !health.data.write_enabled && <p className="muted">Activa la escritura en <a href="#/settings">Configuración</a> para permitir la creación.</p>}
+        {health.data?.available && health.data.spec_supported !== true && <p className="error" role="alert">{health.data.spec_error ?? "No se pudo comprobar la compatibilidad del contrato MCP."} <a href="#/settings">Revisar Configuración</a></p>}
         {!health.loading && !health.data?.available && <div className="preflight-unavailable"><p>Abre Talend Studio con el Bridge activo. Puedes continuar con las guías sin conexión.</p><button type="button" className="secondary" onClick={health.reload}>Comprobar conexión</button><a href="#/settings">Diagnóstico MCP</a></div>}
         {batchState && batchState.status !== "not_started" && <div className={`talend-batch-state ${staleConflictResolved ? "preflight-ready" : batchState.status}`} role="status" aria-live="polite">
           <div className="talend-batch-state-heading"><strong>{staleConflictResolved ? "El conflicto anterior ya no está en Talend" : talendApplyBatchLabel(batchState.status)}</strong><span>{staleConflictResolved && preflight.data ? `${preflight.data.create_count} por crear · ${preflight.data.update_count} por actualizar · 0 conflictos actuales` : `${batchState.completed_jobs} / ${batchState.total_jobs} Jobs resueltos`}</span></div>

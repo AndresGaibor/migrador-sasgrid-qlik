@@ -3,6 +3,7 @@ import { api } from "../api";
 import { useAsync } from "../hooks";
 import { Icon } from "../components/Icon";
 import { Badge, Load } from "./common";
+import { notifyError, notifySuccess } from "../errors";
 
 type Health = Awaited<ReturnType<typeof api.talendHealth>>;
 
@@ -16,6 +17,7 @@ function Stage({ tone, title, detail }: { tone: string; title: string; detail: s
 }
 
 function overall(h: Health) {
+  if (h.available && h.spec_supported === false) return { tone: "warn", label: "Contrato MCP incompatible" };
   if (h.available) return { tone: "ok", label: "Conectado" };
   if (h.mcp_available) return { tone: "warn", label: "Parcial" };
   return { tone: "bad", label: "Sin conexión" };
@@ -27,17 +29,23 @@ function bridgeModeLabel(mode: string | undefined) {
 
 export function SettingsView() {
   const q = useAsync(api.talendHealth, []);
+  const permissions = useAsync(api.talendPermissions, []);
+  const [permission, setPermission] = useState<boolean>();
   const [savingWrite, setSavingWrite] = useState(false);
   const [writeError, setWriteError] = useState<string>();
+  const enabled = permission ?? permissions.data?.write_enabled;
 
   const toggleWrite = async (enabled: boolean) => {
+    if (savingWrite) return;
     setSavingWrite(true);
     setWriteError(undefined);
     try {
-      await api.setTalendWriteEnabled(enabled);
+      const saved = await api.setTalendWriteEnabled(enabled);
+      setPermission(saved.write_enabled);
+      notifySuccess(saved.write_enabled ? "Escritura habilitada" : "Escritura desactivada", "El permiso se conserva al reiniciar el portal.");
       q.reload();
     } catch (error) {
-      setWriteError(error instanceof Error ? error.message : "No se pudo guardar el permiso de escritura.");
+      setWriteError(notifyError(error, "No se pudo guardar el permiso de escritura"));
     } finally {
       setSavingWrite(false);
     }
@@ -46,8 +54,9 @@ export function SettingsView() {
   return <>
     <div className="eyebrow">TU ESPACIO DE TRABAJO</div><h1>Configuración</h1>
     <p className="subtitle">Consulta el estado de la conexión con Talend Studio.</p>
+    <section className="panel" aria-labelledby="write-permission-title"><h2 id="write-permission-title">Permiso de escritura</h2><label className="permission-toggle"><input type="checkbox" role="switch" checked={Boolean(enabled)} disabled={savingWrite || enabled === undefined} onChange={(event) => void toggleWrite(event.target.checked)} /><span>Permitir crear Jobs desde el portal{savingWrite ? " · Guardando…" : enabled === undefined ? " · Consultando…" : enabled ? " · Habilitado" : " · Solo lectura"}</span></label><p className="muted">Cada creación requiere revisión y confirmación. No permite ejecutar ni publicar Jobs. Desactivar no interrumpe una operación ya enviada a Studio, pero impide enviar las siguientes.</p>{(writeError || permissions.error) && <p className="permission-toggle-error" role="alert">{writeError ?? permissions.error} <button className="secondary" onClick={permissions.reload}>Volver a consultar</button></p>}</section>
     <section className="panel">
-      <div className="panel-heading"><Icon name="settings" size={28} /><div><h2>Conexión con Talend</h2><p>Integración opcional para consultar y verificar componentes.</p></div>{q.data && <Badge tone={q.data.write_enabled ? "ok" : "warn"}>{q.data.write_enabled ? "Creación habilitada" : "Solo lectura"}</Badge>}</div>
+      <div className="panel-heading"><Icon name="settings" size={28} /><div><h2>Conexión con Talend</h2><p>Diagnóstico del MCP, el Bridge y el contrato de creación.</p></div></div>
       <div className="notice"><Icon name="info" /><span>Puedes analizar tus programas y preparar planes aunque esta conexión no esté disponible. La verificación de los componentes se hará posteriormente.</span></div>
       <Load q={q}>{(h) => {
         const state = overall(h);
@@ -75,19 +84,10 @@ export function SettingsView() {
                 ? "El MCP no publica talend_job_apply_custom_spec. Actualiza talend-mcp antes de crear Jobs."
                 : h.write_enabled
                 ? `Activada. Los Jobs nuevos se crean en «${h.apply_folder}».`
-                : "Desactivada en Configuración o por TALEND_MCP_READONLY=true; la API solo puede leer."}
+                : "Desactivada desde el permiso de escritura de esta pantalla."}
             />
+            <Stage tone={h.spec_supported ? "ok" : "warn"} title="Contrato de creación" detail={h.spec_supported ? "Compatible con Jobs hijos, borradores y tablas de configuración." : h.spec_error ?? "No se pudo comprobar la compatibilidad del MCP."} />
           </div>
-          <label className="permission-toggle">
-            <input
-              type="checkbox"
-              checked={h.write_enabled}
-              disabled={savingWrite}
-              onChange={(event) => toggleWrite(event.target.checked)}
-            />
-            <span>Permitir crear Jobs desde el portal{savingWrite ? " · Guardando…" : ""}</span>
-          </label>
-          {writeError && <p className="permission-toggle-error" role="alert">{writeError}</p>}
           {h.error && <details><summary>Detalles para el equipo técnico</summary><p className="mono">{h.error}</p></details>}
           <dl className="health-config">
             <div><dt>URL del MCP</dt><dd className="mono">{h.mcp_url ?? "—"}</dd></div>

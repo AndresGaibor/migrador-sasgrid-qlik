@@ -106,6 +106,8 @@ export const api = {
     bridge_mode?: string;
     unsafe_actions?: boolean;
     write_enabled: boolean;
+    spec_supported?: boolean;
+    spec_error?: string | null;
     tools?: number | null;
     write_tool?: boolean | null;
     apply_folder: string;

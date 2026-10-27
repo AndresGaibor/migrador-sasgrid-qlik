@@ -212,11 +212,12 @@ def test_batch_requires_plans_and_write_enabled_mcp(tmp_path, monkeypatch):
         assert client.post(f"/api/projects/{empty}/talend-apply-batch").status_code == 409
 
         project_id = _project_with_plans(client, "Read only", [_plan("pending", "daily.sas", "daily")])
-        monkeypatch.setenv("TALEND_MCP_READONLY", "true")
+        permission = client.patch("/api/integrations/talend/permissions", json={"write_enabled": False})
+        assert permission.status_code == 200
         response = client.post(f"/api/projects/{project_id}/talend-apply-batch")
 
     assert response.status_code == 403
-    assert "solo lectura" in response.json()["detail"].lower()
+    assert "Configuración" in response.json()["detail"]
 
 
 def test_batch_orders_jobs_persists_progress_and_reuses_completed_batch(tmp_path, monkeypatch):

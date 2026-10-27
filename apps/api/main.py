@@ -1154,7 +1154,7 @@ async def _apply_talend_plan(
             if child_previous["status"] == "running":
                 raise HTTPException(409, f"La implementación del Job hijo {related_plan.program} ya está en curso.")
     if not _talend_write_enabled():
-        raise HTTPException(403, "La creación de Jobs está en solo lectura. Actívala en Configuración o fija TALEND_MCP_READONLY=false.")
+        raise HTTPException(403, "La escritura está desactivada. Habilítala en Configuración para crear Jobs.")
     if persist_state:
         s.save_talend_apply_state(
             project_id,
@@ -1284,7 +1284,7 @@ async def start_talend_apply_batch(
     s = store()
     _require(s, project_id)
     if not _talend_write_enabled():
-        raise HTTPException(403, "La creación de Jobs está en solo lectura. Actívala en Configuración o fija TALEND_MCP_READONLY=false.")
+        raise HTTPException(403, "La escritura está desactivada. Habilítala en Configuración para crear Jobs.")
     compatibility = await _talend().custom_spec_status()
     if not compatibility["spec_supported"]:
         raise HTTPException(409, compatibility["spec_error"])
@@ -1785,11 +1785,8 @@ def _talend():
 
 
 def _talend_write_enabled() -> bool:
-    """El permiso guardado en la base manda; TALEND_MCP_READONLY solo fija el valor inicial."""
-    env_allows = os.environ.get("TALEND_MCP_READONLY", "false").strip().casefold() in {
-        "false", "0", "no", "off"
-    }
-    return store().talend_write_enabled(default=env_allows)
+    """El permiso se administra desde la interfaz y se conserva en SQLite."""
+    return store().talend_write_enabled()
 
 
 class TalendPermissions(BaseModel):

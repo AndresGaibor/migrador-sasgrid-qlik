@@ -43,7 +43,6 @@ El portal usa estas variables de entorno. Los valores predeterminados sirven par
 ```dotenv
 TALEND_MCP_URL=http://127.0.0.1:3927/mcp
 TALEND_MCP_TIMEOUT_SECONDS=60
-TALEND_MCP_READONLY=false
 TALEND_APPLY_FOLDER=Process/PruebasWebSAS
 SGM_DATA_DIR=./data
 SGM_MAX_TOTAL_BYTES=268435456
@@ -55,7 +54,7 @@ En el `.env.local` de `talend-mcp`, `TALEND_MCP_HOST` y `TALEND_MCP_PORT` config
 
 Arranca el MCP con `bun run start:server`, la API con `uv run uvicorn apps.api.main:app --host 127.0.0.1 --port 8000` y la UI con `cd apps/web && bun run dev`. Al subir un ZIP, el portal conserva la estructura de carpetas y muestra el estado de cada etapa. En «Plan de migración», pulsa **Implementar todos los flujos del ZIP en Talend**. La API llama secuencialmente a `talend_job_apply_custom_spec` una vez por Job que no haya sido confirmado dentro de un Job padre. El estado y los resultados se guardan por proyecto; el portal consulta el avance al recargar. Los Jobs no se ejecutan.
 
-`TALEND_MCP_READONLY` fija el valor inicial del permiso de escritura: `true` arranca en solo lectura. Después decide el interruptor de «Configuración», que se guarda en la base y por defecto permite crear. El destino por ZIP combina la raíz configurada, un nombre seguro del ZIP, el id estable del proyecto y la subcarpeta del programa. Un Job ausente se crea; uno que ya existe en esa carpeta exacta se actualiza mediante la API de Talend Studio; un homónimo de otra carpeta bloquea el lote. El portal vuelve a comprobar MCP antes de reintentar conflictos guardados o restaurar Jobs borrados. `TALEND_APPLY_FOLDER` debe estar dentro de `Process/`.
+El permiso de escritura se administra únicamente con el interruptor de «Configuración» y se guarda en la base; por defecto permite crear. No depende de variables de entorno. El destino por ZIP combina la raíz configurada, un nombre seguro del ZIP, el id estable del proyecto y la subcarpeta del programa. Un Job ausente se crea; uno que ya existe en esa carpeta exacta se actualiza mediante la API de Talend Studio; un homónimo de otra carpeta bloquea el lote. El portal vuelve a comprobar MCP antes de reintentar conflictos guardados o restaurar Jobs borrados. `TALEND_APPLY_FOLDER` debe estar dentro de `Process/`.
 
 El lote se persiste en SQLite. `GET /api/projects/{id}/talend-apply-batch` devuelve `queued`, `running`, `applied`, `partially_applied`, `failed`, `conflict` o `interrupted`, además del Job actual, las advertencias de dependencias y el estado de cada programa. Si hay ciclos, el portal los informa y usa un orden estable para procesar los Jobs. Los resultados `failed`, `partially_applied` e `interrupted` permiten reintentar el mismo lote sin volver a aplicar los Jobs ya confirmados. Si el Job padre devuelve un resultado confirmado para un Job hijo, el portal lo registra y lo omite como llamada independiente. Una revisión distinta del ZIP/plan se bloquea para evitar sobrescribir el destino.
 

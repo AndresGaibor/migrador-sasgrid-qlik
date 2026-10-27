@@ -849,8 +849,8 @@ def test_api_sends_known_component_as_draft_when_technical_data_is_missing(monke
 
 
 
-def test_api_rejects_apply_in_readonly_mode(monkeypatch):
-    monkeypatch.setenv("TALEND_MCP_READONLY", "true")
+def test_api_rejects_apply_in_readonly_mode(tmp_path, monkeypatch):
+    monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
     migration = plan(step("ready", "tFileInputDelimited"))
     monkeypatch.setattr(
         api_module,
@@ -860,6 +860,7 @@ def test_api_rejects_apply_in_readonly_mode(monkeypatch):
     fake = ApplyAdapterFake()
     monkeypatch.setattr(api_module, "_talend", lambda: fake)
     client = TestClient(api_module.app)
+    assert client.patch("/api/integrations/talend/permissions", json={"write_enabled": False}).status_code == 200
     client.post(
         "/api/projects/project-1/plans/daily.sas/talend-apply/preview",
         json={},

@@ -4,7 +4,7 @@
 - ZIP: validar cada entrada antes de extraer.
 - Sin conexión automática a sistemas de producción.
 - Secretos (credenciales, claves, variables) no se copian a informes; enmascarar al leer configs.
-- `talend-mcp`: solo en loopback/transporte configurado, nunca expuesto a red pública. El portal solo usa la tool de escritura `talend_job_apply_custom_spec` desde el botón explícito de una guía y se puede bloquear desde la vista Configuración o arrancando con `TALEND_MCP_READONLY=true`. No llama a tools de ejecución de Jobs.
+- `talend-mcp`: solo en loopback/transporte configurado, nunca expuesto a red pública. El portal solo usa la tool de escritura `talend_job_apply_custom_spec` desde una acción explícita de creación y se puede bloquear desde la vista Configuración; el permiso se guarda en la base, sin variables de entorno. No llama a tools de ejecución de Jobs.
 
 ## Controles implementados (F7)
 

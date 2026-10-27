@@ -30,7 +30,11 @@ test("the active connection configuration is visible for debugging", () => {
 
 test("the write permission is a switch persisted through the API", () => {
   assert.match(source, /setTalendWriteEnabled/);
-  assert.match(source, /checked=\{h\.write_enabled\}/);
+  assert.match(source, /useAsync\(api\.talendPermissions, \[\]\)/);
+  assert.match(source, /checked=\{Boolean\(enabled\)\}/);
+  assert.match(source, /role="switch"/);
+  assert.match(source, /disabled=\{savingWrite \|\| enabled === undefined\}/);
+  assert.doesNotMatch(source, /TALEND_MCP_READONLY/);
   assert.match(source, /toggleWrite/);
 });
 

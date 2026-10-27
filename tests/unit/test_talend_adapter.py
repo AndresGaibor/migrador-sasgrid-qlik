@@ -517,7 +517,8 @@ def test_apply_custom_spec_sends_the_complete_instruction_in_one_mcp_call(monkey
     assert result["generatedComponents"] == 1
 
 
-def test_api_talend_health_reports_write_enabled_from_readonly_setting(monkeypatch):
+def test_api_talend_health_reports_persisted_write_permission(tmp_path, monkeypatch):
+    monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
     adapter = TalendAdapter(Fake({
         "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
         "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readOnly", "unsafeActions": False}},
@@ -525,10 +526,12 @@ def test_api_talend_health_reports_write_enabled_from_readonly_setting(monkeypat
     monkeypatch.setattr(api_mod, "_talend", lambda: adapter)
     client = TestClient(api)
 
-    monkeypatch.setenv("TALEND_MCP_READONLY", "true")
-    readonly = client.get("/api/integrations/talend/health").json()
     monkeypatch.setenv("TALEND_MCP_READONLY", "false")
-    writable = client.get("/api/integrations/talend/health").json()
+    assert client.patch("/api/integrations/talend/permissions", json={"write_enabled": False}).status_code == 200
+    readonly = TestClient(api).get("/api/integrations/talend/health").json()
+    monkeypatch.setenv("TALEND_MCP_READONLY", "true")
+    assert client.patch("/api/integrations/talend/permissions", json={"write_enabled": True}).status_code == 200
+    writable = TestClient(api).get("/api/integrations/talend/health").json()
 
     assert readonly["write_enabled"] is False
     assert writable["write_enabled"] is True

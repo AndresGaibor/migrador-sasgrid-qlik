@@ -43,7 +43,6 @@ Al re aplicar una guía, un contexto `migration_todo_*` vacío no borra un valor
 ```dotenv
 TALEND_MCP_URL=http://127.0.0.1:3927/mcp
 TALEND_MCP_TIMEOUT_SECONDS=60
-TALEND_MCP_READONLY=false
 TALEND_APPLY_FOLDER=Process/PruebasWebSAS
 ```
 
@@ -68,7 +67,7 @@ El MCP expone `GET /healthz` en su puerto para comprobar si el servidor responde
 
 La misma comprobación de salud lista las tools publicadas y devuelve `tools` (número de tools) y `write_tool` (si `talend_job_apply_custom_spec` está publicada). Así el portal distingue tres casos: el MCP no publica la tool de creación (servidor desactualizado), la tool existe pero su `inputSchema` no trae `childJobs`, `instructions`, `replaceManagedTodoContexts`, `draftOnly`, `draftReason` y `tables`, o el contrato está completo y solo falta el permiso de escritura.
 
-`TALEND_MCP_READONLY=true` hace arrancar el portal en solo lectura; el permiso definitivo lo decide el interruptor de la vista **Configuración**, guardado en la base. `TALEND_APPLY_FOLDER` debe estar bajo `Process/`. La carpeta destino por ZIP es `<TALEND_APPLY_FOLDER>/<slug-del-ZIP>-<project_id>/<subcarpeta-del-programa>`; así dos ZIP con el mismo nombre se mantienen aislados y cada programa conserva su subcarpeta. La guía muestra la ruta exacta que se enviará al MCP.
+El permiso de escritura se controla únicamente desde el interruptor de la vista **Configuración** y se guarda en la base; no depende de variables de entorno. `TALEND_APPLY_FOLDER` debe estar bajo `Process/`. La carpeta destino por ZIP es `<TALEND_APPLY_FOLDER>/<slug-del-ZIP>-<project_id>/<subcarpeta-del-programa>`; así dos ZIP con el mismo nombre se mantienen aislados y cada programa conserva su subcarpeta. La guía muestra la ruta exacta que se enviará al MCP.
 
 `TALEND_MCP_TIMEOUT_SECONDS` limita cuánto espera la API cada respuesta del MCP. Antes de implementar, la API recorre el inventario completo de `talend_jobs_list`, incluso si excede el límite predeterminado de 50, y compara nombre y carpeta. Un Job ausente se crea; un Job que ya está en la carpeta exacta se actualiza; un homónimo que solo existe en otra carpeta bloquea el lote. El portal publica el endpoint de solo lectura `GET /api/projects/{id}/talend-apply-batch/preflight` para mostrar esas acciones. Una lectura MCP incompleta o fallida detiene la escritura.
 
