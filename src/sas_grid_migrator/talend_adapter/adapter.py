@@ -16,6 +16,22 @@ class TalendError(RuntimeError):
     pass
 
 
+class McpClientUnavailable(TalendError):
+    """El paquete `mcp` instalado no trae el cliente 2.x que usa este adaptador."""
+
+
+CLIENT_HINT = "Falta el cliente MCP 2.x: ejecuta «uv sync» (mcp>=2.3)"
+
+
+def _import_client() -> Any:
+    """`from mcp import Client`, pero con un mensaje accionable si la versión es 1.x."""
+    try:
+        from mcp import Client
+    except (ImportError, AttributeError) as e:
+        raise McpClientUnavailable(CLIENT_HINT) from e
+    return Client
+
+
 class Caller(Protocol):
     async def call(self, tool: str, args: dict[str, Any]) -> dict[str, Any]: ...
 
@@ -39,7 +55,7 @@ class McpCaller:
 
     async def describe_tool(self, tool: str) -> dict[str, Any] | None:
         assert_allowed(tool)
-        from mcp import Client
+        Client = _import_client()
 
         try:
             async with Client(self.url, read_timeout_seconds=self.timeout) as client:
@@ -51,7 +67,7 @@ class McpCaller:
 
     async def call(self, tool: str, args: dict[str, Any]) -> dict[str, Any]:
         assert_allowed(tool)
-        from mcp import Client
+        Client = _import_client()
 
         try:
             async with Client(self.url) as client:
@@ -77,7 +93,7 @@ class McpCaller:
 
     async def list_tools(self) -> list[dict[str, Any]]:
         """Tools publicadas por el servidor MCP (read-only)."""
-        from mcp import Client
+        Client = _import_client()
 
         try:
             async with Client(self.url, read_timeout_seconds=self.timeout) as client:

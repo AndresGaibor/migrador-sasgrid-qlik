@@ -133,6 +133,17 @@ def test_mcp_caller_uses_the_configured_timeout_to_list_and_describe(monkeypatch
     assert recorded["init"]["read_timeout_seconds"] == 12.5
 
 
+def test_mcp_caller_reports_client_version_when_import_fails(monkeypatch):
+    """Sin el cliente 2.x el error debe decir qué instalar, no `ImportError` ni «no disponible»."""
+    import sys
+
+    monkeypatch.setitem(sys.modules, "mcp", None)
+    caller = McpCaller("http://127.0.0.1:3927/mcp")
+
+    with pytest.raises(TalendError, match="uv sync"):
+        run(caller.list_tools())
+
+
 def test_inspect_job_parses_and_skips_empty():
     ad = TalendAdapter(Fake({"talend_inspect_job": JOB}))
     insp = run(ad.inspect_job("/w/j_0.1.item"))
