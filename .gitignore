@@ -1,0 +1,95 @@
+# dependencies (bun install)
+node_modules
+
+# output
+out
+dist
+*.tgz
+
+# code coverage
+coverage
+*.lcov
+# Codigo fuente del CLI de cobertura (el patron anterior solo aplica a salidas).
+!scripts/coverage/
+!scripts/coverage/*.ts
+!scripts/coverage/**/*.ts
+
+# logs
+logs
+_.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# talend-mcp runtime
+.talend-mcp/
+
+# Salidas generadas (paquetes de entrega, evidencias de taller)
+entregables/
+evidencias/
+
+# Datos de prueba generados por scripts/make-testdata.ts.
+# Los ficheros grandes no se versionan: se regeneran con `bun run scripts/make-testdata.ts`.
+testdata/*.csv
+testdata/*.xlsx
+testdata/*.xls
+testdata/*.txt
+testdata/*.log
+testdata/resultados.csv
+# Escenarios L5 ya probados (huellas locales de esta maquina).
+testdata/cache-l5.json
+
+# Indice Lucene generado por tSynonymOutput al ejecutar los escenarios L5.
+testdata/l5_synonym_index/
+
+# Carpeta que deja el escenario L5 de tUnarchive al descomprimir el xlsx.
+testdata/l5_unarchive/
+
+# Destino de los escenarios L5 de HDFS: salida generada, no datos de prueba versionados.
+testdata/hdfs-destino/
+
+# Workspace local de Qlik Talend Studio (Eclipse): .metadata, .JETEmitters y
+# proyectos con rutas absolutas de la maquina. No se versiona.
+workspace/
+
+# Indice local de CodeGraph
+.codegraph/
+
+# Gemini/Antigravity local config
+.antigravitycli/
+
+# IntelliJ based IDEs
+.idea
+
+# Finder (MacOS) folder config
+.DS_Store
+
+# Build artifacts
+*.class
+target/
+talend-studio-bridge/**/target
+scratch/
+
+# Carpetas que aparecen por error o son de otras herramientas (no son del repo)
+# Escenario L5 que no sustituyo @TESTDATA@ (ver tests/l5/datos-con-rutas.test.ts).
+/@TESTDATA@/
+# Estado local de otra herramienta: su propio .gitignore dice que no se versione.
+/.freebuff/
+# Manifiesto de un job de Studio que se habia commiteado en la raiz por error.
+/META-INF/
+
+# Drivers de prueba copiados desde el repositorio de Studio (jars grandes, no se versionan).
+testdata/drivers/
+
+# Ficheros que generan las pruebas L5 (entrada y salida de los escenarios).
+testdata/l5_*

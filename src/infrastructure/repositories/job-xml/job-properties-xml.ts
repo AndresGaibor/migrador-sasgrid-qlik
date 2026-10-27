@@ -1,0 +1,92 @@
+import { basename, dirname, join } from "node:path";
+import { parseXml, asArray } from "../../xml/xml-utils";
+import { readTextFile, listFilesRecursive } from "../../filesystem/file-reader";
+import { splitPortable } from "../../../platform/path-bridge";
+import type { TalendJobResource } from "../../../domain/job/job.entity";
+
+export function parseJobProperties(xml: string, propertiesPath: string): TalendJobResource {
+  const parsed = parseXml(xml) as Record<string, unknown>;
+  const root = parsed["xmi:XMI"] as Record<string, unknown> | undefined;
+  const property = root?.["TalendProperties:Property"] as Record<string, string> | undefined;
+  const processItem = root?.["TalendProperties:ProcessItem"] as Record<string, unknown> | undefined;
+  const itemState = root?.["TalendProperties:ItemState"] as Record<string, string> | undefined;
+  const process = processItem?.process as Record<string, string> | undefined;
+  const href = process?.["@_href"] ?? "";
+  const itemFile = href.split("#")[0] ?? "";
+  const folderPath = itemState?.["@_path"] ?? "";
+
+  // Las fechas y el estado vienen en las propiedades adicionales del item.
+  const adicionales = asArray(
+    property?.additionalProperties as Record<string, string> | Record<string, string>[] | undefined,
+  ) as Record<string, string>[];
+  const porClave = new Map(adicionales.map((item) => [item["@_key"] ?? "", item["@_value"] ?? ""]));
+
+  return {
+    label: property?.["@_label"] ?? "",
+    version: property?.["@_version"] ?? "",
+    folderPath: folderPath || undefined,
+    purpose: property?.["@_purpose"],
+    description: property?.["@_description"],
+    statusCode: property?.["@_statusCode"],
+    createdDate: porClave.get("created_date"),
+    modifiedDate: porClave.get("modified_date"),
+    itemPath: join(dirname(propertiesPath), itemFile),
+    propertiesPath,
+  };
+}
+
+export async function listTalendJobs(projectPath: string): Promise<TalendJobResource[]> {
+  const processPath = join(projectPath, "process");
+  const propertiesFiles = await listFilesRecursive(processPath, (ruta) => ruta.endsWith(".properties"));
+  const jobs: TalendJobResource[] = [];
+
+  // Lecturas limitadas por lote: evita el coste de una lectura en serie sin
+  // abrir cientos o miles de archivos simultaneamente en proyectos grandes.
+  const batchSize = 32;
+  for (let i = 0; i < propertiesFiles.length; i += batchSize) {
+    const batch = await Promise.all(propertiesFiles.slice(i, i + batchSize).map(async (propertiesPath) => {
+      const xml = await readTextFile(propertiesPath, projectPath);
+      const job = parseJobProperties(xml, propertiesPath);
+      return job.label && job.itemPath.endsWith(".item") ? job : null;
+    }));
+    jobs.push(...batch.filter((job): job is TalendJobResource => job !== null));
+  }
+
+  return jobs;
+}
+
+export function createEmptyJobItemXml(jobName: string, version: string, defaultContext = "Default"): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<talendfile:ProcessType defaultContext="${defaultContext}" jobType="Standard">
+  <context name="${defaultContext}"/>
+</talendfile:ProcessType>`;
+}
+
+export function createEmptyJobPropertiesXml(options: { label: string; version: string; itemFileName: string; folderPath?: string }): string {
+  const folderPath = normalizeFolderPath(options.folderPath) ?? "";
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI>
+  <TalendProperties:Property label="${options.label}" version="${options.version}" displayName="${options.label}"/>
+  <TalendProperties:ItemState path="${folderPath}"/>
+  <TalendProperties:ProcessItem>
+    <process href="${options.itemFileName}#/"/>
+  </TalendProperties:ProcessItem>
+</xmi:XMI>`;
+}
+
+export function getJobVersion(itemPath: string): string {
+  const match = itemPath.match(/_(\d+\.\d+)\.item$/);
+  return match?.[1] ?? "0.1";
+}
+
+export function normalizeFolderPath(folderPath?: string): string | undefined {
+  const normalized = folderPath?.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "").trim();
+  if (!normalized) return undefined;
+
+  const parts = splitPortable(normalized);
+  if (parts.some((part) => part === ".." || part === "." || part === "")) {
+    throw new Error(`Ruta de carpeta inválida: ${folderPath}`);
+  }
+
+  return normalized;
+}

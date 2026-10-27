@@ -1,0 +1,44 @@
+{
+  "name": "talend-mcp",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "scripts": {
+    "clean:artifacts": "bun run scripts/clean-artifacts.ts",
+    "start": "bun run scripts/start.ts",
+    "start:server": "bun run index.ts",
+    "doctor": "bun run scripts/doctor.ts",
+    "bridge:install": "bun run scripts/start.ts --install-bridge",
+    "bridge:status": "bun run scripts/start.ts --bridge-status",
+    "bridge:watch": "bun run scripts/start.ts --watch-bridge",
+    "talend:api": "bun run scripts/talend-api.ts",
+    "talend:drift": "bun run scripts/talend-api.ts drift",
+    "verify": "bun run typecheck && bun test && bun run l5:validar",
+    "test:ci": "bun test --bail",
+    "test:cambios": "bun test --changed",
+    "l5:validar": "bun run scripts/execution-check.ts --validar",
+    "detect:talend-project": "bun run scripts/detect-talend-project.ts",
+    "dq:analyses": "bun run scripts/list-dq-analyses.ts",
+    "jobs": "bun run scripts/jobs.ts",
+    "contexts": "bun run scripts/contexts.ts",
+    "docs:tools": "bun run scripts/generate-tool-catalog.ts",
+    "docs:componentes": "bun run scripts/catalogo-componentes.ts",
+    "mapa": "bun run scripts/mapa.ts",
+    "benchmark:performance": "bun run scripts/performance-benchmark.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
+    "@modelcontextprotocol/node": "^2.0.0-alpha.2",
+    "@modelcontextprotocol/server": "^2.0.0-alpha.2",
+    "fast-xml-parser": "^5.8.0",
+    "zod": "^4.4.3"
+  }
+}
