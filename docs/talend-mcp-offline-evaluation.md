@@ -1,6 +1,6 @@
 # Evaluación: crear Jobs con Studio o en modo offline
 
-Estado: **análisis de código del 2026-10-27, sin mediciones propias.** Las cifras de rendimiento salen de `talend-mcp/docs/MODO-OFFLINE.md`; la Tarea 7 del plan `docs/superpowers/plans/2026-10-27-talend-mcp-en-el-portal.md` las reemplaza por mediciones con guías reales del portal.
+Estado: **medido el 2026-10-27 con guías reales del portal.** La decisión final está al final del documento; las cifras de la sección introductoria sobre el modo offline salen de `talend-mcp/docs/MODO-OFFLINE.md` y se conservan como referencia del MCP, no como medición del portal.
 
 ## Qué hace hoy el portal
 
@@ -55,32 +55,50 @@ No sustituir Studio por offline: añadir un **motor offline opcional** para las 
 
 Ninguna guía de los tres ZIP usa `mapper`, `tables` ni `childJobs`: las 24 son elegibles para el motor offline.
 
-### Tiempo del motor offline
+### Tiempos por Job con Studio y en modo offline
 
-Con el MCP arrancado con el preset `portal` contra un proyecto de prueba, tres guías aplicadas con `talend_jobs_create_from_spec` (escritura directa de `.item`/`.properties`, sin Studio): media 271 ms por Job, mediana 273 ms, rango 225–315 ms. El tiempo incluye la ida y vuelta MCP; la escritura en disco es una fracción de eso. La medición usó ese tool porque `talend_jobs_create_batch` exige una plantilla común y las guías del portal no comparten los mismos componentes.
+MCP con el preset `portal` sobre el proyecto de Studio real, 20 de las 24 guías elegibles (8, 8 y 4 en el orden de los ZIP), cada una aplicada a la vez con el motor Studio (`talend_job_apply_custom_spec`) y con el motor offline (`talend_jobs_create_from_spec`). El tiempo incluye la ida y vuelta MCP. Se usó `talend_jobs_create_from_spec` y no `talend_jobs_create_batch` porque el lote exige una plantilla común y las guías del portal no comparten los mismos componentes.
 
-### Línea base con Studio: no medible en este equipo
+| Motor | Jobs | Media | Mediana | Mínimo | Máximo | Total |
+|---|---|---|---|---|---|---|
+| Studio | 20 | 12,89 s | 11,73 s | 0,34 s | 22,84 s | 257,75 s |
+| Offline | 20 | 0,50 s | 0,50 s | 0,02 s | 1,26 s | 10,00 s |
 
-El motor Studio (`talend_job_apply_custom_spec`) falló de forma reproducible al aplicar la primera guía:
+El motor offline es unas 23 veces más rápido por mediana y unas 26 veces por tiempo total, y creó los 20 Jobs sin un solo error.
 
-- `APPLY_FAILED: OPERATION_FAILED: No se pudo abrir el job recien creado: El item recien creado no esta en el arbol de recursos`
-- `APPLY_FAILED: OPERATION_FAILED: org.eclipse.core.runtime.OperationCanceledException`
+### Fallos del motor Studio
 
-`talend_job_apply_custom_spec` no dejó ningún `.item` en el proyecto y `talend_jobs_list` no listó los Jobs creados. El diagnóstico de diálogos (`talend_studio_ui_dialogs`) muestra un modal bloqueante de Studio: **«Talend Cloud Data Fabric — Your session timed out, exit or re-log in»**. El modal cancela las operaciones del IDE y explica ambos errores; no se cierra automáticamente porque exige una decisión del usuario (iniciar sesión o salir de Studio).
+`talend_job_apply_custom_spec` falló en 16 de los 20 Jobs:
 
-Sin un motor Studio operativo no hay referencia con la que comparar tiempos, componentes, conexiones ni contextos, y `talend_job_build_batch` no puede compilar Jobs que Studio no ve.
+| Error | Casos |
+|---|---|
+| `El hilo de la interfaz de Studio esta ocupado (se acabo el tiempo de espera)` | 9 |
+| `IConnection.getMetadataTable() is null` al clonar la tabla de metadatos | 5 |
+| `el conector 'FILTER' de 'tFilterRow' no admite entradas` | 2 |
+
+No hay diálogo bloqueante: `talend_studio_ui_dialogs` responde `blocked: false` y `dialogs: []`. Los fallos son del propio montaje y no de una sesión de Talend Cloud caducada, y en varios casos el Job quedó creado pero vacío.
+
+### Paridad entre motores
+
+Solo 4 de los 20 Jobs quedaron aplicados por ambos motores. En dos de ellos (`MedS_01`, `MedS_17`) el Job de origen no tiene componentes, así que no hay nada que comparar. En los otros dos (`MedS_02`, `MedS_16`) coinciden los tipos de componente y el número de conexiones, pero no los `uniqueName`: Studio renumera al crear (`tFileInputDelimited_2`) y el motor offline conserva los del portal (`tFileInputDelimited_1`).
+
+Los contextos no coinciden por un problema de contrato, no del motor: el portal arma los contextos con las claves `type`/`value`/`comment`, y `talend_jobs_create_from_spec` espera `tipo`/`valor`/`comentario`. Con el payload actual los Jobs offline quedaron sin ningún contexto, mientras que los de Studio sí los llevan. Un futuro motor `auto` tendría que reescribir ese bloque.
+
+### Compilación: no verificable en este equipo
+
+`talend_job_build_batch` no sirvió para comprobar que los `.item` offline compilan. Responde `No se encuentra la carpeta generada del job <nombre>` para los Jobs medidos y también para un Job nativo de Studio (`Carga_Datos_SS`), y una llamada posterior agotó los 25 s del puente (`BRIDGE_UNAVAILABLE`). El fallo está en la generación de código del lote, no en los archivos que escribe el motor offline.
 
 ## Decisión
 
-**Se descarta el motor offline `engine: "auto"` y se mantiene `studio` como predeterminado; la Tarea 8 no se implementa.**
+**Se mantiene `studio` como predeterminado y la Tarea 8 no se implementa.**
 
 Motivos medidos:
 
-1. La elegibilidad cumple (100 % de las guías de prueba), pero es el único criterio que se pudo medir.
-2. No se pudo medir la ventaja de velocidad frente a Studio: el motor Studio no aplica ninguna guía mientras el modal de sesión de Talend Cloud bloquee el IDE.
-3. No se verificó paridad de componentes, conexiones y contextos ni que los `.item` offline compilen, porque falta la referencia de Studio.
+1. Velocidad: el criterio de 20 veces se cumple con holgura (23 veces por mediana, 26 por total).
+2. Paridad: no se puede verificar. El motor Studio falla en 16 de 20 casos, renumera los `uniqueName` cuando funciona y los contextos no llegan al motor offline con el payload que hoy genera el portal.
+3. Compilación: no se pudo comprobar porque `talend_job_build_batch` falla también con Jobs nativos de Studio.
 
-Para revisar la decisión: cerrar el modal en Studio (iniciar sesión en Talend Cloud o salir), repetir `talend_job_apply_custom_spec` sobre una guía en una carpeta de prueba y, si completa, volver a correr la medición de la Tarea 7 completa (tiempos por Job, paridad con `talend_inspect_job` y `talend_job_build_batch`). Solo entonces se puede aprobar la Tarea 8.
+Para revisar la decisión: estabilizar el montaje del motor Studio (los tres errores de la tabla), corregir el mapeo de contextos del payload offline, repetir la medición de 20 guías y verificar con `talend_job_build_batch` que los `.item` offline compilan. Solo entonces se puede aprobar la Tarea 8.
 
 ## Ejemplos útiles del MCP
 
