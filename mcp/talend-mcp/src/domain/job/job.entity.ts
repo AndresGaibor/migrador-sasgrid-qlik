@@ -1,0 +1,85 @@
+export type TalendColumn = {
+  name: string;
+  type?: string;
+  length?: number;
+  precision?: number;
+  nullable?: boolean;
+  key?: boolean;
+  sourceType?: string;
+  pattern?: string;
+};
+
+export type TalendSchema = {
+  connector?: string;
+  name?: string;
+  label?: string;
+  columns: TalendColumn[];
+};
+
+export type TalendComponent = {
+  uniqueName: string;
+  componentName: string;
+  label?: string;
+  nodeAttributes: Record<string, string>;
+  parameters: Record<string, string>;
+  schemas: TalendSchema[];
+  rawNodeData?: unknown;
+};
+
+export type TalendConnection = {
+  connectorName?: string;
+  label?: string;
+  metaname?: string;
+  source: string;
+  target: string;
+  uniqueName?: string;
+};
+
+export type TalendContextParameter = {
+  name: string;
+  type?: string;
+  value?: string;
+  prompt?: string;
+};
+
+export type MapperEntry = {
+  componentUniqueName?: string;
+  table: string;
+  name: string;
+  expression?: string;
+  type?: string;
+  nullable?: boolean;
+};
+
+export type ParsedJob = {
+  itemPath: string;
+  components: TalendComponent[];
+  connections: TalendConnection[];
+  contexts: TalendContextParameter[];
+  mapperEntries: MapperEntry[];
+};
+
+export type TalendComponentLink = TalendConnection;
+
+export type SchemaIssue = {
+  component: string;
+  schema?: string;
+  column?: string;
+  issue: "empty-column-name" | "null-column-name";
+};
+
+export type TalendJobResource = {
+  label: string;
+  version: string;
+  folderPath?: string;
+  purpose?: string;
+  description?: string;
+  /** Estado del item en el repositorio (`statusCode` de las propiedades). */
+  statusCode?: string;
+  /** Fecha de creacion (de las propiedades del item). */
+  createdDate?: string;
+  /** Fecha de la ultima modificacion (de las propiedades del item). */
+  modifiedDate?: string;
+  itemPath: string;
+  propertiesPath: string;
+};
