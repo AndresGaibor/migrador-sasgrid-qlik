@@ -46,7 +46,10 @@ def test_batch_arguments_use_one_empty_row_and_keep_contexts_as_the_portal_build
 def test_batch_template_drops_fields_the_offline_tool_does_not_know():
     template = to_batch_arguments(spec())["template"]
 
-    assert set(template["components"][0]) == {"uniqueName", "componentName", "label", "parameters"}
+    # draftOnly/draftReason sí viajan: el MCP omite un borrador cuyo componente no está en su catálogo.
+    assert set(template["components"][0]) == {
+        "uniqueName", "componentName", "label", "parameters", "draftOnly", "draftReason",
+    }
     assert not {"purpose", "instructions", "replaceManagedTodoContexts", "childJobs"} & set(template)
 
 

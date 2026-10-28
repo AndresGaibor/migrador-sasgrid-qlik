@@ -43,10 +43,14 @@ def test_mapper_blocks_offline():
     assert offline_blockers(payload) == ["mapper:tMap_1"]
 
 
-def test_tables_blocks_offline():
-    payload = spec([component("tOracleOutput_1", "tOracleOutput", tables={"TABLE": {"name": "T"}})])
-    assert offline_blockers(payload) == ["tables:tOracleOutput_1"]
-    assert offline_blockers(spec([component("tOracleOutput_1", tables={})])) == []
+def test_tables_no_longer_block_offline_because_the_mcp_writes_them():
+    payload = spec([component("tFilterRow_1", "tFilterRow", tables={"CONDITIONS": {"rows": [["a", "GREATER", "1"]]}})])
+    assert offline_blockers(payload) == []
+
+
+def test_a_placeholder_inside_a_table_blocks_offline():
+    payload = spec([component("tFilterRow_1", "tFilterRow", tables={"CONDITIONS": {"rows": [["a", "==", "{{x}}"]]}})])
+    assert offline_blockers(payload) == ["placeholder:tFilterRow_1"]
 
 
 def test_child_jobs_block_offline():

@@ -9,7 +9,9 @@ from sas_grid_migrator.talend_adapter.contract import load_contract
 _CONTRACT = load_contract()
 
 READ_TOOLS = _CONTRACT.read_tools
-WRITE_TOOLS = frozenset({_CONTRACT.write_tool})
+WRITE_TOOLS = frozenset(
+    tool for tool in (_CONTRACT.write_tool, _CONTRACT.offline_write_tool) if tool
+)
 
 
 class ToolNotAllowed(PermissionError):

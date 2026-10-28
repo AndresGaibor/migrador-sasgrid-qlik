@@ -150,6 +150,17 @@ def test_published_tools_cover_the_contract(mcp_server):
     assert not missing, f"el preset portal no publica: {', '.join(missing)}"
 
 
+def test_the_offline_write_tool_is_published_with_the_fields_the_portal_sends(mcp_server):
+    contract = load_contract()
+    tools = {tool["name"]: tool for tool in _published(mcp_server)}
+
+    assert contract.offline_write_tool in tools, "el preset portal no publica la escritura offline"
+    template = tools[contract.offline_write_tool]["inputSchema"]["properties"]["template"]["properties"]
+    component = template["components"]["items"]["properties"]
+    assert {"jobName", "folderPath", "connections", "contexts"} <= template.keys()
+    assert {"draftOnly", "draftReason"} <= component.keys()
+
+
 def test_write_tool_schema_has_required_fields(mcp_server):
     contract = load_contract()
     tools = {tool["name"]: tool for tool in _published(mcp_server)}

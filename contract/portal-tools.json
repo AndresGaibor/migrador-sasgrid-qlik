@@ -25,6 +25,7 @@
     "talend_bridge_ping"
   ],
   "write_tool": "talend_job_apply_custom_spec",
+  "offline_write_tool": "talend_jobs_create_batch",
   "required_top_fields": ["childJobs", "instructions", "replaceManagedTodoContexts"],
   "required_component_fields": ["draftOnly", "draftReason", "tables"]
 }

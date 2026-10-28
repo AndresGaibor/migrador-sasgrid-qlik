@@ -13,12 +13,12 @@ CALL = re.compile(r'(?:_data|_studio_write|\.call)\(\s*"(talend_[a-z_]+)"', re.D
 def test_contract_matches_policy():
     contract = load_contract()
     assert contract.read_tools == policy.READ_TOOLS
-    assert {contract.write_tool} == policy.WRITE_TOOLS
+    assert {contract.write_tool, contract.offline_write_tool} == policy.WRITE_TOOLS
 
 
 def test_manifest_covers_every_tool_the_portal_calls():
     contract = load_contract()
-    allowed = set(contract.read_tools) | {contract.write_tool}
+    allowed = set(contract.read_tools) | {contract.write_tool, contract.offline_write_tool}
     used: set[str] = set()
     for folder in ("src", "apps/api"):
         for path in (ROOT / folder).rglob("*.py"):

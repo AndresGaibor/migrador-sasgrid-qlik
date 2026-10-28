@@ -763,6 +763,132 @@ def _child_context_table(parent: JobPlan, child: JobPlan, parameters: list[str])
 
 _SUBJOB_START = re.compile(r"Input|RowGenerator")
 
+#: Componentes de trabajo por Job hijo al partir un Job grande; con el manejo de errores quedan en 20,
+#: el máximo que recomienda la guía de buenas prácticas de Talend.
+CHUNK_SIZE = 17
+
+
+def split_oversized_job(
+    job_name: str,
+    folder_path: str,
+    components: list[ApplyComponent],
+    connections: list[ApplyConnection],
+    instructions: dict[str, Any],
+    *,
+    chunk_size: int = CHUNK_SIZE,
+    error_handling: bool = False,
+) -> tuple[list[ApplyComponent], list[ApplyConnection], dict[str, Any], list[dict[str, Any]]]:
+    """Parte un Job demasiado grande en Jobs hijo y deja al padre como una cadena de `tRunJob`.
+
+    Los componentes se agrupan por conexión (un flujo nunca se corta entre dos Jobs) y los grupos
+    se empaquetan, en orden, en hijos de hasta `chunk_size` componentes; un grupo mayor ocupa un
+    hijo propio. Cada hijo se redistribuye en el lienzo y se lleva sus instrucciones.
+
+    Returns:
+        Componentes, conexiones e instrucciones del padre, y los argumentos de cada hijo.
+    """
+    root = {item.unique_name: item.unique_name for item in components}
+
+    def find(name: str) -> str:
+        while root[name] != name:
+            root[name] = root[root[name]]
+            name = root[name]
+        return name
+
+    for edge in connections:
+        if edge.source in root and edge.target in root:
+            root[find(edge.source)] = find(edge.target)
+    groups: dict[str, list[ApplyComponent]] = {}
+    for item in components:
+        groups.setdefault(find(item.unique_name), []).append(item)
+
+    chunks: list[list[list[ApplyComponent]]] = []
+    current: list[list[ApplyComponent]] = []
+    size = 0
+    for group in groups.values():
+        if current and size + len(group) > chunk_size:
+            chunks.append(current)
+            current, size = [], 0
+        current.append(group)
+        size += len(group)
+    if current:
+        chunks.append(current)
+
+    all_steps = list(instructions.get("steps") or [])
+    for macro in instructions.get("macros") or []:
+        all_steps.extend(macro.get("steps") or [])
+    children: list[dict[str, Any]] = []
+    parent_components: list[ApplyComponent] = []
+    parent_connections: list[ApplyConnection] = []
+    moved: set[str] = set()
+    for number, chunk in enumerate(chunks, 1):
+        child_name = f"{job_name}_p{number:02d}"
+        child_components: list[ApplyComponent] = []
+        for row, group in enumerate(chunk):
+            for column, item in enumerate(group):
+                child_components.append(
+                    item.model_copy(update={"pos_x": 160 + 280 * column, "pos_y": 96 + 192 * row})
+                )
+        names = {item.unique_name for item in child_components}
+        child_connections = [edge for edge in connections if edge.source in names]
+        if error_handling:
+            _add_error_handling(child_name, child_components, child_connections)
+        moved |= names
+        children.append(
+            {
+                "jobName": child_name,
+                "version": "0.1",
+                "defaultContext": "Default",
+                "folderPath": folder_path,
+                "description": f"Parte {number} de {len(chunks)} de {job_name}",
+                "purpose": "Parte de un Job dividido por tamaño",
+                "components": [item.model_dump(by_alias=True, exclude_none=True) for item in child_components],
+                "connections": [edge.model_dump(by_alias=True) for edge in child_connections],
+                "contexts": [],
+                "replaceManagedTodoContexts": False,
+                "childJobs": [],
+                "instructions": {
+                    "source": instructions.get("source"),
+                    "job": {"name": child_name, "folderPath": folder_path},
+                    "parentJob": job_name,
+                    "steps": [step for step in all_steps if step.get("talendUniqueName") in names],
+                    "macros": [],
+                },
+            }
+        )
+        index = number - 1
+        parent_components.append(
+            ApplyComponent(
+                uniqueName=f"tRunJob_{number}", componentName="tRunJob",
+                posX=160 + 280 * (index % 6), posY=96 + 192 * (index // 6),
+                label=f"Ejecutar {child_name}", parameters={"PROCESS": child_name},
+            )
+        )
+        if number > 1:
+            parent_connections.append(
+                ApplyConnection(
+                    source=f"tRunJob_{number - 1}", target=f"tRunJob_{number}", label=f"on_ok_{number}",
+                    connectorName="SUBJOB_OK", uniqueName=f"subjob_ok_{number}",
+                )
+            )
+
+    parent_instructions = dict(instructions)
+    parent_instructions["steps"] = [
+        step for step in instructions.get("steps") or [] if step.get("talendUniqueName") not in moved
+    ]
+    parent_instructions["macros"] = [
+        {**macro, "steps": [step for step in macro.get("steps") or [] if step.get("talendUniqueName") not in moved]}
+        for macro in instructions.get("macros") or []
+    ]
+    parent_instructions["split"] = {
+        "reason": f"El Job tenía {len(components)} componentes; se parte en Jobs hijo de hasta {chunk_size}.",
+        "chunkSize": chunk_size,
+        "children": [
+            {"jobName": child["jobName"], "components": len(child["components"])} for child in children
+        ],
+    }
+    return parent_components, parent_connections, parent_instructions, children
+
 
 def _add_error_handling(
     job_name: str, components: list[ApplyComponent], connections: list[ApplyConnection]
@@ -831,6 +957,7 @@ def build_apply_spec(
     related_plans: list[JobPlan] | None = None,
     related_folder_paths: dict[str, str] | None = None,
     error_handling: bool = False,
+    max_components: int | None = None,
     _visited_programs: set[str] | None = None,
 ) -> TalendApplySpec:
     """Build a deterministic spec without filling missing SAS details with sample values."""
@@ -1078,6 +1205,7 @@ def build_apply_spec(
             related_plans=plans,
             related_folder_paths=folder_paths,
             error_handling=error_handling,
+            max_components=max_components,
             _visited_programs=visited,
         )
         child_jobs.append(child_spec.to_mcp_arguments())
@@ -1132,6 +1260,19 @@ def build_apply_spec(
             )
         )
 
+    instructions = _portal_instructions(
+        plan,
+        safe_folder,
+        blocked_steps,
+        pending_details,
+        talend_unique_names=unique_names,
+        configured_mapper_steps=configured_mapper_steps,
+    )
+    if max_components is not None and len(components) > max_components:
+        components, connections, instructions, split_children = split_oversized_job(
+            plan.job_name, safe_folder, components, connections, instructions, error_handling=error_handling
+        )
+        child_jobs.extend(split_children)
     if error_handling and components:
         _add_error_handling(plan.job_name, components, connections)
 
@@ -1147,12 +1288,5 @@ def build_apply_spec(
         contexts=contexts,
         child_jobs=child_jobs,
         blocked_steps=blocked_steps,
-        instructions=_portal_instructions(
-            plan,
-            safe_folder,
-            blocked_steps,
-            pending_details,
-            talend_unique_names=unique_names,
-            configured_mapper_steps=configured_mapper_steps,
-        ),
+        instructions=instructions,
     )

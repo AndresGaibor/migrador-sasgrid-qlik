@@ -18,6 +18,8 @@ CONTRACT_PATH = REPO_ROOT / "contract" / "portal-tools.json"
 class PortalContract:
     read_tools: frozenset[str]
     write_tool: str
+    #: Escritura offline (sin Studio, ~1000 veces mas rapida). Opcional: sin ella todo va en vivo.
+    offline_write_tool: str | None
     required_top_fields: frozenset[str]
     required_component_fields: frozenset[str]
 
@@ -29,6 +31,7 @@ def load_contract(path: Path | None = None) -> PortalContract:
     return PortalContract(
         read_tools=frozenset(raw["read_tools"]),
         write_tool=raw["write_tool"],
+        offline_write_tool=raw.get("offline_write_tool"),
         required_top_fields=frozenset(raw["required_top_fields"]),
         required_component_fields=frozenset(raw["required_component_fields"]),
     )

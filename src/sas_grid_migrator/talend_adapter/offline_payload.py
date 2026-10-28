@@ -19,6 +19,9 @@ _COMPONENT_KEYS = (
     "posY",
     "parameters",
     "schema",
+    "tables",
+    "draftOnly",
+    "draftReason",
 )
 
 

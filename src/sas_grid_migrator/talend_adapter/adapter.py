@@ -5,11 +5,15 @@ Toda llamada pasa por `policy.assert_allowed`. La escritura usa la tool tipada
 """
 
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Any, Protocol
 
 from pydantic import BaseModel
 
 from sas_grid_migrator.talend_adapter.contract import load_contract
+from sas_grid_migrator.talend_adapter.eligibility import offline_tree_blockers
+from sas_grid_migrator.talend_adapter.offline_payload import to_batch_arguments
 from sas_grid_migrator.talend_adapter.policy import assert_allowed
 
 
@@ -75,6 +79,11 @@ def _import_client() -> Any:
     return Client
 
 
+#: El cliente MCP corta las lecturas HTTP a los 300 s aunque la llamada admita más; una operación
+#: larga (montar un Job de cientos de componentes en Studio) necesita ampliar ese límite.
+DEFAULT_HTTP_READ_SECONDS = 300.0
+
+
 class Caller(Protocol):
     async def call(self, tool: str, args: dict[str, Any]) -> dict[str, Any]: ...
 
@@ -89,12 +98,78 @@ class CallerWithTools(Protocol):
 #: Tool de escritura que el portal invoca para crear un Job.
 SPEC_TOOL = "talend_job_apply_custom_spec"
 
+#: Tool de escritura offline (sin Studio); el nombre sale del manifiesto del contrato.
+OFFLINE_TOOL = load_contract().offline_write_tool or ""
+
+
+def _offline_job_result(
+    spec: dict[str, Any],
+    written: dict[str, Any],
+    omitted: list[dict[str, Any]],
+    children: list[dict[str, Any]],
+    notices: list[str] | None = None,
+) -> dict[str, Any]:
+    """Resultado de un Job escrito offline, con las mismas claves que devuelve Studio en vivo."""
+    skipped = {item.get("uniqueName") for item in omitted}
+    components = [item for item in spec.get("components") or [] if item.get("uniqueName") not in skipped]
+    connections = [
+        edge
+        for edge in spec.get("connections") or []
+        if edge.get("source") not in skipped and edge.get("target") not in skipped
+    ]
+    contexts = spec.get("contexts") or []
+    item_path = str(written.get("itemPath") or "")
+    return {
+        "jobName": spec["jobName"],
+        "folderPath": spec.get("folderPath"),
+        "itemPath": item_path,
+        "propertiesPath": item_path.removesuffix(".item") + ".properties" if item_path else "",
+        "generatedComponents": len(components),
+        "reusedComponents": 0,
+        "totalComponents": len(components),
+        "generatedConnections": len(connections),
+        "reusedConnections": 0,
+        "connections": len(connections),
+        "generatedContexts": len(contexts),
+        "updatedContexts": 0,
+        "reusedContexts": 0,
+        "removedContexts": 0,
+        "reusedExisting": False,
+        "componentAliases": {item["uniqueName"]: item["uniqueName"] for item in components},
+        "warnings": [f"{item.get('uniqueName')}: {item.get('motivo')}" for item in omitted] + list(notices or []),
+        "childJobs": children,
+        "mode": "offline",
+    }
+
+
+#: Segundos fijos y segundos por componente que se esperan a Studio al aplicar un Job (con sus hijos).
+APPLY_BASE_SECONDS = 30.0
+APPLY_SECONDS_PER_COMPONENT = 1.5
+
+
+def count_components(arguments: dict[str, Any]) -> int:
+    """Componentes de un Job y de todos sus Jobs hijo."""
+    total = len(arguments.get("components") or [])
+    for child in arguments.get("childJobs") or []:
+        if isinstance(child, dict):
+            total += count_components(child)
+    return total
+
+
+def apply_timeout(arguments: dict[str, Any]) -> float:
+    """Tiempo que se espera a Studio: crecer con el tamaño evita cortar un montaje que sí avanza."""
+    return APPLY_BASE_SECONDS + APPLY_SECONDS_PER_COMPONENT * count_components(arguments)
+
 
 class McpCaller:
     """Llama a talend-mcp por HTTP (`http://127.0.0.1:3927/mcp`). Una sesión por llamada."""
 
     def __init__(self, url: str, timeout: float = 30.0):
         self.url, self.timeout = url, timeout
+
+    def with_timeout(self, timeout: float) -> "McpCaller":
+        """Copia con otro tiempo límite (nunca menor que el actual) para una operación larga."""
+        return McpCaller(self.url, max(self.timeout, timeout))
 
     async def describe_tool(self, tool: str) -> dict[str, Any] | None:
         assert_allowed(tool)
@@ -108,12 +183,30 @@ class McpCaller:
         except Exception as e:
             raise TalendError(f"No se pudo comprobar el contrato MCP: {type(e).__name__}") from e
 
+    @asynccontextmanager
+    async def _session(self, Client: Any) -> AsyncIterator[Any]:
+        """Cliente MCP; con tiempos largos, con la lectura HTTP ampliada hasta `self.timeout`."""
+        if self.timeout <= DEFAULT_HTTP_READ_SECONDS:
+            async with Client(self.url) as client:
+                yield client
+            return
+        import httpx2
+        from mcp.client.streamable_http import streamable_http_client
+        from mcp.shared._httpx_utils import MCP_DEFAULT_TIMEOUT, create_mcp_http_client
+
+        http = create_mcp_http_client(timeout=httpx2.Timeout(MCP_DEFAULT_TIMEOUT, read=self.timeout))
+        try:
+            async with Client(streamable_http_client(self.url, http_client=http)) as client:
+                yield client
+        finally:
+            await http.aclose()
+
     async def call(self, tool: str, args: dict[str, Any]) -> dict[str, Any]:
         assert_allowed(tool)
         Client = _import_client()
 
         try:
-            async with Client(self.url) as client:
+            async with self._session(Client) as client:
                 res = await client.call_tool(tool, args, read_timeout_seconds=self.timeout)
         except Exception as e:  # red, sesión o protocolo
             cause = e
@@ -176,15 +269,19 @@ class JobInspection(BaseModel):
 
 
 class TalendAdapter:
-    def __init__(self, caller: Caller, *, write_enabled: bool = True):
+    def __init__(self, caller: Caller, *, write_enabled: bool = True, offline: bool = False):
         self.caller = caller
         self.write_enabled = write_enabled
+        #: Escribir los Jobs offline cuando se pueda (Studio en vivo para lo que lo necesite o si falla).
+        self.offline = offline
 
     @classmethod
     def from_env(cls, *, write_enabled: bool = True) -> "TalendAdapter":
         url = os.environ.get("TALEND_MCP_URL", "http://127.0.0.1:3927/mcp")
         timeout = float(os.environ.get("TALEND_MCP_TIMEOUT_SECONDS", "60"))
-        return cls(McpCaller(url, timeout=timeout), write_enabled=write_enabled)
+        # TALEND_APPLY_MODE: `auto` (por defecto) escribe offline lo que pueda y el resto en vivo; `live` todo en vivo.
+        offline = os.environ.get("TALEND_APPLY_MODE", "auto").strip().lower() != "live"
+        return cls(McpCaller(url, timeout=timeout), write_enabled=write_enabled, offline=offline)
 
     async def _data(self, tool: str, args: dict[str, Any] | None = None) -> dict[str, Any]:
         assert_allowed(tool)
@@ -468,14 +565,64 @@ class TalendAdapter:
             raise TalendError(
                 "El portal está en modo solo lectura. Habilita la escritura desde Configuración para crear Jobs."
             )
+        fallback_note: str | None = None
+        if self.offline and not offline_tree_blockers(arguments):
+            try:
+                return await self._apply_offline(arguments)
+            except TalendError as error:
+                fallback_note = f"El modo offline no pudo aplicar el Job ({error}); se usó Studio en vivo."
         compatibility = await self.custom_spec_status()
         if not compatibility["spec_supported"]:
             raise TalendError(compatibility["spec_error"])
-        return await self._studio_write(SPEC_TOOL, arguments)
+        result = await self._studio_write(SPEC_TOOL, arguments, timeout=apply_timeout(arguments))
+        if fallback_note:
+            result.setdefault("warnings", []).append(fallback_note)
+        return result
 
-    async def _studio_write(self, tool: str, args: dict[str, Any]) -> dict[str, Any]:
+    async def _apply_offline(self, arguments: dict[str, Any]) -> dict[str, Any]:
+        """Escribe el Job y sus hijos sin Studio, con la forma del resultado en vivo.
+
+        Primero se valida todo el árbol con `dryRun`: si algo falla no se escribe nada, y el Job puede
+        pasar a Studio en vivo sin encontrarse a medias los hijos ya escritos.
+        """
+        await self._write_offline(arguments, dry_run=True)
+        return await self._write_offline(arguments, dry_run=False)
+
+    async def _write_offline(self, spec: dict[str, Any], *, dry_run: bool) -> dict[str, Any]:
+        children = [await self._write_offline(child, dry_run=dry_run) for child in spec.get("childJobs") or []]
+        payload = to_batch_arguments({**spec, "childJobs": []})
+        payload["dryRun"] = dry_run
+        data = await self._offline_call(payload)
+        name = spec["jobName"]
+        written = next((item for item in data.get("jobs") or [] if item.get("job") == name), None)
+        if written is None or not written.get("ok", False):
+            raise TalendError(f"{OFFLINE_TOOL}: {name}: sin confirmación de escritura")
+        return _offline_job_result(spec, written, data.get("omitidos") or [], children, data.get("avisos") or [])
+
+    async def _offline_call(self, payload: dict[str, Any]) -> dict[str, Any]:
+        assert_allowed(OFFLINE_TOOL)
+        env = await self.caller.call(OFFLINE_TOOL, payload)
+        if not isinstance(env, dict) or env.get("ok") is not True:
+            error = env.get("error") if isinstance(env, dict) else None
+            message = f"{error.get('code', 'ERROR')} {error.get('message', '')}".strip() if isinstance(error, dict) else "respuesta sin confirmación"
+            raise TalendError(f"{OFFLINE_TOOL}: {message}")
+        data = env.get("data")
+        if not isinstance(data, dict):
+            raise TalendError(f"{OFFLINE_TOOL}: respuesta sin datos")
+        failures = data.get("fallos") or []
+        if failures:
+            first = failures[0]
+            raise TalendError(f"{first.get('job', '?')}: {first.get('error', 'error desconocido')}")
+        return data
+
+    async def _studio_write(
+        self, tool: str, args: dict[str, Any], *, timeout: float | None = None
+    ) -> dict[str, Any]:
         assert_allowed(tool)
-        env = await self.caller.call(tool, args)
+        caller = self.caller
+        if timeout is not None and hasattr(caller, "with_timeout"):
+            caller = caller.with_timeout(timeout)
+        env = await caller.call(tool, args)
         if not isinstance(env, dict) or env.get("ok") is not True:
             error = env.get("error") if isinstance(env, dict) else None
             if isinstance(error, dict):

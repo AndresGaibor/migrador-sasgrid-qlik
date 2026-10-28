@@ -536,6 +536,36 @@ def test_apply_custom_spec_delegates_the_complete_plan_to_the_mcp_executor(monke
     assert result["generatedComponents"] == 2
 
 
+def test_apply_timeout_grows_with_the_components_of_the_job_and_its_children():
+    from sas_grid_migrator.talend_adapter.adapter import apply_timeout, count_components
+
+    arguments = {
+        "components": [{}] * 10,
+        "childJobs": [{"components": [{}] * 20, "childJobs": [{"components": [{}] * 5}]}],
+    }
+
+    assert count_components(arguments) == 35
+    assert apply_timeout(arguments) == 30 + 1.5 * 35
+    assert apply_timeout({"components": []}) == 30
+
+
+def test_apply_custom_spec_waits_longer_for_bigger_jobs(monkeypatch):
+    seen: list[float] = []
+
+    class SlowFake(Fake):
+        timeout = 60.0
+
+        def with_timeout(self, timeout):
+            seen.append(timeout)
+            return self
+
+    fake = SlowFake({"talend_job_apply_custom_spec": {"ok": True, "data": {"jobName": "j"}}})
+
+    run(TalendAdapter(fake).apply_custom_spec({"jobName": "j", "components": [{}] * 400}))
+
+    assert seen == [30 + 1.5 * 400]
+
+
 def test_apply_custom_spec_rejects_success_envelope_without_explicit_ok(monkeypatch):
     monkeypatch.setenv("TALEND_MCP_READONLY", "false")
     fake = Fake({"talend_job_apply_custom_spec": {"data": {"itemPath": "job.item"}}})
@@ -705,3 +735,27 @@ def test_job_problems_reports_a_clean_job_from_the_bridge_result():
         },
     }))
     assert run(ad.job_problems("job_daily")) == {"clean": True, "problems": []}
+
+
+def test_a_short_timeout_uses_the_plain_mcp_client(monkeypatch):
+    from sas_grid_migrator.talend_adapter import adapter as adapter_module
+
+    created = []
+
+    class PlainClient:
+        def __init__(self, target):
+            created.append(target)
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+    async def use():
+        async with McpCaller("http://127.0.0.1:1/mcp", timeout=60)._session(PlainClient):
+            pass
+
+    run(use())
+    assert created == ["http://127.0.0.1:1/mcp"]
+    assert adapter_module.DEFAULT_HTTP_READ_SECONDS == 300.0
