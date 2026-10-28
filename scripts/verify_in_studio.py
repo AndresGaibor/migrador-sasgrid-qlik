@@ -31,9 +31,9 @@ sys.path.insert(0, str(ROOT / "src"))
 
 #: Errores de Studio que son pendientes esperados de un borrador (faltan datos que el SAS no trae), no defectos.
 EXPECTED_PENDING = [
-    re.compile(r"must have at least one value", re.I),
-    re.compile(r"No schema has been defined yet", re.I),
-    re.compile(r"Module .+ required", re.I),
+    re.compile(r"must have at least one value", re.IGNORECASE),
+    re.compile(r"No schema has been defined yet", re.IGNORECASE),
+    re.compile(r"Module .+ required", re.IGNORECASE),
 ]
 
 
@@ -53,7 +53,7 @@ def _start_mcp() -> tuple[subprocess.Popen, str]:
         raise SystemExit("bun no esta instalado: el MCP no se puede arrancar")
     port = _free_port()
     env = {
-        **os.environ, "TALEND_MCP_FILTER": "talend_job_delete_in_studio,talend_delete_job,portal",
+        **os.environ, "TALEND_MCP_FILTER": "talend_job_delete_in_studio,talend_delete_job,talend_bridge_refresh_workspace,portal",
         "TALEND_MCP_PORT": str(port), "TALEND_MCP_HOST": "127.0.0.1", "TALEND_MCP_LOG": "quiet",
     }
     process = subprocess.Popen(
@@ -71,27 +71,55 @@ def _start_mcp() -> tuple[subprocess.Popen, str]:
     raise SystemExit("el MCP no respondio")
 
 
-def _job_names(result: dict | None, names: set[str]) -> None:
+def _job_names(result: dict | None, names: set[str], paths: set[Path] | None = None) -> None:
     if isinstance(result, dict):
         if result.get("jobName"):
             names.add(str(result["jobName"]))
+        if paths is not None and result.get("itemPath"):
+            item = Path(str(result["itemPath"]))
+            paths.update({item, item.with_suffix(".properties")})
         for child in result.get("childJobs") or []:
-            _job_names(child, names)
+            _job_names(child, names, paths)
 
 
-async def _cleanup(url: str, names: set[str]) -> list[str]:
+def _remove_leftovers(paths: set[Path], folder: str) -> int:
+    """Borra de disco lo que Studio dejo tras borrar un Job (p. ej. el .item de un Job escrito offline).
+
+    Solo toca archivos dentro de la carpeta de verificacion, para no borrar nunca algo ajeno.
+    """
+    marker = folder.replace("\\", "/").strip("/").split("/")[-1].lower()
+    removed = 0
+    for path in sorted(paths):
+        normalized = str(path).replace("\\", "/").lower()
+        if f"/process/{marker}/" not in normalized or not path.exists():
+            continue
+        path.unlink()
+        removed += 1
+    for path in sorted(paths, key=lambda item: len(item.parts), reverse=True):
+        directory = path.parent
+        while directory.exists() and f"/process/{marker}" in str(directory).replace("\\", "/").lower():
+            try:
+                directory.rmdir()
+            except OSError:
+                break
+            directory = directory.parent
+    return removed
+
+
+async def _cleanup(url: str, names: set[str], paths: set[Path], folder: str) -> list[str]:
+    """Borra los Jobs de prueba y devuelve los archivos que sigan en disco."""
     from mcp import Client
 
-    left: list[str] = []
     async with Client(url, read_timeout_seconds=240) as client:
         for name in sorted(names):
-            # El Job puede estar cargado en Studio (se borra del repositorio) o solo escrito en disco (offline).
-            await client.call_tool("talend_job_delete_in_studio", {"name": name, "version": "0.1"})
-            await client.call_tool("talend_delete_job", {"jobName": name})
-        listing = await client.call_tool("talend_jobs_list", {"limit": 5000})
-        jobs = (listing.structured_content or {}).get("data", {}).get("jobs", [])
-        left = [job["name"] for job in jobs if job["name"] in names]
-    return left
+            # Studio borra del repositorio los Jobs que ya conoce; si no, el borrado no hace nada y quedan archivos.
+            try:
+                await client.call_tool("talend_job_delete_in_studio", {"name": name, "version": "0.1"})
+            except Exception as error:  # noqa: BLE001 - la interfaz ocupada no debe impedir limpiar el resto
+                print(f"Studio no pudo borrar {name}: {error}", file=sys.stderr)
+        _remove_leftovers(paths, folder)
+        await client.call_tool("talend_bridge_refresh_workspace", {})
+    return sorted(str(path) for path in paths if path.exists())
 
 
 def main() -> int:
@@ -115,12 +143,12 @@ def main() -> int:
         TALEND_MCP_TIMEOUT_SECONDS="180",
     )
     names: set[str] = set()
+    paths: set[Path] = set()
     report: dict = {"source": str(args.source), "jobs": []}
     exit_code = 0
     try:
-        from fastapi.testclient import TestClient
-
         import apps.api.main as api
+        from fastapi.testclient import TestClient
 
         with TestClient(api.app) as client:
             client.patch("/api/integrations/talend/permissions", json={"write_enabled": True})
@@ -149,7 +177,7 @@ def main() -> int:
             counts: dict[str, int] = {}
             for job in state.get("jobs", []):
                 outcome = job.get("result") or {}
-                _job_names(outcome.get("result"), names)
+                _job_names(outcome.get("result"), names, paths)
                 counts[job["status"]] = counts.get(job["status"], 0) + 1
                 errors = list(outcome.get("design_errors") or [])
                 unexpected = [error for error in errors if not is_expected(error)]
@@ -179,9 +207,9 @@ def main() -> int:
     finally:
         if names and not args.keep:
             try:
-                left = asyncio.run(_cleanup(url, names))
-                report["left_in_studio"] = left
-                print(f"Borrados {len(names) - len(left)} de {len(names)} Jobs de Studio" + (f"; quedan: {left}" if left else ""))
+                left = asyncio.run(_cleanup(url, names, paths, args.folder))
+                report["left_on_disk"] = left
+                print(f"Borrados {len(names)} Jobs de prueba" + (f"; quedan {len(left)} archivos: {left[:3]}" if left else "; no queda nada en disco"))
                 if left:
                     exit_code = max(exit_code, 1)
             except Exception as error:  # noqa: BLE001
