@@ -39,7 +39,7 @@ bun test && bun run build
 
 En «Mis proyectos», **Subir ZIP y crear proyecto** registra un proyecto aislado y arranca extracción, análisis SAS, dependencias y guías. La página conserva el estado y ofrece reintento si falla. En «Plan de migración», **Implementar todos los flujos del ZIP en Talend** consulta primero el inventario completo de Studio y muestra qué Jobs se crearán, actualizarán en su carpeta destino o bloquearán el lote por conflicto. La API vuelve a comprobar el inventario antes de escribir. El botón se activa solo con inventario disponible y sin conflictos. La operación muestra avance y resultado por programa; los Jobs no se ejecutan.
 
-Para escribir Jobs hace falta Talend Studio 8.0.1 abierto, con el proyecto cargado y el Bridge instalado. Si Studio no responde o tiene un diálogo modal abierto, el portal no aplica la guía y la vista **Configuración** muestra el diagnóstico. Los Jobs creados no se compilan ni se ejecutan automáticamente.
+Para escribir Jobs hace falta Talend Studio 8.0.1 abierto, con el proyecto cargado y el Bridge instalado. Si Studio no responde, la vista **Configuración** muestra el diagnóstico; si tiene un diálogo modal abierto, la guía no se aplica y el diálogo debe cerrarse en Studio. Los Jobs creados no se compilan ni se ejecutan automáticamente.
 
 El portal usa estas variables de entorno. Los valores predeterminados sirven para la prueba local; cambia los valores en el entorno del proceso API si MCP usa otro puerto o carpeta:
 
