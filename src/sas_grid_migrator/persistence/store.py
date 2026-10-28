@@ -370,7 +370,6 @@ class Store:
         stage: str,
         message: str | None = None,
         error: str | None = None,
-        retry: bool = False,
     ) -> ProjectProcessing:
         current = self.get_processing(project_id)
         if current is None:
@@ -382,7 +381,7 @@ class Store:
         stage_started_at = current.stage_started_at
         if stage != current.stage or stage_started_at is None:
             stage_started_at = now
-        retry_count = current.retry_count + int(retry)
+        retry_count = current.retry_count
         with closing(self._conn()) as c, c:
             c.execute(
                 """update project_processing set status=?,stage=?,started_at=?,stage_started_at=?,
@@ -409,6 +408,23 @@ class Store:
             error=error,
             retry_count=retry_count,
         )
+
+    def queue_processing_retry(self, project_id: str) -> ProjectProcessing | None:
+        """Transiciona a queued solo si el proceso sigue fallido o interrumpido."""
+        now = datetime.now(UTC)
+        with closing(self._conn()) as c, c:
+            updated = c.execute(
+                """update project_processing set status='queued',stage='queued',stage_started_at=?,
+                updated_at=?,message=?,error=null,retry_count=retry_count+1
+                where project_id=? and status in ('failed','interrupted')""",
+                (
+                    now.isoformat(),
+                    now.isoformat(),
+                    "En cola para analizar el proyecto.",
+                    project_id,
+                ),
+            ).rowcount
+        return self.get_processing(project_id) if updated else None
 
     def recover_interrupted_operations(self) -> None:
         now = datetime.now(UTC).isoformat()

@@ -1,10 +1,13 @@
 import io
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
-from threading import Event
+from threading import Barrier, Event
 
 import apps.api.main as api_module
+import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
+
 from sas_grid_migrator.config import Settings
 from sas_grid_migrator.persistence.store import Store
 
@@ -163,6 +166,69 @@ def test_failed_pipeline_can_be_retried_from_the_retained_snapshot(tmp_path, mon
         assert client.get(f"/api/projects/{project_id}/processing").json()["status"] == "completed"
         assert client.get(f"/api/projects/{project_id}/inventory").status_code == 200
         assert Store(Settings(data_dir=data_dir)).get_processing(project_id).retry_count == 1
+
+
+def test_concurrent_retry_requests_queue_the_pipeline_only_once(tmp_path, monkeypatch):
+    data_dir = tmp_path / "data"
+    monkeypatch.setenv("SGM_DATA_DIR", str(data_dir))
+    with TestClient(api_module.app) as client:
+        uploaded = _upload(client, "retry-race.zip", _zip({"daily.sas": "data a; run;"}))
+        project_id = uploaded.json()["project"]["id"]
+        shared_store = Store(Settings(data_dir=data_dir))
+        shared_store.update_processing(
+            project_id,
+            status="failed",
+            stage="analysis",
+            message="El análisis falló.",
+            error="Error temporal",
+        )
+        monkeypatch.setattr(api_module, "store", lambda: shared_store)
+        original_has_snapshot = shared_store.has_snapshot
+        reads = Barrier(2)
+
+        def synchronized_has_snapshot(identifier):
+            result = original_has_snapshot(identifier)
+            if identifier == project_id:
+                reads.wait(timeout=5)
+            return result
+
+        monkeypatch.setattr(shared_store, "has_snapshot", synchronized_has_snapshot)
+
+        def retry():
+            tasks = api_module.BackgroundTasks()
+            return api_module.retry_project_processing(project_id, tasks), tasks
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            outcomes = list(pool.map(lambda _: _capture_retry(retry), range(2)))
+
+        assert sum(isinstance(result, HTTPException) for result in outcomes) == 1
+        successful = [result for result in outcomes if not isinstance(result, HTTPException)]
+        assert len(successful) == 1
+        assert len(successful[0][1].tasks) == 1
+        assert shared_store.get_processing(project_id).status == "queued"
+        assert shared_store.get_processing(project_id).retry_count == 1
+        api_module._release_pipeline_reservation()
+
+
+def _capture_retry(retry):
+    try:
+        return retry()
+    except HTTPException as exc:
+        return exc
+
+
+def test_pipeline_worker_releases_capacity_when_store_initialization_fails(monkeypatch):
+    monkeypatch.setattr(api_module, "store", lambda: (_ for _ in ()).throw(RuntimeError("store unavailable")))
+    with api_module._PIPELINE_CONDITION:
+        api_module._PIPELINE_ACTIVE = 0
+        api_module._PIPELINE_RESERVED = 0
+
+    with pytest.raises(RuntimeError, match="store unavailable"):
+        api_module._run_project_pipeline("project", max_concurrency=1)
+
+    with api_module._PIPELINE_CONDITION:
+        assert api_module._PIPELINE_ACTIVE == 0
+        assert api_module._PIPELINE_RESERVED == 0
 
 
 def test_api_startup_recovers_a_running_project_pipeline(tmp_path, monkeypatch):

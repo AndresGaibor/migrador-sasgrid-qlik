@@ -106,8 +106,9 @@ def _run_project_pipeline(project_id: str, max_concurrency: int) -> None:
         _PIPELINE_RESERVED = max(0, _PIPELINE_RESERVED - 1)
         _PIPELINE_ACTIVE += 1
     current_stage = "analysis"
-    s = store()
+    s: Store | None = None
     try:
+        s = store()
         s.update_processing(
             project_id,
             status="running",
@@ -138,6 +139,8 @@ def _run_project_pipeline(project_id: str, max_concurrency: int) -> None:
             message="Análisis, dependencias y guías listos.",
         )
     except Exception as exc:
+        if s is None:
+            raise
         s.update_processing(
             project_id,
             status="failed",
@@ -165,14 +168,20 @@ def _queue_project_pipeline(
             429, "Se alcanzó la capacidad de análisis; intenta de nuevo en unos minutos."
         )
     try:
-        state = s.update_processing(
-            project_id,
-            status="queued",
-            stage="queued",
-            message="En cola para analizar el proyecto.",
-            error=None,
-            retry=retry,
-        )
+        if retry:
+            state = s.queue_processing_retry(project_id)
+            if state is None:
+                raise HTTPException(
+                    409, "solo se puede reintentar un análisis fallido o interrumpido"
+                )
+        else:
+            state = s.update_processing(
+                project_id,
+                status="queued",
+                stage="queued",
+                message="En cola para analizar el proyecto.",
+                error=None,
+            )
         background_tasks.add_task(
             _run_project_pipeline,
             project_id,
@@ -308,9 +317,6 @@ def retry_project_processing(project_id: str, background_tasks: BackgroundTasks)
     _require(s, project_id)
     if not s.has_snapshot(project_id):
         raise HTTPException(409, "el proyecto no tiene archivos fuente para reintentar")
-    current = s.get_processing(project_id)
-    if current is None or current.status not in {"failed", "interrupted"}:
-        raise HTTPException(409, "solo se puede reintentar un análisis fallido o interrumpido")
     return _queue_project_pipeline(s, project_id, background_tasks, retry=True)
 
 
