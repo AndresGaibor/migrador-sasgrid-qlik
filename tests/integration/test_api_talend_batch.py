@@ -1037,8 +1037,21 @@ def test_studio_problems_prevent_a_clean_application_status(tmp_path, monkeypatc
     _set_env(monkeypatch, tmp_path)
 
     class StudioProblems(FakeTalend):
+        # Forma real capturada de Studio: `node` y `description`, severidad en mayúsculas.
         async def job_problems(self, job_name: str) -> dict:
-            return {"clean": False, "problems": [{"severity": "ERROR", "message": "Missing schema"}]}
+            return {
+                "clean": False,
+                "problems": [
+                    {
+                        "severity": "ERROR",
+                        "node": "tFixedFlowInput_2",
+                        "component": "tFixedFlowInput",
+                        "description": "Parameter (Valores) must have at least one value.",
+                        "type": "JOB",
+                    },
+                    {"severity": "WARNING", "node": "tLogRow_2", "description": "Sin etiqueta"},
+                ],
+            }
 
     monkeypatch.setattr(api_module, "_talend", lambda: StudioProblems())
     with TestClient(api_module.app) as client:
@@ -1046,8 +1059,73 @@ def test_studio_problems_prevent_a_clean_application_status(tmp_path, monkeypatc
         result = client.post(f"/api/projects/{project_id}/plans/a.sas/talend-apply")
 
     assert result.status_code == 200, result.text
-    assert result.json()["status"] == "partially_applied"
-    assert any("Studio" in warning for warning in result.json()["warnings"])
+    body = result.json()
+    assert body["status"] == "partially_applied"
+    assert body["review_required"] is True
+    assert body["design_errors"] == ["tFixedFlowInput_2: Parameter (Valores) must have at least one value."]
+    assert any("tFixedFlowInput_2" in warning and "Valores" in warning for warning in body["warnings"])
+
+
+def test_errors_reported_by_the_write_call_are_not_lost_when_the_problems_view_is_still_clean(
+    tmp_path, monkeypatch
+):
+    _set_env(monkeypatch, tmp_path)
+
+    class WriteReportsErrors(FakeTalend):
+        async def apply_custom_spec(self, arguments: dict) -> dict:
+            result = await super().apply_custom_spec(arguments)
+            result["problems"] = {
+                "errors": ["tFixedFlowInput_2: Parameter (Valores) must have at least one value."],
+                "warnings": [],
+                "clean": False,
+            }
+            return result
+
+    monkeypatch.setattr(api_module, "_talend", lambda: WriteReportsErrors())
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Write errors", [_plan("x", "a.sas", "job_a")])
+        body = client.post(f"/api/projects/{project_id}/plans/a.sas/talend-apply").json()
+
+    assert body["status"] == "partially_applied"
+    assert body["design_errors"] == ["tFixedFlowInput_2: Parameter (Valores) must have at least one value."]
+
+
+def test_a_clean_job_has_no_design_errors(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    monkeypatch.setattr(api_module, "_talend", lambda: FakeTalend())
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Clean", [_plan("x", "a.sas", "job_a")])
+        body = client.post(f"/api/projects/{project_id}/plans/a.sas/talend-apply").json()
+
+    assert body["design_errors"] == []
+    assert body["status"] == "applied"
+
+
+def test_child_job_design_errors_are_checked_too(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+
+    class ChildHasErrors(FakeTalend):
+        async def job_problems(self, job_name: str) -> dict:
+            if job_name == "job_child":
+                return {
+                    "clean": False,
+                    "problems": [{"severity": "ERROR", "node": "tMap_1", "description": "Falta el mapeo"}],
+                }
+            return {"clean": True, "problems": []}
+
+    monkeypatch.setattr(api_module, "_talend", lambda: ChildHasErrors())
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Child errors",
+            [_plan("x", "parent.sas", "job_parent", child_call=True), _plan("x", "child.sas", "job_child")],
+            [["parent.sas"], ["child.sas"]],
+        )
+        client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        child = client.get(f"/api/projects/{project_id}/plans/child.sas/talend-apply").json()
+
+    assert child["status"] == "partially_applied"
+    assert child["result"]["design_errors"] == ["tMap_1: Falta el mapeo"]
 
 
 def test_nested_draft_job_remains_pending_human_review_after_mcp_creation(tmp_path, monkeypatch):

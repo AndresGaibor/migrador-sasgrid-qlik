@@ -667,7 +667,14 @@ async def _child_apply_outcome(child: dict, spec) -> dict:
         partial = partial or component_count < len(components)
     if isinstance(connection_count, int) and isinstance(connections, list):
         partial = partial or connection_count < len(connections)
-    verification = await _verify_job_arguments(child_arguments, child)
+    verification = await _verify_applied_job(spec, child)
+    design_errors = verification.get("design_errors", [])
+    if design_errors:
+        warnings.append(_design_errors_warning(design_errors))
+        partial = True
+    elif verification.get("studio_problems") is not None and not verification["studio_problems"]["clean"]:
+        warnings.append("Talend Studio reporta problemas de diseño. Revísalos antes de probar o publicar el Job.")
+        partial = True
     if verification["status"] == "unavailable" or verification["pending_steps"]:
         pending_count = verification["pending_steps"]
         warnings.append(
@@ -689,6 +696,7 @@ async def _child_apply_outcome(child: dict, spec) -> dict:
         "warnings": warnings if isinstance(warnings, list) else [],
         "review_required": bool(review_warnings or blocked_steps or warnings or partial),
         "review_warnings": review_warnings,
+        "design_errors": design_errors,
         "verification": verification,
         "result": {key: value for key, value in child.items() if key != "childJobs"},
     }
@@ -1057,21 +1065,44 @@ async def _verify_job_arguments(arguments: dict[str, Any], result: dict[str, Any
     return verification
 
 
+def _design_errors(studio_items: list[dict], write_result: dict) -> list[str]:
+    """Errores de diseño de un Job: vista Problemas de Studio y respuesta de la escritura."""
+    found: list[str] = []
+    for item in studio_items:
+        if str(item.get("severity", "")).upper() != "ERROR":
+            continue
+        node = str(item.get("node") or "").strip()
+        text = str(item.get("description") or item.get("message") or "").strip()
+        found.append(f"{node}: {text}" if node and text else text or node)
+    reported = write_result.get("problems")
+    if isinstance(reported, dict):
+        found.extend(error for error in reported.get("errors", []) if isinstance(error, str))
+    return list(dict.fromkeys(error for error in found if error))
+
+
+def _design_errors_warning(errors: list[str]) -> str:
+    shown = "; ".join(errors[:5]) + ("…" if len(errors) > 5 else "")
+    return f"Talend Studio reporta {len(errors)} error(es) de diseño: {shown}"
+
+
 async def _verify_applied_job(spec, result: dict) -> dict:
     """Inspecciona cada Job en Studio y consulta sus problemas; no ejecuta Jobs."""
     from sas_grid_migrator.talend_adapter.adapter import TalendError
 
     verification = await _verify_job_arguments(spec.to_mcp_arguments(), result)
+    studio_items: list[dict] = []
     try:
         problems = await _talend().job_problems(spec.job_name)
     except TalendError as e:
         verification["problems_reason"] = redact(str(e), "mcp-problems-error.txt")
         verification["studio_problems"] = None
     else:
+        studio_items = problems["problems"]
         verification["studio_problems"] = {
             "clean": problems["clean"],
-            "items": problems["problems"][:20],
+            "items": studio_items[:20],
         }
+    verification["design_errors"] = _design_errors(studio_items, result)
     return verification
 
 
@@ -1210,7 +1241,10 @@ async def _apply_talend_plan(
             f"{verification['pending_steps']} requieren revisión de componente, esquema, mapper o conexiones."
         )
     studio_problems = verification.get("studio_problems")
-    if studio_problems is not None and not studio_problems["clean"]:
+    design_errors = verification.get("design_errors", [])
+    if design_errors:
+        warnings.append(_design_errors_warning(design_errors))
+    elif studio_problems is not None and not studio_problems["clean"]:
         warnings.append("Talend Studio reporta problemas de diseño. Revísalos antes de probar o publicar el Job.")
     non_verification_warnings = [
         warning for warning in warnings
@@ -1228,6 +1262,7 @@ async def _apply_talend_plan(
         "warnings": warnings,
         "review_required": bool(review_warnings or spec.blocked_steps or warnings or verification["status"] != "inspected"),
         "review_warnings": review_warnings,
+        "design_errors": design_errors,
         "verification": verification,
         "result": result,
     }
