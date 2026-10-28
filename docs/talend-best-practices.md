@@ -27,8 +27,12 @@ se cambia de significado.
 
 - Los pendientes de datos (rutas, esquemas, expresiones) se conservan en una variable de contexto `migration_todo_*` y
   no se escriben valores inventados, así que `BP-CTX-01` y `BP-SEC-01` no se disparan.
-- `BP-ERR-01` se dispara en todos los Jobs: el generador todavía no añade manejo de errores. Es el siguiente hueco
-  a cerrar.
+- El generador añade manejo de errores a cada Job con componentes (`error_handling` en `build_apply_spec`, activo
+  en el API): un `tLogCatcher` conectado a un `tLogRow` en una fila propia, que registra cualquier fallo, y un
+  `tDie` con mensaje "Fallo en el Job <nombre>" por `SUBJOB_ERROR` desde el primer componente de entrada sin flujo
+  entrante. Studio solo admite ese enlace desde un componente que inicia un subjob (no desde un `tMap` ni un filtro),
+  así que, si la lectura aún está por determinar y el Job no tiene un inicio así, solo se añade el registro.
+  Con eso `BP-ERR-01` no salta en los Jobs generados.
 
 ## Pendiente de validar con el equipo
 

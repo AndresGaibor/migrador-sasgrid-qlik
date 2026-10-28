@@ -771,8 +771,12 @@ def test_api_applies_ready_and_draft_components_in_one_request(monkeypatch):
     assert [item["uniqueName"] for item in fake.calls[0]["components"]] == [
         "tFileInputDelimited_1",
         "tFilterRow_2",
+        "tLogCatcher_3",
+        "tLogRow_4",
+        "tDie_5",
     ]
     assert fake.calls[0]["components"][1]["draftOnly"] is True
+    assert fake.calls[0]["components"][2]["componentName"] == "tLogCatcher"
 
 
 def test_api_marks_partial_only_when_the_mcp_did_not_create_every_requested_component(monkeypatch):
@@ -914,3 +918,55 @@ def test_api_applies_current_plan_without_preview_token_or_manual_status(monkeyp
     assert fake.calls[0]["instructions"]["source"]["program"] == "daily.sas"
     assert fake.calls[0]["components"][0]["componentName"] == "tFileInputDelimited"
     assert "status" not in fake.calls[0]["instructions"]["steps"][0]
+
+
+def test_error_handling_adds_a_log_catcher_and_a_die_on_subjob_error():
+    from sas_grid_migrator.talend_adapter.best_practices import check_job_arguments
+
+    arguments = build_apply_spec(
+        plan(step("read_1", "tFileInputDelimited")), error_handling=True
+    ).to_mcp_arguments()
+
+    names = {item["uniqueName"]: item for item in arguments["components"]}
+    assert [item["componentName"] for item in arguments["components"]] == [
+        "tFileInputDelimited", "tLogCatcher", "tLogRow", "tDie",
+    ]
+    catcher, log_row, die = names["tLogCatcher_2"], names["tLogRow_3"], names["tDie_4"]
+    assert not any(item.get("draftOnly") for item in (catcher, log_row, die))
+    assert die["parameters"]["MESSAGE"] == '"Fallo en el Job DailyJob"'
+    main_row = names["tFileInputDelimited_1"]["posY"]
+    assert catcher["posY"] > main_row and die["posY"] > catcher["posY"]
+    assert {(c["source"], c["target"], c["connectorName"]) for c in arguments["connections"]} == {
+        ("tLogCatcher_2", "tLogRow_3", "FLOW"),
+        ("tFileInputDelimited_1", "tDie_4", "SUBJOB_ERROR"),
+    }
+    assert "BP-ERR-01" not in {finding.rule for finding in check_job_arguments(arguments)}
+
+
+def test_error_handling_is_off_by_default_and_skipped_for_jobs_without_components():
+    plain = build_apply_spec(plan(step("read_1", "tFileInputDelimited"))).to_mcp_arguments()
+    assert [item["componentName"] for item in plain["components"]] == ["tFileInputDelimited"]
+
+    empty = build_apply_spec(plan(), error_handling=True)
+    assert empty.components == []
+    assert empty.connections == []
+
+
+def test_error_handling_only_cuts_the_job_from_a_subjob_start_component():
+    # Studio rechaza SUBJOB_ERROR desde un componente que no inicia subjob (un tMap, un filtro).
+    transform = step("map_1", "tMap", verified=False)
+    arguments = build_apply_spec(plan(transform), error_handling=True).to_mcp_arguments()
+
+    assert [item["componentName"] for item in arguments["components"]] == ["tMap", "tLogCatcher", "tLogRow"]
+    assert {c["connectorName"] for c in arguments["connections"]} == {"FLOW"}
+
+
+def test_error_handling_skips_input_components_that_already_receive_a_flow():
+    read = step("read_1", "tFileInputDelimited")
+    lookup = step("read_2", "tFileInputDelimited", from_step="read_1")
+    lookup.order = 2
+
+    arguments = build_apply_spec(plan(read, lookup), error_handling=True).to_mcp_arguments()
+    error_edges = [c for c in arguments["connections"] if c["connectorName"] == "SUBJOB_ERROR"]
+
+    assert [(c["source"], c["target"]) for c in error_edges] == [("tFileInputDelimited_1", "tDie_5")]

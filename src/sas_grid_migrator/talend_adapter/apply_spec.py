@@ -761,6 +761,68 @@ def _child_context_table(parent: JobPlan, child: JobPlan, parameters: list[str])
     }
 
 
+_SUBJOB_START = re.compile(r"Input|RowGenerator")
+
+
+def _add_error_handling(
+    job_name: str, components: list[ApplyComponent], connections: list[ApplyConnection]
+) -> None:
+    """Añade el manejo de errores básico: registro de fallos y, si se puede, corte del Job.
+
+    `tLogCatcher` registra en un subjob aparte cualquier error o `tDie` del Job. El corte con
+    `tDie` por `SUBJOB_ERROR` solo es válido desde un componente que inicia un subjob (una
+    entrada sin flujo entrante); Studio rechaza ese enlace desde un `tMap` o un filtro. Si el
+    Job no tiene un inicio así (por ejemplo, la lectura aún está por determinar), solo se
+    añade el registro. Van en filas propias, bajo el flujo.
+    """
+    receiving = {item.target for item in connections}
+    start = next(
+        (
+            item
+            for item in sorted(components, key=lambda candidate: candidate.pos_x)
+            if item.unique_name not in receiving and _SUBJOB_START.search(item.component_name)
+        ),
+        None,
+    )
+    catcher_y = max(item.pos_y for item in components) + 192
+    count = len(components)
+    catcher = f"tLogCatcher_{count + 1}"
+    log_row = f"tLogRow_{count + 2}"
+    components.extend(
+        [
+            ApplyComponent(
+                uniqueName=catcher, componentName="tLogCatcher", posX=160, posY=catcher_y,
+                label="Capturar errores del Job", parameters={},
+            ),
+            ApplyComponent(
+                uniqueName=log_row, componentName="tLogRow", posX=440, posY=catcher_y,
+                label="Registrar errores", parameters={},
+            ),
+        ]
+    )
+    connections.append(
+        ApplyConnection(
+            source=catcher, target=log_row, label="row_errors", connectorName="FLOW", uniqueName="flow_errors"
+        )
+    )
+    if start is None:
+        return
+    die = f"tDie_{count + 3}"
+    components.append(
+        ApplyComponent(
+            uniqueName=die, componentName="tDie", posX=160, posY=catcher_y + 192,
+            label="Detener el Job ante un fallo",
+            parameters={"MESSAGE": f'"Fallo en el Job {job_name}"'},
+        )
+    )
+    connections.append(
+        ApplyConnection(
+            source=start.unique_name, target=die, label="on_error",
+            connectorName="SUBJOB_ERROR", uniqueName="subjob_error_1",
+        )
+    )
+
+
 def build_apply_spec(
     plan: JobPlan,
     folder_path: str = "Process",
@@ -768,6 +830,7 @@ def build_apply_spec(
     context_file: Path | None = None,
     related_plans: list[JobPlan] | None = None,
     related_folder_paths: dict[str, str] | None = None,
+    error_handling: bool = False,
     _visited_programs: set[str] | None = None,
 ) -> TalendApplySpec:
     """Build a deterministic spec without filling missing SAS details with sample values."""
@@ -1014,6 +1077,7 @@ def build_apply_spec(
             child_folder,
             related_plans=plans,
             related_folder_paths=folder_paths,
+            error_handling=error_handling,
             _visited_programs=visited,
         )
         child_jobs.append(child_spec.to_mcp_arguments())
@@ -1067,6 +1131,9 @@ def build_apply_spec(
                 comment="Programa SAS de origen incluido en esta guía.",
             )
         )
+
+    if error_handling and components:
+        _add_error_handling(plan.job_name, components, connections)
 
     return TalendApplySpec(
         project_id=plan.project_id,

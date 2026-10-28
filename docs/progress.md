@@ -23,6 +23,6 @@ La suite omitió una prueba de importación de symlink porque Windows no concede
 - Probar casos representativos en Talend Studio y registrar versión, pasos, evidencia y resultado. Hecho con los fixtures P0 y P1; falta con programas reales.
 - Abierto: Studio marca los `tMap` sin mapeo con "Unknown value in the list [Mapping links display as:]" aunque el `.item` guarda `LINK_STYLE=AUTO`; parece una marca desactualizada de la vista Problemas (plugin Java).
 - Resuelto: si la aplicación falla a mitad, el MCP borra los Jobs que creó en esa llamada y el error lo indica; los Jobs que ya existían no se tocan.
-- Abierto: el generador no añade manejo de errores (`BP-ERR-01`); ver `docs/talend-best-practices.md`.
+- Resuelto: el generador añade `tLogCatcher` + `tLogRow` y, si hay un componente de inicio, `tDie` por `SUBJOB_ERROR` (`BP-ERR-01`); ver `docs/talend-best-practices.md`.
 - Ningún componente se marca verificado solo por una inspección viva: `talend-mcp` está conectado, pero el piloto con programas reales sigue pendiente.
 - El piloto con programas reales del cliente sigue pendiente (`docs/pilot-report.md`).

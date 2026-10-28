@@ -578,6 +578,7 @@ def _talend_apply_spec(project_id: str, program: str, plans: PlanSet | None = No
             folder_paths[program],
             related_plans=plans.plans,
             related_folder_paths=folder_paths,
+            error_handling=True,
         )
     except ValueError as e:
         raise HTTPException(422, str(e)) from e
@@ -603,6 +604,7 @@ def _talend_batch_bundle(project_id: str) -> tuple[list, dict[str, object], str]
                 folder_paths[plan.program],
                 related_plans=plans.plans,
                 related_folder_paths=folder_paths,
+                error_handling=True,
             )
         except ValueError as e:
             raise HTTPException(422, str(e)) from e
@@ -722,6 +724,7 @@ def preview_talend_apply(project_id: str, program: str) -> dict:
             _talend_apply_folder(program, project_id=project_id),
             related_plans=plans.plans,
             related_folder_paths=folder_paths,
+            error_handling=True,
         )
     except ValueError as e:
         raise HTTPException(422, str(e)) from e
