@@ -24,6 +24,9 @@ Después consulta [README.md](README.md) para ejecutar el producto y la document
 del área. Las especificaciones de `docs/superpowers/` explican decisiones de diseño, pero el código
 y las pruebas actuales prevalecen si una especificación quedó atrás.
 
+Si tu tarea es avanzar la automatización de la migración, sigue [el plan de automatización](docs/automation-plan.md):
+reparte el trabajo en paquetes (WP), con la métrica `tools/automation_metrics.py` y los criterios de aceptación de cada uno.
+
 Revisa siempre `git status` y `git diff` antes de editar; conserva trabajo local ajeno a la tarea.
 Si el repositorio tiene índice CodeGraph, úsalo para localizar símbolos y seguir llamadas antes de
 buscar código a mano; verifica en el código actual todo detalle que no cubra el índice.
