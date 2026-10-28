@@ -11,7 +11,10 @@ from typing import Literal
 from pydantic import BaseModel
 
 from sas_grid_migrator.intermediate_representation.models import IROperation, LibraryRef, ProgramIR
-from sas_grid_migrator.migration_planner.expressions import is_simple_arithmetic_translation, translate
+from sas_grid_migrator.migration_planner.expressions import (
+    is_simple_arithmetic_translation,
+    translate,
+)
 from sas_grid_migrator.migration_planner.models import (
     ChildJob,
     Connection,
@@ -57,6 +60,19 @@ def _format_rows(statements: list[str]) -> list[tuple[str, str, str]]:
             if m:
                 rows.append((head.group(1), m.group(1).strip("'\""), m.group(2).strip("'\"")))
     return rows
+
+
+def _sort_key(key: str) -> tuple[str, str]:
+    """Devuelve la columna y dirección para claves SAS BY o SQL ORDER BY."""
+    prefix = re.match(r"^(ascending|descending)\s+(.+)$", key, re.IGNORECASE)
+    if prefix:
+        direction = "DESC" if prefix.group(1).lower().startswith("desc") else "ASC"
+        return prefix.group(2).strip(), direction
+    suffix = re.match(r"^(.+?)\s+(asc|desc|ascending|descending)$", key, re.IGNORECASE)
+    if suffix:
+        direction = "DESC" if suffix.group(2).lower().startswith("desc") else "ASC"
+        return suffix.group(1).strip(), direction
+    return key.strip(), "ASC"
 
 
 class OpRule(BaseModel):
@@ -325,6 +341,10 @@ class _Planner:
                 pend.append("Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo")
             elif op.type == "append":
                 props["TABLE_ACTION"], props["DATA_ACTION"] = "NONE", "INSERT"
+                if re.search(r"\bforce\b", str(d.get("options") or ""), re.IGNORECASE):
+                    pend.append(
+                        "PROC APPEND FORCE permite diferencias de esquema; validar columnas y tipos antes de migrar"
+                    )
         elif op.type == "filter":
             t = translate(d.get("expression", ""))
             exprs.append(Expression(sas=t.sas, talend=t.talend, line=line, warnings=t.warnings))
@@ -393,7 +413,11 @@ class _Planner:
                         "Condición de join no reducible a igualdad de columnas: revisar manualmente"
                     )
         elif op.type == "union":
-            pass
+            text = d.get("text", "")
+            if re.search(r"\bunion\b(?!\s+all\b)", text, re.IGNORECASE):
+                pend.append(
+                    "Validar eliminación de filas duplicadas: UNION SAS/SQL sin ALL no equivale a concatenar con tUnite"
+                )
         elif op.type == "aggregate":
             gb = d.get("group_by", [])
             props["GROUPBYS"] = ", ".join(g.split(".")[-1] for g in gb) or None
@@ -417,19 +441,17 @@ class _Planner:
                     + " a operaciones de agregación"
                 )
         elif op.type == "sort":
-            keys = [
-                re.sub(r"\s+(asc|desc|ascending|descending)$", "", k, flags=re.IGNORECASE).split(
-                    "."
-                )[-1]
-                for k in d.get("keys", [])
-            ]
-            props["CRITERIA"] = ", ".join(d.get("keys", [])) or None
+            keys = [_sort_key(key) for key in d.get("keys", [])]
+            props["CRITERIA"] = ", ".join(
+                f"{name.split('.')[-1]} {direction}" for name, direction in keys
+            ) or None
             for k in keys:
-                col(k)
+                col(k[0].split(".")[-1])
         elif op.type == "dedupe":
-            props["UNIQUE_KEY"] = ", ".join(d.get("keys", [])) or None
-            for k in d.get("keys", []):
-                col(k)
+            keys = [_sort_key(key)[0] for key in d.get("keys", [])]
+            props["UNIQUE_KEY"] = ", ".join(keys) or None
+            for k in keys:
+                col(k.split(".")[-1])
         elif op.type == "project":
             for it in d.get("select", []):
                 col(it["alias"])
@@ -616,6 +638,9 @@ class _Planner:
                 for expression in exprs
             )
             sem = not safe_assignments or op.confidence != "high"
+        elif op.type == "project":
+            sem = any(expression.talend is None or expression.warnings for expression in exprs)
+            sem = sem or op.confidence != "high"
         if offline_configured and op.type in {"read_file", "write_file", "filter"}:
             sem = False
         return PlanStep(

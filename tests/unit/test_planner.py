@@ -174,7 +174,7 @@ def test_grid_recommendations_use_versioned_catalog_and_keep_unsupported_evidenc
     )
     assert unknown.status == "unsupported" and unknown.evidence.line == 4
     assert unknown.details["unknown_options"] == ["-grid", "-queue", "-name", "-wait"]
-    lsf = [r for r in ps.grid_recommendations if r.pattern_id == "scheduler.lsf"]
+    lsf = [r for r in coverage_recommendations if r.pattern_id == "scheduler.lsf"]
     assert [(r.status, r.evidence.line) for r in lsf] == [("unsupported", 5), ("unsupported", 6)]
     missing = next(
         r for r in ps.grid_recommendations if r.pattern_id == "sasgsub.missing_option_value"

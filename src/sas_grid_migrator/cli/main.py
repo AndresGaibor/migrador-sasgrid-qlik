@@ -4,12 +4,14 @@ from pathlib import Path
 import typer
 
 from sas_grid_migrator import __version__
+from sas_grid_migrator.cli.agent import agent_app
 from sas_grid_migrator.cli.dev import dev
 from sas_grid_migrator.config import Settings
 from sas_grid_migrator.ingestion.importer import ImportError_
 from sas_grid_migrator.persistence.store import Store
 
 app = typer.Typer(help="SAS Grid Migrator: análisis estático y planes de migración a Talend.")
+app.add_typer(agent_app, name="agent")
 
 
 @app.callback()

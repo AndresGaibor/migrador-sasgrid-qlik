@@ -16,6 +16,7 @@ dist/
 # Manuales SAS (copyright SAS Institute): solo locales, no se versionan
 docs/reference/sas/*.md
 !docs/reference/sas/README.md
+docs/reference/sas/gridref-9.4-fifth-edition.pdf
 # Documentación de Talend (copyright de Qlik): solo local; el catálogo estructurado sí se versiona
 docs/reference/talend/*
 !docs/reference/talend/README.md

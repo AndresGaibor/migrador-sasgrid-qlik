@@ -391,7 +391,14 @@ def _proc_step(stmts: list[Stmt], ctx: _Ctx) -> ProcStep:
         kw = _kw(s.text)
         rest = s.text[len(kw) :].strip()
         if kw == "by":
-            ps.by += rest.split()
+            tokens = iter(rest.split())
+            for token in tokens:
+                if token.lower() in ("ascending", "descending"):
+                    variable = next(tokens, None)
+                    if variable:
+                        ps.by.append(f"{token.lower()} {variable}")
+                else:
+                    ps.by.append(token)
         elif kw in ("output", "out") or (
             kw not in ("var", "class", "model", "tables", "table") and "out=" in rest.lower()
         ):

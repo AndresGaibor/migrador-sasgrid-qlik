@@ -92,6 +92,26 @@ Medido sobre el corpus: 58 programas, 372 datasets, 6 tareas de macro orquestado
 - API: `GET /api/talend/catalog[?q=&family=]`, `GET /api/talend/catalog/{componente}` (incluye la doc local si existe). UI: «Catálogo Talend».
 - Test de coherencia: toda propiedad y componente de `rules/mappings` existe en el catálogo (encontró `KEY/VALUE` → `VARIABLES` y `CONTEXT_PARAMS` → `CONTEXTPARAMS`).
 
-## API prevista
+## API implementada
 
-`POST /api/projects`, `POST /api/projects/uploads`, `GET /api/projects/{id}/processing`, `POST /api/projects/{id}/processing/retry`, `POST|GET /api/projects/{id}/analyses`, `GET /api/projects/{id}/inventory`, `GET /api/projects/{id}/dependencies`, `GET /api/projects/{id}/programs` y `GET /api/projects/{id}/programs/{path}` (el programa se identifica por proyecto + ruta), `POST|GET /api/projects/{id}/plans`, `GET /api/projects/{id}/plans/{path}[?format=md]`, `GET|POST /api/projects/{id}/plans/{path}/talend-apply`, `POST /api/projects/{id}/plans/{path}/talend-apply/preview`, `PATCH /api/projects/{id}/plans/{path}/steps/{step_id}`, `POST /api/projects/{id}/plans/verify`, `POST /api/projects/{id}/exports`, `GET /api/integrations/talend/health`, `POST /api/integrations/talend/inspect`.
+La API FastAPI está en `apps/api/main.py` y `apps/api/`; delega al núcleo Python y a
+`TalendAdapter`. La especificación vigente se genera desde la aplicación en `/openapi.json` y se
+puede explorar en `/docs` mientras corre la API. No mantengas una segunda lista exhaustiva de
+rutas aquí; usa estos grupos funcionales para orientarte:
+
+| Grupo | Capacidades principales |
+| --- | --- |
+| Salud | estado del servicio y límites del pipeline |
+| Proyectos | crear/listar/borrar, subir ZIP como proyecto aislado, importar ruta/ZIP en un proyecto existente |
+| Procesamiento | estado de análisis asíncrono y reintento de trabajos fallidos/interrumpidos |
+| Análisis | inventario, resumen, programas SAS, evidencia de fuente y dependencias |
+| Planes | generación/listado/detalle, recomendaciones Grid y decisiones por paso |
+| Talend por Job | preview, estado, aplicar y volver a verificar contra Studio |
+| Talend por proyecto | preflight, resumen, iniciar/reintentar lote, estado y resumen de lote |
+| Exportaciones | generar y descargar Markdown, JSON y CSV |
+| Integración Talend | catálogo, configuración Studio, health y lectura/escritura de permisos |
+
+Para automatización desde shell, `sgm agent api METHOD PATH` invoca una ruta y emite JSON; el
+comando `sgm agent migrate PATH -n NAME` ejecuta importación, análisis, planes y exportación, pero
+no aplica Jobs en Talend. El permiso de escritura sigue administrándose desde Configuración. Ver
+los ejemplos y límites en [`agent-guide.md`](agent-guide.md).

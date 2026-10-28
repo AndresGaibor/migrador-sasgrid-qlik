@@ -12,7 +12,7 @@
 
 ## Cobertura Grid
 
-Los conteos describen entradas del catálogo, no ocurrencias ni porcentaje del universo SAS Grid. Las formas `sasgsub` del fixture son ilustrativas: no se confirmó su sintaxis contra una versión de SAS Grid. Por eso las recomendaciones relacionadas permanecen `partial`; LSF y opciones desconocidas/incompletas quedan `unsupported` con motivo y evidencia. No elevar estados hasta contrastar scripts representativos o fuentes de la versión objetivo.
+Los conteos describen entradas del catálogo, no ocurrencias ni porcentaje del universo SAS Grid. Se añadió [`docs/sas-grid-support.md`](sas-grid-support.md), basado entre otras fuentes en *Grid Computing in SAS 9.4, Fifth Edition* (PDF oficial local, ignorado por Git). La referencia confirma argumentos como `-GRIDJOBNAME`, `-GRIDWAITRESULTS` y el paso de opciones de proveedor mediante `-GRIDJOBOPTS`; no confirma el entorno objetivo del proyecto. Las formas `sasgsub` del fixture siguen siendo ilustrativas: las recomendaciones relacionadas permanecen `partial`; LSF y opciones desconocidas/incompletas quedan `unsupported` con motivo y evidencia. No elevar estados hasta identificar versión/proveedor y contrastar scripts representativos.
 
 La suite omitió una prueba de importación de symlink porque Windows no concede el privilegio requerido en este entorno. La protección de symlinks no se declara validada aquí.
 

@@ -4,7 +4,7 @@
 - ZIP: validar cada entrada antes de extraer.
 - Sin conexión automática a sistemas de producción.
 - Secretos (credenciales, claves, variables) no se copian a informes; enmascarar al leer configs.
-- `talend-mcp`: solo en loopback/transporte configurado, nunca expuesto a red pública. El portal solo usa la tool de escritura `talend_job_apply_custom_spec` desde una acción explícita de creación y se puede bloquear desde la vista Configuración; el permiso se guarda en la base, sin variables de entorno. No llama a tools de ejecución de Jobs.
+- `talend-mcp`: solo en loopback/transporte configurado, nunca expuesto a red pública. La UI y `sgm agent` pueden solicitar la tool de escritura `talend_job_apply_custom_spec`; el permiso se puede cambiar únicamente desde Configuración y se guarda en la base, sin variables de entorno. El CLI no puede cambiar ese permiso. No se llaman tools de ejecución de Jobs.
 
 ## Controles implementados (F7)
 
@@ -12,5 +12,6 @@
 - **Importación**: sin symlinks, límites de tamaño/cantidad/total (`SGM_MAX_FILE_BYTES`, `SGM_MAX_FILES`, `SGM_MAX_TOTAL_BYTES`), rutas con `..` rechazadas (zip-slip), carpeta de datos dentro de la fuente excluida (evita copia recursiva) y fuente dentro de la propia copia rechazada (evitaba borrarla al reimportar). `POST /api/projects/uploads` crea un proyecto independiente por ZIP; la API no ejecuta el contenido importado.
 - **API**: `SGM_IMPORT_ROOTS` limita las rutas importables (403 fuera de ellas). Si no se define, cualquier ruta local es importable: usar solo en máquina de un usuario, escuchando en `127.0.0.1`.
 - **Talend**: allowlist `policy.assert_allowed` en cada llamada; `inspect_job` solo acepta rutas `.item`. La escritura se limita a la especificación estructurada de la guía y al destino aislado del proyecto. El resultado se guarda en SQLite para recuperación y deduplicación; un conflicto no sobrescribe un Job ajeno.
+- **CLI para agentes**: `sgm agent api` usa la misma API que la UI y puede pedir escrituras si el permiso ya está habilitado. Antes de un lote, consulta el preflight/resumen vigente; el servidor repite sus comprobaciones de destino al iniciar el lote. No asumas que ejecutar el comando equivale a aprobación humana ni a validación del Job.
 - El análisis y los planes funcionan sin Talend.
 - **Despliegue**: `ops/systemd/` (API en `127.0.0.1:38421`, datos en `/var/lib/sgm`, `SGM_IMPORT_ROOTS=/var/lib/sgm/imports`, unidad endurecida). La app **no tiene autenticación**: el acceso remoto solo por Tailscale Serve (tailnet), nunca público. La subida de ZIP (`POST /api/projects/{id}/uploads`) pasa por las mismas validaciones que una carpeta.

@@ -14,7 +14,19 @@ gana este archivo.
 | `contract/portal-tools.json` | Manifiesto del contrato con el MCP: tools de lectura, tool de escritura y campos obligatorios. |
 | `mcp/talend-mcp/` | Servidor MCP, como `git subtree` del repositorio [AndresGaibor/talend-mcp](https://github.com/AndresGaibor/talend-mcp). Es código propio: se puede editar aquí. |
 | `docs/superpowers/` | Planes y especificaciones del portal (incluidos los que antes vivían dentro del MCP). |
-| `tests/` | Pruebas de Python con `pytest`. Las de web viven junto al código, en `apps/web/src/**/*.test.mjs`. |
+| `tests/` | Pruebas de Python con `pytest`. Las de web viven junto al código, en `apps/web/src/**/*.test.*`. |
+
+## Punto de entrada recomendado
+
+Antes de explorar una tarea, lee [la guía de agentes](docs/agent-guide.md): resume el flujo SAS →
+plan → Talend, el mapa código/pruebas, contratos importantes y recetas de cambios frecuentes.
+Después consulta [README.md](README.md) para ejecutar el producto y la documentación específica
+del área. Las especificaciones de `docs/superpowers/` explican decisiones de diseño, pero el código
+y las pruebas actuales prevalecen si una especificación quedó atrás.
+
+Revisa siempre `git status` y `git diff` antes de editar; conserva trabajo local ajeno a la tarea.
+Si el repositorio tiene índice CodeGraph, úsalo para localizar símbolos y seguir llamadas antes de
+buscar código a mano; verifica en el código actual todo detalle que no cubra el índice.
 
 El MCP es un proyecto aparte con sus propias reglas: lee
 [mcp/talend-mcp/AGENTS.md](mcp/talend-mcp/AGENTS.md) antes de tocar nada dentro del subtree. Este

@@ -22,10 +22,47 @@ uv run sgm inventory <project_id>
 uv run sgm analyze <project_id>               # parseo + cobertura P0/P1/P2
 uv run sgm deps <project_id>                  # dependencias, capas y tareas Grid
 uv run sgm plan <project_id> [-o dir]         # planes por Job + index.md + steps.csv
+uv run sgm agent migrate ./lote_sas -n clientes # importar → analizar → planear → exportar
+uv run sgm agent api GET /projects             # API completa, salida JSON para agentes
 uv run uvicorn apps.api.main:app --reload   # API local
 ```
 
+### CLI para agentes
+
+`sgm agent api METHOD PATH` permite invocar los endpoints de la plataforma y devuelve JSON
+por stdout. Cubre las operaciones de migración de la UI (proyectos, inventario, análisis,
+planes, decisiones, catálogo Talend, consulta de permisos, preflight, aplicación, verificación y exportación),
+además de endpoints nuevos sin tener que ampliar la CLI. Usa `--data '{...}'` para cuerpos JSON,
+`--file archivo.zip` para cargas multipart y `--server URL` o `SGM_API` si la API no está en
+`http://127.0.0.1:8000`. El cambio del permiso de escritura está bloqueado en la CLI y se hace
+únicamente desde Configuración.
+
+```bash
+PROJECT_ID=abc123
+uv run sgm agent api GET "/projects/$PROJECT_ID/plans"
+uv run sgm agent api PATCH "/projects/$PROJECT_ID/plans/programa.sas/steps/step_id" --data '{"status":"pendiente","note":"requiere cotejo en Studio"}'
+uv run sgm agent api POST "/projects/$PROJECT_ID/plans/programa.sas/talend-apply/preview"
+uv run sgm agent api GET "/projects/$PROJECT_ID/talend-apply-batch/preflight"
+```
+
+La escritura sigue sujeta a los controles del servidor y al permiso administrado en Configuración;
+la CLI no elude esos controles. `sgm agent migrate PATH -n NOMBRE` ejecuta el flujo seguro hasta
+generar planes y exportarlos, pero no crea ni ejecuta Jobs de Talend. La ruta de importación debe
+ser accesible desde la máquina donde corre la API. Si una etapa falla, el proyecto queda disponible
+para inspección y reintento.
+
+## Trabajar en el repositorio
+
+Para orientarse en el código, el flujo SAS → Talend, las reglas de negocio y las pruebas por área,
+empieza por la [guía para agentes](docs/agent-guide.md). La [arquitectura](docs/architecture.md)
+explica límites y modelos; la [guía de seguridad](docs/security.md) y la
+[operación de proyectos ZIP](docs/zip-project-workspaces.md) describen las restricciones en tiempo
+de ejecución. El archivo [AGENTS.md](AGENTS.md) contiene las reglas obligatorias para cambios y
+trabajo con el subtree del MCP.
+
 Para operar el portal con proyectos ZIP, análisis automático, reintentos y destinos aislados en Talend, consulta [la guía operativa](docs/zip-project-workspaces.md). Despliegue persistente (systemd + Tailscale Serve): ver [ops/systemd/README.md](ops/systemd/README.md).
+
+Para revisar el alcance actual del analizador de orquestación SAS Grid, sus límites y la lista de datos que se deben confirmar en el entorno origen, consulta la [guía SAS Grid](docs/sas-grid-support.md). La documentación oficial descargada para consulta local está en `docs/reference/sas/` y no se versiona por copyright.
 
 Frontend (`apps/web`, React + TS + Vite + Bun):
 
