@@ -8,7 +8,7 @@
 | API / Andres | Flujo API validado | Prueba de integración cubre ZIP multiarchivo, análisis, plan, evidencia, progreso y exportación. El progreso se conserva en la base del proyecto. |
 | Web / Byron | UI integrada; E2E pendiente de ejecución | ZIP, resumen, navegación a job/guía, evidencia, estados, catálogo Talend, enlaces de exportación y adaptación móvil implementados. `bun test` y build pasan. El runner Playwright está actualizado, pero Playwright no está instalado en este entorno. |
 | Validación automatizada | Suite Python y web verificadas | `pytest -q`: 87 passed, 1 skipped; `ruff check .`: all checks passed; `bun test`: 2 passed; `bun run build`: passed. |
-| Talend Studio | Pendiente | No se encontró instalación de Talend Studio. No se afirma equivalencia validada en Studio. |
+| Talend Studio | Conectado y verificado (28/10/2026) | Studio 8.0.1 con el Bridge `readWrite`. El portal lista 55 Jobs, crea y lee Jobs, y los fixtures P0 se aplican como borradores en `Process/PruebasPortal`. Los errores de Studio se informan en `design_errors`. No se afirma equivalencia SAS ↔ Talend: eso sigue siendo manual (`docs/equivalence-testing.md`). |
 
 ## Cobertura Grid
 
@@ -20,6 +20,9 @@ La suite omitió una prueba de importación de symlink porque Windows no concede
 
 - Ejecutar `.claude/scripts/e2e_web.mjs` con Playwright instalado y servicios web/API activos; confirmar upload, errores, navegación, progreso tras recarga, descarga, teclado y viewport móvil.
 - Verificar nombres/opciones Grid con documentación o scripts representativos de una versión identificada.
-- Probar casos representativos en Talend Studio y registrar versión, pasos, evidencia y resultado cuando esté disponible.
-- El servidor `talend-mcp` no está conectado; ningún componente se marca verificado por una inspección viva.
+- Probar casos representativos en Talend Studio y registrar versión, pasos, evidencia y resultado. Hecho con los fixtures P0 y P1; falta con programas reales.
+- Abierto: Studio marca los `tMap` sin mapeo con "Unknown value in the list [Mapping links display as:]" aunque el `.item` guarda `LINK_STYLE=AUTO`; parece una marca desactualizada de la vista Problemas (plugin Java).
+- Abierto: la aplicación en Studio no es atómica; si falla a mitad, el Job queda a medias.
+- Abierto: el generador no añade manejo de errores (`BP-ERR-01`); ver `docs/talend-best-practices.md`.
+- Ningún componente se marca verificado solo por una inspección viva: `talend-mcp` está conectado, pero el piloto con programas reales sigue pendiente.
 - El piloto con programas reales del cliente sigue pendiente (`docs/pilot-report.md`).

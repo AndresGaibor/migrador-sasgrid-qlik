@@ -43,6 +43,7 @@ from sas_grid_migrator.sas_parser.analyze import (
 )
 from sas_grid_migrator.sas_parser.ast import ParsedProgram
 from sas_grid_migrator.talend_adapter.batch import collect_child_results, order_plans_for_batch
+from sas_grid_migrator.talend_adapter.best_practices import check_job_arguments
 
 
 @asynccontextmanager
@@ -697,6 +698,7 @@ async def _child_apply_outcome(child: dict, spec) -> dict:
         "review_required": bool(review_warnings or blocked_steps or warnings or partial),
         "review_warnings": review_warnings,
         "design_errors": design_errors,
+        "best_practices": _best_practices(spec),
         "verification": verification,
         "result": {key: value for key, value in child.items() if key != "childJobs"},
     }
@@ -1080,6 +1082,12 @@ def _design_errors(studio_items: list[dict], write_result: dict) -> list[str]:
     return list(dict.fromkeys(error for error in found if error))
 
 
+def _best_practices(spec) -> list[dict]:
+    """Recomendaciones de buenas prácticas de Talend; no cambian el estado de la aplicación."""
+    findings = check_job_arguments(spec.to_mcp_arguments())
+    return [finding.model_dump(exclude_none=True) for finding in findings]
+
+
 def _design_errors_warning(errors: list[str]) -> str:
     shown = "; ".join(errors[:5]) + ("…" if len(errors) > 5 else "")
     return f"Talend Studio reporta {len(errors)} error(es) de diseño: {shown}"
@@ -1263,6 +1271,7 @@ async def _apply_talend_plan(
         "review_required": bool(review_warnings or spec.blocked_steps or warnings or verification["status"] != "inspected"),
         "review_warnings": review_warnings,
         "design_errors": design_errors,
+        "best_practices": _best_practices(spec),
         "verification": verification,
         "result": result,
     }

@@ -1418,3 +1418,30 @@ def test_preflight_fails_closed_when_mcp_inventory_is_unavailable(tmp_path, monk
 
     assert response.status_code == 502
     assert "mcp caído" in response.json()["detail"].lower()
+
+
+def test_outcome_lists_talend_best_practice_findings_without_changing_the_status(tmp_path, monkeypatch):
+    from sas_grid_migrator.talend_adapter.best_practices import PracticeFinding
+
+    _set_env(monkeypatch, tmp_path)
+    finding = PracticeFinding(
+        rule="BP-CTX-01", severity="warning", component="tFileInputDelimited_1", parameter="FILENAME",
+        message="valor fijo",
+    )
+    monkeypatch.setattr(api_module, "check_job_arguments", lambda arguments: [finding])
+    monkeypatch.setattr(api_module, "_talend", lambda: FakeTalend())
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Practices",
+            [_plan("x", "parent.sas", "job_parent", child_call=True), _plan("x", "child.sas", "job_child")],
+            [["parent.sas"], ["child.sas"]],
+        )
+        client.post(f"/api/projects/{project_id}/talend-apply-batch")
+        parent = client.get(f"/api/projects/{project_id}/plans/parent.sas/talend-apply").json()
+        child = client.get(f"/api/projects/{project_id}/plans/child.sas/talend-apply").json()
+
+    expected = [finding.model_dump(exclude_none=True)]
+    assert parent["result"]["best_practices"] == expected
+    assert child["result"]["best_practices"] == expected
+    assert child["status"] == "applied"
