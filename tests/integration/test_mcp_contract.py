@@ -58,7 +58,10 @@ def _wait_for_health(url: str, proc: subprocess.Popen, timeout: float = 30.0) ->
 
 
 class _Server:
-    def __init__(self, preset: str, project: Path):
+    def __init__(self, preset: str, project: Path, cwd: Path | None = None):
+        # El catálogo de componentes se resuelve respecto al cwd del servidor
+        # (`.talend-mcp/component-catalog.json`): un cwd propio aísla la prueba del
+        # catálogo que cada equipo genera con su Studio.
         self.project = project
         self.port = _free_port()
         self.url = f"http://127.0.0.1:{self.port}/mcp"
@@ -72,8 +75,8 @@ class _Server:
             "TALEND_PROJECT": str(project),
         }
         self.proc = subprocess.Popen(
-            [BUN, "run", "index.ts"],
-            cwd=MCP_DIR,
+            [BUN, "run", str(MCP_DIR / "index.ts")],
+            cwd=cwd or MCP_DIR,
             env=env,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
@@ -106,6 +109,28 @@ def agent_server(tmp_path_factory):
     project = tmp_path_factory.mktemp("talend-project-agent")
     (project / "talend.project").write_text("", encoding="utf-8")
     server = _Server("agent", project)
+    try:
+        yield server
+    finally:
+        server.stop()
+
+
+@pytest.fixture(scope="module")
+def offline_server(tmp_path_factory):
+    _require_bun()
+    project = tmp_path_factory.mktemp("talend-project-offline")
+    (project / "talend.project").write_text("", encoding="utf-8")
+    cwd = tmp_path_factory.mktemp("talend-mcp-cwd")
+    catalog = cwd / ".talend-mcp"
+    catalog.mkdir()
+    entries = [
+        {"componentName": name, "family": family, "version": "0.102", "pluginJar": "", "definitionFiles": [],
+         "parameters": [], "schemas": {"hasInputSchema": True, "hasOutputSchema": True, "hasDynamicSchema": False},
+         "connectors": [], "dependencies": [], "limitations": []}
+        for name, family in (("tFileInputDelimited", "File/Input"), ("tLogRow", "Logs_Errors"))
+    ]
+    (catalog / "component-catalog.json").write_text(json.dumps({"entries": entries}), encoding="utf-8")
+    server = _Server("portal", project, cwd=cwd)
     try:
         yield server
     finally:
@@ -145,7 +170,7 @@ def test_agent_preset_alone_is_reported_incomplete(agent_server):
     assert "TALEND_MCP_FILTER=portal" in status["fix_hint"]
 
 
-def test_offline_batch_writes_the_contexts_the_portal_builds(mcp_server):
+def test_offline_batch_writes_the_contexts_the_portal_builds(offline_server):
     """`talend_jobs_create_from_spec` descarta `contexts`; el lote offline sí los escribe."""
     import asyncio
 
@@ -168,13 +193,13 @@ def test_offline_batch_writes_the_contexts_the_portal_builds(mcp_server):
     }
 
     async def create():
-        async with Client(mcp_server.url, read_timeout_seconds=30) as client:
+        async with Client(offline_server.url, read_timeout_seconds=30) as client:
             return await client.call_tool("talend_jobs_create_batch", to_batch_arguments(spec))
 
     result = asyncio.run(create())
 
     assert not getattr(result, "is_error", False), result
-    items = list((mcp_server.project / "process").rglob("OfflineContexts_0.1.item"))
+    items = list((offline_server.project / "process").rglob("OfflineContexts_0.1.item"))
     assert len(items) == 1, f"el lote no escribió el Job: {result}"
     xml = items[0].read_text(encoding="utf-8")
     assert 'name="run_date"' in xml and "2026-10-28" in xml
