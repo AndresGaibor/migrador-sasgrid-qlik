@@ -26,3 +26,15 @@ La suite omitió una prueba de importación de symlink porque Windows no concede
 - Resuelto: el generador añade `tLogCatcher` + `tLogRow` y, si hay un componente de inicio, `tDie` por `SUBJOB_ERROR` (`BP-ERR-01`); ver `docs/talend-best-practices.md`.
 - Ningún componente se marca verificado solo por una inspección viva: `talend-mcp` está conectado, pero el piloto con programas reales sigue pendiente.
 - El piloto con programas reales del cliente sigue pendiente (`docs/pilot-report.md`).
+
+## Corrida masiva contra Studio (28/10/2026)
+
+Proyecto sintético `bancolombia_sas_synthetic_orchestration` (7 programas y un orquestador), aplicado por el flujo de lote
+contra Studio 8.0.1: **8 de 8 Jobs creados** en 43 s, todos como `partially_applied` (borradores con pendientes de esquema
+y de expresiones SAS). La primera pasada creó 6 de 8; lo que falló y se corrigió en el MCP y el plugin:
+
+- Conectar dos `tFilterRow` seguidos (dos `WHERE` encadenados) se rechazaba: el validador buscaba la entrada en el conector `FILTER`, que es solo de salida.
+- Esa misma conexión abre en Studio el diálogo modal "Do you want to get the schema of the target component?" que dejaba el hilo de interfaz colgado. El plugin lo contesta con No, y el MCP atiende los diálogos conocidos mientras conecta.
+- `talend_job_problems` y la aplicación abrían el editor de cada Job y no lo cerraban; en lotes grandes saturaban Studio. Ahora cierran los editores que ellos abrieron (nunca uno que ya estaba abierto).
+
+Abierto: la vista Problemas sigue marcando `tMap` (`LINK_STYLE`) y `tFilterRow` (`LOGICAL_OP`) borradores con "Unknown value in the list", aunque lo guardado en el `.item` coincide con lo que escribe Studio (`AUTO` y `&&`). Parece la caché en memoria de Studio; se confirmaría reiniciándolo y reabriendo uno de los Jobs.

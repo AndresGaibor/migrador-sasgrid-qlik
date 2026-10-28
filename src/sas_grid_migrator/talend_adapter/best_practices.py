@@ -9,7 +9,9 @@ from typing import Any, Literal
 
 from pydantic import BaseModel
 
-MAX_COMPONENTS = 30
+MAX_COMPONENTS = 20  # guía de buenas prácticas de Talend: "evita más de 20 componentes en un Job"
+RESERVED_GIT_NAMES = frozenset({"tests", "target", "src"})
+JOB_PREFIX = "job_"
 
 _ENVIRONMENT_PARAMETERS = ("FILENAME", "DIRECTORY", "HOST", "PORT", "DBNAME", "URL")
 _PASSWORD_PARAMETERS = ("PASS", "PASSWORD", "PASSPHRASE")
@@ -42,6 +44,22 @@ def check_job_arguments(arguments: dict[str, Any]) -> list[PracticeFinding]:
     components = [item for item in arguments.get("components", []) if isinstance(item, dict)]
     connections = [item for item in arguments.get("connections", []) if isinstance(item, dict)]
     findings: list[PracticeFinding] = []
+
+    job_name = str(arguments.get("jobName") or "")
+    if job_name and not job_name.startswith(JOB_PREFIX):
+        findings.append(PracticeFinding(
+            rule="BP-NAME-01",
+            severity="info",
+            message=f"El Job '{job_name}' no empieza por '{JOB_PREFIX}'; la guía de Talend propone ese prefijo para distinguir Jobs de rutas, servicios y tareas.",
+        ))
+    folders = [part for part in str(arguments.get("folderPath") or "").replace("\\", "/").split("/") if part]
+    reserved = [name for name in [job_name, *folders] if name.lower() in RESERVED_GIT_NAMES]
+    if reserved:
+        findings.append(PracticeFinding(
+            rule="BP-NAME-02",
+            severity="warning",
+            message=f"El nombre '{reserved[0]}' está reservado con Git (tests, target, src): los cambios del Job no se suben al repositorio; renómbralo.",
+        ))
 
     for component in components:
         unique_name = component.get("uniqueName")

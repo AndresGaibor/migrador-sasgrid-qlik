@@ -137,14 +137,44 @@ def test_error_connectors_count_as_error_handling():
 
 
 def test_oversized_jobs_should_be_split():
-    components = [_component(f"tLogRow_{i}", "tLogRow") for i in range(1, 32)]
+    components = [_component(f"tLogRow_{i}", "tLogRow") for i in range(1, 22)]
     components.append(_component("tLogCatcher_99", "tLogCatcher"))
 
     finding = next(f for f in check_job_arguments(_job(components)) if f.rule == "BP-SIZE-01")
 
     assert finding.severity == "warning"
-    assert "32" in finding.message
+    assert "22" in finding.message
+    twenty = [_component(f"tLogRow_{i}", "tLogRow") for i in range(1, 20)] + [_component("tLogCatcher_99", "tLogCatcher")]
+    assert "BP-SIZE-01" not in _rules(check_job_arguments(_job(twenty)))
 
 
 def test_single_component_jobs_do_not_ask_for_error_handling():
     assert check_job_arguments(_job([_component("tLogRow_1", "tLogRow")])) == []
+
+
+def test_job_names_follow_the_job_prefix_convention():
+    job = _job([_component("tLogCatcher_1", "tLogCatcher"), _component("tLogRow_2", "tLogRow")])
+    job["jobName"] = "carga_clientes"
+
+    finding = next(f for f in check_job_arguments(job) if f.rule == "BP-NAME-01")
+
+    assert finding.severity == "info"
+    assert "job_" in finding.message
+    job["jobName"] = "job_carga_clientes"
+    assert "BP-NAME-01" not in _rules(check_job_arguments(job))
+
+
+def test_reserved_git_names_are_flagged_in_the_job_and_its_folders():
+    # Con Git, un Job o carpeta llamado tests, target o src no se sube al repositorio.
+    job = _job([_component("tLogCatcher_1", "tLogCatcher"), _component("tLogRow_2", "tLogRow")])
+    job["jobName"] = "job_ok"
+    job["folderPath"] = "Process/Banking/SRC/cargas"
+
+    finding = next(f for f in check_job_arguments(job) if f.rule == "BP-NAME-02")
+    assert finding.severity == "warning"
+    assert "SRC" in finding.message
+
+    job["folderPath"] = "Process/Banking/fuentes"
+    assert "BP-NAME-02" not in _rules(check_job_arguments(job))
+    job["jobName"] = "target"
+    assert "BP-NAME-02" in _rules(check_job_arguments(job))

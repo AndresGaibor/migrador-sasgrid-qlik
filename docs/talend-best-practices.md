@@ -13,7 +13,19 @@ se cambia de significado.
 | `BP-SEC-01` | error | `PASS`, `PASSWORD` o `PASSPHRASE` en claro | Variable de contexto de tipo contraseña; el mensaje nunca incluye el valor |
 | `BP-DB-01` | warning | Dos o más accesos a base de datos sin un componente de conexión | `t<Base>Connection` al inicio, accesos con "usar conexión existente", y commit y cierre al final |
 | `BP-ERR-01` | info | Job de dos o más componentes sin `tDie`, `tWarn`, `tLogCatcher`, `tStatCatcher`, `tFlowMeterCatcher`, `tAssertCatcher` ni conexión de error | Conexión `OnSubjobError` a `tDie` o `tWarn`, y `tLogCatcher` para registrar |
-| `BP-SIZE-01` | warning | Más de 30 componentes en un Job | Dividir en Jobs hijo con `tRunJob` |
+| `BP-SIZE-01` | warning | Más de 20 componentes en un Job | Dividir en Jobs hijo con `tRunJob` |
+| `BP-NAME-01` | info | El nombre del Job no empieza por `job_` | Renombrarlo, por ejemplo `job_carga_clientes` |
+| `BP-NAME-02` | warning | El Job o una carpeta suya se llama `tests`, `target` o `src` | Renombrarlo: con Git, esos nombres impiden subir los cambios |
+
+## Fuente
+
+Los umbrales y los nombres salen de la guía oficial de buenas prácticas del ciclo de vida de Talend
+([Designing Jobs, Routes or Data Services](https://help.qlik.com/talend/en-US/software-dev-lifecycle-best-practices-guide/7.3/designing-jobs-routes-or-data-services)):
+prefijos `job_`, `route_`, `service_`, `test_`, `pub_` y `task_`; nombres de componentes con significado; contextos para
+conexiones, hosts y puertos y para pasar de Desarrollo a QA y Producción; "evita más de 20 componentes en un Job"; flujo de
+izquierda a derecha y subjobs de arriba abajo; y la prohibición de `tests`, `target` y `src` como nombre de Job o de carpeta
+en proyectos con Git. La guía no cubre el manejo de errores, el registro ni las conexiones a base de datos más allá de los
+metadatos: esas reglas (`BP-ERR-01`, `BP-DB-01`) vienen de la práctica general de Talend.
 
 ## Qué se espera de un Job migrado
 
@@ -21,7 +33,7 @@ se cambia de significado.
 - Ninguna credencial dentro del Job.
 - Una conexión de base de datos por Job y por base, con commit y cierre explícitos.
 - Un fallo termina el Job con un mensaje (`tDie`) o queda registrado (`tLogCatcher`); nunca pasa en silencio.
-- Jobs pequeños: lo que en SAS es una macro o un `%include` se convierte en un Job hijo.
+- Jobs pequeños (hasta 20 componentes): lo que en SAS es una macro o un `%include` se convierte en un Job hijo.
 
 ## Estado actual del generador (fixtures SAS P0 y P1, Studio 8.0.1)
 
