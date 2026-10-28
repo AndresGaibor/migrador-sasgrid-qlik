@@ -146,8 +146,15 @@ def _published(mcp_server) -> list[dict]:
 def test_published_tools_cover_the_contract(mcp_server):
     contract = load_contract()
     names = {tool["name"] for tool in _published(mcp_server)}
-    missing = sorted((contract.read_tools | {contract.write_tool}) - names)
+    missing = sorted((contract.read_tools | {contract.write_tool, contract.restart_tool}) - names)
     assert not missing, f"el preset portal no publica: {', '.join(missing)}"
+
+
+def test_the_restart_tool_is_published_with_the_options_the_portal_sends(mcp_server):
+    contract = load_contract()
+    tools = {tool["name"]: tool for tool in _published(mcp_server)}
+
+    assert {"onlyIfMemoryAbove", "force"} <= tools[contract.restart_tool]["inputSchema"]["properties"].keys()
 
 
 def test_the_offline_write_tool_is_published_with_the_fields_the_portal_sends(mcp_server):

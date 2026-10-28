@@ -131,7 +131,7 @@
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties)
 - **Conexiones:** Main desde `op_15_read_1`
 - **Propiedades:**
-  - `CRITERIA` (Criteria) = `cliente_id` — SAS p0_clientes_activos.sas:15 · nombre oficial
+  - `CRITERIA` (Criteria) = `cliente_id ASC` — SAS p0_clientes_activos.sas:15 · nombre oficial
 - **Esquema:** `cliente_id` _(tipos por determinar)_
 - **Pruebas:** `vc_op_15_sort_1_ordering`
 

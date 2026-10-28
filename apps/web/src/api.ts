@@ -119,12 +119,22 @@ export const api = {
       blocking: Array<{ title: string; hint: string }>;
       error?: string;
     };
+    studio_memory?: {
+      checked: boolean;
+      used_percent?: number;
+      used_mb?: number;
+      max_mb?: number;
+      restart_recommended?: boolean;
+      error?: string;
+    };
     apply_folder: string;
     mcp_url?: string;
     timeout_seconds?: number;
     jobs?: number;
     error?: string;
   }>("/integrations/talend/health"),
+  restartTalendStudio: () =>
+    post<{ restarted: boolean; forced?: boolean; closedDialogs?: number; seconds?: number }>("/integrations/talend/studio/restart"),
   talendPermissions: () => req<{ write_enabled: boolean }>("/integrations/talend/permissions"),
   setTalendWriteEnabled: (enabled: boolean) =>
     patch<{ write_enabled: boolean }>("/integrations/talend/permissions", { write_enabled: enabled }),

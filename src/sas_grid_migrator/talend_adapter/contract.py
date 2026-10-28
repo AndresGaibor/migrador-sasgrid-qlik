@@ -20,6 +20,8 @@ class PortalContract:
     write_tool: str
     #: Escritura offline (sin Studio, ~1000 veces mas rapida). Opcional: sin ella todo va en vivo.
     offline_write_tool: str | None
+    #: Reinicio de Studio a petición (libera la memoria que retiene tras crear muchos Jobs). Opcional.
+    restart_tool: str | None
     required_top_fields: frozenset[str]
     required_component_fields: frozenset[str]
 
@@ -32,6 +34,7 @@ def load_contract(path: Path | None = None) -> PortalContract:
         read_tools=frozenset(raw["read_tools"]),
         write_tool=raw["write_tool"],
         offline_write_tool=raw.get("offline_write_tool"),
+        restart_tool=raw.get("restart_tool"),
         required_top_fields=frozenset(raw["required_top_fields"]),
         required_component_fields=frozenset(raw["required_component_fields"]),
     )

@@ -101,6 +101,15 @@ SPEC_TOOL = "talend_job_apply_custom_spec"
 #: Tool de escritura offline (sin Studio); el nombre sale del manifiesto del contrato.
 OFFLINE_TOOL = load_contract().offline_write_tool or ""
 
+#: Tool que reinicia Studio; el nombre sale del manifiesto del contrato.
+RESTART_TOOL = load_contract().restart_tool or ""
+
+#: Heap de Studio (%) a partir del cual se recomienda reiniciarlo: tras muchos Jobs la interfaz deja de responder.
+RESTART_RECOMMENDED_PERCENT = 75
+
+#: Cerrar Studio (hasta 2 min, y forzarlo si no sale), arrancarlo y esperar al bridge puede tardar varios minutos.
+RESTART_TIMEOUT_SECONDS = 600.0
+
 
 def _offline_job_result(
     spec: dict[str, Any],
@@ -355,6 +364,7 @@ class TalendAdapter:
             }
         status = await self.custom_spec_status()
         dialogs = await self._studio_dialogs()
+        memory = await self.studio_memory()
         if dialogs["blocked"] and status["diagnosis"] == "ok":
             titles = ", ".join(f"«{item['title']}»" for item in dialogs["blocking"])
             status = {
@@ -373,6 +383,7 @@ class TalendAdapter:
             "unsafe_actions": bridge.get("unsafeActions", False),
             "jobs": job_count,
             "studio_dialogs": dialogs,
+            "studio_memory": memory,
             **status,
             **config,
         }
@@ -398,6 +409,38 @@ class TalendAdapter:
             "blocked": bool(data.get("blocked")) or bool(blocking),
             "blocking": blocking,
         }
+
+    async def studio_memory(self) -> dict[str, Any]:
+        """Heap que lleva usado Studio. Si la comprobación falla, `checked: false` y no cambia el diagnóstico."""
+        try:
+            data = await self._data("talend_studio_memory")
+        except TalendError as e:
+            return {"checked": False, "error": str(e)}
+        percent = data.get("usedPercent")
+        if not isinstance(percent, int | float):
+            return {"checked": False, "error": "Studio no informó de su memoria"}
+        return {
+            "checked": True,
+            "used_percent": int(percent),
+            "used_mb": data.get("usedMb"),
+            "max_mb": data.get("maxMb"),
+            "restart_recommended": percent >= RESTART_RECOMMENDED_PERCENT,
+        }
+
+    async def restart_studio(self, *, only_if_memory_above: int | None = None, force: bool = True) -> dict[str, Any]:
+        """Reinicia Studio: cierra sus diálogos, la ventana principal y, si no sale, el proceso.
+
+        Libera la memoria que Studio retiene tras crear muchos Jobs. Cierra el IDE del usuario (los editores sin
+        guardar se pierden y Talend Cloud puede pedir volver a iniciar sesión), por eso exige el permiso de escritura.
+        """
+        if not self.write_enabled:
+            raise TalendError(
+                "El portal está en modo solo lectura. Habilita la escritura desde Configuración para reiniciar Studio."
+            )
+        args: dict[str, Any] = {"force": force}
+        if only_if_memory_above is not None:
+            args["onlyIfMemoryAbove"] = only_if_memory_above
+        return await self._studio_write(RESTART_TOOL, args, timeout=RESTART_TIMEOUT_SECONDS)
 
     async def list_jobs(self) -> list[dict[str, Any]]:
         """Return the complete Job inventory, failing if MCP cannot page it fully."""

@@ -29,6 +29,8 @@ class Fake:
 
     async def call(self, tool, args):
         self.calls.append((tool, args))
+        if tool not in self.responses:
+            raise TalendError(f"{tool}: sin respuesta simulada")
         r = self.responses[tool]
         if isinstance(r, Exception):
             raise r
@@ -365,6 +367,87 @@ def test_health_keeps_the_contract_diagnosis_when_dialogs_cannot_be_checked():
         "error": "la sonda no respondió",
     }
     assert health["diagnosis"] == "tools_missing"
+
+
+def _memory(percent):
+    return {"ok": True, "data": {"usedMb": 3300, "totalMb": 4096, "maxMb": 4096, "usedPercent": percent}}
+
+
+def test_health_recommends_a_restart_when_studio_memory_is_high():
+    adapter = TalendAdapter(Fake({
+        "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
+        "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readWrite", "unsafeActions": False}},
+        "talend_studio_ui_dialogs": {"ok": True, "data": {"blocked": False, "blocking": []}},
+        "talend_studio_memory": _memory(83),
+    }))
+
+    health = run(adapter.health_check())
+
+    assert health["studio_memory"] == {
+        "checked": True, "used_percent": 83, "used_mb": 3300, "max_mb": 4096, "restart_recommended": True,
+    }
+
+
+def test_studio_memory_below_the_threshold_does_not_recommend_a_restart():
+    adapter = TalendAdapter(Fake({"talend_studio_memory": _memory(40)}))
+
+    assert run(adapter.studio_memory())["restart_recommended"] is False
+
+
+def test_studio_memory_that_cannot_be_read_is_reported_without_failing():
+    adapter = TalendAdapter(Fake({"talend_studio_memory": TalendError("el hilo de la interfaz está ocupado")}))
+
+    memory = run(adapter.studio_memory())
+
+    assert memory["checked"] is False
+    assert "ocupado" in memory["error"]
+
+
+def test_restart_studio_sends_the_options_and_returns_the_result():
+    caller = Fake({"talend_studio_restart": {"ok": True, "data": {"restarted": True, "forced": True, "closedDialogs": 2}}})
+
+    result = run(TalendAdapter(caller).restart_studio(only_if_memory_above=75, force=True))
+
+    assert result["forced"] is True
+    assert caller.calls == [("talend_studio_restart", {"force": True, "onlyIfMemoryAbove": 75})]
+
+
+def test_restart_studio_requires_write_permission():
+    caller = Fake({})
+
+    with pytest.raises(TalendError, match="solo lectura"):
+        run(TalendAdapter(caller, write_enabled=False).restart_studio())
+
+    assert caller.calls == []
+
+
+def test_restart_studio_reports_the_mcp_refusal():
+    caller = Fake({"talend_studio_restart": {"ok": False, "error": {"code": "STUDIO_RESTART_READONLY", "message": "solo lectura"}}})
+
+    with pytest.raises(TalendError, match="STUDIO_RESTART_READONLY"):
+        run(TalendAdapter(caller).restart_studio())
+
+
+def test_restart_endpoint_is_refused_without_write_permission(monkeypatch):
+    monkeypatch.setattr(api_mod, "_talend_write_enabled", lambda: False)
+
+    response = TestClient(api).post("/api/integrations/talend/studio/restart")
+
+    assert response.status_code == 403
+
+
+def test_restart_endpoint_passes_the_options_to_the_adapter(monkeypatch):
+    caller = Fake({"talend_studio_restart": {"ok": True, "data": {"restarted": False, "usedPercent": 40}}})
+    monkeypatch.setattr(api_mod, "_talend_write_enabled", lambda: True)
+    monkeypatch.setattr(api_mod, "_talend", lambda: TalendAdapter(caller))
+
+    response = TestClient(api).post(
+        "/api/integrations/talend/studio/restart", json={"only_if_memory_above": 75, "force": False}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["restarted"] is False
+    assert caller.calls == [("talend_studio_restart", {"force": False, "onlyIfMemoryAbove": 75})]
 
 
 def test_health_reports_bridge_offline_even_when_mcp_server_is_reachable():

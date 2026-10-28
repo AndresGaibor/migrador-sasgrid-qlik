@@ -10,7 +10,7 @@ _CONTRACT = load_contract()
 
 READ_TOOLS = _CONTRACT.read_tools
 WRITE_TOOLS = frozenset(
-    tool for tool in (_CONTRACT.write_tool, _CONTRACT.offline_write_tool) if tool
+    tool for tool in (_CONTRACT.write_tool, _CONTRACT.offline_write_tool, _CONTRACT.restart_tool) if tool
 )
 
 

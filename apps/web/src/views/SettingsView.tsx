@@ -43,6 +43,7 @@ export function SettingsView() {
   const [permission, setPermission] = useState<boolean>();
   const [savingWrite, setSavingWrite] = useState(false);
   const [writeError, setWriteError] = useState<string>();
+  const [restarting, setRestarting] = useState(false);
   const enabled = permission ?? permissions.data?.write_enabled;
 
   const toggleWrite = async (enabled: boolean) => {
@@ -58,6 +59,20 @@ export function SettingsView() {
       setWriteError(notifyError(error, "No se pudo guardar el permiso de escritura"));
     } finally {
       setSavingWrite(false);
+    }
+  };
+
+  const restartStudio = async () => {
+    if (restarting || !window.confirm("Studio se cerrará y volverá a abrirse (1-3 minutos). Los editores sin guardar se perderán. ¿Reiniciarlo?")) return;
+    setRestarting(true);
+    try {
+      const result = await api.restartTalendStudio();
+      notifySuccess("Studio reiniciado", result.forced ? "No cerró por sí solo y se forzó el cierre." : "Cerró y volvió a abrir con normalidad.");
+    } catch (error) {
+      notifyError(error, "No se pudo reiniciar Studio");
+    } finally {
+      setRestarting(false);
+      q.reload();
     }
   };
 
@@ -97,6 +112,13 @@ export function SettingsView() {
                 : "Sin diálogos que bloqueen el IDE."}
             />
             <Stage
+              tone={!h.studio_memory?.checked || h.studio_memory.restart_recommended ? "warn" : "ok"}
+              title="Memoria de Studio"
+              detail={!h.studio_memory?.checked
+                ? "No se pudo medir la memoria de Studio."
+                : `Usa el ${h.studio_memory.used_percent} % de su memoria${h.studio_memory.max_mb ? ` (${h.studio_memory.used_mb} de ${h.studio_memory.max_mb} MB)` : ""}.${h.studio_memory.restart_recommended ? " Tras crear muchos Jobs Studio retiene memoria y la interfaz deja de responder: conviene reiniciarlo." : ""}`}
+            />
+            <Stage
               tone={h.write_tool === false ? "bad" : h.write_enabled ? "ok" : "warn"}
               title="Escritura de Jobs"
               detail={h.write_tool === false
@@ -122,6 +144,8 @@ export function SettingsView() {
         </>;
       }}</Load>
       <button className="secondary" onClick={q.reload} disabled={q.loading}><Icon name="check" size={18} />{q.loading ? "Comprobando…" : "Comprobar conexión"}</button>
+      <button className="secondary" onClick={() => void restartStudio()} disabled={restarting || !enabled}><Icon name="settings" size={18} />{restarting ? "Reiniciando Studio…" : "Reiniciar Studio"}</button>
+      <p className="muted">Cierra Studio (y sus diálogos abiertos; si no sale, fuerza el cierre) y lo vuelve a abrir. Los editores sin guardar se pierden y Talend Cloud puede pedir iniciar sesión de nuevo. Requiere el permiso de escritura.</p>
     </section>
   </>;
 }

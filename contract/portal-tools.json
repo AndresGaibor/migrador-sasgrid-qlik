@@ -22,10 +22,12 @@
     "talend_job_problems",
     "talend_job_list_nodes",
     "talend_studio_ui_dialogs",
+    "talend_studio_memory",
     "talend_bridge_ping"
   ],
   "write_tool": "talend_job_apply_custom_spec",
   "offline_write_tool": "talend_jobs_create_batch",
+  "restart_tool": "talend_studio_restart",
   "required_top_fields": ["childJobs", "instructions", "replaceManagedTodoContexts"],
   "required_component_fields": ["draftOnly", "draftReason", "tables"]
 }

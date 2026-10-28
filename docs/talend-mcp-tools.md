@@ -7,6 +7,8 @@ El portal se conecta al MCP local por `TALEND_MCP_URL` (por defecto `http://127.
 - `talend_jobs_list`: comprueba que el servidor MCP responde y devuelve el número de Jobs del workspace.
 - `talend_bridge_ping`: confirma que Talend Studio y el Bridge local están disponibles para aplicar cambios.
 - `talend_studio_ui_dialogs`: lista los diálogos de Studio y marca los modales que bloquean el IDE; el diagnóstico del portal lo consulta en cada comprobación.
+- `talend_studio_memory`: heap que lleva usado Studio; el diagnóstico del portal lo muestra y recomienda reiniciar a partir del 75 %.
+- `talend_studio_restart`: reinicia Studio a petición (`POST /api/integrations/talend/studio/restart` o el botón de Configuración). Cierra los diálogos abiertos, pide el cierre de la ventana principal y, si Studio no sale en 2 minutos, termina el proceso (`force`, por defecto). Requiere el permiso de escritura. Con `onlyIfMemoryAbove` solo reinicia si el heap supera ese porcentaje.
 - `talend_job_apply_custom_spec`: recibe la guía estructurada y aplica el Job mediante las operaciones de Studio.
 
 La herramienta de escritura recibe `jobName`, `version`, `defaultContext`, `folderPath`, `description`, `purpose`, `components`, `connections`, `contexts` e `instructions`. Cada componente puede incluir propiedades, tablas, esquema, mapper y una marca de borrador con el motivo pendiente. El MCP valida el componente y sus propiedades contra la paleta y los parámetros que responde Studio.

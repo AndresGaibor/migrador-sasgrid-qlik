@@ -51,6 +51,14 @@ test("a broken diagnosis shows its fix hint and the missing tools", () => {
   assert.match(source, /Faltan tools del portal/);
 });
 
+test("Studio memory is reported and the restart is a confirmed action behind the write permission", () => {
+  assert.match(source, /Memoria de Studio/);
+  assert.match(source, /h\.studio_memory\.restart_recommended/);
+  assert.match(source, /api\.restartTalendStudio\(\)/);
+  assert.match(source, /window\.confirm/);
+  assert.match(source, /disabled=\{restarting \|\| !enabled\}/);
+});
+
 test("a modal dialog in Studio is reported without hiding the rest of the diagnosis", () => {
   assert.match(source, /h\.studio_dialogs\?\.checked/);
   assert.match(source, /h\.studio_dialogs\.blocked/);

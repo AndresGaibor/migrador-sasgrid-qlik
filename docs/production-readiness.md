@@ -77,8 +77,13 @@ Cada uno tiene su prueba, para que no vuelva:
 ## Operación
 
 - **Memoria de Studio.** Tras muchas creaciones seguidas Studio retiene varios GB (llegó al 86 % de 4 GB) y la interfaz tarda en
-  responder. `talend_studio_memory` (con `gc: true`) la muestra y fuerza una recolección; si sigue por encima del 70 %, reinicia
-  Studio. Mide antes de una verificación larga.
+  responder. La comprobación de conexión del portal la muestra y recomienda reiniciar a partir del 75 %.
+  `talend_studio_memory` (con `gc: true`) la mide y fuerza una recolección.
+- **Reiniciar Studio a voluntad.** `talend_studio_restart` (en el portal: botón «Reiniciar Studio» en Configuración o
+  `POST /api/integrations/talend/studio/restart`, con permiso de escritura) cierra los diálogos abiertos, pide el cierre de la
+  ventana principal, lo fuerza si Studio no sale en 2 minutos, lo vuelve a abrir y espera al bridge (1-3 min). Un Studio colgado
+  también se encuentra por el nombre del proceso. Los editores sin guardar se pierden y Talend Cloud puede pedir iniciar sesión.
+  Con `onlyIfMemoryAbove` reinicia solo si la memoria lo justifica.
 - **No borres archivos de `process/` a espaldas de Studio.** Studio conserva el Job en memoria y puede devolver errores de un Job
   anterior con el mismo nombre. Borra desde Studio o con `scripts/verify_in_studio.py`, que además elimina por ruta lo que Studio
   deja.

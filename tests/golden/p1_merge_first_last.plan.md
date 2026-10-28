@@ -40,7 +40,7 @@
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties)
 - **Conexiones:** Main desde `op_6_read_1`
 - **Propiedades:**
-  - `CRITERIA` (Criteria) = `cliente_id, fecha_pago` — SAS p1_merge_first_last.sas:6 · nombre oficial
+  - `CRITERIA` (Criteria) = `cliente_id ASC, fecha_pago ASC` — SAS p1_merge_first_last.sas:6 · nombre oficial
 - **Esquema:** `cliente_id`, `fecha_pago` _(tipos por determinar)_
 - **Pruebas:** `vc_op_6_sort_1_ordering`
 
@@ -82,7 +82,7 @@
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tsortrow-standard-properties)
 - **Conexiones:** Main desde `op_7_read_1`
 - **Propiedades:**
-  - `CRITERIA` (Criteria) = `cliente_id` — SAS p1_merge_first_last.sas:7 · nombre oficial
+  - `CRITERIA` (Criteria) = `cliente_id ASC` — SAS p1_merge_first_last.sas:7 · nombre oficial
 - **Esquema:** `cliente_id` _(tipos por determinar)_
 - **Pruebas:** `vc_op_7_sort_1_ordering`
 

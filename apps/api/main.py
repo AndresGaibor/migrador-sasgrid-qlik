@@ -1901,6 +1901,28 @@ async def talend_health() -> dict:
     return {**health, "write_enabled": _talend_write_enabled(), "apply_folder": _talend_apply_folder()}
 
 
+class TalendRestart(BaseModel):
+    only_if_memory_above: int | None = Field(default=None, ge=1, le=99)
+    force: StrictBool = True
+
+
+@app.post("/api/integrations/talend/studio/restart")
+async def talend_studio_restart(body: TalendRestart | None = None) -> dict:
+    """Reinicia Talend Studio a petición: cierra sus diálogos y, si no sale, fuerza el cierre.
+
+    Sin cuerpo reinicia siempre; con `only_if_memory_above` solo si el heap supera ese porcentaje.
+    """
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+
+    if not _talend_write_enabled():
+        raise HTTPException(403, "La escritura está desactivada. Habilítala en Configuración para reiniciar Studio.")
+    options = body or TalendRestart()
+    try:
+        return await _talend().restart_studio(only_if_memory_above=options.only_if_memory_above, force=options.force)
+    except TalendError as e:
+        raise HTTPException(502, str(e)) from e
+
+
 @app.post("/api/integrations/talend/inspect")
 async def talend_inspect(body: TalendInspect):
     from sas_grid_migrator.talend_adapter.adapter import TalendError
