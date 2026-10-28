@@ -33,6 +33,7 @@ from sas_grid_migrator.migration_planner.service import (
     load_plans,
     set_decision,
 )
+from sas_grid_migrator.persistence.artifacts import write_text_atomic
 from sas_grid_migrator.persistence.store import ProjectDeletionBlockedError, Store
 from sas_grid_migrator.reporting.exports import render_plan_md, steps_csv
 from sas_grid_migrator.sas_parser.analyze import (
@@ -1959,7 +1960,7 @@ async def verify_project_plans(project_id: str, body: VerifyBody) -> dict:
     except TalendError as e:
         raise HTTPException(502, str(e)) from e
     stats = verify_plans(ps, catalog)
-    s.plans_path(project_id).write_text(ps.model_dump_json(), encoding="utf-8")
+    write_text_atomic(s.plans_path(project_id), ps.model_dump_json())
     return {"catalog_components": sorted(catalog.components), **stats}
 
 

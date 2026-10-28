@@ -16,6 +16,7 @@ from sas_grid_migrator.migration_planner.planner import (
     plan_program,
     unique_job_names,
 )
+from sas_grid_migrator.persistence.artifacts import write_text_atomic
 from sas_grid_migrator.persistence.store import Store
 from sas_grid_migrator.sas_parser.analyze import analyze_project, load_analysis
 from sas_grid_migrator.sas_parser.ast import Loc
@@ -134,7 +135,7 @@ def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSe
         plans=plans,
         grid_recommendations=all_grid,
     )
-    store.plans_path(project_id).write_text(ps.model_dump_json(), encoding="utf-8")
+    write_text_atomic(store.plans_path(project_id), ps.model_dump_json())
     return ps
 
 

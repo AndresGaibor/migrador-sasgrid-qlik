@@ -19,6 +19,7 @@ from sas_grid_migrator.macro_resolver.resolver import (
     substitute,
     walk,
 )
+from sas_grid_migrator.persistence.artifacts import write_text_atomic
 from sas_grid_migrator.persistence.store import Store
 from sas_grid_migrator.sas_parser.analyze import Analysis, analyze_project, load_analysis
 from sas_grid_migrator.sas_parser.ast import (
@@ -350,7 +351,7 @@ def build_dependencies(store: Store, project_id: str) -> DependencyReport:
         return redact(text, path)
 
     report = build_report(analysis, all_files, shell, read)
-    store.dependencies_path(project_id).write_text(report.model_dump_json(), encoding="utf-8")
+    write_text_atomic(store.dependencies_path(project_id), report.model_dump_json())
     return report
 
 
