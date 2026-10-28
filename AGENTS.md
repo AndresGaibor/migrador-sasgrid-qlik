@@ -49,8 +49,10 @@ cd apps/web && bun install && bun test && bun run typecheck
 cd mcp/talend-mcp && bun install && bun test && bun run typecheck
 ```
 
-Para levantar todo el entorno: `powershell -ExecutionPolicy Bypass -File scripts/dev.ps1`
-(MCP con el preset `portal`, API en `127.0.0.1:8000` y web en `127.0.0.1:5173`).
+Para levantar todo el entorno: `uv run sgm dev` (o `scripts/dev.ps1`, que lo invoca). Arranca el MCP con
+el preset `portal` (`bun run start:server`), la API en `127.0.0.1:8000` y la web en `127.0.0.1:5173`;
+`--no-mcp` omite el MCP. No reinstala el Bridge ni mata procesos ajenos: para instalar el plugin usa
+`bun run bridge:install` en `mcp/talend-mcp` con Studio sin Jobs ni diálogos en curso.
 
 ## Subtree del MCP
 

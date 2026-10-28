@@ -11,4 +11,6 @@ def test_cli_version():
 
 
 def test_api_health():
-    assert TestClient(api).get("/api/health").json()["status"] == "ok"
+    client = TestClient(api)
+    assert client.get("/api/health").json()["status"] == "ok"
+    assert client.get("/health").json()["status"] == "ok"

@@ -91,7 +91,7 @@ Clon de `origin/main` en una carpeta aparte, siguiendo solo el README:
 | `uv sync` | correcto; solo avisa de rutas de referencia duplicadas en `docs/reference/talend/` |
 | `bun install` en `apps/web` | 166 paquetes |
 | `bun install` en `mcp/talend-mcp` | 17 paquetes |
-| `scripts/dev.ps1` | MCP en 3927 con 66 tools, API en 8000 y web en 5173; el `doctor` ve Studio, JDK, Bridge y proyecto |
+| `scripts/dev.ps1` (versión inicial, hoy reemplazada por `uv run sgm dev`) | MCP en 3927 con 66 tools, API en 8000 y web en 5173; el `doctor` ve Studio, JDK, Bridge y proyecto |
 
 Dos hallazgos corregidos o anotados:
 

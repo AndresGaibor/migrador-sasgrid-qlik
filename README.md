@@ -16,7 +16,7 @@ F1–F7 completas: importación segura, parser P0/P1/P2, dependencias y Grid, IR
 uv sync
 uv run pytest
 uv run sgm version
-uv run sgm dev                                 # API + UI con un solo comando (Ctrl+C detiene ambos)
+uv run sgm dev                                   # MCP (preset portal) + API + UI con un solo comando (Ctrl+C detiene todo)
 uv run sgm import tests/fixtures/sas -n corpus   # crea proyecto e importa el lote
 uv run sgm inventory <project_id>
 uv run sgm analyze <project_id>               # parseo + cobertura P0/P1/P2
@@ -30,6 +30,7 @@ Para operar el portal con proyectos ZIP, análisis automático, reintentos y des
 Frontend (`apps/web`, React + TS + Vite + Bun):
 
 ```bash
+uv run sgm dev --no-mcp                           # solo API + UI, si el MCP ya corre aparte
 uv run uvicorn apps.api.main:app --port 8000     # API
 cd apps/web && bun install && bun run dev         # UI en :5173; SGM_API=http://127.0.0.1:8000 si la API usa otro puerto
 bun test && bun run build
@@ -55,7 +56,7 @@ SGM_MAX_QUEUED_PIPELINES=20
 
 En el `.env.local` de `mcp/talend-mcp`, `TALEND_MCP_HOST` y `TALEND_MCP_PORT` configuran el servidor (por defecto `127.0.0.1` y `3927`). Si cambias alguno, ajusta `TALEND_MCP_URL` para que coincida. Mantén el MCP en loopback y reinicia los dos procesos después de cambiar su configuración.
 
-El código del MCP vive en `mcp/talend-mcp/` (subtree de [AndresGaibor/talend-mcp](https://github.com/AndresGaibor/talend-mcp)). Para levantar MCP, API y UI con la configuración correcta, usa `scripts/dev.ps1`; el MCP arranca con el preset `portal`. Al subir un ZIP, el portal conserva la estructura de carpetas y muestra el estado de cada etapa. En «Plan de migración», pulsa **Implementar todos los flujos del ZIP en Talend**. La API llama secuencialmente a `talend_job_apply_custom_spec` una vez por Job que no haya sido confirmado dentro de un Job padre. El estado y los resultados se guardan por proyecto; el portal consulta el avance al recargar. Los Jobs no se ejecutan.
+El código del MCP vive en `mcp/talend-mcp/` (subtree de [AndresGaibor/talend-mcp](https://github.com/AndresGaibor/talend-mcp)). Para levantar MCP, API y UI con la configuración correcta, usa `uv run sgm dev` (o `scripts/dev.ps1`, que lo invoca); el MCP arranca con `bun run start:server` y el preset `portal`, sin tocar el plugin de un Studio abierto. Si el puerto 3927 ya está ocupado, reutiliza ese servidor. Al subir un ZIP, el portal conserva la estructura de carpetas y muestra el estado de cada etapa. En «Plan de migración», pulsa **Implementar todos los flujos del ZIP en Talend**. La API llama secuencialmente a `talend_job_apply_custom_spec` una vez por Job que no haya sido confirmado dentro de un Job padre. El estado y los resultados se guardan por proyecto; el portal consulta el avance al recargar. Los Jobs no se ejecutan.
 
 El permiso de escritura se administra únicamente con el interruptor de «Configuración» y se guarda en la base; por defecto permite crear. No depende de variables de entorno. El destino por ZIP combina la raíz configurada, un nombre seguro del ZIP, el id estable del proyecto y la subcarpeta del programa. Un Job ausente se crea; uno que ya existe en esa carpeta exacta se actualiza mediante la API de Talend Studio; un homónimo de otra carpeta bloquea el lote. El portal vuelve a comprobar MCP antes de reintentar conflictos guardados o restaurar Jobs borrados. `TALEND_APPLY_FOLDER` debe estar dentro de `Process/`.
 

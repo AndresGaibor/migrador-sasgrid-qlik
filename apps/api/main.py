@@ -183,6 +183,7 @@ def _queue_project_pipeline(
         raise
 
 
+@app.get("/health")
 @app.get("/api/health")
 def health() -> dict[str, str | int]:
     settings = Settings.from_env()

@@ -4,6 +4,7 @@ from pathlib import Path
 import typer
 
 from sas_grid_migrator import __version__
+from sas_grid_migrator.cli.dev import dev
 from sas_grid_migrator.config import Settings
 from sas_grid_migrator.ingestion.importer import ImportError_
 from sas_grid_migrator.persistence.store import Store
@@ -20,6 +21,9 @@ def main() -> None:
 def version() -> None:
     """Muestra la versión."""
     typer.echo(__version__)
+
+
+app.command("dev")(dev)
 
 
 @app.command("import")
