@@ -82,7 +82,11 @@ No hay diálogo bloqueante: `talend_studio_ui_dialogs` responde `blocked: false`
 
 Solo 4 de los 20 Jobs quedaron aplicados por ambos motores. En dos de ellos (`MedS_01`, `MedS_17`) el Job de origen no tiene componentes, así que no hay nada que comparar. En los otros dos (`MedS_02`, `MedS_16`) coinciden los tipos de componente y el número de conexiones, pero no los `uniqueName`: Studio renumera al crear (`tFileInputDelimited_2`) y el motor offline conserva los del portal (`tFileInputDelimited_1`).
 
-Los contextos no coinciden por un problema de contrato, no del motor: el portal arma los contextos con las claves `type`/`value`/`comment`, y `talend_jobs_create_from_spec` espera `tipo`/`valor`/`comentario`. Con el payload actual los Jobs offline quedaron sin ningún contexto, mientras que los de Studio sí los llevan. Un futuro motor `auto` tendría que reescribir ese bloque.
+Los contextos no coinciden, y la causa no era el nombre de las claves. Comprobado el 2026-10-28 contra el MCP real: `talend_jobs_create_from_spec` **descarta `contexts` sin avisar**, tanto con las claves del portal (`type`/`value`/`comment`) como con las suyas (`tipo`/`valor`/`comentario`). El generador de `create-from-spec.ts` construye el `JobSpec` sin ese campo. Los Jobs offline de la medición quedaron sin contextos por eso. `talend_jobs_create_batch`, en cambio, sí escribe `contexts` y usa la misma forma que el portal; una plantilla con una sola fila vacía crea un Job. El portal ya tiene esa conversión (`talend_adapter/offline_payload.py`, `to_batch_arguments`) y una prueba contra el MCP real que comprueba que el contexto llega al `.item`.
+
+Dos defectos del MCP que conviene reportar al upstream: `talend_jobs_create_from_spec` ignora `contexts` aunque lo acepta en su schema, y sin `folder` falla con `ENOENT` porque no crea la carpeta `process/`.
+
+Además, `create_batch` expande `{{variable}}` en todos los textos de la plantilla. Un valor SAS con esa sintaxis rompería o alteraría el Job, así que `offline_blockers` lo trata como bloqueo (`placeholder:<componente>`).
 
 ### Compilación: no verificable en este equipo
 
@@ -95,10 +99,10 @@ Los contextos no coinciden por un problema de contrato, no del motor: el portal 
 Motivos medidos:
 
 1. Velocidad: el criterio de 20 veces se cumple con holgura (23 veces por mediana, 26 por total).
-2. Paridad: no se puede verificar. El motor Studio falla en 16 de 20 casos, renumera los `uniqueName` cuando funciona y los contextos no llegan al motor offline con el payload que hoy genera el portal.
+2. Paridad: no se pudo verificar. El motor Studio falla en 16 de 20 casos y renumera los `uniqueName` cuando funciona. Los contextos faltaban en la medición porque se usó `talend_jobs_create_from_spec`, que los descarta; con `talend_jobs_create_batch` sí se escriben (ver arriba), así que ese punto ya no bloquea.
 3. Compilación: no se pudo comprobar porque `talend_job_build_batch` falla también con Jobs nativos de Studio.
 
-Para revisar la decisión: estabilizar el montaje del motor Studio (los tres errores de la tabla), corregir el mapeo de contextos del payload offline, repetir la medición de 20 guías y verificar con `talend_job_build_batch` que los `.item` offline compilan. Solo entonces se puede aprobar la Tarea 8.
+Para revisar la decisión: estabilizar el montaje del motor Studio (los tres errores de la tabla), repetir la medición de 20 guías usando `to_batch_arguments` (contextos incluidos) y verificar con `talend_job_build_batch` que los `.item` offline compilan. Solo entonces se puede aprobar la Tarea 8. La medición con el payload corregido está pendiente: necesita un Studio estable y no se repitió el 2026-10-28.
 
 ## Ejemplos útiles del MCP
 
