@@ -334,7 +334,8 @@ class _Planner:
                 props["USE_INTABLE"] = "true"
                 props["INTABLE"] = "\n".join(" | ".join(r) for r in rows)
         elif op.type in ("read", "write", "append"):
-            ds = (op.inputs or op.outputs or [""])[0]
+            datasets = op.outputs if op.type == "append" else op.inputs or op.outputs
+            ds = datasets[0] if datasets else ""
             props["TABLE"] = ds.split(".")[-1] if ds else None
             if op.type == "write":  # DATA lib.x reemplaza el dataset
                 props["TABLE_ACTION"], props["DATA_ACTION"] = "DROP_CREATE", "INSERT"
@@ -739,6 +740,8 @@ def _connect(steps: list[PlanStep], prev_subjob_last: str | None) -> None:
                     Connection(type="Lookup", from_step=r.id) for r in reads[1:]
                 ]
                 first_join_done = True
+            elif s.operation_type == "union" and reads:
+                s.connections = [Connection(type="Main", from_step=r.id) for r in reads]
             elif prev is not None:
                 s.connections = [Connection(type="Main", from_step=prev.id)]
             prev = s

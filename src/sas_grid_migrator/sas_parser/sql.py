@@ -73,6 +73,7 @@ class _Select:
         self.constructs: set[str] = set()
         self.select_list = ""
         self.distinct = False
+        self.set_operations: list[str] = []
         self.into: list[str] = []
         self.where = self.group_by = self.having = self.order_by = None
 
@@ -127,9 +128,11 @@ def _parse_from(fc: str, sel: _Select) -> None:
 
 def _parse_select(text: str, sel: _Select, nested: bool = False) -> None:
     masked = _mask(text)
-    cuts = [(m.start(), m.end()) for m in _SET_OPS.finditer(masked)]
+    operators = list(_SET_OPS.finditer(masked))
+    cuts = [(m.start(), m.end()) for m in operators]
     if cuts:
         sel.constructs.add("sql_set_operation")
+        sel.set_operations.extend(" ".join(m.group(1).lower().split()) for m in operators)
     bounds = [0] + [x for c in cuts for x in c] + [len(text)]
     segments = [text[bounds[i] : bounds[i + 1]] for i in range(0, len(bounds), 2)]
     for seg in segments:
@@ -236,6 +239,7 @@ def parse_sql_statement(text: str, loc: Loc) -> SqlQuery | None:
         having=sel.having,
         order_by=sel.order_by,
         into=sel.into,
+        set_operations=sel.set_operations,
         text=t,
         loc=loc,
         constructs=sorted(sel.constructs),

@@ -124,6 +124,28 @@ def test_rejected_reimport_preserves_existing_snapshot(tmp_path):
     assert store.analysis_path(project.id).read_text() == "cached analysis"
 
 
+def test_duplicate_zip_paths_reject_reimport_without_changing_project(tmp_path):
+    store = Store(cfg(tmp_path))
+    project = store.create_project("demo")
+    original = tmp_path / "original"
+    original.mkdir()
+    (original / "old.sas").write_text("data old; run;")
+    manifest = store.import_batch(project.id, original)
+    store.analysis_path(project.id).write_text("cached analysis")
+
+    replacement = tmp_path / "duplicate-paths.zip"
+    with zipfile.ZipFile(replacement, "w") as archive:
+        archive.writestr("same.sas", "data first; run;")
+        archive.writestr("same.sas", "data second; run;")
+
+    with pytest.raises(ImportError_, match="ruta duplicada"):
+        store.import_batch(project.id, replacement)
+
+    assert store.get_manifest(project.id) == manifest
+    assert (store.source_dir(project.id) / "old.sas").read_text() == "data old; run;"
+    assert store.analysis_path(project.id).read_text() == "cached analysis"
+
+
 def test_store_roundtrip_is_reproducible(tmp_path):
     s = Store(cfg(tmp_path))
     p = s.create_project("demo")

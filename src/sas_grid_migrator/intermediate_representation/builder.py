@@ -264,18 +264,38 @@ def _data_step(n: DataStep, c: _Ctx) -> list[IROperation]:
             "rename",
             details={"mapping": dict(re.findall(r"(\w+)\s*=\s*(\w+)", " ".join(n.rename)))},
         )
-    for o in n.outputs:
-        oo = dataset_options(o.options)
-        d = {"dataset": o.raw, "options": o.options}
-        if "keep" in oo or "drop" in oo:
-            add(
-                "select_columns",
-                outputs=[dsid(o)],
-                details={k: oo[k] for k in ("keep", "drop") if k in oo},
+    conditional_multi_output = (
+        len(n.outputs) > 1
+        and n.n_conditionals > 0
+        and any(
+            statement.kw == "output"
+            or (
+                statement.kw in {"if", "else"}
+                and re.search(r"\boutput\b", statement.text, re.IGNORECASE)
             )
-        if "rename" in oo:
-            add("rename", outputs=[dsid(o)], details={"mapping": oo["rename"]})
-        add("write", outputs=[dsid(o)], details=d)
+            for statement in n.statements
+        )
+    )
+    if conditional_multi_output:
+        add(
+            "unsupported",
+            outputs=[dsid(output) for output in n.outputs],
+            confidence="low",
+            notes=["OUTPUT condicional a varios datasets: modelar el routing de filas manualmente"],
+        )
+    else:
+        for o in n.outputs:
+            oo = dataset_options(o.options)
+            d = {"dataset": o.raw, "options": o.options}
+            if "keep" in oo or "drop" in oo:
+                add(
+                    "select_columns",
+                    outputs=[dsid(o)],
+                    details={k: oo[k] for k in ("keep", "drop") if k in oo},
+                )
+            if "rename" in oo:
+                add("rename", outputs=[dsid(o)], details={"mapping": oo["rename"]})
+            add("write", outputs=[dsid(o)], details=d)
     if "file_output" in n.constructs:
         add(
             "write_file",
@@ -299,19 +319,28 @@ def _sql_ops(q: SqlQuery, step: str, c: _Ctx) -> list[IROperation]:
             inputs=[dsid(s)],
             details={"dataset": s.raw, "alias": s.alias, "options": s.options},
         )
-    for j in q.joins:
+    if len(q.joins) > 1:
         add(
-            "join",
+            "unsupported",
             inputs=srcs,
-            details={
-                "kind": j.kind,
-                "table": j.table.raw if j.table else None,
-                "alias": j.table.alias if j.table else None,
-                "on": j.on,
-            },
-            confidence="high" if j.on else "medium",
+            details={"statement": "chained_sql_joins", "text": q.text[:300]},
+            confidence="low",
+            notes=["SQL con JOIN encadenados: diseñar manualmente la topología de entradas y claves"],
         )
-    if "sql_implicit_join" in q.constructs:
+    else:
+        for j in q.joins:
+            add(
+                "join",
+                inputs=srcs,
+                details={
+                    "kind": j.kind,
+                    "table": j.table.raw if j.table else None,
+                    "alias": j.table.alias if j.table else None,
+                    "on": j.on,
+                },
+                confidence="high" if j.on else "medium",
+            )
+    if "sql_implicit_join" in q.constructs and len(q.joins) <= 1:
         add(
             "join",
             inputs=srcs,
@@ -320,7 +349,17 @@ def _sql_ops(q: SqlQuery, step: str, c: _Ctx) -> list[IROperation]:
             notes=["Join por coma: la condición está en el WHERE"],
         )
     if "sql_set_operation" in q.constructs:
-        add("union", inputs=srcs, details={"text": q.text[:200]}, confidence="medium")
+        unsupported = [op for op in q.set_operations if op in {"intersect", "except"}]
+        if unsupported:
+            add(
+                "unsupported",
+                inputs=srcs,
+                details={"set_operations": unsupported, "text": q.text[:200]},
+                confidence="low",
+                notes=[f"SQL {op.upper()}: requiere diseño manual; no equivale a tUnite" for op in unsupported],
+            )
+        else:
+            add("union", inputs=srcs, details={"text": q.text[:200]}, confidence="medium")
     if q.where:
         add("filter", inputs=srcs, details={"expression": q.where, "origin": "WHERE"})
     items = split_select_list(q.select_list)

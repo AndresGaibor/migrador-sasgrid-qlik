@@ -74,6 +74,86 @@ def test_ir_clientes_activos():
     assert all(o.evidence.line > 0 for o in ops)
 
 
+def test_data_set_union_connects_every_input_to_tunite():
+    parsed = parse_program("data result; set left right; run;", "union.sas")
+    plan = plan_program(build_ir(parsed), "project-1", load_mapping_rules(), {})
+
+    source_steps = [step for step in plan.steps if step.operation_type == "read"]
+    union_step = next(step for step in plan.steps if step.operation_type == "union")
+
+    assert [connection.from_step for connection in union_step.connections] == [
+        step.id for step in source_steps
+    ]
+
+
+def test_proc_append_configures_target_table_not_source_table():
+    parsed = parse_program(
+        "proc append base=lib.target data=lib.source force; run;", "append.sas"
+    )
+    plan = plan_program(build_ir(parsed), "project-1", load_mapping_rules(), {})
+    append_step = next(step for step in plan.steps if step.operation_type == "append")
+
+    assert next(prop.value for prop in append_step.properties if prop.name == "TABLE") == "target"
+
+
+def test_sql_intersect_and_except_remain_manual_instead_of_becoming_union():
+    for operator in ("INTERSECT", "EXCEPT"):
+        source = (
+            "proc sql; create table result as select id from left_table "
+            f"{operator} select id from right_table; quit;"
+        )
+        parsed = parse_program(source, "set-operation.sas")
+        plan = plan_program(build_ir(parsed), "project-1", load_mapping_rules(), {})
+
+        assert not any(step.operation_type == "union" for step in plan.steps)
+        manual_step = next(
+            step for step in plan.steps if step.operation_type == "unsupported"
+        )
+        assert manual_step.action == "manual_decision"
+        assert any(operator in note for note in manual_step.assumptions)
+
+
+def test_sql_union_variants_keep_their_tunite_candidate():
+    for operator in ("UNION", "UNION ALL"):
+        source = (
+            "proc sql; create table result as select id from left_table "
+            f"{operator} select id from right_table; quit;"
+        )
+        parsed = parse_program(source, "union.sas")
+        plan = plan_program(build_ir(parsed), "project-1", load_mapping_rules(), {})
+
+        assert any(step.operation_type == "union" for step in plan.steps)
+
+
+def test_chained_sql_joins_stay_manual_until_topology_is_modeled():
+    source = (
+        "proc sql; create table result as select a.id from left_table as a "
+        "left join middle_table as b on a.id=b.id "
+        "inner join last_table as c on b.id=c.id; quit;"
+    )
+    parsed = parse_program(source, "chained-joins.sas")
+    plan = plan_program(build_ir(parsed), "project-1", load_mapping_rules(), {})
+
+    assert not any(step.operation_type == "join" for step in plan.steps)
+    manual_step = next(step for step in plan.steps if step.operation_type == "unsupported")
+    assert manual_step.action == "manual_decision"
+    assert any("JOIN" in note and "encadenad" in note for note in manual_step.assumptions)
+
+
+def test_conditional_multi_output_data_step_stays_manual_until_routing_is_modeled():
+    source = (
+        "data active inactive; set source; "
+        "if status = 'A' then output active; else output inactive; run;"
+    )
+    parsed = parse_program(source, "conditional-outputs.sas")
+    plan = plan_program(build_ir(parsed), "project-1", load_mapping_rules(), {})
+
+    assert not any(step.operation_type == "write" for step in plan.steps)
+    manual_step = next(step for step in plan.steps if step.operation_type == "unsupported")
+    assert manual_step.action == "manual_decision"
+    assert any("OUTPUT" in note and "condicional" in note for note in manual_step.assumptions)
+
+
 def test_plan_steps_have_contract(tmp_path):
     store, pid = project(tmp_path)
     ps = generate_plans(store, pid)

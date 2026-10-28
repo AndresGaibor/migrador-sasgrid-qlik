@@ -7,6 +7,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from sas_grid_migrator.migration_planner.expressions import is_simple_arithmetic_translation
 from sas_grid_migrator.migration_planner.models import (
     Connection,
     ContextVariable,
@@ -14,7 +15,6 @@ from sas_grid_migrator.migration_planner.models import (
     PlanStep,
     Property,
 )
-from sas_grid_migrator.migration_planner.expressions import is_simple_arithmetic_translation
 
 
 class ApplyBlock(BaseModel):
@@ -455,6 +455,10 @@ def _pending_details(
         block_reason = _step_block_reason(step)
         if block_reason:
             details.append(f"Paso {step.operation_id or step.id} ({location}): {block_reason}")
+        if step.requires_semantic_validation:
+            details.append(
+                f"Paso {step.operation_id or step.id} ({location}): la equivalencia semántica SAS/Talend sigue pendiente de validación."
+            )
         if (not step.verified or step.confidence != "high") and not step.offline_configured and not configured_mapper:
             details.append(
                 f"Paso {step.operation_id or step.id} ({location}): componente o configuración pendiente de validación; completar en Talend."
@@ -1036,7 +1040,8 @@ def build_apply_spec(
             for expression in step.expressions
         )
         needs_draft = (
-            bool([item for item in step.pending if not (configured_mapper and item == "Tipos de las columnas calculadas")])
+            step.requires_semantic_validation
+            or bool([item for item in step.pending if not (configured_mapper and item == "Tipos de las columnas calculadas")])
             or mapper_pending
             or step.action == "manual_decision"
             or (not configured_mapper and not step.offline_configured and (not step.verified or step.confidence != "high"))
@@ -1062,13 +1067,20 @@ def build_apply_spec(
         )
         if can_create_draft:
             pending = [*step.pending]
+            if step.requires_semantic_validation:
+                pending.append("La equivalencia semántica SAS/Talend sigue pendiente de validación.")
             if mapper_pending:
                 pending.append(mapper_reason or "El plan propone tMap, pero su mapper no se pudo configurar automáticamente.")
             if step_properties_pending:
                 pending.append("Hay propiedades sin valor confirmado; se conservarán en el contexto del Job.")
             if step_expressions_pending:
                 pending.append("Hay expresiones SAS pendientes de traducción o validación semántica.")
-            if any(not column.name or not column.talend_type for column in (mapped_schema or step.schema_columns)):
+            schema_pending = (
+                any(not column.name or not column.type for column in mapped_schema)
+                if mapped_schema is not None
+                else any(not column.name or not column.talend_type for column in step.schema_columns)
+            )
+            if schema_pending:
                 pending.append("Faltan nombres o tipos Talend para completar el esquema.")
             if not configured_mapper and (step.confidence != "high" or not step.verified):
                 pending.append("El componente o su configuración aún no está verificado en Studio.")
@@ -1268,12 +1280,25 @@ def build_apply_spec(
         talend_unique_names=unique_names,
         configured_mapper_steps=configured_mapper_steps,
     )
-    if max_components is not None and len(components) > max_components:
+    include_error_handling = error_handling
+    error_component_count = 3 if include_error_handling and components else 0
+    can_split = max_components is None or max_components >= 5 or not error_handling
+    if (
+        max_components is not None
+        and can_split
+        and len(components) + error_component_count > max_components
+    ):
         components, connections, instructions, split_children = split_oversized_job(
-            plan.job_name, safe_folder, components, connections, instructions, error_handling=error_handling
+            plan.job_name,
+            safe_folder,
+            components,
+            connections,
+            instructions,
+            chunk_size=min(CHUNK_SIZE, max(1, max_components - error_component_count)),
+            error_handling=include_error_handling,
         )
         child_jobs.extend(split_children)
-    if error_handling and components:
+    if include_error_handling and components:
         _add_error_handling(plan.job_name, components, connections)
 
     return TalendApplySpec(

@@ -45,6 +45,7 @@ class SqlQuery(BaseModel):
     having: str | None = None
     order_by: str | None = None
     into: list[str] = []
+    set_operations: list[str] = []
     text: str
     loc: Loc
     constructs: list[str] = []

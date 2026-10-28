@@ -168,6 +168,37 @@ def test_compute_tmap_generates_a_verified_direct_and_arithmetic_mapper():
     assert instruction["talendUniqueName"] == component["uniqueName"]
 
 
+def test_semantic_validation_flag_keeps_component_draft_even_when_tmap_is_configured():
+    source = step("read_1", "tFileInputDelimited")
+    source.schema_columns = [SchemaColumn(name="amount", talend_type="id_BigDecimal", nullable=False)]
+    mapping = step("compute_1", "tMap", from_step="read_1")
+    mapping.order = 2
+    mapping.operation_type = "compute"
+    mapping.schema_columns = [
+        SchemaColumn(name="amount", talend_type="id_BigDecimal", nullable=False),
+        SchemaColumn(name="service_fee", talend_type="id_BigDecimal", nullable=False),
+    ]
+    mapping.expressions = [
+        Expression(
+            sas="amount * 0.005", talend="(input_row.amount * 0.005)", line=8,
+            requires_semantic_validation=False, target="service_fee",
+        )
+    ]
+    mapping.requires_semantic_validation = True
+    target = step("write_1", "tFileOutputDelimited", from_step="compute_1")
+    target.order = 3
+
+    arguments = build_apply_spec(plan(source, mapping, target)).to_mcp_arguments()
+    component = next(item for item in arguments["components"] if item["componentName"] == "tMap")
+    pending_contexts = [
+        item for item in arguments["contexts"] if item["name"].startswith("migration_todo_")
+    ]
+
+    assert component["draftOnly"] is True
+    assert component["mapper"] is not None
+    assert any("equivalencia semántica" in item["comment"].lower() for item in pending_contexts)
+
+
 def test_tmap_with_unsupported_function_remains_a_draft():
     source = step("read_1", "tFileInputDelimited")
     source.schema_columns = [SchemaColumn(name="amount", talend_type="id_BigDecimal", nullable=False)]
@@ -978,11 +1009,16 @@ def test_a_job_above_max_components_is_split_into_child_jobs():
     arguments = build_apply_spec(plan(*steps), error_handling=True, max_components=10).to_mcp_arguments()
 
     children = arguments["childJobs"]
-    assert [child["jobName"] for child in children] == ["DailyJob_p01", "DailyJob_p02"]
-    assert [len([c for c in child["components"] if c["componentName"] == "tFileInputDelimited"]) for child in children] == [17, 3]
+    assert [child["jobName"] for child in children] == [
+        "DailyJob_p01", "DailyJob_p02", "DailyJob_p03"
+    ]
+    assert [
+        len([c for c in child["components"] if c["componentName"] == "tFileInputDelimited"])
+        for child in children
+    ] == [7, 7, 6]
     assert {c["componentName"] for c in arguments["components"]} == {"tRunJob", "tLogCatcher", "tLogRow"}
     assert [c["parameters"].get("PROCESS") for c in arguments["components"] if c["componentName"] == "tRunJob"] == [
-        "DailyJob_p01", "DailyJob_p02",
+        "DailyJob_p01", "DailyJob_p02", "DailyJob_p03",
     ]
     assert arguments["instructions"]["split"]["children"][0]["jobName"] == "DailyJob_p01"
     moved = {step["talendUniqueName"] for child in children for step in child["instructions"]["steps"]}
@@ -996,3 +1032,16 @@ def test_a_job_within_max_components_is_not_split():
 
     assert arguments["childJobs"] == []
     assert "split" not in arguments["instructions"]
+
+
+def test_component_limit_reserves_space_for_error_handling_nodes():
+    steps = [step(f"read_{index}", "tFileInputDelimited") for index in range(198)]
+
+    arguments = build_apply_spec(
+        plan(*steps), error_handling=True, max_components=200
+    ).to_mcp_arguments()
+
+    assert all(
+        len(job.get("components") or []) <= 200
+        for job in [arguments, *arguments.get("childJobs", [])]
+    )

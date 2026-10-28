@@ -113,12 +113,17 @@ def import_source(
     dest.parent.mkdir(parents=True, exist_ok=True)
     files: list[SourceFile] = []
     skipped: list[Skipped] = []
+    seen_paths: set[str] = set()
     total = 0
     with tempfile.TemporaryDirectory(dir=dest.parent) as tmp:
         staged = Path(tmp) / "snapshot"
         staged.mkdir()
         for raw, data, reason in _entries(src, limits, staged):
             rel = safe_relpath(raw)
+            path_key = rel if rel is not None else raw
+            if path_key in seen_paths:
+                raise ImportError_(f"ruta duplicada: {raw}")
+            seen_paths.add(path_key)
             if data is None or rel is None:
                 skipped.append(Skipped(path=raw, reason=reason or "ruta insegura"))
                 continue

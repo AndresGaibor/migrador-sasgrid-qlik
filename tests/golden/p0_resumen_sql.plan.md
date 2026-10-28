@@ -1,7 +1,7 @@
 # Job `job_p0_resumen_sql`
 
 - **Programa SAS:** `p0_resumen_sql.sas` (sha256 `fb6d9d23beef`)
-- **Instrucciones:** 9 · **Reglas:** v1
+- **Instrucciones:** 8 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Variables de contexto
@@ -56,46 +56,21 @@
   - Librería dwh es de tipo BASE en /data/dwh: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo
 - **Pruebas:** `vc_op_6_read_3_row_count`, `vc_op_6_read_3_schema`
 
-### 4. Unir (inner join): dwh.ventas, dwh.clientes, dwh.productos
+### 4. Lógica sin traducción definida
 
-- **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJoin`
-- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
-- **Conexiones:** Main desde `op_6_read_1`, Lookup desde `op_6_read_2`, Lookup desde `op_6_read_3`
-- **Propiedades:**
-  - `Join model` (Editor del componente (no es un parámetro plano)) = `Inner Join` — SAS p0_resumen_sql.sas:6
-  - `Match model` (Editor del componente (no es un parámetro plano)) = _por configurar_ — regla mappings
-  - `Expression key` (Editor del componente (no es un parámetro plano)) = `v.cliente_id = c.id` — SAS p0_resumen_sql.sas:6
-- **Esquema:** `cliente_id`, `id` _(tipos por determinar)_
-- **Expresión** (línea 6): SAS `on v.cliente_id = c.id` → _sin traducción automática_
-  - ⚠ Mapear las claves del ON en la tabla de join de tMap
+- **Acción:** manual_decision · **Componente:** `por_determinar` (sin verificar)
+- **Subjob:** `s5` · **Confianza:** low · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Conexiones:** Main desde `op_6_read_1`
+- **Supuestos:** SQL con JOIN encadenados: diseñar manualmente la topología de entradas y claves
 - **Pendientes:**
-  - Columnas clave y tipos en ambos lados
-- **Pruebas:** `vc_op_6_join_1_duplicates`, `vc_op_6_join_1_row_count`, `vc_op_6_join_1_nulls`
+  - Documentar la lógica y decidir el diseño manualmente
 
-### 5. Unir (left join): dwh.ventas, dwh.clientes, dwh.productos
-
-- **Acción:** add_component · **Componente:** `tMap` ![Icono Talend](/talend-icons/tMap_icon32.png) (sin verificar) · alternativas: `tJoin`
-- **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
-- **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
-- **Conexiones:** Main desde `op_6_join_1`
-- **Propiedades:**
-  - `Join model` (Editor del componente (no es un parámetro plano)) = `Left Outer Join` — SAS p0_resumen_sql.sas:6
-  - `Match model` (Editor del componente (no es un parámetro plano)) = _por configurar_ — regla mappings
-  - `Expression key` (Editor del componente (no es un parámetro plano)) = `v.producto_id = p.id` — SAS p0_resumen_sql.sas:6
-- **Esquema:** `producto_id`, `id` _(tipos por determinar)_
-- **Expresión** (línea 6): SAS `on v.producto_id = p.id` → _sin traducción automática_
-  - ⚠ Mapear las claves del ON en la tabla de join de tMap
-- **Pendientes:**
-  - Columnas clave y tipos en ambos lados
-- **Pruebas:** `vc_op_6_join_2_duplicates`, `vc_op_6_join_2_row_count`, `vc_op_6_join_2_nulls`
-
-### 6. Filtrar filas (WHERE): year(v.fecha) = &anio.
+### 5. Filtrar filas (WHERE): year(v.fecha) = &anio.
 
 - **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/processing/tfilterrow-standard-properties)
-- **Conexiones:** Main desde `op_6_join_2`
+- **Conexiones:** Main desde `op_6_unsupported_1`
 - **Propiedades:**
   - `LOGICAL_OP` (Logical operator used to combine conditions) = _por configurar_ — regla mappings · nombre oficial · opciones: OR, AND
   - `CONDITIONS` (Conditions) = _por configurar_ — regla mappings · nombre oficial
@@ -107,7 +82,7 @@
   - Traducir la condición manualmente (no hay traducción automática segura)
 - **Pruebas:** `vc_op_6_filter_1_row_count`, `vc_op_6_filter_1_nulls`, `vc_op_6_filter_1_empty`
 
-### 7. Agregar por c.region, p.categoria
+### 6. Agregar por c.region, p.categoria
 
 - **Acción:** add_component · **Componente:** `tAggregateRow` ![Icono Talend](/talend-icons/tAggregateRow_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
@@ -119,7 +94,7 @@
 - **Esquema:** `region`, `categoria`, `total_monto`, `clientes` _(tipos por determinar)_
 - **Pruebas:** `vc_op_6_aggregate_1_aggregates`, `vc_op_6_aggregate_1_numeric`
 
-### 8. Filtrar filas (HAVING): calculated total_monto > 1000
+### 7. Filtrar filas (HAVING): calculated total_monto > 1000
 
 - **Acción:** add_component · **Componente:** `tFilterRow` ![Icono Talend](/talend-icons/tFilterRow_icon32.png) (sin verificar) · alternativas: `tMap`
 - **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
@@ -136,7 +111,7 @@
   - Traducir la condición manualmente (no hay traducción automática segura)
 - **Pruebas:** `vc_op_6_filter_2_row_count`, `vc_op_6_filter_2_nulls`, `vc_op_6_filter_2_empty`
 
-### 9. Escribir work.ventas_resumen (reemplaza)
+### 8. Escribir work.ventas_resumen (reemplaza)
 
 - **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
 - **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
@@ -160,12 +135,6 @@
 - `vc_op_6_read_2_schema` (schema): Mismos nombres y tipos de columna
 - `vc_op_6_read_3_row_count` (row_count): Mismo número de filas leídas que en SAS
 - `vc_op_6_read_3_schema` (schema): Mismos nombres y tipos de columna
-- `vc_op_6_join_1_duplicates` (duplicates): Claves duplicadas en ambos lados (MERGE y JOIN difieren)
-- `vc_op_6_join_1_row_count` (row_count): Filas sin pareja en cada lado
-- `vc_op_6_join_1_nulls` (nulls): Claves nulas no deben emparejarse (o sí, según SAS)
-- `vc_op_6_join_2_duplicates` (duplicates): Claves duplicadas en ambos lados (MERGE y JOIN difieren)
-- `vc_op_6_join_2_row_count` (row_count): Filas sin pareja en cada lado
-- `vc_op_6_join_2_nulls` (nulls): Claves nulas no deben emparejarse (o sí, según SAS)
 - `vc_op_6_filter_1_row_count` (row_count): Filas que cumplen el filtro igual a SAS
 - `vc_op_6_filter_1_nulls` (nulls): Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)
 - `vc_op_6_filter_1_empty` (empty): Entrada vacía produce salida vacía
