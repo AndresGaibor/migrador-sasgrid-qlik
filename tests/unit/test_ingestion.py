@@ -77,6 +77,16 @@ def test_zip_bomb_entry_skipped(tmp_path):
     assert not files and skipped[0].reason == "supera max_file_bytes"
 
 
+def test_zip_member_limit_rejects_archives_with_too_many_skipped_entries(tmp_path):
+    z = tmp_path / "many-members.zip"
+    with zipfile.ZipFile(z, "w") as archive:
+        archive.writestr("../rejected-1.sas", "x")
+        archive.writestr("../rejected-2.sas", "x")
+
+    with pytest.raises(ImportError_, match="miembros ZIP"):
+        import_source(z, tmp_path / "dest", cfg(tmp_path, max_zip_members=1))
+
+
 def test_zip_appledouble_metadata_is_skipped(tmp_path):
     z = tmp_path / "mac.zip"
     with zipfile.ZipFile(z, "w") as zf:

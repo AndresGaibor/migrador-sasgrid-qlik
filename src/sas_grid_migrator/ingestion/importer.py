@@ -80,7 +80,10 @@ def _entries(
                     yield rel, p.read_bytes(), None
     elif zipfile.is_zipfile(src):
         with zipfile.ZipFile(src) as zf:
-            for info in sorted(zf.infolist(), key=lambda i: i.filename):
+            infos = zf.infolist()
+            if len(infos) > limits.max_zip_members:
+                raise ImportError_(f"más de {limits.max_zip_members} miembros ZIP")
+            for info in sorted(infos, key=lambda i: i.filename):
                 if info.is_dir():
                     continue
                 rel = safe_relpath(info.filename)

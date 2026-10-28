@@ -84,3 +84,12 @@ Métrica antes (`f4d3630`) → después: `real`, 8,1 % → 8,1 % (2 063 pasos; s
 `synthetic`, 16,8 % → 16,8 % (429 pasos; 303 sin esquema; 95 expresiones). No aumenta la automatización: se prioriza no
 promover comparaciones cuyo tipo no puede demostrarse. Verificación: `uv run pytest -q` (556 passed, 1 skipped) y Ruff.
 La comprobación en Studio queda pendiente por el límite de ejecución de esta tarea.
+
+## Importación ZIP — MIG-029 (28/10/2026)
+
+Se añadió `max_zip_members` (10 000 por defecto; configurable con `SGM_MAX_ZIP_MEMBERS`) y el importador rechaza el ZIP
+completo cuando supera la cuota, antes de ordenar, extraer o acumular miembros omitidos. Python `ZipFile.infolist()` aún
+materializa la tabla central, así que el límite no elimina el coste inicial de metadatos. Prueba sintética offline para
+excedentes compuestos solo por rutas inseguras. Métricas antes → después: `real` 8,1 % → 8,1 % (2 063 pasos), `synthetic`
+16,8 % → 16,8 % (429 pasos); cambio no relacionado con automatización SAS. Verificación focal: 20 passed, 1 skipped;
+Ruff pasó. Sin SAS, código importado, Studio ni Jobs Talend.
