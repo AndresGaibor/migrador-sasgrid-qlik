@@ -1445,3 +1445,39 @@ def test_outcome_lists_talend_best_practice_findings_without_changing_the_status
     assert parent["result"]["best_practices"] == expected
     assert child["result"]["best_practices"] == expected
     assert child["status"] == "applied"
+
+
+def test_a_job_above_the_component_limit_is_not_sent_to_studio(tmp_path, monkeypatch):
+    # Un Job de cientos de componentes congela Studio minutos y, si agota el tiempo, queda a medias.
+    _set_env(monkeypatch, tmp_path)
+    monkeypatch.setenv("TALEND_MAX_COMPONENTS", "2")
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(
+            client,
+            "Too big",
+            [_plan("x", "big.sas", "job_big", child_call=True), _plan("x", "child.sas", "job_child")],
+            [["child.sas"], ["big.sas"]],
+        )
+        preview = client.post(f"/api/projects/{project_id}/plans/big.sas/talend-apply/preview").json()
+        applied = client.post(f"/api/projects/{project_id}/plans/big.sas/talend-apply")
+
+    assert preview["ready"] is False
+    assert preview["component_limit"] == 2
+    assert preview["component_count"] > 2
+    assert applied.status_code == 422
+    assert "componentes" in applied.json()["detail"] and "2" in applied.json()["detail"]
+    assert fake.calls == []
+
+
+def test_the_component_limit_defaults_to_a_value_that_lets_normal_jobs_through(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    monkeypatch.delenv("TALEND_MAX_COMPONENTS", raising=False)
+    monkeypatch.setattr(api_module, "_talend", lambda: FakeTalend())
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Normal", [_plan("x", "a.sas", "job_a")])
+        preview = client.post(f"/api/projects/{project_id}/plans/a.sas/talend-apply/preview").json()
+
+    assert preview["ready"] is True
+    assert preview["component_limit"] == 200

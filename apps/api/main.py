@@ -729,7 +729,9 @@ def preview_talend_apply(project_id: str, program: str) -> dict:
     except ValueError as e:
         raise HTTPException(422, str(e)) from e
     return {
-        "ready": spec.ready_for_creation,
+        "ready": spec.ready_for_creation and _component_limit_error(spec) is None,
+        "component_count": len(spec.components),
+        "component_limit": _max_apply_components(),
         "preview_id": _talend_apply_preview_id(spec),
         "tools": ["talend_job_apply_custom_spec"],
         "identity": {
@@ -1085,6 +1087,29 @@ def _design_errors(studio_items: list[dict], write_result: dict) -> list[str]:
     return list(dict.fromkeys(error for error in found if error))
 
 
+DEFAULT_MAX_COMPONENTS = 200
+
+
+def _max_apply_components() -> int:
+    """Tope de componentes de un Job al aplicarlo en Studio (`TALEND_MAX_COMPONENTS`)."""
+    try:
+        return max(1, int(os.environ.get("TALEND_MAX_COMPONENTS", DEFAULT_MAX_COMPONENTS)))
+    except ValueError:
+        return DEFAULT_MAX_COMPONENTS
+
+
+def _component_limit_error(spec) -> str | None:
+    """Mensaje si el Job supera el tope: crearlo congelaría Studio y podría quedar a medias."""
+    limit = _max_apply_components()
+    if len(spec.components) <= limit:
+        return None
+    return (
+        f"El Job {spec.job_name} tendría {len(spec.components)} componentes y el máximo para aplicarlo en "
+        f"Studio es {limit}. Divide el programa SAS en programas más pequeños (la guía de Talend recomienda "
+        f"hasta 20 componentes por Job) o sube TALEND_MAX_COMPONENTS."
+    )
+
+
 def _best_practices(spec) -> list[dict]:
     """Recomendaciones de buenas prácticas de Talend; no cambian el estado de la aplicación."""
     findings = check_job_arguments(spec.to_mcp_arguments())
@@ -1133,6 +1158,8 @@ async def _apply_talend_plan(
     s = store()
     if not spec.ready_for_creation:
         raise HTTPException(409, "No hay componentes ni variables de contexto para crear el Job.")
+    if (too_big := _component_limit_error(spec)) is not None:
+        raise HTTPException(422, too_big)
     identity = {
         "project_id": spec.project_id,
         "program": spec.program,

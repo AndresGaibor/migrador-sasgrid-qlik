@@ -38,3 +38,16 @@ y de expresiones SAS). La primera pasada creó 6 de 8; lo que falló y se corrig
 - `talend_job_problems` y la aplicación abrían el editor de cada Job y no lo cerraban; en lotes grandes saturaban Studio. Ahora cierran los editores que ellos abrieron (nunca uno que ya estaba abierto).
 
 Abierto: la vista Problemas sigue marcando `tMap` (`LINK_STYLE`) y `tFilterRow` (`LOGICAL_OP`) borradores con "Unknown value in the list", aunque lo guardado en el `.item` coincide con lo que escribe Studio (`AUTO` y `&&`). Parece la caché en memoria de Studio; se confirmaría reiniciándolo y reabriendo uno de los Jobs.
+
+### Corpus reales aplicados contra Studio (28/10/2026)
+
+| Corpus | Programas | Resultado |
+| ------ | --------- | --------- |
+| `bancolombia_sas_synthetic_orchestration` | 8 | 8 creados |
+| `ts-sas-legacy-analytics` (ETL banca y seguros) | 18 | 18 creados |
+| `sas-access-samples` | 8 | 8 creados |
+| `cmmi-shadow-bundles` | 4 | 4 creados |
+| `ci360-download-client` | 4 | 4 creados |
+| `learning-sas-by-example` | 3 | 3 bloqueados por tamaño (167, 205 y 500 componentes) |
+
+Lo que fallaba y se corrigió: `tFilterRow` encadenados; el diálogo de esquema que colgaba la interfaz; editores sin cerrar que saturaban Studio; un trigger hacia un componente que no inicia subjob (`customer_profitability`); `tUnite` (entradas ilimitadas); nombres de Job repetidos entre carpetas (cuatro `bulkload.sas`). Un Job de 500 componentes agota el tiempo y dejaba restos, así que el API rechaza los de más de `TALEND_MAX_COMPONENTS` (200 por defecto) con un mensaje que pide dividir el programa.
