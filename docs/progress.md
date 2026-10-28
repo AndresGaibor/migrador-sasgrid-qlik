@@ -51,3 +51,24 @@ Abierto: la vista Problemas sigue marcando `tMap` (`LINK_STYLE`) y `tFilterRow` 
 | `learning-sas-by-example` | 3 | 3 bloqueados por tamaño (167, 205 y 500 componentes) |
 
 Lo que fallaba y se corrigió: `tFilterRow` encadenados; el diálogo de esquema que colgaba la interfaz; editores sin cerrar que saturaban Studio; un trigger hacia un componente que no inicia subjob (`customer_profitability`); `tUnite` (entradas ilimitadas); nombres de Job repetidos entre carpetas (cuatro `bulkload.sas`). Un Job de 500 componentes agota el tiempo y dejaba restos, así que el API rechaza los de más de `TALEND_MAX_COMPONENTS` (200 por defecto) con un mensaje que pide dividir el programa.
+
+## Verificación en Studio con el modo offline (28/10/2026)
+
+`scripts/verify_in_studio.py` sobre todos los corpus, con escritura offline por defecto y sin errores inesperados de Studio:
+
+| Corpus | Jobs | Tiempo | Antes (en vivo) |
+| ------ | ---- | ------ | --------------- |
+| `bancolombia_sas_synthetic_orchestration` | 8 | 19 s | 71 s |
+| `ts-sas-legacy-analytics` | 18 | 39 s | 105 s |
+| `tmsis-analytic-file` | 13 | 45 s | 71 s |
+| `sas-access-samples` | 8 | 31 s | 51 s |
+| `cmmi-shadow-bundles` y `ci360-download-client` | 4 + 4 | 16 s y 15 s | 27 s y 37 s |
+| `sas_synthetic_customer360_multisource_v2` | 8 | 38 s | sin medir |
+| `learning-sas-by-example` (3 programas, 47 Jobs con los hijos) | 47 | 56 s | 366 s y un Job de 500 componentes que fallaba |
+
+Los Jobs nacen sin los errores de `tMap`, `tFilterRow` (`LOGICAL_OP`) ni `tRunJob` que producía montar los nodos por la API.
+Quedan los pendientes esperados de un borrador (`Valores` vacíos, esquemas sin definir). Puertas automáticas sin Studio:
+`tests/integration/test_corpus_gate.py` y `tests/integration/test_adversarial_projects.py`; ver `docs/production-readiness.md`.
+
+Abierto: tras decenas de pruebas seguidas con los mismos nombres, la sesión de Studio devolvió errores de un Job anterior para
+`job_02_load_accounts` (el mismo spec con otro nombre salió limpio); se despeja reiniciando Studio.
