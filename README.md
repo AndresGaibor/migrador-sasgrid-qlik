@@ -23,6 +23,12 @@ de escritura del proyecto.
 > importados; tampoco ejecuta, compila ni publica Jobs Talend. Los planes son una propuesta técnica:
 > la equivalencia de resultados debe comprobarla una persona con datos de prueba.
 
+<p align="center">
+  <img src="docs/media/portal-demo.png" alt="Resumen del portal para un proyecto SAS sintético, con estado de análisis, métricas e instrucciones detectadas" width="1120">
+  <br>
+  <em>Resumen de un proyecto de demostración con datos sintéticos.</em>
+</p>
+
 ## Qué hace
 
 - **Inventaría y analiza** programas SAS, macros, sentencias y evidencia para revisión P0/P1/P2.
