@@ -46,6 +46,21 @@ metadatos: esas reglas (`BP-ERR-01`, `BP-DB-01`) vienen de la práctica general 
   así que, si la lectura aún está por determinar y el Job no tiene un inicio así, solo se añade el registro.
   Con eso `BP-ERR-01` no salta en los Jobs generados.
 
+## Programas grandes
+
+Un programa SAS de miles de líneas (por ejemplo, todos los ejemplos de un libro en un solo archivo) genera cientos de componentes
+en un único Job. Studio tarda minutos en montarlo, la guía de Talend recomienda no pasar de 20 y, si agota el tiempo, el montaje
+queda a medias. Por eso el API aplica dos controles, con `TALEND_MAX_COMPONENTS` (200 por defecto):
+
+- **Por encima del tope, el Job se parte solo.** Los componentes se agrupan por conexión (un flujo de datos nunca se corta entre dos
+  Jobs) y los grupos se empaquetan en Jobs hijo `<job>_p01`, `<job>_p02`… de hasta 17 componentes de trabajo, que con su manejo de
+  errores quedan en 20. El Job padre pasa a ser una cadena de `tRunJob` unidos por `OnSubjobOk`, y cada hijo se lleva las
+  instrucciones de sus pasos. `instructions.split` del padre lista los hijos.
+- **Si un flujo conectado es mayor que el tope**, no se puede partir sin cortarlo: la vista previa marca `ready: false` y la aplicación
+  responde 422 con el nombre y el tamaño del Job.
+
+El tiempo que el portal espera a Studio crece con el tamaño: 30 s más 1,5 s por componente (padre e hijos).
+
 ## Pendiente de validar con el equipo
 
 Estas reglas salen de la práctica general de Talend, no de una convención del cliente. Conviene contrastarlas con

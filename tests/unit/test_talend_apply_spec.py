@@ -970,3 +970,29 @@ def test_error_handling_skips_input_components_that_already_receive_a_flow():
     error_edges = [c for c in arguments["connections"] if c["connectorName"] == "SUBJOB_ERROR"]
 
     assert [(c["source"], c["target"]) for c in error_edges] == [("tFileInputDelimited_1", "tDie_5")]
+
+
+def test_a_job_above_max_components_is_split_into_child_jobs():
+    steps = [step(f"read_{index:02d}", "tFileInputDelimited") for index in range(1, 21)]
+
+    arguments = build_apply_spec(plan(*steps), error_handling=True, max_components=10).to_mcp_arguments()
+
+    children = arguments["childJobs"]
+    assert [child["jobName"] for child in children] == ["DailyJob_p01", "DailyJob_p02"]
+    assert [len([c for c in child["components"] if c["componentName"] == "tFileInputDelimited"]) for child in children] == [17, 3]
+    assert {c["componentName"] for c in arguments["components"]} == {"tRunJob", "tLogCatcher", "tLogRow"}
+    assert [c["parameters"].get("PROCESS") for c in arguments["components"] if c["componentName"] == "tRunJob"] == [
+        "DailyJob_p01", "DailyJob_p02",
+    ]
+    assert arguments["instructions"]["split"]["children"][0]["jobName"] == "DailyJob_p01"
+    moved = {step["talendUniqueName"] for child in children for step in child["instructions"]["steps"]}
+    assert len(moved) == 20
+
+
+def test_a_job_within_max_components_is_not_split():
+    steps = [step(f"read_{index}", "tFileInputDelimited") for index in range(1, 4)]
+
+    arguments = build_apply_spec(plan(*steps), max_components=10).to_mcp_arguments()
+
+    assert arguments["childJobs"] == []
+    assert "split" not in arguments["instructions"]

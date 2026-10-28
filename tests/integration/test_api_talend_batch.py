@@ -1481,3 +1481,33 @@ def test_the_component_limit_defaults_to_a_value_that_lets_normal_jobs_through(t
 
     assert preview["ready"] is True
     assert preview["component_limit"] == 200
+
+
+def test_an_oversized_job_is_split_instead_of_rejected_when_its_components_are_independent(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    monkeypatch.setenv("TALEND_MAX_COMPONENTS", "24")
+    fake = FakeTalend()
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    reads = [
+        PlanStep(
+            id=f"read_{index}", order=index, subjob="default", action="add_component",
+            component_candidate="tFileInputDelimited", purpose=f"Leer {index}",
+            properties=[Property(name="HEADER", value="1", origin="SAS", verified=True)],
+            evidence=Loc(file="big.sas", line=index, end_line=index), verified=True, in_catalog=True,
+        )
+        for index in range(1, 26)
+    ]
+    big = _plan("x", "big.sas", "job_big")
+    big.steps = reads
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Split", [big])
+        preview = client.post(f"/api/projects/{project_id}/plans/big.sas/talend-apply/preview").json()
+        applied = client.post(f"/api/projects/{project_id}/plans/big.sas/talend-apply")
+
+    assert preview["ready"] is True
+    assert preview["child_jobs"] and preview["component_count"] <= 24
+    assert preview["split_into_children"] is True
+    assert applied.status_code == 200, applied.text
+    assert len(fake.calls) == 1
+    assert [child["jobName"] for child in fake.calls[0]["childJobs"]] == ["job_big_p01", "job_big_p02"]
+    assert applied.json()["status"] in {"applied", "partially_applied"}

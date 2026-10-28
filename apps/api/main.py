@@ -579,6 +579,7 @@ def _talend_apply_spec(project_id: str, program: str, plans: PlanSet | None = No
             related_plans=plans.plans,
             related_folder_paths=folder_paths,
             error_handling=True,
+            max_components=_max_apply_components(),
         )
     except ValueError as e:
         raise HTTPException(422, str(e)) from e
@@ -605,6 +606,7 @@ def _talend_batch_bundle(project_id: str) -> tuple[list, dict[str, object], str]
                 related_plans=plans.plans,
                 related_folder_paths=folder_paths,
                 error_handling=True,
+                max_components=_max_apply_components(),
             )
         except ValueError as e:
             raise HTTPException(422, str(e)) from e
@@ -725,12 +727,14 @@ def preview_talend_apply(project_id: str, program: str) -> dict:
             related_plans=plans.plans,
             related_folder_paths=folder_paths,
             error_handling=True,
+            max_components=_max_apply_components(),
         )
     except ValueError as e:
         raise HTTPException(422, str(e)) from e
     return {
         "ready": spec.ready_for_creation and _component_limit_error(spec) is None,
         "component_count": len(spec.components),
+        "split_into_children": bool(spec.instructions.get("split")),
         "component_limit": _max_apply_components(),
         "preview_id": _talend_apply_preview_id(spec),
         "tools": ["talend_job_apply_custom_spec"],
@@ -1101,12 +1105,20 @@ def _max_apply_components() -> int:
 def _component_limit_error(spec) -> str | None:
     """Mensaje si el Job supera el tope: crearlo congelaría Studio y podría quedar a medias."""
     limit = _max_apply_components()
-    if len(spec.components) <= limit:
+    jobs = [(spec.job_name, len(spec.components))]
+    pending = list(spec.child_jobs)
+    while pending:
+        child = pending.pop()
+        jobs.append((str(child.get("jobName")), len(child.get("components") or [])))
+        pending.extend(child.get("childJobs") or [])
+    name, count = max(jobs, key=lambda item: item[1])
+    if count <= limit:
         return None
     return (
-        f"El Job {spec.job_name} tendría {len(spec.components)} componentes y el máximo para aplicarlo en "
-        f"Studio es {limit}. Divide el programa SAS en programas más pequeños (la guía de Talend recomienda "
-        f"hasta 20 componentes por Job) o sube TALEND_MAX_COMPONENTS."
+        f"El Job {name} tendría {count} componentes y el máximo para aplicarlo en "
+        f"Studio es {limit}. Un Job grande se parte solo en Jobs hijo cuando sus componentes son independientes; "
+        f"este tiene un flujo conectado demasiado grande. Divide el programa SAS en programas más pequeños (la guía "
+        f"de Talend recomienda hasta 20 componentes por Job) o sube TALEND_MAX_COMPONENTS."
     )
 
 
