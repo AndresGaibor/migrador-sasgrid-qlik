@@ -561,7 +561,6 @@ class _Planner:
             simple = translated.simple or []
             if (
                 simple
-                and translated.talend
                 and all(
                     item.get("column") and item.get("operator") and item.get("value")
                     for item in simple

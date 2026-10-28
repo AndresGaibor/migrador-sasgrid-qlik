@@ -72,3 +72,15 @@ Quedan los pendientes esperados de un borrador (`Valores` vacíos, esquemas sin 
 
 Abierto: tras decenas de pruebas seguidas con los mismos nombres, la sesión de Studio devolvió errores de un Job anterior para
 `job_02_load_accounts` (el mismo spec con otro nombre salió limpio); se despeja reiniciando Studio.
+
+## Traductor de expresiones — MIG-009 (28/10/2026)
+
+Las comparaciones que involucran columnas sin un tipo conocido ya no emiten una expresión Java candidata. El plan conserva
+las condiciones simples de `tFilterRow` cuando se pueden representar, pero las deja como borrador con advertencia de tipos,
+conversión y semántica de missing/nulos. Esto cubre comparaciones columna-columna, columna-literal y `IN`; no se ejecutaron
+SAS, código importado, Studio ni Jobs Talend.
+
+Métrica antes (`f4d3630`) → después: `real`, 8,1 % → 8,1 % (2 063 pasos; sin esquema 1 750 → 1 749; 627 expresiones);
+`synthetic`, 16,8 % → 16,8 % (429 pasos; 303 sin esquema; 95 expresiones). No aumenta la automatización: se prioriza no
+promover comparaciones cuyo tipo no puede demostrarse. Verificación: `uv run pytest -q` (556 passed, 1 skipped) y Ruff.
+La comprobación en Studio queda pendiente por el límite de ejecución de esta tarea.

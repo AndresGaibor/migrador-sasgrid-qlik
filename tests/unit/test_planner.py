@@ -39,26 +39,33 @@ def ir_of(name: str):
 
 
 def test_translate_supported_and_unsupported():
-    t = translate("saldo > 0 and saldo < 10")
-    assert "&&" in t.talend and t.columns == ["saldo"]
-    assert translate("saldo > &min").talend == "(input_row.saldo > context.min)"
+    t = translate("saldo + 10")
+    assert t.talend == "(input_row.saldo + 10)" and t.columns == ["saldo"]
+    assert translate("saldo + &min").talend == "(input_row.saldo + context.min)"
     assert translate("x is missing").talend is None
     assert translate("foo(x) > 1").talend is None
 
 
 def test_column_equality_without_known_types_stays_untranslated():
-    for source in ("first_name = last_name", "first_name in (last_name, backup_name)"):
+    for source in (
+        "first_name = last_name",
+        "first_name in (last_name, backup_name)",
+        "name < 'M'",
+        "name > 'M'",
+        "name = 1",
+        "amount = '1'",
+    ):
         translated = translate(source)
 
         assert translated.talend is None, source
         assert translated.warnings, source
 
 
-def test_text_comparison_keeps_candidate_but_warns_about_missing_null_semantics():
+def test_text_comparison_stays_untranslated_without_type_and_missing_semantics():
     for source in ("name = 'A'", "'A' = name", "name in ('A', 'B')"):
         translated = translate(source)
 
-        assert translated.talend is not None, source
+        assert translated.talend is None, source
         assert any("missing/nulos" in warning for warning in translated.warnings), source
 
 

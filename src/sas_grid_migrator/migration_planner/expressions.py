@@ -64,6 +64,7 @@ class _Parser:
         self.warnings: list[str] = []
         self.simple: list[dict] = []
         self.ops: set[str] = set()
+        self.unsafe_comparison = False
 
     def peek(self) -> tuple[str, str]:
         return self.t[self.i] if self.i < len(self.t) else ("end", "")
@@ -119,10 +120,10 @@ class _Parser:
                 raise _Unsupported("IN sin cierre")
             self.ops.add("in")
             if re.fullmatch(r"input_row\.\w+", left):
-                if any(re.fullmatch(r"input_row\.\w+", value) for value in vals):
-                    raise _Unsupported("IN entre columnas sin tipos confirmados")
-                if any(value.startswith('"') for value in vals):
-                    self.warnings.append("IN textual: validar semántica de missing/nulos antes de promover")
+                self.unsafe_comparison = True
+                self.warnings.append(
+                    "IN sobre columna sin tipo conocido: validar conversión y semántica de missing/nulos"
+                )
             return (
                 "("
                 + " || ".join(
@@ -136,14 +137,10 @@ class _Parser:
         right = self.arith()
         left_column = re.fullmatch(r"input_row\.\w+", left)
         right_column = re.fullmatch(r"input_row\.\w+", right)
-        textual_comparison = (left_column and right.startswith('"')) or (
-            right_column and left.startswith('"')
-        )
-        if op in ("==", "!=") and left_column and right_column:
-            raise _Unsupported("igualdad entre columnas sin tipos confirmados")
-        if textual_comparison:
+        if left_column or right_column:
+            self.unsafe_comparison = True
             self.warnings.append(
-                "Comparación textual: validar tipos, orden y semántica de missing/nulos antes de promover"
+                "Comparación con columna sin tipo conocido: validar conversión, orden y semántica de missing/nulos"
             )
         if (
             len(self.t)
@@ -160,7 +157,7 @@ class _Parser:
             )
         else:
             self.simple.append({})  # no representable en modo simple
-        if op in ("<", "<=", "!=") and not textual_comparison:
+        if op in ("<", "<=", "!="):
             self.warnings.append(
                 "Missing numérico: en SAS es menor que cualquier número; en Java un null no compara igual"
             )
@@ -246,7 +243,7 @@ def translate(sas: str) -> Translation:
     except _Unsupported as e:
         t.warnings.append(f"Sin traducción automática: {e}")
         return t
-    t.talend = java
+    t.talend = None if p.unsafe_comparison else java
     t.columns = sorted(set(p.cols))
     t.warnings = sorted(set(p.warnings))
     if p.simple and all(p.simple) and len(p.ops) <= 1 and p.ops <= {"&&", "||"}:

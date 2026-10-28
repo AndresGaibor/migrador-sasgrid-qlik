@@ -165,7 +165,8 @@ def test_tmap_filter_case_keeps_filter_candidate_and_tmap_alternative():
 
     assert filter_step.component_candidate == "tFilterRow"
     assert "tMap" in filter_step.alternatives
-    assert filter_step.expressions[0].talend == "(input_row.amount > 0)"
+    assert filter_step.expressions[0].talend is None
+    assert filter_step.expressions[0].warnings
     assert filter_step.properties[0].name == "LOGICAL_OP"
     assert filter_step.properties[0].value == "AND"
 
@@ -314,7 +315,8 @@ def test_filter_preserves_boolean_operator_and_source_columns(condition: str, ex
     assert filter_step.component_candidate == "tFilterRow"
     assert properties["LOGICAL_OP"] == expected_operator
     assert [column.name for column in filter_step.schema_columns] == ["amount", "status"]
-    assert filter_step.expressions[0].talend
+    assert filter_step.expressions[0].talend is None
+    assert filter_step.expressions[0].warnings
     assert filter_step.requires_semantic_validation
 
 
