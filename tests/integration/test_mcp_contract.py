@@ -1,7 +1,9 @@
 """Contrato portal↔MCP contra el servidor real.
 
 Arranca `talend-mcp` con el preset `portal`, lee `tools/list` y compara con
-`contract/portal-tools.json`. Si Bun no está instalado, se salta con motivo.
+`contract/portal-tools.json`. Si Bun no está instalado, se salta con motivo, salvo
+en CI (`CI=true`), donde su ausencia es un fallo: una prueba de contrato que se
+salta en silencio no protege nada.
 """
 
 import json
@@ -16,12 +18,20 @@ from pathlib import Path
 
 import pytest
 
-from sas_grid_migrator.talend_adapter.adapter import McpCaller
+from sas_grid_migrator.talend_adapter.adapter import McpCaller, TalendAdapter
 from sas_grid_migrator.talend_adapter.contract import load_contract
 
 ROOT = Path(__file__).resolve().parents[2]
 MCP_DIR = ROOT / "mcp" / "talend-mcp"
 BUN = shutil.which("bun")
+
+
+def _require_bun() -> None:
+    if BUN is not None:
+        return
+    if os.environ.get("CI", "").lower() in {"1", "true"}:
+        pytest.fail("bun no está instalado en CI: la prueba de contrato no puede saltarse")
+    pytest.skip("bun no está instalado")
 
 
 def _free_port() -> int:
@@ -49,6 +59,7 @@ def _wait_for_health(url: str, proc: subprocess.Popen, timeout: float = 30.0) ->
 
 class _Server:
     def __init__(self, preset: str, project: Path):
+        self.project = project
         self.port = _free_port()
         self.url = f"http://127.0.0.1:{self.port}/mcp"
         env = {
@@ -79,8 +90,7 @@ class _Server:
 
 @pytest.fixture(scope="module")
 def mcp_server(tmp_path_factory):
-    if BUN is None:
-        pytest.skip("bun no está instalado")
+    _require_bun()
     project = tmp_path_factory.mktemp("talend-project")
     (project / "talend.project").write_text("", encoding="utf-8")
     server = _Server("portal", project)
@@ -92,8 +102,7 @@ def mcp_server(tmp_path_factory):
 
 @pytest.fixture(scope="module")
 def agent_server(tmp_path_factory):
-    if BUN is None:
-        pytest.skip("bun no está instalado")
+    _require_bun()
     project = tmp_path_factory.mktemp("talend-project-agent")
     (project / "talend.project").write_text("", encoding="utf-8")
     server = _Server("agent", project)
@@ -127,9 +136,46 @@ def test_write_tool_schema_has_required_fields(mcp_server):
     assert contract.required_component_fields <= component.keys()
 
 
-@pytest.mark.xfail(reason="missing_tools llega en la Tarea 9", strict=False)
 def test_agent_preset_alone_is_reported_incomplete(agent_server):
     import asyncio
 
-    status = asyncio.run(McpCaller(agent_server.url).custom_spec_status())
-    assert status["missing_tools"], json.dumps(status, ensure_ascii=False)
+    status = asyncio.run(TalendAdapter(McpCaller(agent_server.url)).custom_spec_status())
+    assert status["diagnosis"] == "tools_missing", json.dumps(status, ensure_ascii=False)
+    assert "talend_job_problems" in status["missing_tools"]
+    assert "TALEND_MCP_FILTER=portal" in status["fix_hint"]
+
+
+def test_offline_batch_writes_the_contexts_the_portal_builds(mcp_server):
+    """`talend_jobs_create_from_spec` descarta `contexts`; el lote offline sí los escribe."""
+    import asyncio
+
+    from mcp import Client
+
+    from sas_grid_migrator.talend_adapter.offline_payload import to_batch_arguments
+
+    spec = {
+        "jobName": "OfflineContexts",
+        "version": "0.1",
+        "folderPath": "Process/PruebasOffline",
+        "components": [
+            {"uniqueName": "tFileInputDelimited_1", "componentName": "tFileInputDelimited"},
+            {"uniqueName": "tLogRow_1", "componentName": "tLogRow"},
+        ],
+        "connections": [
+            {"source": "tFileInputDelimited_1", "target": "tLogRow_1", "label": "row1", "connectorName": "FLOW"}
+        ],
+        "contexts": [{"name": "run_date", "type": "id_String", "value": "2026-10-28", "comment": "SAS"}],
+    }
+
+    async def create():
+        async with Client(mcp_server.url, read_timeout_seconds=30) as client:
+            return await client.call_tool("talend_jobs_create_batch", to_batch_arguments(spec))
+
+    result = asyncio.run(create())
+
+    assert not getattr(result, "is_error", False), result
+    items = list((mcp_server.project / "process").rglob("OfflineContexts_0.1.item"))
+    assert len(items) == 1, f"el lote no escribió el Job: {result}"
+    xml = items[0].read_text(encoding="utf-8")
+    assert 'name="run_date"' in xml and "2026-10-28" in xml
+    assert "tLogRow_1" in xml

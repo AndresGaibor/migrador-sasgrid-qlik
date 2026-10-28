@@ -17,6 +17,12 @@ jobs:
           python-version: "3.12"
           enable-cache: true
       - run: uv sync --frozen
+      # La prueba de contrato arranca el MCP real: necesita Bun y sus dependencias.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+        working-directory: mcp/talend-mcp
       - run: uv run pytest -q
 
   web:
