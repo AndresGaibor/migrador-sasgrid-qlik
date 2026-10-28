@@ -136,12 +136,15 @@ class _Parser:
         right = self.arith()
         left_column = re.fullmatch(r"input_row\.\w+", left)
         right_column = re.fullmatch(r"input_row\.\w+", right)
+        textual_comparison = (left_column and right.startswith('"')) or (
+            right_column and left.startswith('"')
+        )
         if op in ("==", "!=") and left_column and right_column:
             raise _Unsupported("igualdad entre columnas sin tipos confirmados")
-        if op in ("==", "!=") and (
-            (left_column and right.startswith('"')) or (right_column and left.startswith('"'))
-        ):
-            self.warnings.append("Comparación textual: validar semántica de missing/nulos antes de promover")
+        if textual_comparison:
+            self.warnings.append(
+                "Comparación textual: validar tipos, orden y semántica de missing/nulos antes de promover"
+            )
         if (
             len(self.t)
             and self.i - left_start == 3
@@ -157,7 +160,7 @@ class _Parser:
             )
         else:
             self.simple.append({})  # no representable en modo simple
-        if op in ("<", "<=", "!="):
+        if op in ("<", "<=", "!=") and not textual_comparison:
             self.warnings.append(
                 "Missing numérico: en SAS es menor que cualquier número; en Java un null no compara igual"
             )

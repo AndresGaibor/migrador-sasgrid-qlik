@@ -21,6 +21,7 @@ from sas_grid_migrator.persistence.store import Store
 from sas_grid_migrator.reporting.exports import render_plan_md, steps_csv, write_exports
 from sas_grid_migrator.sas_parser.ast import Loc, ProcStep
 from sas_grid_migrator.sas_parser.parser import parse_program
+from sas_grid_migrator.talend_adapter.apply_spec import build_apply_spec
 
 FIXTURES = Path(__file__).parent.parent / "fixtures" / "sas"
 ROOT = Path(__file__).parent.parent.parent
@@ -59,6 +60,25 @@ def test_text_comparison_keeps_candidate_but_warns_about_missing_null_semantics(
 
         assert translated.talend is not None, source
         assert any("missing/nulos" in warning for warning in translated.warnings), source
+
+
+def test_offline_text_order_filter_stays_a_draft_until_semantics_are_validated():
+    ir = build_ir(parse_program(
+        "data filtered; set source; if name > 'A'; run;", "offline-filter.sas"
+    ))
+    filter_operation = next(operation for operation in ir.operations if operation.type == "filter")
+    filter_operation.details["offline_schema"] = [
+        {"name": "name", "talend_type": "id_String", "nullable": False}
+    ]
+
+    plan = plan_program(ir, "project-1", load_mapping_rules(), {})
+    filter_step = next(step for step in plan.steps if step.operation_type == "filter")
+    spec = build_apply_spec(plan).to_mcp_arguments()
+    filter_component = next(item for item in spec["components"] if item["componentName"] == "tFilterRow")
+
+    assert filter_step.offline_configured is True
+    assert filter_step.requires_semantic_validation is True
+    assert filter_component["draftOnly"] is True
 
 
 def test_compute_plan_keeps_each_assignment_target_for_tmap_configuration():
