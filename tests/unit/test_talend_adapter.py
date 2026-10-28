@@ -674,12 +674,34 @@ def test_api_talend_health_reports_persisted_write_permission(tmp_path, monkeypa
 
 
 def test_job_problems_unwraps_clean_flag_and_items():
+    # Forma real capturada de Studio: el Bridge anida el resultado en `data.result`.
     ad = TalendAdapter(Fake({
         "talend_job_problems": {
             "ok": True,
-            "data": {"clean": False, "problems": [{"severity": "warn", "message": "sin esquema"}], "extra": 1},
+            "data": {
+                "ok": True,
+                "endpoint": "/automation/problems",
+                "result": {
+                    "job": "job_daily",
+                    "errors": 0,
+                    "warnings": 1,
+                    "infos": 0,
+                    "clean": False,
+                    "problems": [{"severity": "warn", "message": "sin esquema"}],
+                },
+            },
         },
     }))
     result = run(ad.job_problems("job_daily"))
     assert result == {"clean": False, "problems": [{"severity": "warn", "message": "sin esquema"}]}
     assert ad.caller.calls == [("talend_job_problems", {"job": "job_daily"})]
+
+
+def test_job_problems_reports_a_clean_job_from_the_bridge_result():
+    ad = TalendAdapter(Fake({
+        "talend_job_problems": {
+            "ok": True,
+            "data": {"ok": True, "result": {"job": "job_daily", "errors": 0, "clean": True, "problems": []}},
+        },
+    }))
+    assert run(ad.job_problems("job_daily")) == {"clean": True, "problems": []}

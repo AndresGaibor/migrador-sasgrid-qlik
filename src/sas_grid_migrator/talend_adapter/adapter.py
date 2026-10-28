@@ -451,6 +451,9 @@ class TalendAdapter:
     async def job_problems(self, job_name: str) -> dict[str, Any]:
         """Avisos de diseño del Job en la vista Problemas de Studio (requiere Bridge)."""
         data = await self._data("talend_job_problems", {"job": job_name})
+        result = data.get("result")
+        if isinstance(result, dict):
+            data = result
         problems = data.get("problems")
         return {
             "clean": bool(data.get("clean", False)),
