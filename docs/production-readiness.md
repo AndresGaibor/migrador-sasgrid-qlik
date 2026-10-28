@@ -59,6 +59,36 @@ otro nombre salió limpio).
 | Ruta del workspace larga en Windows | Studio puede fallar al compilar con rutas de más de 260 caracteres | Activar las rutas largas de Windows o acortar `TALEND_APPLY_FOLDER`; las carpetas y nombres ya se acotan |
 | Studio con la interfaz ocupada | El MCP espera a que se libere entre un Job y el siguiente y atiende los diálogos conocidos | Si persiste, cerrar editores (`talend_bridge_close_saved_editors`) o reiniciar Studio |
 
+## Defectos que estas puertas ya cazaron
+
+Cada uno tiene su prueba, para que no vuelva:
+
+| Defecto | Cómo se manifestaba | Dónde se cubre |
+| ------- | ------------------- | -------------- |
+| `.item` offline con `xsi:type` sin declarar `xsi` (Jobs con `tMap`) | Studio: "Error when loading the job", un diálogo modal que **bloquea la interfaz**; al borrar el Job quedaba el `.item` huérfano | MCP: `prefijosSinDeclarar` rechaza escribirlo; corpus: `ElementTree` parsea todo lo escrito |
+| `ProcessItem.property` apuntaba al `id` de la propiedad y no a su `xmi:id` | Studio no enlazaba el `.item` con el Job | `job-generator-robust.test.ts` y la puerta del corpus |
+| Dos Jobs con la misma etiqueta en carpetas distintas | Talend exige nombres únicos; `job_problems` leía uno cualquiera | MCP: `createJobsFromTemplate` lo rechaza |
+| `LOGICAL_OP: "AND"` escrito como nombre, no como valor (`&&`) | "has a value (AND) that doesn't exist" | `normalizar-parametros.test.ts` |
+| `tRunJob` sin id del hijo | "Parameter (Trabajo) is empty but is required" | `enlazar-trunjob.test.ts` |
+| Un Job sin componentes perdía sus variables de contexto | Se escribía vacío en silencio | `job-batch.test.ts` |
+| Nombres de Job de 180 caracteres y carpetas `src`/`tests`/`target` | Rutas de Windows demasiado largas; Git no sube esos nombres | `test_naming.py` y `test_adversarial_projects.py` |
+| Proyecto Talend recién creado, sin carpeta `process/` | `ENOENT` al enlazar `tRunJob` | `enlazar-trunjob.test.ts` |
+
+## Operación
+
+- **Memoria de Studio.** Tras muchas creaciones seguidas Studio retiene varios GB (llegó al 86 % de 4 GB) y la interfaz tarda en
+  responder. `talend_studio_memory` (con `gc: true`) la muestra y fuerza una recolección; si sigue por encima del 70 %, reinicia
+  Studio. Mide antes de una verificación larga.
+- **No borres archivos de `process/` a espaldas de Studio.** Studio conserva el Job en memoria y puede devolver errores de un Job
+  anterior con el mismo nombre. Borra desde Studio o con `scripts/verify_in_studio.py`, que además elimina por ruta lo que Studio
+  deja.
+- **Diálogos modales.** Un diálogo abierto (un error de carga, un aviso de red de Talend Cloud) bloquea la interfaz y todas las
+  llamadas al puente fallan con "hilo de interfaz ocupado". Ciérralo antes de reintentar.
+- Un Job escrito offline que Studio aún no ha cargado no se puede borrar desde Studio: refresca el workspace
+  (`talend_bridge_refresh_workspace`) o bórralo desde el sistema de archivos.
+- Los tests del MCP son herméticos (`mcp/talend-mcp/tests/setup.ts` apunta el puente a un puerto muerto): no dependen de que
+  haya un Studio abierto ni de su estado.
+
 ## Qué no cubre
 
 - **Equivalencia SAS ↔ Talend**: el portal no ejecuta SAS ni compara datos. Sigue siendo manual (`docs/equivalence-testing.md`).
