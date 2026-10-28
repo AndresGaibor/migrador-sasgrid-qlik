@@ -1351,6 +1351,8 @@ async def _talend_batch_preflight(project_id: str) -> dict:
         "available": True,
         "inventory_count": len(inventory),
         "total_jobs": len(ordered),
+        # Un lote grande llena la memoria de Studio: se avisa antes de empezar si ya va justo.
+        "studio_memory": await _talend().studio_memory(),
         **classified,
     }
 

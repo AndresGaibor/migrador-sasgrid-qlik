@@ -178,6 +178,7 @@ function TalendPreflightPanel({ preflight }: { preflight: { data?: TalendApplyBa
       <button type="button" className="secondary" onClick={preflight.reload} disabled={preflight.loading}>Volver a comprobar</button>
     </div>
     {preflight.error && <p className="error" role="alert">No se iniciará ninguna escritura hasta verificar MCP y el inventario completo: {preflight.error}</p>}
+    {report?.studio_memory?.restart_recommended && !preflight.error && <p className="notice" role="status">Studio ya usa el {report.studio_memory.used_percent} % de su memoria y un lote grande la llena: reinícialo desde Configuración antes de aplicar.</p>}
     {report && !preflight.error && <details open={report.conflict_count > 0}>
       <summary>Ver acciones para los {report.total_jobs} Jobs</summary>
       <ul>{report.jobs.map((job) => <li key={job.program} className={`talend-preflight-job ${job.action}`}>

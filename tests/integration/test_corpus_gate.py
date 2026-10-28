@@ -28,6 +28,7 @@ import apps.api.main as api_module
 import pytest
 from fastapi.testclient import TestClient
 from jsonschema import Draft202012Validator
+from tests.support.item_invariants import item_problems
 from tests.support.spec_invariants import project_problems, walk
 
 from sas_grid_migrator.talend_adapter.eligibility import offline_blockers
@@ -279,3 +280,8 @@ def test_the_files_the_mcp_writes_are_well_formed_xml_that_studio_can_link(corpu
                     broken.append(f"{program}: la referencia al .item no es #/")
     assert not broken, f"{label}:\n" + "\n".join(broken[:10])
     assert written, f"{label}: no se escribio ningun Job para comprobar"
+
+    # Un `.item` bien formado puede igualmente dejar a Studio con un diálogo al abrirlo (tablas del tMap que no
+    # siguen a sus conexiones): no sale en la vista Problemas, así que se comprueba aquí.
+    incoherent = [f"{program}: {problem}" for program, item in written for problem in item_problems(Path(item))]
+    assert not incoherent, f"{label}: Studio avisaría al abrir estos Jobs:\n" + "\n".join(incoherent[:10])

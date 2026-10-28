@@ -30,6 +30,11 @@ test("the ZIP-level operation shows durable progress, current job, and each resu
   assert.match(source, /result\?\.result\.itemPath/);
 });
 
+test("the preflight warns when Studio is short of memory before a large batch", () => {
+  assert.match(source, /studio_memory\?\.restart_recommended/);
+  assert.match(source, /reinícialo desde Configuración/);
+});
+
 test("the ZIP-level action checks current Talend destinations and shows create/update/conflict decisions", () => {
   assert.match(source, /api\.talendApplyBatchPreflight\(id\)/);
   assert.match(source, /preflightReady/);

@@ -255,6 +255,7 @@ export type TalendApplyBatchPreflight = {
   create_count: number;
   update_count: number;
   conflict_count: number;
+  studio_memory?: { checked: boolean; used_percent?: number; restart_recommended?: boolean };
 };
 export type CatalogList = {
   count: number;

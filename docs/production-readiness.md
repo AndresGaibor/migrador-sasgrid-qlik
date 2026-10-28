@@ -30,7 +30,10 @@ uv run python scripts/verify_in_studio.py ruta/a/los/sas --folder Process/Verifi
 Importa la carpeta como un proyecto, la planifica, la aplica por el mismo flujo de lote que la interfaz y lee los problemas
 de cada Job. Falla (código 1) si algún Job termina `failed` o `conflict`, o tiene un error de Studio que no sea un pendiente
 esperado de un borrador (`must have at least one value`, `No schema has been defined yet`, falta de un módulo). Al terminar
-borra de Studio los Jobs que creó (`--keep` los conserva). Código 2: no se pudo hablar con Studio.
+borra de Studio los Jobs que creó (`--keep` los conserva). Código 2: no se pudo hablar con Studio. Imprime la memoria de Studio
+al empezar y al terminar, para ver cuánto consume un lote, y anota los diálogos bloqueantes que Studio muestre durante el
+lote (un Job con avisos de carga no los pone en Problemas): cualquiera hace fallar la verificación. El preflight del portal también la incluye y avisa antes de aplicar
+si Studio ya supera el 75 %.
 
 Para que la verificación sea fiable, usa un Studio **recién reiniciado** o un proyecto de pruebas: Studio conserva en
 memoria información de los Jobs que se crearon y borraron con el mismo nombre durante la sesión, y `job_problems` puede
@@ -73,6 +76,8 @@ Cada uno tiene su prueba, para que no vuelva:
 | Un Job sin componentes perdía sus variables de contexto | Se escribía vacío en silencio | `job-batch.test.ts` |
 | Nombres de Job de 180 caracteres y carpetas `src`/`tests`/`target` | Rutas de Windows demasiado largas; Git no sube esos nombres | `test_naming.py` y `test_adversarial_projects.py` |
 | Proyecto Talend recién creado, sin carpeta `process/` | `ENOENT` al enlazar `tRunJob` | `enlazar-trunjob.test.ts` |
+| `tMap` offline con las tablas `out1`/`row1` fijas, sin `<metadata>` y con la conexión de salida sin `metaname` | Studio, al abrir el Job: diálogo modal «Some errors appear after the migration in the following connections, please check them: row_3_1». **No sale en la vista Problemas**, así que `job_problems` no lo ve | `tmap-tablas.test.ts`; `tests/support/item_invariants.py` en la puerta del corpus; `verify_in_studio.py` anota los diálogos |
+| Conexiones que Studio no admite (conector de salida inexistente, más conexiones de las que admite un conector) | Aviso al abrir el Job o un flujo sin filas | `comprobar-conexiones.test.ts`; el MCP rechaza con `INVALID_CONNECTIONS` antes de escribir |
 
 ## Operación
 

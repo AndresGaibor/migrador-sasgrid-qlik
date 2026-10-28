@@ -1,0 +1,78 @@
+<talendfile:ProcessType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:TalendMapper="http://www.talend.org/mapper" xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" xmi:id="_6HONoDDfM7L46phuqiXmdv" defaultContext="Default" jobType="Standard">
+  <context confirmationNeeded="false" hide="false" name="Default">
+    <contextParameter xmi:id="_u-pLYfQpppPoeur9zJU6aX" name="migration_todo_b7b7ab52ece2" type="id_String" value="" comment="Información técnica pendiente del portal (step:op_3_read_1):
+- Paso op_3_read_1 (component_scenarios/11_normalize_delimited_list.sas:3): No hay un componente Talend definido para este paso.
+- Paso op_3_read_1 (component_scenarios/11_normalize_delimited_list.sas:3): componente o configuración pendiente de validación; completar en Talend.
+- Paso op_3_read_1 (component_scenarios/11_normalize_delimited_list.sas:3): Formato físico o sistema de origen del dataset
+- Paso op_3_read_1 (component_scenarios/11_normalize_delimited_list.sas:3): Esquema y tipos de columnas
+- Paso op_3_read_1 (component_scenarios/11_normalize_delimited_list.sas:3): propiedad TABLE sin valor verificado; origen indicado por el portal: SAS component_scenarios/11_normalize_delimited_list.sas:3.
+- Paso op_3_read_1 (component_scenarios/11_normalize_delimited_list.sas:3): propiedad QUERY sin valor verificado; origen indicado por el portal: regla mappings.
+- Paso op_3_read_1 (component_scenarios/11_normalize_delimited_list.sas:3): propiedad CONNECTION sin valor verificado; origen indicado por el portal: regla mappings."></contextParameter>
+    <contextParameter xmi:id="_qqNNLmTY0LmaNLUvRmfDbU" name="migration_todo_a85e61c26668" type="id_String" value="" comment="Información técnica pendiente del portal (step:op_3_compute_1):
+- Paso op_3_compute_1 (component_scenarios/11_normalize_delimited_list.sas:3): la equivalencia semántica SAS/Talend sigue pendiente de validación.
+- Paso op_3_compute_1 (component_scenarios/11_normalize_delimited_list.sas:3): componente o configuración pendiente de validación; completar en Talend.
+- Paso op_3_compute_1 (component_scenarios/11_normalize_delimited_list.sas:3): Tipos de las columnas calculadas
+- Paso op_3_compute_1 (component_scenarios/11_normalize_delimited_list.sas:3): propiedad Expressions sin valor verificado; origen indicado por el portal: SAS component_scenarios/11_normalize_delimited_list.sas:3.
+- Paso op_3_compute_1 (component_scenarios/11_normalize_delimited_list.sas:3): propiedad Var table sin valor verificado; origen indicado por el portal: regla mappings.
+- Paso op_3_compute_1 (component_scenarios/11_normalize_delimited_list.sas:3): expresión SAS strip(scan(tags,i,&apos;,&apos;)) sin traducción Talend verificada.
+- Paso op_3_compute_1 (component_scenarios/11_normalize_delimited_list.sas:3): expresión SAS if not missing(tag) then output sin traducción Talend verificada.
+- Paso op_3_compute_1 (component_scenarios/11_normalize_delimited_list.sas:3): falta definir el nombre o tipo Talend de una columna del esquema."></contextParameter>
+    <contextParameter xmi:id="_rNAJV8HpMNnwkYyj_iKsDX" name="migration_todo_5cee9040c218" type="id_String" value="" comment="Información técnica pendiente del portal (step:op_3_select_columns_1):
+- Paso op_3_select_columns_1 (component_scenarios/11_normalize_delimited_list.sas:3): componente o configuración pendiente de validación; completar en Talend.
+- Paso op_3_select_columns_1 (component_scenarios/11_normalize_delimited_list.sas:3): propiedad SCHEMA sin valor verificado; origen indicado por el portal: SAS component_scenarios/11_normalize_delimited_list.sas:3.
+- Paso op_3_select_columns_1 (component_scenarios/11_normalize_delimited_list.sas:3): falta definir el nombre o tipo Talend de una columna del esquema."></contextParameter>
+    <contextParameter xmi:id="_V2Hh2MANwf4lb6szJDF-Vx" name="migration_todo_487cb7ffacca" type="id_String" value="" comment="Información técnica pendiente del portal (step:op_3_write_1):
+- Paso op_3_write_1 (component_scenarios/11_normalize_delimited_list.sas:3): No hay un componente Talend definido para este paso.
+- Paso op_3_write_1 (component_scenarios/11_normalize_delimited_list.sas:3): componente o configuración pendiente de validación; completar en Talend.
+- Paso op_3_write_1 (component_scenarios/11_normalize_delimited_list.sas:3): Sistema y tabla/archivo de destino
+- Paso op_3_write_1 (component_scenarios/11_normalize_delimited_list.sas:3): Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
+- Paso op_3_write_1 (component_scenarios/11_normalize_delimited_list.sas:3): propiedad TABLE sin valor verificado; origen indicado por el portal: SAS component_scenarios/11_normalize_delimited_list.sas:3.
+- Paso op_3_write_1 (component_scenarios/11_normalize_delimited_list.sas:3): propiedad TABLE_ACTION sin valor verificado; origen indicado por el portal: SAS component_scenarios/11_normalize_delimited_list.sas:3.
+- Paso op_3_write_1 (component_scenarios/11_normalize_delimited_list.sas:3): propiedad DATA_ACTION sin valor verificado; origen indicado por el portal: SAS component_scenarios/11_normalize_delimited_list.sas:3.
+- Paso op_3_write_1 (component_scenarios/11_normalize_delimited_list.sas:3): propiedad CONNECTION sin valor verificado; origen indicado por el portal: regla mappings."></contextParameter>
+    <contextParameter xmi:id="_l-4gvi0NRU8DFU_fv4LzWh" name="migration_todo_9f6e841333ef" type="id_String" value="" comment="Información técnica pendiente del portal (validation:row_count):
+- Validación pendiente row_count: Mismo número de filas leídas que en SAS
+- Validación pendiente row_count: Filas escritas iguales"></contextParameter>
+    <contextParameter xmi:id="_ggn1HG8gJlan23UIkcu2q4" name="migration_todo_73a8f8139bff" type="id_String" value="" comment="Información técnica pendiente del portal (validation:schema):
+- Validación pendiente schema: Mismos nombres y tipos de columna
+- Validación pendiente schema: Solo las columnas esperadas
+- Validación pendiente schema: Esquema destino"></contextParameter>
+    <contextParameter xmi:id="_OUkBAQ51UKn2DAtc6TUDDQ" name="migration_todo_c58f7f9c087a" type="id_String" value="" comment="Información técnica pendiente del portal (validation:nulls):
+- Validación pendiente nulls: Cálculos con valores missing (SAS propaga missing en aritmética)"></contextParameter>
+    <contextParameter xmi:id="_Kc8Fa8cYF4uylgL8tzwB-R" name="migration_todo_20d6f7ed0136" type="id_String" value="" comment="Información técnica pendiente del portal (validation:dates):
+- Validación pendiente dates: Fechas calculadas (epoch 1960 vs 1970)"></contextParameter>
+    <contextParameter xmi:id="_QaMskBytB0tO7IfGCUL86L" name="migration_todo_06a4b02c736f" type="id_String" value="" comment="Información técnica pendiente del portal (validation:numeric):
+- Validación pendiente numeric: Redondeo y precisión"></contextParameter>
+  </context>
+  <node xmi:id="_dUSkLkzz0CYJoVOzRZmZQp" componentName="tMap" componentVersion="2.1" posX="160" posY="96">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tMap_1"></elementParameter>
+    <elementParameter field="TEXT" name="LABEL" value="Calcular columnas (asignaciones y condicionales) · SAS 3"></elementParameter>
+    <elementParameter field="CLOSED_LIST" name="LINK_STYLE" value="AUTO"></elementParameter>
+    <nodeData xsi:type="TalendMapper:MapperData">
+      <uiProperties shellMaximized="true"></uiProperties>
+      <varTables sizeState="INTERMEDIATE" name="Var" minimized="true"></varTables>
+      <outputTables sizeState="INTERMEDIATE" name="out1"></outputTables>
+      <inputTables sizeState="INTERMEDIATE" name="row1" matchingMode="ALL_ROWS" lookupMode="LOAD_ONCE"></inputTables>
+    </nodeData>
+  </node>
+  <node xmi:id="_UsJ8szg7R-dCBjyoPCf65F" componentName="tFilterColumns" componentVersion="0.101" posX="440" posY="96">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tFilterColumns_2"></elementParameter>
+    <elementParameter field="TEXT" name="LABEL" value="Conservar/descartar columnas · SAS 3"></elementParameter>
+  </node>
+  <node xmi:id="__IhYfguIUZzy9InpW2dckc" componentName="tLogCatcher" componentVersion="0.101" posX="160" posY="288">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tLogCatcher_3"></elementParameter>
+    <elementParameter field="TEXT" name="LABEL" value="Capturar errores del Job"></elementParameter>
+  </node>
+  <node xmi:id="_MS-Qxv7hfCOI9_RF1xpNv5" componentName="tLogRow" componentVersion="0.101" posX="440" posY="288">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="tLogRow_4"></elementParameter>
+    <elementParameter field="TEXT" name="LABEL" value="Registrar errores"></elementParameter>
+    <elementParameter field="CHECK" name="PRINT_CONTENT_WITH_LOG4J" value="true"></elementParameter>
+    <elementParameter field="TEXT" name="SCHEMA_OPT_NUM" value="100"></elementParameter>
+  </node>
+  <connection xmi:id="_eTXwhYIgC3ROg-Hib8Zrca" source="tMap_1" target="tFilterColumns_2" label="row_3_1" connectorName="FLOW">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="flow_3_1"></elementParameter>
+  </connection>
+  <connection xmi:id="_N00weR04fhfgccN3fHSpT4" source="tLogCatcher_3" target="tLogRow_4" label="row_errors" connectorName="FLOW">
+    <elementParameter field="TEXT" name="UNIQUE_NAME" value="flow_errors"></elementParameter>
+  </connection>
+</talendfile:ProcessType>

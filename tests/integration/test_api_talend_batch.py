@@ -113,6 +113,10 @@ class FakeTalend:
         self.inspection_job_names: list[str] = []
         self.job_inventory = job_inventory or []
         self.inventory_error = inventory_error
+        self.memory: dict = {"checked": True, "used_percent": 10, "restart_recommended": False}
+
+    async def studio_memory(self) -> dict:
+        return self.memory
 
     async def list_jobs(self) -> list[dict]:
         if self.inventory_error is not None:
@@ -1338,6 +1342,20 @@ def test_batch_rejects_plan_change_between_preflight_and_batch_snapshot(tmp_path
     assert "cambió" in response.json()["detail"].lower()
     assert fake.calls == []
     assert state["status"] == "not_started"
+
+
+def test_preflight_reports_studio_memory_so_a_large_batch_is_not_started_on_a_full_studio(tmp_path, monkeypatch):
+    _set_env(monkeypatch, tmp_path)
+    fake = FakeTalend()
+    fake.memory = {"checked": True, "used_percent": 83, "restart_recommended": True}
+    monkeypatch.setattr(api_module, "_talend", lambda: fake)
+    with TestClient(api_module.app) as client:
+        project_id = _project_with_plans(client, "Memory", [_plan("pending", "a.sas", "job_alpha")])
+        preflight = client.get(f"/api/projects/{project_id}/talend-apply-batch/preflight")
+
+    assert preflight.status_code == 200, preflight.text
+    assert preflight.json()["studio_memory"]["restart_recommended"] is True
+    assert fake.calls == []
 
 
 def test_batch_updates_existing_job_in_exact_destination_folder(tmp_path, monkeypatch):

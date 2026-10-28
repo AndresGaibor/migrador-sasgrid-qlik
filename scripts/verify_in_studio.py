@@ -13,6 +13,7 @@ Codigos de salida: 0 todo bien; 1 hay Jobs fallidos o con errores inesperados; 2
 
 import argparse
 import asyncio
+import contextlib
 import json
 import os
 import re
@@ -21,6 +22,7 @@ import socket
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import urllib.request
 from pathlib import Path
@@ -33,12 +35,58 @@ sys.path.insert(0, str(ROOT / "src"))
 EXPECTED_PENDING = [
     re.compile(r"must have at least one value", re.IGNORECASE),
     re.compile(r"No schema has been defined yet", re.IGNORECASE),
+    # La salida de un tMap sin columnas: el SAS no dice qué columnas salen, así que el borrador las deja por definir.
+    re.compile(r"output schema/link named .+ has no column defined", re.IGNORECASE),
     re.compile(r"Module .+ required", re.IGNORECASE),
 ]
 
 
 def is_expected(message: str) -> bool:
     return any(pattern.search(message) for pattern in EXPECTED_PENDING)
+
+
+def _print_memory(moment: str, health: dict) -> None:
+    memory = health.get("studio_memory") or {}
+    if memory.get("checked"):
+        print(f"Memoria de Studio {moment}: {memory['used_percent']} %" + (" (conviene reiniciarlo)" if memory.get("restart_recommended") else ""))
+
+
+class DialogWatcher(threading.Thread):
+    """Anota los diálogos bloqueantes que Studio muestra mientras corre el lote.
+
+    Un Job que Studio carga con avisos ("Some errors appear after the migration in the following connections") abre un
+    diálogo modal, no una entrada de la vista Problemas: `job_problems` no lo ve, y quien mira Studio lo cierra y sigue.
+    """
+
+    def __init__(self, url: str):
+        super().__init__(daemon=True)
+        self.url = url
+        self.seen: dict[tuple[str, str], int] = {}
+        self._stop_event = threading.Event()
+
+    def stop(self) -> None:
+        self._stop_event.set()
+
+    def run(self) -> None:
+        asyncio.run(self._poll())
+
+    async def _poll(self) -> None:
+        from mcp import Client
+
+        try:
+            async with Client(self.url, read_timeout_seconds=30) as client:
+                while not self._stop_event.is_set():
+                    # Con la interfaz ocupada la consulta falla: se reintenta en la ronda siguiente.
+                    with contextlib.suppress(Exception):
+                        result = await client.call_tool("talend_studio_ui_dialogs", {})
+                        data = (result.structured_content or {}).get("data") or {}
+                        for dialog in data.get("blocking") or []:
+                            texts = " | ".join(str(text) for text in dialog.get("texts") or [])
+                            key = (str(dialog.get("title") or "sin título"), texts[:300])
+                            self.seen[key] = self.seen.get(key, 0) + 1
+                    await asyncio.sleep(2)
+        except Exception:  # noqa: BLE001 - sin vigilante la verificación sigue; solo se pierde esta red de seguridad
+            return
 
 
 def _free_port() -> int:
@@ -144,6 +192,8 @@ def main() -> int:
     )
     names: set[str] = set()
     paths: set[Path] = set()
+    watcher = DialogWatcher(url)
+    watcher.start()
     report: dict = {"source": str(args.source), "jobs": []}
     exit_code = 0
     try:
@@ -156,6 +206,7 @@ def main() -> int:
             if not health.get("available"):
                 print(f"Studio no esta disponible: {health.get('diagnosis')} - {health.get('fix_hint')}", file=sys.stderr)
                 return 2
+            _print_memory("al empezar", health)
             project = client.post("/api/projects", json={"name": args.source.name}).json()["id"]
             client.post(f"/api/projects/{project}/imports", json={"path": str(args.source.resolve())})
             client.post(f"/api/projects/{project}/analyses")
@@ -197,6 +248,11 @@ def main() -> int:
                 if job.get("error"):
                     print(f"          {str(job['error'])[:220]}")
             report["counts"] = counts
+            watcher.stop()
+            report["studio_dialogs"] = [{"title": title, "texts": texts} for title, texts in watcher.seen]
+            for title, texts in watcher.seen:
+                exit_code = 1
+                print(f"[FALLA] Studio mostró un diálogo durante el lote: «{title}» {texts[:220]}")
             print(f"\nResumen: {counts} en {report['seconds']} s")
             if report["status"] in {"running", "pending", "queued"}:
                 print("El lote no termino en el tiempo dado", file=sys.stderr)
@@ -205,6 +261,7 @@ def main() -> int:
         print(f"No se pudo completar la verificacion: {type(error).__name__}: {error}", file=sys.stderr)
         exit_code = 2
     finally:
+        watcher.stop()
         if names and not args.keep:
             try:
                 left = asyncio.run(_cleanup(url, names, paths, args.folder))
