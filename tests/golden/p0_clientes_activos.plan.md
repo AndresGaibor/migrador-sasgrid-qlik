@@ -49,6 +49,7 @@
   - `ADVANCED_COND` (Advanced) = _por configurar_ — regla mappings · nombre oficial
 - **Esquema:** `estado`, `saldo` _(tipos por determinar)_
 - **Expresión** (línea 7): SAS `estado = 'A' and saldo > 0` → Java `(input_row.estado.equals("A") && (input_row.saldo > 0))`
+  - ⚠ Comparación textual: validar semántica de missing/nulos antes de promover
 - **Pruebas:** `vc_op_7_filter_1_row_count`, `vc_op_7_filter_1_nulls`, `vc_op_7_filter_1_empty`
 
 ### 4. Calcular columnas (asignaciones y condicionales)

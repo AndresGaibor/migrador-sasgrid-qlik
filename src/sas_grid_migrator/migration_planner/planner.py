@@ -552,6 +552,7 @@ class _Planner:
         values, exprs, cols, pend2 = self.fill(op, comp)
         component_tables: dict[str, object] = {}
         offline_configured = False
+        filter_semantic_warning = False
         if op.type in {"read_file", "write_file"}:
             file_config = op.details.get("offline_file_config")
             offline_configured = bool(isinstance(file_config, dict) and file_config.get("ready"))
@@ -561,7 +562,6 @@ class _Planner:
             if (
                 simple
                 and translated.talend
-                and not translated.warnings
                 and all(
                     item.get("column") and item.get("operator") and item.get("value")
                     for item in simple
@@ -591,6 +591,7 @@ class _Planner:
                 }
                 values["LOGICAL_OP"] = "OR" if translated.logical == "||" else "AND"
                 offline_configured = True
+                filter_semantic_warning = bool(translated.warnings)
         origin = f"SAS {op.evidence.file}:{op.evidence.line}"
         props = [
             Property(
@@ -643,7 +644,7 @@ class _Planner:
             sem = any(expression.talend is None or expression.warnings for expression in exprs)
             sem = sem or op.confidence != "high"
         if offline_configured and op.type in {"read_file", "write_file", "filter"}:
-            sem = False
+            sem = filter_semantic_warning if op.type == "filter" else False
         return PlanStep(
             id=sid,
             order=order,

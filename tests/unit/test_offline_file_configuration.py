@@ -72,7 +72,11 @@ def test_offline_file_job_uses_project_context_schema_and_filter_table(tmp_path:
     assert "CREATE_HEADER" not in writer["parameters"]
     assert writer["parameters"]["FILE_EXIST_EXCEPTION"] == "false"
     assert writer["schema"]["columns"] == reader["schema"]["columns"]
-    assert all(not component["draftOnly"] for component in spec["components"])
+    assert {component["componentName"]: component["draftOnly"] for component in spec["components"]} == {
+        "tFileInputDelimited": False,
+        "tFilterRow": True,
+        "tFileOutputDelimited": False,
+    }
     assert [(edge["source"], edge["target"]) for edge in spec["connections"]] == [
         (reader["uniqueName"], filter_component["uniqueName"]),
         (filter_component["uniqueName"], writer["uniqueName"]),

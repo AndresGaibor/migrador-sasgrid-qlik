@@ -118,6 +118,11 @@ class _Parser:
             if self.take()[1] != ")":
                 raise _Unsupported("IN sin cierre")
             self.ops.add("in")
+            if re.fullmatch(r"input_row\.\w+", left):
+                if any(re.fullmatch(r"input_row\.\w+", value) for value in vals):
+                    raise _Unsupported("IN entre columnas sin tipos confirmados")
+                if any(value.startswith('"') for value in vals):
+                    self.warnings.append("IN textual: validar semántica de missing/nulos antes de promover")
             return (
                 "("
                 + " || ".join(
@@ -129,6 +134,14 @@ class _Parser:
             return left
         self.take()
         right = self.arith()
+        left_column = re.fullmatch(r"input_row\.\w+", left)
+        right_column = re.fullmatch(r"input_row\.\w+", right)
+        if op in ("==", "!=") and left_column and right_column:
+            raise _Unsupported("igualdad entre columnas sin tipos confirmados")
+        if op in ("==", "!=") and (
+            (left_column and right.startswith('"')) or (right_column and left.startswith('"'))
+        ):
+            self.warnings.append("Comparación textual: validar semántica de missing/nulos antes de promover")
         if (
             len(self.t)
             and self.i - left_start == 3
