@@ -21,7 +21,7 @@ La suite omitió una prueba de importación de symlink porque Windows no concede
 - Ejecutar `.claude/scripts/e2e_web.mjs` con Playwright instalado y servicios web/API activos; confirmar upload, errores, navegación, progreso tras recarga, descarga, teclado y viewport móvil.
 - Verificar nombres/opciones Grid con documentación o scripts representativos de una versión identificada.
 - Probar casos representativos en Talend Studio y registrar versión, pasos, evidencia y resultado. Hecho con los fixtures P0 y P1; falta con programas reales.
-- Abierto: Studio marca los `tMap` sin mapeo con "Unknown value in the list [Mapping links display as:]" aunque el `.item` guarda `LINK_STYLE=AUTO`; parece una marca desactualizada de la vista Problemas (plugin Java).
+- Abierto: Studio marca los `tMap` sin mapeo con "Unknown value in the list [Mapping links display as:]" en la vista Problemas (aparece en `design_errors`). Descartado: el `.item` guarda `LINK_STYLE=AUTO`; ningún valor (`AUTO`, `LINE`, `BEZIER_CURVE`) ni reconfigurar el nodo, cerrar y reabrir el editor o refrescar el workspace lo limpia; solo desaparece si el `tMap` recibe una conexión. Pendiente: abrir el Job en la interfaz de Studio para ver si la marca es real, y depurar el plugin Java (`JobProblems`).
 - Resuelto: si la aplicación falla a mitad, el MCP borra los Jobs que creó en esa llamada y el error lo indica; los Jobs que ya existían no se tocan.
 - Resuelto: el generador añade `tLogCatcher` + `tLogRow` y, si hay un componente de inicio, `tDie` por `SUBJOB_ERROR` (`BP-ERR-01`); ver `docs/talend-best-practices.md`.
 - Ningún componente se marca verificado solo por una inspección viva: `talend-mcp` está conectado, pero el piloto con programas reales sigue pendiente.
