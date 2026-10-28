@@ -26,6 +26,17 @@ def test_redact_sas_masks_credentials_only():
     assert out.count("\n") == SRC.count("\n")
 
 
+def test_redact_pwencode_literal_but_not_a_macro_variable():
+    """`proc pwencode in='clave'` lleva la clave en texto claro: tampoco puede llegar a ningún análisis."""
+    source = "proc pwencode in='Cl4veSecreta*9';\nrun;\nproc pwencode in=&clave;\nrun;\n"
+    out = redact_sas(source)
+
+    assert "Cl4veSecreta" not in out
+    assert "in=***" in out
+    assert "in=&clave" in out  # una macrovariable no es un secreto
+    assert out.count("\n") == source.count("\n")
+
+
 def test_redact_shell_and_dispatch():
     sh = 'export DB_PASSWORD="abc"\nsasgsub -password xyz -sysin a.sas\nAPI_TOKEN=t0k\n'
     out = redact_other(sh)

@@ -60,7 +60,7 @@ def analyze_project(store: Store, project_id: str) -> Analysis:
         if f.kind != FileKind.SAS:
             continue
         raw = (store.source_dir(project_id) / f.path).read_bytes()
-        text = raw.decode(f.encoding or "utf-8", errors="replace")
+        text = raw.decode(f.encoding or "utf-8", errors="replace").lstrip("\u200b\ufeff")
         prog = parse_program(redact_sas(text), f.path, f.sha256)
         total += classify(prog, rules)
         programs.append(prog)

@@ -5,6 +5,7 @@ Los archivos aceptados se copian a `dest` (snapshot reproducible) y se registran
 
 import hashlib
 import os
+import re
 import stat
 import tempfile
 import zipfile
@@ -25,6 +26,19 @@ KIND_BY_SUFFIX = {
     ".txt": FileKind.DOC,
 }
 TEXT_KINDS = {FileKind.SAS, FileKind.SHELL, FileKind.LOG, FileKind.DOC}
+
+# Los programas se entregan a veces como `.txt`: un `.txt` es SAS si se lee como SAS (varias sentencias propias del
+# lenguaje al inicio de linea y un cierre de paso). Una nota que menciona "data" o "proc" en prosa no cumple.
+_SAS_STATEMENT = re.compile(
+    r"(?im)^\s*(?:proc\s+[a-z]+\b|data\s+[\w.&]+[^;\n]*;|%macro\s+\w+|%let\s+\w+\s*=|libname\s+\w+|%include\b|filename\s+\w+)"
+)
+_SAS_STEP_END = re.compile(r"(?im)\b(?:run|quit)\s*;|^\s*%mend\b")
+
+
+def looks_like_sas(text: str) -> bool:
+    """Si el texto parece un programa SAS. SAS Studio antepone un carácter invisible (U+200B) al exportar."""
+    text = text.lstrip("\u200b\ufeff")
+    return len(_SAS_STATEMENT.findall(text)) >= 3 and _SAS_STEP_END.search(text) is not None
 
 
 class ImportError_(ValueError):
@@ -144,7 +158,10 @@ def import_source(
                 raise ImportError_(f"más de {limits.max_files} archivos")
             if total > limits.max_total_bytes:
                 raise ImportError_(f"más de {limits.max_total_bytes} bytes en total")
-            kind = KIND_BY_SUFFIX.get(PurePosixPath(rel).suffix.lower(), FileKind.OTHER)
+            suffix = PurePosixPath(rel).suffix.lower()
+            kind = KIND_BY_SUFFIX.get(suffix, FileKind.OTHER)
+            if suffix == ".txt" and looks_like_sas(data.decode(detect_encoding(data) or "utf-8", errors="replace")):
+                kind = FileKind.SAS
             target = staged / rel
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(data)

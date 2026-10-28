@@ -5,8 +5,14 @@ de texto simples). Todo lo demás devuelve `talend=None`: no se inventa una trad
 Cada resultado debe validarse semánticamente (missing, mayúsculas, tipos).
 """
 
+import os
 import re
 from dataclasses import dataclass, field
+
+from sas_grid_migrator.migration_planner.routine_translator import (
+    Unsupported,
+    translate_with_routine,
+)
 
 
 @dataclass
@@ -17,6 +23,7 @@ class Translation:
     simple: list[dict] | None = None  # condiciones tFilterRow (modo simple)
     logical: str | None = None  # "&&" | "||" para el modo simple
     warnings: list[str] = field(default_factory=list)
+    engine: str = "inline"  # "inline" (Java suelto) | "routine" (llamadas a SasFunctions)
 
 
 class _Unsupported(Exception):
@@ -228,8 +235,34 @@ class _Parser:
         raise _Unsupported(f"inesperado: {v!r}")
 
 
+def routine_enabled() -> bool:
+    """Interruptor del motor de la rutina: `SGM_SAS_ROUTINE=1`.
+
+    Apagado por defecto: la rutina `SasFunctions` (`rules/talend/routines/SasFunctions.java`) tiene que estar instalada en
+    el proyecto Talend, o los Jobs con `SasFunctions.*` no compilan. Se enciende cuando el MCP la instala.
+    """
+    return os.environ.get("SGM_SAS_ROUTINE", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def translate(sas: str) -> Translation:
-    """Traduce una condición o expresión SAS; `talend=None` si no es seguro."""
+    """Traduce una condición o expresión SAS; `talend=None` si no es seguro.
+
+    Primero el traductor en línea (lo que ya traducía no cambia); si se rinde y `SGM_SAS_ROUTINE` está activo, el de la rutina `SasFunctions`, que cubre la
+    gramática completa y deja la semántica de SAS (valores perdidos, orden, fechas) en la biblioteca de ejecución.
+    """
+    t = _translate_inline(sas)
+    if t.talend is not None or not routine_enabled():
+        return t
+    try:
+        result = translate_with_routine(sas)
+    except Unsupported as error:
+        t.warnings.append(f"Sin traducción con SasFunctions: {error}")
+        return t
+    t.talend, t.columns, t.warnings, t.engine = result.java, result.columns, result.warnings, "routine"
+    return t
+
+
+def _translate_inline(sas: str) -> Translation:
     t = Translation(sas=sas)
     s = re.sub(r"\s+", " ", sas).strip()
     if re.search(r"\bis\s+(not\s+)?missing\b|\bcalculated\b", s, re.IGNORECASE):

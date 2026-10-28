@@ -517,11 +517,17 @@ def _proc_step(n: ProcStep, c: _Ctx) -> list[IROperation]:
 
 # ---------- global ----------
 
+#: Macros que SAS Studio añade a las consultas generadas para soltar y abrir la tabla en su visor de resultados. No
+#: transforman datos: en un programa real son más de la mitad de las llamadas a macro y no tienen equivalente en Talend.
+SAS_STUDIO_VIEWER_HELPERS = frozenset({"web_drop_table", "web_open_table"})
+
 
 def _global(n: GlobalStmt, c: _Ctx) -> list[IROperation]:
     step = f"s{n.loc.line}"
     if n.kind == "macro_call":
         name = n.fields["name"].lower()
+        if name in SAS_STUDIO_VIEWER_HELPERS:
+            return []
         return [
             c.op(
                 "macro_call",

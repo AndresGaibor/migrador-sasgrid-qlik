@@ -196,3 +196,107 @@ sin verificación de equivalencia no es producción.
 Al terminar un WP, añade a `docs/progress.md` una entrada con: id del WP, qué se hizo, métricas antes y después (copia la
 salida de `tools/automation_metrics.py`), qué quedó fuera y qué repos tocaste sin empujar. El siguiente agente parte de esa
 entrada y del código, no de la conversación.
+
+## 13. Primer código real del cliente (28/10/2026)
+
+El cliente entregó dos programas reales (`Cod1.txt` y `Cod2.txt`, unas 27 700 líneas). Viven **fuera de Git**: tienen servidores,
+rutas y una clave. Se analizaron con el portal; esto es lo medido y lo que cambió.
+
+| Medida | Valor |
+| ------ | ----- |
+| Sentencias reconocidas | 11 305 (52 sin reconocer, el 0,5 %) |
+| Tiempo | análisis 2,4 s, planes 6,4 s |
+| Pasos de los planes | 3 095 (antes de ignorar las macros auxiliares de SAS Studio: 3 550) |
+| Automatizados | **16,8 %** (14,6 % antes de esa limpieza) |
+
+**El perfil no se parece a los fixtures.** Es orquestación por macros: 970 llamadas, 337 definiciones, 1 606 `%let` y 1 096
+sentencias de control (`%do`/`%if`). Usa SQL *pass-through* contra Impala (137 conexiones; 65 `execute` y 33 `select ... from
+connection to`), y el SQL de los `execute` se construye en una macrovariable en tiempo de ejecución. Hay `%syslput`/`rsubmit`
+(sesión remota), 40 `%include` de una biblioteca corporativa de macros **que no se entregó** (1 111 referencias sin resolver) y
+629 marcas `/* Etiqueta: ... */`, que son los nodos de un flujo de SAS Studio.
+
+**Corregido a partir de estos archivos** (con sus pruebas):
+- Un `.txt` con código SAS se importa como SAS por su contenido (antes se ignoraba como documento).
+- `proc pwencode in='...'` llevaba una clave en claro al `analysis.json`: ahora se redacta. En Talend no llegaba.
+- SAS Studio antepone un carácter invisible (U+200B) al exportar: ya no se pega al primer comentario.
+- `%web_drop_table` y `%web_open_table` (455 de las 712 llamadas a macro) no son lógica: dejan de generar pasos.
+
+**Paquetes nuevos que salen de este código:**
+
+| Id | Qué | Fase |
+| -- | --- | ---- |
+| WP14 | Las marcas `Etiqueta:` como nombres de subjob y de componente: trazabilidad directa al flujo de SAS Studio y nombres de Job con sentido para el cliente. | 1 |
+| WP15 | SQL *pass-through*: `connect to impala` + `execute`/`select ... from connection to` → `tImpalaRow`/`tImpalaInput` (o `tDBRow`/`tDBInput`) con el SQL literal; cuando el SQL está en una macrovariable, variable de contexto y pendiente trazado. | 2 |
+| WP16 | Lista de dependencias no entregadas (los `%include` sin resolver) como entregable del informe: «pide estos archivos al cliente». Sin ellos, las macros no se pueden expandir. | 1 |
+| WP17 | `%syslput`/`rsubmit`/`signon` (sesión remota) → variables de contexto o descarte documentado. | 1 |
+| WP18 | Bucles de macro (`%do i=1 %to N`) → `tLoop` o `tFlowToIterate`, con el cuerpo como Job hijo. | 4 |
+
+**Decisión que necesita del usuario:** los archivos que incluye el código (la biblioteca de macros) y confirmar que
+Impala es el motor de datos del cliente.
+
+## 14. Traducir a componentes, no a Java: arquitectura y reparto
+
+**La unidad de traducción es el componente de Talend Studio con su configuración**, no una expresión. Una expresión Java solo
+aparece donde Studio la guarda como Java (`tMap`, `tFilterRow` avanzado). El catálogo tiene más de mil componentes: la
+traducción usa **el más específico que exista** (`docs/conventions.md`, sección 4) y la forma del Job es siempre la de las
+convenciones: prejob con las conexiones, un subjob por etiqueta, postjob que cierra, errores con `tLogCatcher`/`tDie`, todo lo
+que cambia por entorno en contexto, y joblets para lo repetido.
+
+### Cómo lo hacen los conversores profesionales, y cómo lo hacemos nosotros
+
+| Etapa profesional | Aquí |
+| ----------------- | ---- |
+| Preprocesar y normalizar | Hecho: `.txt` por contenido, carácter invisible, redacción de claves, macros auxiliares de SAS Studio |
+| Árbol de análisis + repositorio de patrones | El IR y el planificador, más **recetas** en datos (`rules/recipes/`, WP-A2): patrón SAS → componentes + parámetros + tablas |
+| Biblioteca de ejecución para la semántica | Rutina `SasFunctions` (`rules/talend/routines/`), instalada en el proyecto (WP-B1) |
+| Registrar lo no traducido para revisión | Informe de traducción (WP-A5): lo no traducido, ordenado por frecuencia, alimenta las recetas |
+| Validar contra la salida de SAS | Arnés de equivalencia (Q2) con salidas doradas |
+
+### Estado a 28/10/2026 (lo ya hecho en esta sesión)
+
+Commiteado antes: plan, métrica `tools/automation_metrics.py`. **En el árbol sin commitear**, de esta sesión, cada pieza con su
+prueba cuando se indica: importar `.txt` como SAS y quitar el carácter invisible (con prueba); redactar `proc pwencode` (con
+prueba); ignorar `%web_drop_table`/`%web_open_table` (con prueba); `routine_translator.py`, el traductor de gramática completa
+(funciones de varios argumentos, `CASE`, `IN`, `BETWEEN`, `IS MISSING`, `.`, formatos, fechas), **detrás del interruptor
+`SGM_SAS_ROUTINE=1`, apagado por defecto**; `docs/conventions.md`. **Falta y no está hecho**: la rutina
+`rules/talend/routines/SasFunctions.java` (la carpeta existe vacía), pruebas de `routine_translator.py` y su instalación en
+el proyecto. **No enciendas el interruptor hasta que B1 esté hecho**: sin la rutina instalada los Jobs no compilan.
+
+### Reparto: dos agentes, sin pisarse
+
+- **Agente A (núcleo Python): `src/sas_grid_migrator/**`, `rules/**`, `tests/` de Python.** Decide *qué* se genera.
+- **Agente B (MCP, Studio y producto): `mcp/talend-mcp/**`, `apps/**`, `scripts/**`, `contract/**`.** Hace que Studio *lo
+  escriba y lo valide*. El contrato entre los dos es la plantilla de `talend_jobs_create_batch`: si A necesita un campo nuevo,
+  B lo añade primero al MCP y al manifiesto `contract/portal-tools.json`, y A lo usa después.
+
+**Agente A (yo, el que escribe esto) hace, en este orden:**
+
+| Id | Entregable | Aceptación |
+| -- | ---------- | ---------- |
+| A1 | **Estructura de Job por convención**: prejob con las conexiones (una por `libname` de base de datos), un subjob por `Etiqueta:`, postjob que confirma y cierra, `tLogCatcher`/`tDie`, contexto `DEV`/`TEST`/`PROD`. En el planificador y en `offline_payload.py`. | Cada Job generado cumple `docs/conventions.md` (prueba en `spec_invariants.py`) |
+| A2 | **Recetas** en datos, `rules/recipes/*.json`: patrón SAS → componentes, parámetros y tablas, para los ~60 componentes de la sección 4 de las convenciones. Se validan contra el catálogo (`rules/talend/components.json`). | Una receta con un componente o parámetro que no existe falla la prueba |
+| A3 | **Traducción dentro de la configuración**: `WHERE` → tabla `CONDITIONS`; `ON` → tabla `JOIN_KEY` de `tJoin`; `PROC SORT` → `CRITERIA`; `NODUPKEY` → `UNIQUE_KEY`; `MEANS/FREQ` → `GROUPBY`/`OPERATIONS`; asignaciones y `IF/THEN/ELSE` → expresiones de `tMap` con `SasFunctions` | Los filtros, joins, orden y agregados salen sin pendiente cuando las columnas se conocen |
+| A4 | `SasFunctions.java` completa y con su prueba de semántica (valores esperados de SAS), más las pruebas de `routine_translator.py` | La rutina compila y sus pruebas pasan |
+| A5 | **Informe de traducción**: qué no se tradujo, por qué y cuántas veces; endpoint y exportación | Lista ordenada por frecuencia, con archivo y línea |
+| A6 | Catálogo de entorno y propagación de esquemas (WP5 a WP7 de este plan) | Como en las secciones 6 y 9 |
+
+**Agente B hace, en este orden:**
+
+| Id | Entregable | Aceptación |
+| -- | ---------- | ---------- |
+| B1 | **Instalar la rutina**: tool del MCP que escribe offline `SasFunctions` como rutina de usuario del proyecto (copiar el formato de una rutina existente en `code/routines/`) y la verifica | Un Job con `SasFunctions.eq(...)` compila en Studio |
+| B2 | **Escribir en Studio lo que A genera**: `tPrejob`/`tPostjob` con sus disparadores, conexiones compartidas, **joblets** (crear y usar offline), grupos de contexto `DEV`/`TEST`/`PROD`, `tLogCatcher`/`tDie`, `tRunJob` con contexto. Extender `talend_jobs_create_batch` y su esquema | `verify_in_studio.py` sin errores ni diálogos con Jobs de la estructura nueva |
+| B3 | **Comprobar la configuración de cada componente** contra sus definiciones: parámetros, tablas, conectores; rechazar antes de escribir (hecho para las conexiones: `comprobar-conexiones.ts`) | `INVALID_COMPONENT` con el motivo |
+| B4 | **Cobertura de componentes**: `talend_studio_coverage` sobre los que usan las recetas | Informe de cuáles se crean, configuran y compilan |
+| B5 | **Compilar, ejecutar y comparar** (Q1 y Q2) con `talend_job_verify` y salidas doradas | Informe por Job |
+| B6 | **Web**: pantalla del catálogo de entorno, del informe de traducción y de la política de reportes | Recorrido E2E (Q4) |
+| B7 | Operación: reinicio automático entre tandas, deshacer un lote, Git de Talend Cloud, manual (O1 a O4, Q5, Q6) | Según la sección 9 |
+
+### Reglas del reparto
+
+1. **A y B no editan los mismos archivos.** Si hace falta, el que necesita deja una petición en `docs/progress.md` con el
+   formato del campo y el otro la atiende.
+2. **MCP primero**: un cambio del MCP se commitea y se publica (`docs/mcp-subtree.md`) antes de que A lo use.
+3. **Interruptores, no regresiones**: lo que depende de algo aún no instalado (la rutina) va apagado por defecto.
+4. Cada entrega: pruebas rápidas del área, entrada en `docs/progress.md`, y avisar de lo que queda sin empujar.
+5. **No se mide nada de más.** La métrica es `tools/automation_metrics.py` y se corre al cerrar cada paquete, no antes.

@@ -12,7 +12,12 @@ from typer.testing import CliRunner
 from sas_grid_migrator.cli.main import app as cli
 from sas_grid_migrator.config import Settings
 from sas_grid_migrator.domain.models import Manifest
-from sas_grid_migrator.ingestion.importer import ImportError_, import_source, safe_relpath
+from sas_grid_migrator.ingestion.importer import (
+    ImportError_,
+    import_source,
+    looks_like_sas,
+    safe_relpath,
+)
 from sas_grid_migrator.persistence.store import Store
 
 ROOT = Path(__file__).parent.parent.parent
@@ -52,6 +57,36 @@ def test_folder_import_hashes_and_skips(tmp_path):
         "link.sas": "enlace simbólico",
     }
     assert (tmp_path / "dest" / "a.sas").exists()
+
+
+SAS_EN_TXT = """/* Etiqueta: Programa */
+libname lib "/data/x";
+%let anio = 2025;
+data work.a; set lib.t; run;
+proc sql; create table work.b as select * from work.a; quit;
+"""
+
+
+def test_a_txt_file_with_sas_code_is_imported_as_sas(tmp_path):
+    """Los programas se entregan a veces como `.txt`: se reconocen por su contenido, no por la extension."""
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "Cod1.txt").write_text(SAS_EN_TXT, encoding="utf-8")
+    (src / "notas.txt").write_text(
+        "Reunion del lunes.\nTema: data lake y proc de compras.\nrun de pruebas el viernes.\n", encoding="utf-8"
+    )
+    (src / "LEEME.md").write_text(SAS_EN_TXT, encoding="utf-8")
+
+    files, _ = import_source(src, tmp_path / "dest", cfg(tmp_path))
+    kinds = {f.path: f.kind.value for f in files}
+
+    assert kinds == {"Cod1.txt": "sas", "notas.txt": "doc", "LEEME.md": "doc"}
+
+
+def test_sas_is_recognised_by_content_even_after_an_invisible_character():
+    """SAS Studio antepone U+200B al exportar; una nota cualquiera no es SAS."""
+    assert looks_like_sas("\u200b" + SAS_EN_TXT)
+    assert not looks_like_sas("Una nota cualquiera.\nSin codigo.\n")
 
 
 def test_zip_slip_and_symlink_rejected(tmp_path):
