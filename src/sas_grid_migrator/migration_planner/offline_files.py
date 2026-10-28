@@ -31,8 +31,10 @@ def configure_offline_file_operations(ir: ProgramIR, source_root: Path) -> None:
             details = operation.details
             sas_path = _file_path(operation, block)
             if sas_path:
-                resolved = _resolve_local_path(sas_path, parameters, source_root)
-                path_expression = _talend_path(sas_path, ir, parameters)
+                resolved, base = _resolve_local_path(sas_path, parameters, source_root, ir.file)
+                path_expression = _talend_path(
+                    sas_path, ir, parameters, _path_prefix(base, source_root)
+                )
                 if path_expression:
                     delimiter = _delimiter(_operation_text(operation, block), resolved)
                     input_fields = _input_fields(_operation_text(operation, block))
@@ -171,20 +173,79 @@ def _expanded_path(value: str, parameters: dict[str, str]) -> str | None:
     return None if missing else expanded
 
 
-def _resolve_local_path(value: str, parameters: dict[str, str], root: Path) -> Path | None:
+def _resolve_local_path(
+    value: str, parameters: dict[str, str], root: Path, program: str | None = None
+) -> tuple[Path | None, Path]:
+    """Resuelve la ruta y devuelve la carpeta base tomada como raíz relativa.
+
+    Un ZIP importado conserva su carpeta envolvente dentro de `src/`, así que la ruta relativa
+    del SAS puede colgar de una carpeta intermedia. Se prueban las carpetas desde la raíz del
+    proyecto hacia la del programa y se toma la primera donde el archivo existe.
+    """
     expanded = _expanded_path(value, parameters)
     if not expanded:
-        return None
+        return None, root
+    root = root.resolve()
     path = Path(expanded)
-    candidate = path.resolve() if path.is_absolute() else (root / path).resolve()
+    if path.is_absolute():
+        candidate = path.resolve()
+        try:
+            candidate.relative_to(root)
+        except ValueError:
+            return None, root
+        return candidate, root
+    fallback: tuple[Path, Path] | None = None
+    for base in _search_bases(root, program):
+        candidate = (base / path).resolve()
+        try:
+            candidate.relative_to(root)
+        except ValueError:
+            continue
+        if candidate.exists():
+            return candidate, base
+        if fallback is None and candidate.parent.is_dir():
+            fallback = (candidate, base)
+    if fallback:
+        return fallback
+    candidate = (root / path).resolve()
     try:
-        candidate.relative_to(root.resolve())
+        candidate.relative_to(root)
     except ValueError:
-        return None
-    return candidate
+        return None, root
+    return candidate, root
 
 
-def _talend_path(value: str, ir: ProgramIR, parameters: dict[str, str]) -> str | None:
+def _search_bases(root: Path, program: str | None) -> list[Path]:
+    """Carpetas candidatas: la raíz del proyecto y luego las del programa, de arriba abajo."""
+    if not program:
+        return [root]
+    relative = PurePosixPath(program.replace("\\", "/"))
+    if relative.is_absolute() or ".." in relative.parts:
+        return [root]
+    bases = [root]
+    current = root
+    for part in relative.parts[:-1]:
+        current = current / part
+        if not current.is_dir():
+            break
+        bases.append(current)
+    return bases
+
+
+def _path_prefix(base: Path, root: Path) -> str:
+    """Prefijo relativo a la raíz del proyecto cuando la ruta se resolvió en una subcarpeta."""
+    try:
+        relative = base.resolve().relative_to(root.resolve())
+    except ValueError:
+        return ""
+    return relative.as_posix() if relative.parts else ""
+
+
+def _talend_path(
+    value: str, ir: ProgramIR, parameters: dict[str, str], prefix: str = ""
+) -> str | None:
+    if prefix:
+        value = f"{prefix}/{value}"
     matches = list(_MACRO.finditer(value))
     segments: list[str] = []
     cursor = 0

@@ -127,3 +127,38 @@ def test_repository_synthetic_bank_import_is_configured_from_its_csv(tmp_path: P
     assert reader["parameters"]["HEADER"] == "1"
     assert reader["schema"]["columns"][0]["name"] == "customer_id"
     assert reader["draftOnly"] is False
+
+
+def test_zip_project_resolves_paths_below_the_enclosing_folder(tmp_path: Path):
+    archive = FIXTURES / "synthetic" / "bancolombia_sas_synthetic_orchestration.zip"
+    store = Store(Settings(data_dir=tmp_path / "state"))
+    project = store.create_project("synthetic-bank-zip")
+    store.import_batch(project.id, archive)
+    plans = generate_plans(store, project.id, fresh=True)
+    plan = next(
+        item
+        for item in plans.plans
+        if item.program.endswith("Programs/Banking/01_load_customers.sas")
+    )
+    arguments = build_apply_spec(plan, "Process/OfflineTest").to_mcp_arguments()
+    components = {item["componentName"]: item for item in arguments["components"]}
+    root = "/bancolombia_sas_synthetic_orchestration"
+
+    reader = components["tFileInputDelimited"]
+    assert (
+        reader["parameters"]["FILENAME"]
+        == f'context.SAS_PROJECT_ROOT + "{root}/data/customers.csv"'
+    )
+    assert reader["parameters"]["HEADER"] == "1"
+    assert [column["name"] for column in reader["schema"]["columns"]][:2] == [
+        "customer_id",
+        "customer_name",
+    ]
+    assert reader["draftOnly"] is False
+
+    writer = components["tFileOutputDelimited"]
+    assert (
+        writer["parameters"]["FILENAME"]
+        == f'context.SAS_PROJECT_ROOT + "{root}/data/stage/customers_active.csv"'
+    )
+    assert writer["draftOnly"] is False
