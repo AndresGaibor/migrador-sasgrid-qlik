@@ -44,6 +44,7 @@ from sas_grid_migrator.sas_parser.analyze import (
 from sas_grid_migrator.sas_parser.ast import ParsedProgram
 from sas_grid_migrator.talend_adapter.batch import collect_child_results, order_plans_for_batch
 from sas_grid_migrator.talend_adapter.best_practices import check_job_arguments
+from sas_grid_migrator.talend_adapter.naming import folder_path, folder_segment
 
 
 @asynccontextmanager
@@ -541,15 +542,18 @@ def _talend_apply_folder(program: str | None = None, *, project_id: str | None =
     if project is not None:
         archive_or_project_name = project.archive_name or project.name
         slug_source = PurePosixPath(archive_or_project_name.replace("\\", "/")).stem
-        slug = re.sub(r"[^\w.-]+", "-", slug_source, flags=re.UNICODE).strip(" .-_").casefold()
-        slug = slug[:48] or "proyecto"
+        # Nombre acotado y saneado (sin acentos ni simbolos) mas el id: el segmento raiz repite en la ruta de
+        # cada Job, y en Windows el codigo generado por Studio duplica carpetas y nombre de Job.
+        slug = folder_segment(slug_source).casefold()[:30].strip("._-") or "proyecto"
         base = f"{base}/{slug}-{project.id}"
     if not program:
         return base
     source_parent = PurePosixPath(program.replace("\\", "/")).parent.as_posix()
     if source_parent in {"", "."}:
         return base
-    return f"{base}/{source_parent}"
+    # Las carpetas del proyecto SAS se sanean: `src`/`tests`/`target` rompen Git en Talend, y los acentos, los
+    # simbolos y las rutas largas dan problemas en el codigo generado y en Windows.
+    return folder_path(base, source_parent)
 
 
 def _talend_apply_preview_id(spec) -> str:

@@ -20,6 +20,7 @@ from sas_grid_migrator.persistence.store import Store
 from sas_grid_migrator.sas_parser.analyze import analyze_project, load_analysis
 from sas_grid_migrator.sas_parser.ast import Loc
 from sas_grid_migrator.semantic_analysis.classify import load_rules
+from sas_grid_migrator.talend_adapter.naming import cap_job_name
 
 VALID_STATUS = {"propuesto", "pendiente", "verificado", "validado_manualmente", "descartado"}
 
@@ -125,6 +126,8 @@ def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSe
         )
         plans.append(plan_program(ir, project_id, rules, libs, pending[prog.file], orch))
     unique_job_names(plans)
+    for plan in plans:
+        plan.job_name = cap_job_name(plan.job_name)
     ps = PlanSet(
         project_id=project_id,
         rules_version=rules.version,
