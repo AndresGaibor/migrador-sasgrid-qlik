@@ -14,6 +14,7 @@ from sas_grid_migrator.migration_planner.planner import (
     load_grid_catalog,
     load_mapping_rules,
     plan_program,
+    unique_job_names,
 )
 from sas_grid_migrator.persistence.store import Store
 from sas_grid_migrator.sas_parser.analyze import analyze_project, load_analysis
@@ -123,6 +124,7 @@ def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSe
             grid_recommendations=grid_by_program[prog.file],
         )
         plans.append(plan_program(ir, project_id, rules, libs, pending[prog.file], orch))
+    unique_job_names(plans)
     ps = PlanSet(
         project_id=project_id,
         rules_version=rules.version,

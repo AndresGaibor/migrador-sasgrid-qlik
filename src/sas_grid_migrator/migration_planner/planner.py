@@ -5,7 +5,7 @@ Nada de lo que produce está verificado: componentes y propiedades son candidato
 """
 
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Literal
 
 from pydantic import BaseModel
@@ -165,6 +165,41 @@ def grid_recommendation(
 
 def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", s.lower()).strip("_")
+
+
+def unique_job_names(plans: list[JobPlan]) -> None:
+    """Hace únicos los nombres de Job del proyecto: Talend no admite dos Jobs con el mismo nombre.
+
+    Solo se renombran los que chocan, añadiendo carpetas del programa de dentro hacia fuera
+    (`DB2/bulkload.sas` y `Hadoop/bulkload.sas` pasan a `job_db2_bulkload` y `job_hadoop_bulkload`).
+    Si aun así dos rutas dan el mismo nombre, se añade un número.
+    """
+    by_name: dict[str, list[JobPlan]] = {}
+    for plan in plans:
+        by_name.setdefault(plan.job_name, []).append(plan)
+    taken = {name for name, group in by_name.items() if len(group) == 1}
+    for group in by_name.values():
+        if len(group) == 1:
+            continue
+        parts = [PurePosixPath(plan.program.replace("\\", "/")).parts for plan in group]
+        depth = 1
+        while depth < max(len(item) for item in parts):
+            candidates = [_job_name_with_folders(item, depth) for item in parts]
+            if len(set(candidates)) == len(candidates) and not taken.intersection(candidates):
+                break
+            depth += 1
+        candidates = [_job_name_with_folders(item, depth) for item in parts]
+        for plan, candidate in zip(group, candidates, strict=True):
+            final, number = candidate, 2
+            while final in taken:
+                final, number = f"{candidate}_{number}", number + 1
+            plan.job_name = final
+            taken.add(final)
+
+
+def _job_name_with_folders(parts: tuple[str, ...], depth: int) -> str:
+    stem = PurePosixPath(parts[-1]).stem
+    return "job_" + slug("_".join([*parts[-(depth + 1):-1], stem]))
 
 
 def _macro_call_arguments(raw: str, params: list[str]) -> dict[str, str]:
