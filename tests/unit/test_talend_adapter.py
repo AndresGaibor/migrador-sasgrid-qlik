@@ -72,6 +72,8 @@ def listing(*, without=(), write_schema=SPEC_SCHEMA):
     ]
 
 
+DIALOGS_CLEAR = {"ok": True, "data": {"blocked": False, "dialogs": [], "blocking": []}}
+
 JOB = {
     "ok": True,
     "data": {
@@ -199,6 +201,7 @@ def test_health_unavailable_does_not_raise():
     ok = TalendAdapter(Fake({
         "talend_jobs_list": {"ok": True, "data": {"jobs": [{"name": "job", "path": "/process/job/job_0.1.item"}], "total": 1}},
         "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readOnly", "unsafeActions": False}},
+        "talend_studio_ui_dialogs": DIALOGS_CLEAR,
     }))
     health = run(ok.health_check())
     assert health["available"] is True
@@ -283,6 +286,7 @@ def test_health_reports_the_published_tool_inventory():
         {
             "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
             "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readWrite", "unsafeActions": False}},
+            "talend_studio_ui_dialogs": DIALOGS_CLEAR,
         },
         listing(),
     ))
@@ -301,6 +305,7 @@ def test_health_propagates_the_missing_tools_diagnosis():
         {
             "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
             "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readWrite", "unsafeActions": False}},
+            "talend_studio_ui_dialogs": DIALOGS_CLEAR,
         },
         listing(without=("talend_job_problems",)),
     ))
@@ -310,6 +315,56 @@ def test_health_propagates_the_missing_tools_diagnosis():
     assert health["diagnosis"] == "tools_missing"
     assert health["missing_tools"] == ["talend_job_problems"]
     assert "TALEND_MCP_FILTER=portal" in health["fix_hint"]
+
+
+def test_health_reports_a_modal_dialog_that_blocks_studio():
+    adapter = TalendAdapter(Fake({
+        "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
+        "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readWrite", "unsafeActions": False}},
+        "talend_studio_ui_dialogs": {
+            "ok": True,
+            "data": {
+                "blocked": True,
+                "dialogs": [],
+                "blocking": [
+                    {"title": "Network Issue Occured", "hint": "Ciérralo en Studio."},
+                ],
+            },
+        },
+    }))
+
+    health = run(adapter.health_check())
+
+    assert health["available"] is True
+    assert health["spec_supported"] is True
+    assert health["diagnosis"] == "studio_blocked"
+    assert "Network Issue Occured" in health["fix_hint"]
+    assert health["studio_dialogs"] == {
+        "checked": True,
+        "blocked": True,
+        "blocking": [{"title": "Network Issue Occured", "hint": "Ciérralo en Studio."}],
+    }
+
+
+def test_health_keeps_the_contract_diagnosis_when_dialogs_cannot_be_checked():
+    adapter = TalendAdapter(ListingFake(
+        {
+            "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
+            "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readWrite", "unsafeActions": False}},
+            "talend_studio_ui_dialogs": TalendError("la sonda no respondió"),
+        },
+        listing(without=("talend_job_problems",)),
+    ))
+
+    health = run(adapter.health_check())
+
+    assert health["studio_dialogs"] == {
+        "checked": False,
+        "blocked": False,
+        "blocking": [],
+        "error": "la sonda no respondió",
+    }
+    assert health["diagnosis"] == "tools_missing"
 
 
 def test_health_reports_bridge_offline_even_when_mcp_server_is_reachable():
@@ -602,6 +657,7 @@ def test_api_talend_health_reports_persisted_write_permission(tmp_path, monkeypa
     adapter = TalendAdapter(Fake({
         "talend_jobs_list": {"ok": True, "data": {"jobs": []}},
         "talend_bridge_ping": {"ok": True, "data": {"ok": True, "mode": "readOnly", "unsafeActions": False}},
+        "talend_studio_ui_dialogs": DIALOGS_CLEAR,
     }))
     monkeypatch.setattr(api_mod, "_talend", lambda: adapter)
     client = TestClient(api)

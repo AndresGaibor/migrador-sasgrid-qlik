@@ -39,6 +39,10 @@ FIX_HINTS: dict[str, str | None] = {
     "bridge_down": (
         "Abre Talend Studio con el proyecto y el plugin del bridge instalado; luego vuelve a comprobar."
     ),
+    "studio_blocked": (
+        "Talend Studio tiene un diálogo modal abierto que bloquea el IDE. Ciérralo en Studio y "
+        "vuelve a comprobar."
+    ),
 }
 
 
@@ -252,6 +256,18 @@ class TalendAdapter:
                 "missing_tools": [],
                 **config,
             }
+        status = await self.custom_spec_status()
+        dialogs = await self._studio_dialogs()
+        if dialogs["blocked"] and status["diagnosis"] == "ok":
+            titles = ", ".join(f"«{item['title']}»" for item in dialogs["blocking"])
+            status = {
+                **status,
+                "diagnosis": "studio_blocked",
+                "fix_hint": (
+                    f"Talend Studio tiene abierto un diálogo modal que bloquea el IDE: {titles}. "
+                    "Ciérralo en Studio y vuelve a comprobar."
+                ),
+            }
         return {
             "available": True,
             "mcp_available": True,
@@ -259,8 +275,31 @@ class TalendAdapter:
             "bridge_mode": bridge.get("mode"),
             "unsafe_actions": bridge.get("unsafeActions", False),
             "jobs": job_count,
-            **(await self.custom_spec_status()),
+            "studio_dialogs": dialogs,
+            **status,
             **config,
+        }
+
+    async def _studio_dialogs(self) -> dict[str, Any]:
+        """Diálogos abiertos en Studio; un modal detiene el hilo de la interfaz.
+
+        Solo informa: un diálogo bloqueante no impide crear ni leer Jobs, que no pasan por la UI.
+        Si la comprobación falla, se devuelve `checked: false` y no cambia el diagnóstico.
+        """
+        try:
+            data = await self._data("talend_studio_ui_dialogs")
+        except TalendError as e:
+            return {"checked": False, "blocked": False, "blocking": [], "error": str(e)}
+        raw = data.get("blocking")
+        blocking = [
+            {"title": str(item.get("title") or "sin título"), "hint": str(item.get("hint") or "")}
+            for item in (raw if isinstance(raw, list) else [])
+            if isinstance(item, dict)
+        ]
+        return {
+            "checked": True,
+            "blocked": bool(data.get("blocked")) or bool(blocking),
+            "blocking": blocking,
         }
 
     async def list_jobs(self) -> list[dict[str, Any]]:

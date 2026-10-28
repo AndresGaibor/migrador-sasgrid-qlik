@@ -13,12 +13,13 @@ const DIAGNOSIS_LABELS: Record<string, string> = {
   tools_missing: "Faltan tools del portal",
   contract_incomplete: "Contrato MCP incompatible",
   bridge_down: "Bridge sin conexión",
+  studio_blocked: "Diálogo abierto en Studio",
 };
 
 function Stage({ tone, title, detail }: { tone: string; title: string; detail: string }) {
   return (
     <div className="health-stage">
-      <Badge tone={tone}>{tone === "ok" ? "OK" : tone === "warn" ? "Revisar" : "Pendiente"}</Badge>
+      <Badge tone={tone}>{tone === "ok" ? "OK" : tone === "bad" ? "Bloqueado" : "Revisar"}</Badge>
       <div><strong>{title}</strong><p className="muted">{detail}</p></div>
     </div>
   );
@@ -85,6 +86,15 @@ export function SettingsView() {
               detail={h.bridge_available
                 ? `Conectado en modo ${bridgeModeLabel(h.bridge_mode)}.`
                 : "Sin conexión. Abre Talend Studio con el plugin del bridge instalado para inspeccionar y escribir Jobs."}
+            />
+            <Stage
+              tone={!h.studio_dialogs?.checked ? "warn" : h.studio_dialogs.blocked ? "bad" : "ok"}
+              title="Diálogos de Studio"
+              detail={!h.studio_dialogs?.checked
+                ? "No se pudieron comprobar los diálogos abiertos. El Bridge puede ser anterior al endpoint de diálogos."
+                : h.studio_dialogs.blocked
+                ? `Un modal bloquea el IDE y detendría compilaciones o ejecuciones: ${h.studio_dialogs.blocking.map((dialog) => `«${dialog.title}»`).join(", ")}. Crear y leer Jobs sigue funcionando.`
+                : "Sin diálogos que bloqueen el IDE."}
             />
             <Stage
               tone={h.write_tool === false ? "bad" : h.write_enabled ? "ok" : "warn"}

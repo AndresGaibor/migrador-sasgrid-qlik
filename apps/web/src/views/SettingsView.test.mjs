@@ -50,3 +50,11 @@ test("a broken diagnosis shows its fix hint and the missing tools", () => {
   assert.match(source, /h\.missing_tools/);
   assert.match(source, /Faltan tools del portal/);
 });
+
+test("a modal dialog in Studio is reported without hiding the rest of the diagnosis", () => {
+  assert.match(source, /h\.studio_dialogs\?\.checked/);
+  assert.match(source, /h\.studio_dialogs\.blocked/);
+  assert.match(source, /h\.studio_dialogs\.blocking/);
+  assert.match(source, /Diálogos de Studio/);
+  assert.match(source, /Diálogo abierto en Studio/);
+});

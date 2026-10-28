@@ -6,6 +6,7 @@ El portal se conecta al MCP local por `TALEND_MCP_URL` (por defecto `http://127.
 
 - `talend_jobs_list`: comprueba que el servidor MCP responde y devuelve el número de Jobs del workspace.
 - `talend_bridge_ping`: confirma que Talend Studio y el Bridge local están disponibles para aplicar cambios.
+- `talend_studio_ui_dialogs`: lista los diálogos de Studio y marca los modales que bloquean el IDE; el diagnóstico del portal lo consulta en cada comprobación.
 - `talend_job_apply_custom_spec`: recibe la guía estructurada y aplica el Job mediante las operaciones de Studio.
 
 La herramienta de escritura recibe `jobName`, `version`, `defaultContext`, `folderPath`, `description`, `purpose`, `components`, `connections`, `contexts` e `instructions`. Cada componente puede incluir propiedades, tablas, esquema, mapper y una marca de borrador con el motivo pendiente. El MCP valida el componente y sus propiedades contra la paleta y los parámetros que responde Studio.
@@ -128,4 +129,4 @@ Con `unsafeActions=false` y `readOnly=false` en `~/.talend-bridge/config.json`, 
 
 ### Modal bloqueante en Studio
 
-El primer intento falló con «El hilo de la interfaz de Studio esta ocupado» y después con `OperationCanceledException`. La causa era un modal «Network Issue Occured» (conexión al servidor con timeout) que bloqueaba el hilo de UI. `talend_studio_ui_dialogs` lo detecta y marca `blocked: true`, pero el `health_check` seguía en `ok` porque solo consulta `talend_bridge_ping`. Antes de aplicar Jobs conviene revisar los diálogos abiertos; incorporar esa comprobación al diagnóstico del portal queda como mejora pendiente.
+El primer intento falló con «El hilo de la interfaz de Studio esta ocupado» y después con `OperationCanceledException`. La causa era un modal «Network Issue Occured» (conexión al servidor con timeout) que bloqueaba el hilo de UI. `talend_studio_ui_dialogs` lo detecta y marca `blocked: true`. El diagnóstico del portal consulta esa tool y, si hay un modal, devuelve `diagnosis: studio_blocked` con los títulos en la pista de arreglo y el detalle en `studio_dialogs`; la creación y la lectura de Jobs siguen disponibles porque no pasan por el hilo de la interfaz. Si la comprobación no responde (Bridge anterior al endpoint), queda `studio_dialogs.checked: false` y el resto del diagnóstico no cambia.

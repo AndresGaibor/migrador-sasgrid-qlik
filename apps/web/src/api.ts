@@ -111,8 +111,14 @@ export const api = {
     tools?: number | null;
     write_tool?: boolean | null;
     missing_tools?: string[];
-    diagnosis?: "ok" | "mcp_down" | "client_incompatible" | "tools_missing" | "contract_incomplete" | "bridge_down";
+    diagnosis?: "ok" | "mcp_down" | "client_incompatible" | "tools_missing" | "contract_incomplete" | "bridge_down" | "studio_blocked";
     fix_hint?: string | null;
+    studio_dialogs?: {
+      checked: boolean;
+      blocked: boolean;
+      blocking: Array<{ title: string; hint: string }>;
+      error?: string;
+    };
     apply_folder: string;
     mcp_url?: string;
     timeout_seconds?: number;

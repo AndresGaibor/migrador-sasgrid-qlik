@@ -21,6 +21,7 @@
     "talend_job_info",
     "talend_job_problems",
     "talend_job_list_nodes",
+    "talend_studio_ui_dialogs",
     "talend_bridge_ping"
   ],
   "write_tool": "talend_job_apply_custom_spec",
