@@ -21,6 +21,7 @@ import subprocess
 import time
 import urllib.error
 import urllib.request
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import apps.api.main as api_module
@@ -38,6 +39,10 @@ MCP_DIR = ROOT / "mcp" / "talend-mcp"
 BUN = shutil.which("bun")
 WRITE_TOOL = "talend_job_apply_custom_spec"
 BATCH_TOOL = "talend_jobs_create_batch"
+XMI = "{http://www.omg.org/XMI}"
+
+#: Carpeta del proyecto temporal del MCP, para leer lo que escribe.
+_MCP_PROJECT: dict[str, Path] = {}
 
 
 def _corpora() -> dict[str, Path]:
@@ -136,6 +141,7 @@ def mcp(corpus_trees, tmp_path_factory):
     project = base / "proyecto"
     project.mkdir()
     (project / "talend.project").write_text("", encoding="utf-8")
+    _MCP_PROJECT["path"] = project
     cwd = base / "cwd"
     (cwd / ".talend-mcp").mkdir(parents=True)
     entries = [
@@ -213,3 +219,63 @@ def test_offline_eligible_jobs_validate_and_the_real_mcp_accepts_them_with_dry_r
 
     refused = asyncio.run(run())
     assert not refused, f"{label}: el MCP rechazo {len(refused)} de {len(payloads)} Jobs:\n" + "\n".join(refused[:10])
+
+
+@pytest.mark.parametrize("label", CORPORA)
+def test_the_files_the_mcp_writes_are_well_formed_xml_that_studio_can_link(corpus_trees, mcp, label):
+    """Escribe de verdad los Jobs elegibles y parsea sus archivos con un parser estricto.
+
+    Un `xsi:type` sin `xmlns:xsi` (visto con los tMap) hace que Studio no cargue el `.item`: el Job sale con
+    "Error when loading the job" y, al borrarlo, el `.item` queda huerfano. El parser de ElementTree falla igual.
+    """
+    from mcp import Client
+
+    index = list(CORPORA).index(label)
+    written: list[tuple[str, str]] = []
+    payloads = []
+    for program, tree in corpus_trees[label]["trees"].items():
+        for job in walk(tree):
+            single = {**job, "childJobs": []}
+            if offline_blockers(single):
+                continue
+            single["jobName"] = f"{job['jobName']}_g{index}"
+            single["folderPath"] = f"Process/Gate{index}"
+            payloads.append((program, to_batch_arguments(single)))
+
+    async def run() -> list[str]:
+        refused = []
+        async with Client(mcp, read_timeout_seconds=60) as client:
+            for program, arguments in payloads:
+                result = await client.call_tool(BATCH_TOOL, arguments)
+                data = (result.structured_content or {}).get("data") or {}
+                if data.get("fallos") or not (result.structured_content or {}).get("ok"):
+                    if not any("ya existe" in str(f.get("error", "")).lower() for f in data.get("fallos") or []):
+                        refused.append(f"{program}: {json.dumps(result.structured_content, ensure_ascii=False)[:200]}")
+                    continue
+                for entry in data.get("jobs") or []:
+                    if entry.get("itemPath"):
+                        written.append((program, entry["itemPath"]))
+        return refused
+
+    refused = asyncio.run(run())
+    assert not refused, f"{label}: el MCP no pudo escribir:\n" + "\n".join(refused[:8])
+
+    broken = []
+    for program, item in written:
+        for path in (Path(item), Path(item).with_suffix(".properties")):
+            try:
+                ET.parse(path)
+            except ET.ParseError as error:
+                broken.append(f"{program}: {path.name}: {error}")
+        properties = ET.parse(Path(item).with_suffix(".properties")).getroot()
+        xmi_ids = {element.get(f"{XMI}id") for element in properties.iter()}
+        for element in properties.iter():
+            if element.tag.endswith("ProcessItem"):
+                for attribute in ("property", "state"):
+                    if element.get(attribute) not in xmi_ids:
+                        broken.append(f"{program}: ProcessItem.{attribute} apunta a un id que no existe")
+                process = element.find("process")
+                if process is None or not str(process.get("href", "")).endswith(".item#/"):
+                    broken.append(f"{program}: la referencia al .item no es #/")
+    assert not broken, f"{label}:\n" + "\n".join(broken[:10])
+    assert written, f"{label}: no se escribio ningun Job para comprobar"
