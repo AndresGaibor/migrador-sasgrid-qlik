@@ -42,17 +42,31 @@ cd ../.. && uv run pytest tests/integration/test_mcp_contract.py
 
 ## Publicar cambios del portal en el MCP
 
-Por defecto el cambio viaja a una rama y se abre un PR en `AndresGaibor/talend-mcp`. Empujar
-directo a `main` está permitido cuando el usuario lo pide de forma explícita (es su repositorio).
+Es un repositorio propio: el cambio puede ir directo a `main` o por una rama con PR, y el agente
+puede fusionar el PR él mismo (`gh pr merge <n> --repo AndresGaibor/talend-mcp --merge`). Usa
+la rama con PR cuando quieras dejar el cambio revisable o que corra el CI antes de entrar a
+`main`; usa `main` directo para cambios pequeños y ya verificados. El permiso para hacer commit y
+push sigue siendo del usuario: se ejecuta cuando él lo pide.
+
+Directo a `main` (con el árbol limpio, y tras `bun test` y `bun run typecheck` en el MCP):
 
 ```bash
-git subtree push --prefix=mcp/talend-mcp talend-mcp-upstream feat/<nombre>
+git subtree pull --prefix=mcp/talend-mcp talend-mcp-upstream main --squash   # partir al día
+git subtree push --prefix=mcp/talend-mcp talend-mcp-upstream main
 ```
 
-El comando imprime la URL del PR. Si la rama ya existe en el remoto, `git subtree push` falla:
-borra la rama remota (`git push talend-mcp-upstream --delete feat/<nombre>`) y vuelve a empujar,
-o crea otra rama. Para empujar directo a `main` (solo si el usuario lo pidió): primero
-`git subtree pull`, luego `git subtree push --prefix=mcp/talend-mcp talend-mcp-upstream main`.
+Por rama y PR, y fusión del PR:
+
+```bash
+git subtree push --prefix=mcp/talend-mcp talend-mcp-upstream fix/<nombre>
+gh pr create --repo AndresGaibor/talend-mcp --base main --head fix/<nombre> --fill
+gh pr merge <n> --repo AndresGaibor/talend-mcp --merge
+```
+
+Si la rama ya existe en el remoto, `git subtree push` falla: borra la rama remota
+(`git push talend-mcp-upstream --delete fix/<nombre>`) y vuelve a empujar, o crea otra rama.
+Después de fusionar, actualiza el clon (`git pull --ff-only` en `../talend-mcp`) y trae `main`
+al portal con `git subtree pull`.
 
 ## Trabajar en el clon `../talend-mcp/`
 
