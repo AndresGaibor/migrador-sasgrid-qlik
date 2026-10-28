@@ -65,7 +65,7 @@ try {
 
     if (-not $SkipWeb) {
         Write-Host "Web   http://127.0.0.1:5173" -ForegroundColor Cyan
-        $started += Start-Process -FilePath "bun" -ArgumentList "run", "dev" `
+        $started += Start-Process -FilePath "bun" -ArgumentList "run", "dev", "--", "--host", "127.0.0.1" `
             -WorkingDirectory $webDir -NoNewWindow -PassThru
     }
 

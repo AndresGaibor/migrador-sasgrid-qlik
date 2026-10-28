@@ -76,3 +76,56 @@ El resultado del lote se persiste por proyecto y programa y la vista consulta el
 El botón **Implementar todos los flujos del ZIP en Talend** inicia un lote de proyecto. La API ordena las guías por dependencias y hace llamadas secuenciales a `talend_job_apply_custom_spec`; el navegador nunca se conecta directamente al MCP. La vista de proyecto muestra el Job actual, el conteo terminado, la comprobación de destino y los resultados de cada Job agrupados por las carpetas de origen. Un hijo que aparezca confirmado en la respuesta recursiva del MCP se registra en el lote y no se envía otra vez como Job independiente. Al fallar un Job, se conserva el error y se continúa con los siguientes.
 
 Los valores técnicos no resueltos se agregan como contextos `migration_todo_*` con su descripción. El resultado de cada Job puede ser completo o parcial. El lote no compila ni ejecuta los Jobs. La vista individual de una guía permite consultar el destino y resultado, pero la escritura comienza desde el botón único del proyecto.
+
+## Smoke test con Studio (2026-10-27)
+
+Prueba manual de la Tarea 10 del plan `docs/superpowers/plans/2026-10-27-talend-mcp-en-el-portal.md`, con Talend Studio 8.0.1 abierto y el Bridge en `readWrite`. No se compiló, ejecutó ni publicó ningún Job.
+
+### Instalación en limpio
+
+Clon de `origin/main` en una carpeta aparte, siguiendo solo el README:
+
+| Paso | Resultado |
+|---|---|
+| `uv sync` | correcto; solo avisa de rutas de referencia duplicadas en `docs/reference/talend/` |
+| `bun install` en `apps/web` | 166 paquetes |
+| `bun install` en `mcp/talend-mcp` | 17 paquetes |
+| `scripts/dev.ps1` | MCP en 3927 con 66 tools, API en 8000 y web en 5173; el `doctor` ve Studio, JDK, Bridge y proyecto |
+
+Dos hallazgos corregidos o anotados:
+
+- La web se anunciaba en `http://127.0.0.1:5173`, pero Vite escuchaba en `localhost` (IPv6 `::1`) y esa dirección no respondía. `scripts/dev.ps1` ahora pasa `--host 127.0.0.1`; verificado con respuesta 200 en la dirección anunciada.
+- Con el puerto 3927 libre, el arranque del MCP muestra «No se pudo liberar el puerto 3927». Es un aviso cosmético de `mcp/talend-mcp/scripts/start.ts`: PowerShell devuelve 1 cuando `Get-NetTCPConnection` no encuentra conexiones. El servidor arranca igual.
+
+El `doctor` avisa de que `TALEND_PROJECT` y `TALEND_WORKSPACE` no están definidos; el MCP infiere ambos del workspace abierto, así que no bloquea la prueba.
+
+### Diagnóstico por caso
+
+| Caso | `diagnosis` | Respuesta observada |
+|---|---|---|
+| MCP apagado | `mcp_down` | `mcp_available=false`; el `fix_hint` indica arrancar el MCP |
+| Preset `agent` (56 tools) | `tools_missing` | faltan 10 tools del contrato; el `fix_hint` pide `TALEND_MCP_FILTER=portal` |
+| Preset `all` (241 tools) | `ok` | contrato completo |
+| Preset `portal` (66 tools) | `ok` | contrato completo y `write_tool=true` |
+| Bridge inaccesible | `bridge_down` | `mcp_available=true` y `bridge_available=false`; el `fix_hint` pide abrir Studio |
+
+Para el último caso no se cerró Studio: se arrancó otro MCP con `TALEND_BRIDGE_PORT=3939`, sin nadie escuchando, que produce el mismo estado sin tocar la sesión del usuario.
+
+### Creación y lectura en `Process/PruebasWebSAS`
+
+Guía `job_01_load_customers` del ZIP sintético, aplicada con `talend_job_apply_custom_spec` y el motor Studio:
+
+- 4 componentes (`tFileInputDelimited`, `tFilterRow`, `tMap`, `tFileOutputDelimited`), 1 conexión y 13 contextos.
+- `talend_inspect_job` devuelve los cuatro componentes y `talend_job_problems` responde sin problemas.
+- Repetir la misma guía en el mismo proyecto reanuda el Job sin `CONFLICT`.
+- Aplicar otra guía con el mismo nombre devuelve `CONFLICT` y no sobrescribe.
+
+El hash del marcador `[portal-spec:...]` incluye `instructions.source.projectId`. Dos proyectos distintos con la misma guía no se reconocen como la misma especificación; es el comportamiento esperado, pero conviene tenerlo en cuenta al probar con proyectos temporales.
+
+### `unsafeActions`
+
+Con `unsafeActions=false` y `readOnly=false` en `~/.talend-bridge/config.json`, la creación del mismo Job siguió funcionando y la lectura devolvió los mismos 4 componentes, 1 conexión y 13 contextos. La creación no depende de `unsafeActions`; la escritura la limitan el permiso del portal y, si se activa, `readOnly` del Bridge. La configuración original se restauró al terminar.
+
+### Modal bloqueante en Studio
+
+El primer intento falló con «El hilo de la interfaz de Studio esta ocupado» y después con `OperationCanceledException`. La causa era un modal «Network Issue Occured» (conexión al servidor con timeout) que bloqueaba el hilo de UI. `talend_studio_ui_dialogs` lo detecta y marca `blocked: true`, pero el `health_check` seguía en `ok` porque solo consulta `talend_bridge_ping`. Antes de aplicar Jobs conviene revisar los diálogos abiertos; incorporar esa comprobación al diagnóstico del portal queda como mejora pendiente.
