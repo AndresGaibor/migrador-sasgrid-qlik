@@ -9,9 +9,9 @@ import os
 import re
 from dataclasses import dataclass, field
 
-from sas_grid_migrator.migration_planner.routine_translator import (
+from sas_grid_migrator.migration_planner.talend_translator import (
     Unsupported,
-    translate_with_routine,
+    translate_to_talend,
 )
 
 
@@ -23,7 +23,7 @@ class Translation:
     simple: list[dict] | None = None  # condiciones tFilterRow (modo simple)
     logical: str | None = None  # "&&" | "||" para el modo simple
     warnings: list[str] = field(default_factory=list)
-    engine: str = "inline"  # "inline" (Java suelto) | "routine" (llamadas a SasFunctions)
+    engine: str = "inline"  # "inline" (traductor original) | "talend" (rutinas de sistema de Talend)
 
 
 class _Unsupported(Exception):
@@ -235,30 +235,30 @@ class _Parser:
         raise _Unsupported(f"inesperado: {v!r}")
 
 
-def routine_enabled() -> bool:
-    """Interruptor del motor de la rutina: `SGM_SAS_ROUTINE=1`.
+def talend_expressions_enabled() -> bool:
+    """Interruptor del traductor con rutinas de Talend: `SGM_TALEND_EXPRESSIONS=1`.
 
-    Apagado por defecto: la rutina `SasFunctions` (`rules/talend/routines/SasFunctions.java`) tiene que estar instalada en
-    el proyecto Talend, o los Jobs con `SasFunctions.*` no compilan. Se enciende cuando el MCP la instala.
+    Apagado por defecto hasta comprobar en Studio que el Java que emite compila (`talend_job_verify`); no necesita nada
+    instalado: solo usa rutinas de sistema de Talend y Java nativo.
     """
-    return os.environ.get("SGM_SAS_ROUTINE", "").strip().lower() in {"1", "true", "yes", "on"}
+    return os.environ.get("SGM_TALEND_EXPRESSIONS", "").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def translate(sas: str) -> Translation:
     """Traduce una condición o expresión SAS; `talend=None` si no es seguro.
 
-    Primero el traductor en línea (lo que ya traducía no cambia); si se rinde y `SGM_SAS_ROUTINE` está activo, el de la rutina `SasFunctions`, que cubre la
-    gramática completa y deja la semántica de SAS (valores perdidos, orden, fechas) en la biblioteca de ejecución.
+    Primero el traductor en línea (lo que ya traducía no cambia); si se rinde y `SGM_TALEND_EXPRESSIONS` está activo, el de rutinas de Talend, que cubre la
+    gramática completa con `StringHandling`, `TalendDate`, `Mathematical` y Java nativo, y conserva la semántica del perdido.
     """
     t = _translate_inline(sas)
-    if t.talend is not None or not routine_enabled():
+    if t.talend is not None or not talend_expressions_enabled():
         return t
     try:
-        result = translate_with_routine(sas)
+        result = translate_to_talend(sas)
     except Unsupported as error:
-        t.warnings.append(f"Sin traducción con SasFunctions: {error}")
+        t.warnings.append(f"Sin traducción con rutinas de Talend: {error}")
         return t
-    t.talend, t.columns, t.warnings, t.engine = result.java, result.columns, result.warnings, "routine"
+    t.talend, t.columns, t.warnings, t.engine = result.java, result.columns, result.warnings, "talend"
     return t
 
 

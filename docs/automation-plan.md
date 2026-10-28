@@ -248,7 +248,7 @@ que cambia por entorno en contexto, y joblets para lo repetido.
 | ----------------- | ---- |
 | Preprocesar y normalizar | Hecho: `.txt` por contenido, carácter invisible, redacción de claves, macros auxiliares de SAS Studio |
 | Árbol de análisis + repositorio de patrones | El IR y el planificador, más **recetas** en datos (`rules/recipes/`, WP-A2): patrón SAS → componentes + parámetros + tablas |
-| Biblioteca de ejecución para la semántica | Rutina `SasFunctions` (`rules/talend/routines/`), instalada en el proyecto (WP-B1) |
+| Biblioteca de ejecución para la semántica | **Ninguna propia**: rutinas de sistema de Talend (`StringHandling`, `TalendDate`, `Mathematical`, `Relational`) y Java nativo con guardas de nulo. No hay nada que instalar |
 | Registrar lo no traducido para revisión | Informe de traducción (WP-A5): lo no traducido, ordenado por frecuencia, alimenta las recetas |
 | Validar contra la salida de SAS | Arnés de equivalencia (Q2) con salidas doradas |
 
@@ -256,11 +256,9 @@ que cambia por entorno en contexto, y joblets para lo repetido.
 
 Commiteado antes: plan, métrica `tools/automation_metrics.py`. **En el árbol sin commitear**, de esta sesión, cada pieza con su
 prueba cuando se indica: importar `.txt` como SAS y quitar el carácter invisible (con prueba); redactar `proc pwencode` (con
-prueba); ignorar `%web_drop_table`/`%web_open_table` (con prueba); `routine_translator.py`, el traductor de gramática completa
+prueba); ignorar `%web_drop_table`/`%web_open_table` (con prueba); `talend_translator.py`, el traductor de gramática completa
 (funciones de varios argumentos, `CASE`, `IN`, `BETWEEN`, `IS MISSING`, `.`, formatos, fechas), **detrás del interruptor
-`SGM_SAS_ROUTINE=1`, apagado por defecto**; `docs/conventions.md`. **Falta y no está hecho**: la rutina
-`rules/talend/routines/SasFunctions.java` (la carpeta existe vacía), pruebas de `routine_translator.py` y su instalación en
-el proyecto. **No enciendas el interruptor hasta que B1 esté hecho**: sin la rutina instalada los Jobs no compilan.
+`SGM_TALEND_EXPRESSIONS=1`, apagado por defecto**; `docs/conventions.md`. **Falta**: pruebas propias de `talend_translator.py` y comprobar en Studio que el Java que emite compila. **No enciendas el interruptor hasta que B1 lo haya comprobado.**
 
 ### Reparto: dos agentes, sin pisarse
 
@@ -275,8 +273,8 @@ el proyecto. **No enciendas el interruptor hasta que B1 esté hecho**: sin la ru
 | -- | ---------- | ---------- |
 | A1 | **Estructura de Job por convención**: prejob con las conexiones (una por `libname` de base de datos), un subjob por `Etiqueta:`, postjob que confirma y cierra, `tLogCatcher`/`tDie`, contexto `DEV`/`TEST`/`PROD`. En el planificador y en `offline_payload.py`. | Cada Job generado cumple `docs/conventions.md` (prueba en `spec_invariants.py`) |
 | A2 | **Recetas** en datos, `rules/recipes/*.json`: patrón SAS → componentes, parámetros y tablas, para los ~60 componentes de la sección 4 de las convenciones. Se validan contra el catálogo (`rules/talend/components.json`). | Una receta con un componente o parámetro que no existe falla la prueba |
-| A3 | **Traducción dentro de la configuración**: `WHERE` → tabla `CONDITIONS`; `ON` → tabla `JOIN_KEY` de `tJoin`; `PROC SORT` → `CRITERIA`; `NODUPKEY` → `UNIQUE_KEY`; `MEANS/FREQ` → `GROUPBY`/`OPERATIONS`; asignaciones y `IF/THEN/ELSE` → expresiones de `tMap` con `SasFunctions` | Los filtros, joins, orden y agregados salen sin pendiente cuando las columnas se conocen |
-| A4 | `SasFunctions.java` completa y con su prueba de semántica (valores esperados de SAS), más las pruebas de `routine_translator.py` | La rutina compila y sus pruebas pasan |
+| A3 | **Traducción dentro de la configuración**: `WHERE` → tabla `CONDITIONS`; `ON` → tabla `JOIN_KEY` de `tJoin`; `PROC SORT` → `CRITERIA`; `NODUPKEY` → `UNIQUE_KEY`; `MEANS/FREQ` → `GROUPBY`/`OPERATIONS`; asignaciones y `IF/THEN/ELSE` → expresiones de `tMap` con rutinas de Talend; `tJava` solo como último recurso | Los filtros, joins, orden y agregados salen sin pendiente cuando las columnas se conocen |
+| A4 | Pruebas de `talend_translator.py` por función, con el Java esperado, y sustituir lo que pueda ser un componente (`tReplace`, `tConvertType`, `tExtractRegexFields`) por el componente | Cada función del mapeo tiene su prueba; `tJava` solo en el último recurso |
 | A5 | **Informe de traducción**: qué no se tradujo, por qué y cuántas veces; endpoint y exportación | Lista ordenada por frecuencia, con archivo y línea |
 | A6 | Catálogo de entorno y propagación de esquemas (WP5 a WP7 de este plan) | Como en las secciones 6 y 9 |
 
@@ -284,7 +282,7 @@ el proyecto. **No enciendas el interruptor hasta que B1 esté hecho**: sin la ru
 
 | Id | Entregable | Aceptación |
 | -- | ---------- | ---------- |
-| B1 | **Instalar la rutina**: tool del MCP que escribe offline `SasFunctions` como rutina de usuario del proyecto (copiar el formato de una rutina existente en `code/routines/`) y la verifica | Un Job con `SasFunctions.eq(...)` compila en Studio |
+| B1 | **Comprobar en Studio el Java que emite el traductor**: un Job de prueba por cada función del mapeo (`StringHandling`, `TalendDate`, `Mathematical`, `Relational`), compilado con `talend_job_verify`. Es lo que permite encender `SGM_TALEND_EXPRESSIONS` | Todas compilan; las que no, se corrigen en el mapeo |
 | B2 | **Escribir en Studio lo que A genera**: `tPrejob`/`tPostjob` con sus disparadores, conexiones compartidas, **joblets** (crear y usar offline), grupos de contexto `DEV`/`TEST`/`PROD`, `tLogCatcher`/`tDie`, `tRunJob` con contexto. Extender `talend_jobs_create_batch` y su esquema | `verify_in_studio.py` sin errores ni diálogos con Jobs de la estructura nueva |
 | B3 | **Comprobar la configuración de cada componente** contra sus definiciones: parámetros, tablas, conectores; rechazar antes de escribir (hecho para las conexiones: `comprobar-conexiones.ts`) | `INVALID_COMPONENT` con el motivo |
 | B4 | **Cobertura de componentes**: `talend_studio_coverage` sobre los que usan las recetas | Informe de cuáles se crean, configuran y compilan |

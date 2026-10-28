@@ -56,12 +56,21 @@ errores   ─► tLogCatcher ─► tLogRow  (+ tDie si el subjob es crítico)  
 Se usa **el componente más específico que existe** (hay más de mil en el catálogo; el valor está en no caer siempre en
 `tMap`). Una expresión Java dentro de un componente es el último recurso, no el primero.
 
+**Orden de decisión, siempre el mismo:**
+
+1. **Un componente específico con su configuración** (`tFilterRow` con `CONDITIONS`, `tJoin`, `tSortRow`, `tUniqRow`,
+   `tAggregateRow`, `tReplace`, `tConvertType`, `tExtractRegexFields`, `tNormalize`...). Sin Java.
+2. **Una expresión de `tMap`** con rutinas de sistema de Talend y Java nativo, solo para calcular columnas.
+3. **`tJava`/`tJavaRow`**, únicamente si no hay otra forma: estado entre filas que `tMap` no resuelve, o lógica sin
+   equivalente. Va siempre con el SAS original en comentario y marcado `needs_review`. Un Job con más de un `tJava` por
+   cada diez componentes se revisa.
+
 | SAS | Componente | Configuración |
 | --- | ---------- | ------------- |
 | `WHERE`, `IF` simple | `tFilterRow` | tabla `CONDITIONS`; modo avanzado solo si no cabe |
 | Columnas a conservar o quitar | `tFilterColumns` | esquema de salida |
 | Renombrar | `tMap` o esquema del siguiente componente | sin Java |
-| Calcular columnas | `tMap` | expresiones; con la rutina `SasFunctions` |
+| Calcular columnas | `tMap` | expresiones con rutinas de sistema de Talend (`StringHandling`, `TalendDate`, `Mathematical`, `Relational`) |
 | `PROC SORT`, `NODUPKEY` | `tSortRow`, `tUniqRow` | tablas `CRITERIA` y `UNIQUE_KEY` |
 | `MERGE BY`, `JOIN ... ON` | `tJoin` | tabla `JOIN_KEY`; `tMap` solo con varias salidas o lookups complejos |
 | `PROC MEANS/SUMMARY/FREQ`, `GROUP BY` | `tAggregateRow` | `GROUPBY` y `OPERATIONS` |
@@ -88,9 +97,10 @@ Se usa **el componente más específico que existe** (hay más de mil en el cat�
 
 - El esquema sale del **catálogo de entorno** (`environment.json`) y se propaga por el plan; nunca se inventa.
 - Tipos SAS → Talend: numérico → `id_Double` (o `id_Integer`/`id_Long` si el catálogo lo dice), carácter → `id_String`
-  con su longitud, fecha SAS → `id_Date` con patrón `yyyy-MM-dd`. La fecha SAS cuenta días desde 1960; la rutina
-  `SasFunctions` hace la conversión.
-- **Valor perdido de SAS = `null`.** Las comparaciones y la aritmética pasan por `SasFunctions`.
+  con su longitud, fecha SAS → `id_Date` con patrón `yyyy-MM-dd`. La fecha SAS cuenta días desde 1960; una fecha leída de un archivo
+  o una base ya llega como `Date`, y las funciones de fecha (`TalendDate`) trabajan sobre `Date`.
+- **Valor perdido de SAS = `null`.** El traductor lo propaga como SAS (un perdido numérico es menor que cualquier número;
+  `a + .` es perdido) con guardas de nulo en el Java del `tMap`, sin bibliotecas propias.
 
 ## 6. Qué queda siempre como pendiente
 
