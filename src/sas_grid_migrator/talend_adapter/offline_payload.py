@@ -5,6 +5,8 @@ sí los escribe y usa la misma forma (`name`/`type`/`value`/`comment`) que el po
 Se envía una plantilla con una sola fila vacía por Job.
 """
 
+import hashlib
+import json
 from typing import Any
 
 from sas_grid_migrator.talend_adapter.eligibility import offline_blockers
@@ -34,6 +36,11 @@ def to_batch_arguments(spec: dict[str, Any]) -> dict[str, Any]:
     if blockers:
         raise ValueError(f"La guía no es elegible para offline: {', '.join(blockers)}")
     template: dict[str, Any] = {key: spec[key] for key in _TEMPLATE_KEYS if spec.get(key) is not None}
+    digest = hashlib.sha256(
+        json.dumps(spec, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    description = str(template.get("description") or "").strip()
+    template["description"] = f"{description}\n[portal-spec:{digest}]".strip()
     template["components"] = [
         {key: component[key] for key in _COMPONENT_KEYS if component.get(key) is not None}
         for component in spec.get("components") or []

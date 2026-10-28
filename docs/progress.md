@@ -93,3 +93,12 @@ materializa la tabla central, así que el límite no elimina el coste inicial de
 excedentes compuestos solo por rutas inseguras. Métricas antes → después: `real` 8,1 % → 8,1 % (2 063 pasos), `synthetic`
 16,8 % → 16,8 % (429 pasos); cambio no relacionado con automatización SAS. Verificación focal: 20 passed, 1 skipped;
 Ruff pasó. Sin SAS, código importado, Studio ni Jobs Talend.
+
+## Aplicación offline Talend — MIG-023 (28/10/2026)
+
+El fallback a Studio queda limitado a fallos de `dryRun`; un error durante la escritura se devuelve sin repetir la operación
+por otra vía. El batch crea los dos ficheros con exclusión y revierte el `.item` nuevo si falla el `.properties`. Para una
+respuesta perdida tras una escritura completa, el portal añade una marca SHA-256 de propiedad; el batch reconoce en el
+reintento el par que conserva esa misma marca y no sobrescribe un Job distinto. Métrica antes → después: `real` 8,1 % →
+8,1 % (2 063 pasos), `synthetic` 16,8 % → 16,8 % (429 pasos). Verificación focal offline de Python y MCP; la simulación
+de timeout posterior a persistencia completa no se ejecutó. Sin Studio ni Jobs Talend.

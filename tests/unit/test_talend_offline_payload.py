@@ -41,6 +41,15 @@ def test_batch_arguments_use_one_empty_row_and_keep_contexts_as_the_portal_build
     assert template["contexts"] == [
         {"name": "run_date", "type": "id_String", "value": "2026-10-28", "comment": "SAS"}
     ]
+    assert "[portal-spec:" in template["description"]
+
+
+def test_offline_ownership_marker_changes_when_the_spec_changes():
+    marker = to_batch_arguments(spec())["template"]["description"].split("[portal-spec:")[1]
+    changed = to_batch_arguments(spec(jobName="OtherJob"))["template"]["description"].split("[portal-spec:")[1]
+
+    assert marker.endswith("]")
+    assert marker != changed
 
 
 def test_batch_template_drops_fields_the_offline_tool_does_not_know():

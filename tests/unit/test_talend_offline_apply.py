@@ -114,6 +114,20 @@ def test_an_eligible_job_is_written_offline_with_the_live_result_shape():
     assert result["mode"] == "offline"
 
 
+def test_offline_retry_reports_when_the_existing_portal_job_was_reused():
+    def response(args):
+        result = batch_ok(args)
+        if not args["dryRun"]:
+            result["data"]["jobs"][0]["reusedExisting"] = True
+        return result
+
+    caller = Recorder({OFFLINE: response})
+
+    result = run(TalendAdapter(caller, offline=True).apply_custom_spec(job("job_a")))
+
+    assert result["reusedExisting"] is True
+
+
 def test_child_jobs_are_written_first_each_one_as_its_own_job():
     caller = Recorder({OFFLINE: batch_ok})
     parent = job("job_padre", childJobs=[job("job_hijo_1"), job("job_hijo_2", childJobs=[job("job_nieto")])])
@@ -179,6 +193,34 @@ def test_a_failed_offline_write_falls_back_to_studio_with_a_warning():
     assert caller.names() == [OFFLINE, LIVE]
     assert result["warnings"][0] == "w"
     assert any("offline" in warning.lower() and "ya existe" in warning for warning in result["warnings"])
+
+
+def test_ambiguous_failure_during_offline_write_never_retries_through_studio():
+    from sas_grid_migrator.talend_adapter.adapter import TalendError
+
+    def response(args):
+        if args["dryRun"]:
+            return batch_ok(args)
+        return {
+            "ok": True,
+            "data": {
+                "total": 1,
+                "correctos": 0,
+                "escritos": 0,
+                "fallos": [{"job": "job_a", "error": "fallo de escritura"}],
+                "jobs": [],
+            },
+        }
+
+    caller = Recorder({
+        OFFLINE: response,
+        LIVE: {"ok": True, "data": {"jobName": "job_a", "itemPath": "x.item"}},
+    })
+
+    with pytest.raises(TalendError, match="fallo de escritura"):
+        run(TalendAdapter(caller, offline=True).apply_custom_spec(job("job_a")))
+
+    assert caller.names() == [OFFLINE, OFFLINE]
 
 
 def test_a_tool_level_error_also_falls_back():

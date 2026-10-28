@@ -21,6 +21,10 @@ class TalendError(RuntimeError):
     pass
 
 
+class _OfflinePreflightError(TalendError):
+    """El dryRun falló antes de que el lote pudiera escribir artefactos."""
+
+
 class McpClientUnavailable(TalendError):
     """El paquete `mcp` instalado no trae el cliente 2.x que usa este adaptador."""
 
@@ -143,7 +147,7 @@ def _offline_job_result(
         "updatedContexts": 0,
         "reusedContexts": 0,
         "removedContexts": 0,
-        "reusedExisting": False,
+        "reusedExisting": bool(written.get("reusedExisting")),
         "componentAliases": {item["uniqueName"]: item["uniqueName"] for item in components},
         "warnings": [f"{item.get('uniqueName')}: {item.get('motivo')}" for item in omitted] + list(notices or []),
         "childJobs": children,
@@ -612,7 +616,7 @@ class TalendAdapter:
         if self.offline and not offline_tree_blockers(arguments):
             try:
                 return await self._apply_offline(arguments)
-            except TalendError as error:
+            except _OfflinePreflightError as error:
                 fallback_note = f"El modo offline no pudo aplicar el Job ({error}); se usó Studio en vivo."
         compatibility = await self.custom_spec_status()
         if not compatibility["spec_supported"]:
@@ -628,7 +632,10 @@ class TalendAdapter:
         Primero se valida todo el árbol con `dryRun`: si algo falla no se escribe nada, y el Job puede
         pasar a Studio en vivo sin encontrarse a medias los hijos ya escritos.
         """
-        await self._write_offline(arguments, dry_run=True)
+        try:
+            await self._write_offline(arguments, dry_run=True)
+        except TalendError as error:
+            raise _OfflinePreflightError(str(error)) from error
         return await self._write_offline(arguments, dry_run=False)
 
     async def _write_offline(self, spec: dict[str, Any], *, dry_run: bool) -> dict[str, Any]:
