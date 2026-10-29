@@ -36,3 +36,8 @@ test("CSV quotes uploaded text that could be interpreted as a spreadsheet formul
   const unsafe = { ...plan, steps: [{ ...plan.steps[0], purpose: "=HYPERLINK(\"https://example.invalid\")" }] };
   assert.match(guideCsv([unsafe], "project-1"), /"'=HYPERLINK/);
 })
+
+test("Markdown guide shows the job description under the title only when set", () => {
+  assert.match(guideMarkdown({ ...plan, description: "Carga diaria de ventas" }, "project-1"), /^# Guía de migración: job_ventas\n\nCarga diaria de ventas\n/);
+  assert.doesNotMatch(guideMarkdown(plan, "project-1"), /Carga diaria/);
+});

@@ -58,6 +58,7 @@ export function guideMarkdown(plan: JobPlan, projectId: string): string {
   const lines = [
     `# Guía de migración: ${plan.job_name}`,
     "",
+    ...(plan.description ? [plan.description, ""] : []),
     `- **Programa SAS:** \`${plan.program}\``,
     "- **Ejecución:** MCP crea el Job en Talend Studio; esta guía no ejecuta el Job.",
     "",

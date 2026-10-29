@@ -76,6 +76,7 @@ class TalendApplySpec(BaseModel):
     source_sha256: str | None
     rules_version: str
     job_name: str
+    description: str | None = None
     folder_path: str
     components: list[ApplyComponent]
     connections: list[ApplyConnection]
@@ -96,7 +97,7 @@ class TalendApplySpec(BaseModel):
             "version": "0.1",
             "defaultContext": "Default",
             "folderPath": self.folder_path,
-            "description": f"Migrated from SAS program {self.program}",
+            "description": self.description or f"Migrated from SAS program {self.program}",
             "purpose": f"Generated from migration plan {self.rules_version}",
             "components": [
                 item.model_dump(
@@ -1307,6 +1308,7 @@ def build_apply_spec(
         source_sha256=plan.sha256,
         rules_version=plan.rules_version,
         job_name=plan.job_name,
+        description=plan.description,
         folder_path=safe_folder,
         components=components,
         connections=connections,

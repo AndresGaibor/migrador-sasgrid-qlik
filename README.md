@@ -35,6 +35,11 @@ de escritura del proyecto.
 - **Construye dependencias** entre programas y datasets e infiere tareas y secuencias SAS Grid.
 - **Prepara un plan por programa/Job** con componentes candidatos, propiedades, conexiones y
   decisiones pendientes; exporta JSON, Markdown y CSV.
+- **Permite editar el plan.** Nombre y descripción del Job, renombrado masivo y traducción Talend de cada expresión;
+  las ediciones se guardan aparte y no reescriben `plans.json`.
+- **Traduce expresiones sueltas.** El laboratorio `#/traductor` muestra el Java para Talend, las columnas y los avisos de
+  una expresión SAS.
+- **Muestra el avance del proyecto.** El resumen tiene las etapas, la siguiente acción y los pendientes agrupados por motivo.
 - **Conserva lo desconocido como pendiente.** No inventa esquemas, credenciales, valores ni
   equivalencias que el código fuente no demuestra.
 - **Integra con Talend mediante MCP.** Antes de escribir, el portal revisa destinos y conflictos; la
