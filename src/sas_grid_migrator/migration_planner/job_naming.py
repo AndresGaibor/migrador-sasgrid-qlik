@@ -15,6 +15,7 @@ from .planner import slug
 DEFAULT_NAME_TEMPLATE = "job_{programa}"
 TEMPLATE_TOKENS = ("proyecto", "carpeta", "programa")
 MAX_JOB_NAME = 60
+_NESTED_QUANTIFIERS = re.compile(r"\([^()]*[|+*{][^()]*\)[+*{]|\([^)]*\([^)]*\)[^)]*\)[+*{]")
 
 
 class BulkRule(BaseModel):
@@ -73,7 +74,7 @@ def bulk_preview(plans: Sequence[JobPlan], rule: BulkRule) -> list[RenamePreview
     if selected is not None and selected.difference(plan.program for plan in targets):
         raise ValueError("Uno o más programas solicitados no existen en el plan.")
     if rule.mode == "regex":
-        if len(rule.find) > 200 or re.search(r"\([^)]*[+*][^)]*\)[+*{]", rule.find):
+        if len(rule.find) > 200 or _NESTED_QUANTIFIERS.search(rule.find):
             raise ValueError("El patrón es demasiado complejo.")
         try:
             pattern = re.compile(rule.find)

@@ -30,6 +30,7 @@ export function PlanList({ id }: { id: string }) {
   const [batchError, setBatchError] = useState<string>();
   const [confirmation, setConfirmation] = useState<TalendApplyBatchSummary>();
   const [showBulkRename, setShowBulkRename] = useState(false);
+  const [renameWarnings, setRenameWarnings] = useState<string[]>([]);
   const batchState = batch.data;
   const batchActive = batchState?.status === "queued" || batchState?.status === "running";
   const events = useProjectEvents(id, batch.reload);
@@ -101,6 +102,7 @@ export function PlanList({ id }: { id: string }) {
     <>
       <div className="migration-heading"><div><h1>Plan de migración</h1><p className="subtitle">Primero crea la estructura, después completa los Jobs y al final programa su ejecución.</p></div>
       <div className="plan-rebuild-toolbar">{q.data?.length ? <button type="button" className="secondary" onClick={() => setShowBulkRename(true)} disabled={batchActive || batchBusy || busy || Boolean(confirmation)}>Renombrar Jobs</button> : null}<button type="button" className={q.data?.length ? "secondary" : undefined} onClick={gen} disabled={busy || batchActive || batchBusy || Boolean(confirmation)} title="Tu progreso se conserva al volver a preparar las guías"><Icon name="play" size={16} />{busy ? "Preparando guías…" : q.data?.length ? "Actualizar guías" : "Preparar guías de migración"}</button><small>Tu progreso se conserva.</small></div></div>
+      {renameWarnings.length > 0 && <div className="notice warning" role="status">{renameWarnings.map((warning) => <p key={warning}>{warning}</p>)}</div>}
       {err && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{err}</span></div>}
       <div className="migration-workspace">
       {q.data?.length ? <section className="talend-batch-panel" aria-labelledby="talend-batch-title">
@@ -140,7 +142,7 @@ export function PlanList({ id }: { id: string }) {
         {batchError && <p className="error" role="alert">{batchError}</p>}
         <div className="dialog-actions"><button type="button" className="secondary" disabled={batchBusy} onClick={() => setConfirmation(undefined)}>Cancelar</button><button type="button" disabled={!canStartBatch} onClick={() => void implementProject()}>{batchBusy ? "Iniciando…" : "Crear Jobs en Talend Studio"}</button></div>
       </Dialog>}
-      {showBulkRename && <BulkRename id={id} batchActive={batchActive || batchBusy} onClose={() => setShowBulkRename(false)} onDone={() => { q.reload(); summary.reload(); preflight.reload(); }} />}
+      {showBulkRename && <BulkRename id={id} batchActive={batchActive || batchBusy} onClose={() => setShowBulkRename(false)} onDone={(warnings) => { setRenameWarnings(warnings); q.reload(); summary.reload(); preflight.reload(); }} />}
     </>
   );
 }

@@ -10,7 +10,7 @@ export function renameSummary(rows: RenamePreviewRow[]) {
   return { changes, errors, canApply: changes > 0 && errors === 0 };
 }
 
-export function BulkRename({ id, onClose, onDone, batchActive }: { id: string; onClose: () => void; onDone: () => void; batchActive: boolean }) {
+export function BulkRename({ id, onClose, onDone, batchActive }: { id: string; onClose: () => void; onDone: (warnings: string[]) => void; batchActive: boolean }) {
   const [mode, setMode] = useState<BulkRenameRule["mode"]>("prefix");
   const [text, setText] = useState("");
   const [find, setFind] = useState("");
@@ -41,8 +41,8 @@ export function BulkRename({ id, onClose, onDone, batchActive }: { id: string; o
     setError(undefined);
     try {
       const changes = rows!.filter((row) => row.current !== row.proposed).map((row) => ({ program: row.program, job_name: row.proposed }));
-      await api.renameJobs(id, changes);
-      onDone();
+      const result = await api.renameJobs(id, changes);
+      onDone(result.warnings);
       onClose();
     } catch (reason) {
       setError(formatErrorMessage(reason));

@@ -85,7 +85,7 @@ export const api = {
   translate: (sas: string) => post<TranslateResult>("/translator/translate", { sas }),
   renamePreview: (id: string, rule: BulkRenameRule) => post<RenamePreviewRow[]>(`/projects/${id}/plans/rename-preview`, rule),
   renameJobs: (id: string, renames: { program: string; job_name: string }[]) =>
-    post<{ renamed: number }>(`/projects/${id}/plans/rename`, { renames }),
+    post<{ renamed: number; warnings: string[] }>(`/projects/${id}/plans/rename`, { renames }),
   namingTemplate: () => req<NamingTemplate>("/settings/naming"),
   namingExample: (template: string) => post<{ name: string }>("/settings/naming/preview", { template }),
   setNamingTemplate: (template: string) =>

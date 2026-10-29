@@ -45,3 +45,15 @@ def test_bulk_preview_reports_duplicate_proposals_without_losing_other_rows():
     assert all(row.error is None for row in rows)
     with pytest.raises(ValueError, match="complejo"):
         bulk_preview(plans, BulkRule(mode="regex", find="(a+)+$", replace_with="x"))
+
+
+@pytest.mark.parametrize("pattern", ["(a+)+$", "(a|aa)+$", "((a+)b)+", "((a))+x"])
+def test_regex_guard_rejects_nested_quantifiers_that_backtrack(pattern):
+    with pytest.raises(ValueError, match="complejo"):
+        bulk_preview([_plan("a.sas", "job_a")], BulkRule(mode="regex", find=pattern, replace_with="x"))
+
+
+@pytest.mark.parametrize("pattern", ["(abc)+", "(a|b)", "x(y)z", "[a-z]+", r"job_(\d+)", "^job_", r"(job)_(\d+)"])
+def test_regex_guard_accepts_benign_patterns(pattern):
+    rows = bulk_preview([_plan("a.sas", "job_a")], BulkRule(mode="regex", find=pattern, replace_with="x"))
+    assert rows[0].error is None

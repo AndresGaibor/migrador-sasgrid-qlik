@@ -1,6 +1,7 @@
 import asyncio
 import hashlib
 import json
+import logging
 import os
 import re
 import tempfile
@@ -62,6 +63,8 @@ from sas_grid_migrator.sas_parser.ast import ParsedProgram
 from sas_grid_migrator.talend_adapter.batch import collect_child_results, order_plans_for_batch
 from sas_grid_migrator.talend_adapter.best_practices import check_job_arguments
 from sas_grid_migrator.talend_adapter.naming import folder_path, folder_segment
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -1913,6 +1916,30 @@ def _require_editable_project(s: Store, project_id: str) -> None:
         raise HTTPException(409, "No se puede editar mientras Talend crea Jobs de este proyecto.")
 
 
+_CREATED_STATUSES = {"applied", "partially_applied"}
+
+
+def _already_created_name(s: Store, project_id: str, program: str, fallback: str) -> str | None:
+    """Nombre con el que Studio ya creó el Job de este programa, o `None` si aún no existe."""
+    state = s.get_talend_apply_state(project_id, program)
+    if state and state.get("status") in _CREATED_STATUSES:
+        identity = state.get("identity")
+        return (identity.get("job_name") if isinstance(identity, dict) else None) or fallback
+    batch = s.get_talend_apply_batch_state(project_id) or {}
+    for job in batch.get("jobs", []):
+        if job.get("program") == program and job.get("status") in _CREATED_STATUSES:
+            return fallback
+    return None
+
+
+def _created_rename_warning(created_as: str) -> str:
+    return (
+        f"Este Job ya se creó en Talend Studio con el nombre anterior ({created_as}). "
+        "El portal no lo renombra en Studio: ese Job se conserva con el nombre anterior y la próxima "
+        "aplicación puede pedir confirmar la nueva revisión."
+    )
+
+
 @app.patch("/api/projects/{project_id}/plans/{program:path}/meta")
 def update_job_meta(project_id: str, program: str, body: JobMetaEdit) -> dict[str, Any]:
     s = store()
@@ -1927,6 +1954,7 @@ def update_job_meta(project_id: str, program: str, body: JobMetaEdit) -> dict[st
         raise HTTPException(422, "La descripción no puede pasar de 500 caracteres.")
 
     current = load_plans(s, project_id) or raw_plans
+    previous = next((item for item in current.plans if item.program == program), raw_plan)
     if body.job_name:
         taken = [item.job_name for item in current.plans if item.program != program]
         error = validate_job_name(body.job_name, taken=taken)
@@ -1937,7 +1965,18 @@ def update_job_meta(project_id: str, program: str, body: JobMetaEdit) -> dict[st
     updated = get_plan(s, project_id, program)
     if updated is None:
         raise HTTPException(404, "plan no encontrado")
-    return {"plan": updated.model_dump(mode="json"), "warnings": []}
+    warnings: list[str] = []
+    renamed = updated.job_name != previous.job_name
+    if renamed or updated.description != previous.description:
+        created_as = _already_created_name(s, project_id, program, previous.job_name)
+        if created_as is not None and renamed:
+            warnings.append(_created_rename_warning(created_as))
+        elif created_as is not None:
+            warnings.append(
+                "Este Job ya se creó en Talend Studio; el cambio de descripción no se refleja allí hasta volver "
+                "a aplicar y la aplicación puede pedir confirmar la nueva revisión."
+            )
+    return {"plan": updated.model_dump(mode="json"), "warnings": warnings}
 
 
 @app.post("/api/projects/{project_id}/plans/rename-preview")
@@ -1954,7 +1993,7 @@ def preview_job_renames(project_id: str, body: BulkRule) -> list[dict[str, Any]]
 
 
 @app.post("/api/projects/{project_id}/plans/rename")
-def rename_jobs(project_id: str, body: BulkRenameBody) -> dict[str, int]:
+def rename_jobs(project_id: str, body: BulkRenameBody) -> dict[str, Any]:
     s = store()
     _require_editable_project(s, project_id)
     plans = load_plans(s, project_id)
@@ -1989,8 +2028,16 @@ def rename_jobs(project_id: str, body: BulkRenameBody) -> dict[str, int]:
         )
         for program, name in requested.items()
     }
+    warnings: list[str] = []
+    for program, name in requested.items():
+        if name == current[program].job_name:
+            continue
+        created_as = _already_created_name(s, project_id, program, current[program].job_name)
+        if created_as is not None:
+            warnings.append(_created_rename_warning(created_as))
     s.set_job_overrides(project_id, updates)
-    return {"renamed": sum(name != current[program].job_name for program, name in requested.items())}
+    renamed = sum(name != current[program].job_name for program, name in requested.items())
+    return {"renamed": renamed, "warnings": warnings}
 
 
 @app.patch("/api/projects/{project_id}/plans/{program:path}/steps/{step_id}/expressions/{index}")
@@ -2025,14 +2072,20 @@ def edit_plan_expression(
 
 @app.post("/api/translator/translate")
 def translate_expression(body: TranslateBody) -> dict[str, Any]:
-    result = translate(body.sas)
+    try:
+        result = translate(body.sas)
+        talend, columns, warnings, engine = result.talend, result.columns, result.warnings, result.engine
+    except Exception:  # noqa: BLE001 - entrada hostil: el traductor nunca debe responder 500
+        logger.exception("El traductor falló; se responde sin traducción automática")
+        talend, columns, engine = None, [], "inline"
+        warnings = ["Sin traducción automática: no se pudo analizar la expresión (demasiado compleja o no válida)."]
     return {
-        "sas": result.sas,
-        "talend": result.talend,
-        "columns": result.columns,
-        "warnings": result.warnings,
-        "engine": result.engine,
-        "supported": result.talend is not None,
+        "sas": body.sas,
+        "talend": talend,
+        "columns": columns,
+        "warnings": warnings,
+        "engine": engine,
+        "supported": talend is not None,
         "talend_engine_enabled": talend_expressions_enabled(),
     }
 
