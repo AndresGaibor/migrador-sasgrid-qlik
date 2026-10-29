@@ -13,6 +13,7 @@
     "tFixedFlowInput": ["p0/14_datalines.sas"],
     "tGreenplumInput": ["engine_connectors/08_greenplum_read_write.sas"],
     "tGreenplumOutput": ["engine_connectors/08_greenplum_read_write.sas"],
+    "tLogRow": ["component_scenarios/20_report_rows.sas"],
     "tMSSqlInput": ["database/04_sqlserver_libname.sas"],
     "tMSSqlOutput": ["engine_connectors/04_sqlserver_output.sas"],
     "tMap": [
@@ -51,7 +52,6 @@
     "tFlowToIterate": ["component_scenarios/21_global_variable.sas"],
     "tJava": ["component_scenarios/21_global_variable.sas"],
     "tJavaRow": ["component_scenarios/03_clean_strings.sas"],
-    "tJoin": ["component_scenarios/15_sql_full_join.sas"],
-    "tLogRow": ["component_scenarios/20_report_rows.sas"]
+    "tJoin": ["component_scenarios/15_sql_full_join.sas"]
   }
 }

@@ -1,5 +1,8 @@
 import socket
+import subprocess
+from types import SimpleNamespace
 
+from sas_grid_migrator.cli import dev as dev_module
 from sas_grid_migrator.cli.dev import mcp_launch, port_in_use
 
 
@@ -27,3 +30,20 @@ def test_port_in_use_detects_a_listening_socket():
         port = server.getsockname()[1]
         assert port_in_use("127.0.0.1", port)
     assert not port_in_use("127.0.0.1", port)
+
+
+def test_windows_reload_process_has_no_console_to_interrupt_the_supervisor(monkeypatch, tmp_path):
+    monkeypatch.setattr(dev_module, "IS_WINDOWS", True)
+    monkeypatch.setattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0x200, raising=False)
+    monkeypatch.setattr(subprocess, "CREATE_NO_WINDOW", 0x8000000, raising=False)
+    captured = {}
+
+    def fake_popen(command, **kwargs):
+        captured.update(kwargs)
+        return SimpleNamespace(pid=1234)
+
+    monkeypatch.setattr(dev_module.subprocess, "Popen", fake_popen)
+
+    dev_module.spawn(["python", "-m", "uvicorn"], tmp_path, {}, None, no_console=True)
+
+    assert captured["creationflags"] == 0x200 | 0x8000000

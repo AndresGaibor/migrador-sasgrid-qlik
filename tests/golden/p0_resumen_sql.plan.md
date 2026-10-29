@@ -124,7 +124,6 @@
 - **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
-  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_6_write_1_row_count`, `vc_op_6_write_1_schema`
 
 ## Casos de validación

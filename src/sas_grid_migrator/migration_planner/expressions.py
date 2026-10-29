@@ -24,6 +24,7 @@ class Translation:
     logical: str | None = None  # "&&" | "||" para el modo simple
     warnings: list[str] = field(default_factory=list)
     engine: str = "inline"  # "inline" (traductor original) | "talend" (rutinas de sistema de Talend)
+    kind: str = "any"  # num | str | bool | date | any: tipo que el Java emitido produce
 
 
 class _Unsupported(Exception):
@@ -251,7 +252,11 @@ def translate(sas: str) -> Translation:
     gramática completa con `StringHandling`, `TalendDate`, `Mathematical` y Java nativo, y conserva la semántica del perdido.
     """
     t = _translate_inline(sas)
-    if t.talend is not None or not talend_expressions_enabled():
+    if t.talend is not None:
+        # El tipo del resultado no depende del motor que escribe el Java: el traductor completo lo sabe.
+        t.kind = _talend_kind(sas)
+        return t
+    if not talend_expressions_enabled():
         return t
     try:
         result = translate_to_talend(sas)
@@ -259,7 +264,16 @@ def translate(sas: str) -> Translation:
         t.warnings.append(f"Sin traducción con rutinas de Talend: {error}")
         return t
     t.talend, t.columns, t.warnings, t.engine = result.java, result.columns, result.warnings, "talend"
+    t.kind = result.kind
     return t
+
+
+def _talend_kind(sas: str) -> str:
+    """Tipo del valor que produce la expresión, según el traductor completo (`any` si no lo sabe)."""
+    try:
+        return translate_to_talend(sas).kind
+    except Unsupported:
+        return "any"
 
 
 def _translate_inline(sas: str) -> Translation:

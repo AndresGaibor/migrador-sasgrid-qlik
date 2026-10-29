@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { api } from "../api";
 import { useAsync } from "../hooks";
 import { Icon } from "../components/Icon";
+import { ComponentIcon } from "../components/ComponentIcon";
 import type { CatalogComponent, CatalogItem } from "../types";
 import { filterCatalogItems, getGuideCatalogItems } from "../catalog-explorer";
 import { Badge, Load } from "./common";
@@ -45,7 +46,7 @@ function CatalogList() {
     <>
       <div className="eyebrow">BIBLIOTECA DE RECURSOS</div>
       <h1>Catálogo de Talend Studio 8</h1>
-      <p className="subtitle">Busca componentes de la instalación predeterminada de Talend Studio 8. Los opcionales y retirados se archivan y no se ofrecen como candidatos.</p>
+      <p className="subtitle">Catálogo oficial contrastado con el inventario de tu Studio, incluidas todas las paletas. Si no existe un SVG nativo, el componente se muestra sin icono.</p>
       <div className="catalog-filters">
         <label className="catalog-search">
           Buscar componente
@@ -69,7 +70,7 @@ function CatalogList() {
         hasMore={!guideOnly && data.has_more}
       />}</Load>
       {!guideOnly && res.data?.official_documentation_inventory && (
-        <p className="muted">Perfil: {res.data.official_documentation_inventory.license_profile.label} · {res.data.official_documentation_inventory.count} componentes en la instalación predeterminada; {res.data.official_documentation_inventory.documented} con ficha Qlik y {res.data.official_documentation_inventory.exception} excepciones documentales. <a href={res.data.official_documentation_inventory.source} target="_blank" rel="noreferrer">Ver disponibilidad oficial ↗</a></p>
+        <p className="muted">Perfil: {res.data.official_documentation_inventory.license_profile.label} · {res.data.official_documentation_inventory.count} componentes de este catálogo presentes en Studio; {res.data.official_documentation_inventory.documented} con ficha Qlik y {res.data.official_documentation_inventory.exception} excepciones documentales. <a href={res.data.official_documentation_inventory.source} target="_blank" rel="noreferrer">Ver disponibilidad oficial ↗</a></p>
       )}
       {!guideOnly && <details>
         <summary>Configuración global de Talend Studio 8</summary>
@@ -101,7 +102,7 @@ function CatalogResults({ items, count, hasMore = false }: { items: DisplayItem[
 function CatalogRow({ item }: { item: DisplayItem }) {
   return (
     <tr>
-      <td><a href={`#/catalogo/${item.name}`}><code>{item.name}</code></a></td>
+      <td><a className="catalog-component-link" href={`#/catalogo/${item.name}`}><ComponentIcon name={item.name} className="catalog-component-icon" /><code>{item.name}</code></a></td>
       <td>{item.description}</td>
       <td>{item.families.join(", ")}</td>
       <td>{item.guideScope ? <Badge tone={item.guideScope === "principal" ? "ok" : "neutral"}>{item.guideScope === "principal" ? "Principal" : "Alternativa"}</Badge> : <span className="muted">—</span>}</td>
@@ -135,7 +136,7 @@ function ComponentBody({ name, component }: { name: string; component: CatalogCo
     <>
       <p><a href="#/catalogo">← Volver al catálogo</a></p>
       <div className="eyebrow">TALEND STUDIO 8 · FICHA OFICIAL</div>
-      <h1 className="component-heading">{name}</h1>
+      <h1 className="component-heading"><ComponentIcon name={name} className="catalog-component-icon" />{name}</h1>
       <p className="subtitle">{component.description}</p>
       <div className="catalog-state-grid" aria-label="Estados del componente">
         <section className="catalog-state-card">

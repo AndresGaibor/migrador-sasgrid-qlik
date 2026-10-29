@@ -127,6 +127,11 @@
           "default": null,
           "title": "Talend"
         },
+        "talend_edited": {
+          "default": false,
+          "title": "Talend Edited",
+          "type": "boolean"
+        },
         "target": {
           "anyOf": [
             {
@@ -835,6 +840,27 @@
     "job_name": {
       "title": "Job Name",
       "type": "string"
+    },
+    "description": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "default": null,
+      "title": "Description"
+    },
+    "job_name_edited": {
+      "default": false,
+      "title": "Job Name Edited",
+      "type": "boolean"
+    },
+    "rename_ignored": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "default": null,
+      "title": "Rename Ignored"
     },
     "job_status": {
       "default": "needs_review",

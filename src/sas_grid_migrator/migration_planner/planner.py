@@ -5,11 +5,13 @@ Nada de lo que produce está verificado: componentes y propiedades son candidato
 """
 
 import re
+from collections.abc import Callable
 from pathlib import Path, PurePosixPath
 from typing import Literal
 
 from pydantic import BaseModel
 
+from sas_grid_migrator.environment.catalog import EnvironmentCatalog, EnvironmentDataset
 from sas_grid_migrator.intermediate_representation.models import IROperation, LibraryRef, ProgramIR
 from sas_grid_migrator.migration_planner.expressions import (
     is_simple_arithmetic_translation,
@@ -45,6 +47,163 @@ _FMT_NAME = re.compile(r"^\s*value\s+\$?(\w+)", re.IGNORECASE)
 _FMT_ROW = re.compile(
     r"^\s*('(?:[^']|'')*'|\"[^\"]*\"|[^=\s][^=]*?)\s*=\s*('(?:[^']|'')*'|\"[^\"]*\")\s*$"
 )
+
+
+#: Estadística de PROC MEANS/SUMMARY → operación de `tAggregateRow`. Lo que no esté aquí queda pendiente.
+_MEANS_OPS = {
+    "n": "count",
+    "sum": "sum",
+    "mean": "avg",
+    "min": "min",
+    "max": "max",
+    "std": "stddev",
+    "stddev": "stddev",
+}
+_MEANS_DEFAULT = ["n", "mean", "std", "min", "max"]
+
+
+def _proc_aggregate(
+    proc: str, details: dict[str, object]
+) -> tuple[list[str], list[str], str | None]:
+    """PROC MEANS/SUMMARY/FREQ → (`GROUPBYS`, `OPERATIONS`, motivo si no se puede).
+
+    Solo se automatiza lo que el programa dice: las variables del `VAR`, los grupos de `CLASS`/`BY`, las estadísticas
+    pedidas y los nombres de salida del `OUTPUT OUT=`. PROC TABULATE y PROC UNIVARIATE no salen como una tabla de una fila
+    por grupo, así que quedan como pendiente.
+    """
+    statements = [str(s) for s in details.get("statements") or []]
+    if proc in ("tabulate", "univariate"):
+        return [], [], f"PROC {proc.upper()}: su salida no es una tabla de una fila por grupo; revisar a mano"
+    group: list[str] = []
+    for value in details.get("by") or []:
+        name = str(value).split(".")[-1]
+        if name and name not in group:
+            group.append(name)
+    for text in statements:
+        m = re.match(r"\s*(class|by)\s+(.+?)\s*;?\s*$", text, re.IGNORECASE)
+        if m:
+            for value in m.group(2).split():
+                name = value.split(".")[-1]
+                if name and name not in group:
+                    group.append(name)
+    if proc == "freq":
+        tables = [t for t in statements if re.match(r"\s*tables?\b", t, re.IGNORECASE)]
+        if len(tables) != 1 or "/" in tables[0]:
+            return [], [], "PROC FREQ sin una única tabla simple en TABLES: revisar cruces y opciones a mano"
+        spec = re.sub(r"^\s*tables?\s+", "", tables[0].strip().rstrip(";"), flags=re.IGNORECASE)
+        columns = [part.strip().split(".")[-1] for part in spec.split("*")]
+        if not columns or any(not re.fullmatch(r"\w+", c) for c in columns):
+            return [], [], "PROC FREQ con una tabla que no son columnas simples: revisar a mano"
+        return columns, [f"COUNT = count({columns[0]})"], None
+    variables: list[str] = []
+    for text in statements:
+        m = re.match(r"\s*var\s+(.+?)\s*;?\s*$", text, re.IGNORECASE)
+        if m:
+            variables += [value.split(".")[-1] for value in m.group(1).split()]
+    if not variables:
+        return [], [], (
+            f"PROC {proc.upper()} sin VAR: agregaría todas las variables numéricas del dataset y su esquema no se conoce"
+        )
+    # `output out=x mean=media std=desv;` manda; si no hay OUTPUT, SAS escribe las estadísticas por defecto.
+    requested: list[tuple[str, str]] = []
+    for text in statements:
+        if not re.match(r"\s*output\b", text, re.IGNORECASE):
+            continue
+        body = re.sub(r"\s*out\s*=\s*[^\s;]+(?:\s*\([^)]*\))?", "", text, flags=re.IGNORECASE)
+        requested += [
+            (stat.lower(), alias)
+            for stat, alias in re.findall(r"([A-Za-z_]+)\s*=\s*(\w*)", body)
+            if stat.lower() != "out"
+        ]
+    if requested:
+        unsupported = sorted({stat for stat, _alias in requested if stat not in _MEANS_OPS})
+        if unsupported:
+            return [], [], (
+                f"PROC {proc.upper()} pide estadísticas sin equivalente directo en tAggregateRow ({', '.join(unsupported)})"
+            )
+        if len(variables) > 1 and any(alias for _stat, alias in requested):
+            return [], [], (
+                f"PROC {proc.upper()}: el OUTPUT da un solo nombre de salida para {len(variables)} variables; "
+                "SAS necesita AUTONAME y la lista de columnas de salida hay que fijarla a mano"
+            )
+    else:
+        requested = [(stat, "") for stat in _MEANS_DEFAULT]
+    operations = []
+    for stat, alias in requested:
+        for variable in variables:
+            name = alias or f"{variable}_{stat.capitalize()}"
+            operations.append(f"{name} = {_MEANS_OPS[stat]}({variable})")
+    return group, operations, None
+
+
+#: `IF cond THEN target = expr;` y su `ELSE target = expr;`: se pueden llevar a una expresión ternaria de tMap.
+_COND_ASSIGN = re.compile(r"^\s*if\s+(.+?)\s+then\s+(\w+)\s*=\s*(.+?)\s*;?\s*$", re.IGNORECASE | re.DOTALL)
+_ELSE_ASSIGN = re.compile(r"^\s*else\s+(\w+)\s*=\s*(.+?)\s*;?\s*$", re.IGNORECASE | re.DOTALL)
+
+#: Clave de un formato que no es un valor suelto: rango, comparación u OTHER (necesita lógica, no una tabla).
+_FORMAT_RANGE = re.compile(r"<-?|-|\b(?:low|high|other)\b|[<>&]", re.IGNORECASE)
+
+
+def _format_needs_logic(key: str) -> bool:
+    """Una clave vacía es el valor perdido y un rango exige lógica: ninguna de las dos es una fila de lookup."""
+    return not key.strip() or bool(_FORMAT_RANGE.search(key))
+
+_LIST_INPUT = re.compile(r"^\s*input\s+(.+?)\s*;?\s*$", re.IGNORECASE | re.DOTALL)
+_DLM = re.compile(r"\b(?:dlm|delimiter)\s*=\s*'?(.)'?", re.IGNORECASE)
+
+
+def _inline_data(
+    details: dict[str, object],
+) -> tuple[list[tuple[str, str]], list[list[str]], str | None]:
+    """Esquema y filas de un bloque `datalines` de entrada por lista (WP2).
+
+    Devuelve `(columnas, filas, motivo)`. Si el SAS usa entrada por columnas (`@1`, `#2`) o por grupos, o una fila no
+    tiene el número de valores del `INPUT`, **no se inventa nada**: se devuelve el motivo para que quede como pendiente.
+    """
+    rows = [str(r) for r in details.get("rows") or []]
+    statements = [str(s) for s in details.get("statements") or []]
+    spec = next((s for s in statements if re.match(r"^\s*input\b", s, re.IGNORECASE)), None)
+    if spec is None:
+        return [], [], "El bloque `datalines` no trae una sentencia `INPUT`: revisar a mano"
+    body = _LIST_INPUT.match(spec.split(";")[0]).group(1) if _LIST_INPUT.match(spec.split(";")[0]) else ""
+    if not body or any(ch in body for ch in "@#("):
+        return [], [], (
+            "Datos incrustados con entrada por columnas, punteros o grupos: el mapeo a tFixedFlowInput necesita revisión manual"
+        )
+    tokens = body.split()
+    columns: list[tuple[str, str]] = []
+    index = 0
+    while index < len(tokens):
+        name = tokens[index]
+        if not re.fullmatch(r"[A-Za-z_]\w*", name):
+            return [], [], f"Nombre de columna no reconocido en INPUT ({name!r}): revisar a mano"
+        index += 1
+        char = False
+        if index < len(tokens) and tokens[index].startswith("$"):
+            char = True
+            index += 1
+        elif index < len(tokens) and re.fullmatch(r"[A-Za-z_$][\w$]*\d+\.\d*|\$?\d+\.\d*", tokens[index]):
+            index += 1  # formato numérico (8., best12., comma10.2)
+        columns.append((name, "String" if char else "Double"))
+    if not columns:
+        return [], [], "El `INPUT` no declara columnas utilizables: revisar a mano"
+    infile = next((s for s in statements if re.match(r"^\s*infile\b", s, re.IGNORECASE)), "")
+    dlm = _DLM.search(infile)
+    delimiter = dlm.group(1) if dlm else None
+    parsed: list[list[str]] = []
+    for row in rows:
+        if not row:
+            continue
+        values = [v for v in (row.split(delimiter) if delimiter else row.split())]
+        values = [v.strip().strip("\"'") for v in values]
+        if len(values) != len(columns):
+            return [], [], (
+                "Las filas de `datalines` no coinciden con las columnas del `INPUT` (¿texto con espacios?): revisar a mano"
+            )
+        parsed.append(values)
+    if not parsed:
+        return [], [], "El bloque `datalines` está vacío: no hay datos que cargar"
+    return columns, parsed, None
 
 
 def _format_rows(statements: list[str]) -> list[tuple[str, str, str]]:
@@ -183,13 +342,17 @@ def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", s.lower()).strip("_")
 
 
-def unique_job_names(plans: list[JobPlan]) -> None:
+def unique_job_names(
+    plans: list[JobPlan],
+    name_with_folders: Callable[[tuple[str, ...], int], str] | None = None,
+) -> None:
     """Hace únicos los nombres de Job del proyecto: Talend no admite dos Jobs con el mismo nombre.
 
     Solo se renombran los que chocan, añadiendo carpetas del programa de dentro hacia fuera
     (`DB2/bulkload.sas` y `Hadoop/bulkload.sas` pasan a `job_db2_bulkload` y `job_hadoop_bulkload`).
     Si aun así dos rutas dan el mismo nombre, se añade un número.
     """
+    name_with_folders = name_with_folders or _job_name_with_folders
     by_name: dict[str, list[JobPlan]] = {}
     for plan in plans:
         by_name.setdefault(plan.job_name, []).append(plan)
@@ -200,11 +363,11 @@ def unique_job_names(plans: list[JobPlan]) -> None:
         parts = [PurePosixPath(plan.program.replace("\\", "/")).parts for plan in group]
         depth = 1
         while depth < max(len(item) for item in parts):
-            candidates = [_job_name_with_folders(item, depth) for item in parts]
+            candidates = [name_with_folders(item, depth) for item in parts]
             if len(set(candidates)) == len(candidates) and not taken.intersection(candidates):
                 break
             depth += 1
-        candidates = [_job_name_with_folders(item, depth) for item in parts]
+        candidates = [name_with_folders(item, depth) for item in parts]
         for plan, candidate in zip(group, candidates, strict=True):
             final, number = candidate, 2
             while final in taken:
@@ -239,9 +402,28 @@ def _macro_call_arguments(raw: str, params: list[str]) -> dict[str, str]:
     return result
 
 
+#: Políticas de reportes de `docs/conventions.md` (WP3): registrar en el log, exportar a CSV o descartar.
+REPORT_POLICIES = {"log": "tLogRow", "csv": "tFileOutputDelimited", "discard": "ninguno"}
+
+
 class _Planner:
-    def __init__(self, rules: MappingRules, libs: dict[str, LibraryRef], file: str):
+    def __init__(
+        self,
+        rules: MappingRules,
+        libs: dict[str, LibraryRef],
+        file: str,
+        report_policy: str = "log",
+        environment: EnvironmentCatalog | None = None,
+        table_action: str = "drop_create",
+    ):
+        if report_policy not in REPORT_POLICIES:
+            raise ValueError(
+                f"Política de reportes desconocida: {report_policy!r} (admitidas: {', '.join(REPORT_POLICIES)})"
+            )
         self.rules, self.libs, self.file = rules, libs, file
+        self.report_policy = report_policy
+        self.environment = environment
+        self.table_action = table_action
         self.catalog = load_catalog()
         self.cases: list[ValidationCase] = []
         self.used_libs: set[str] = set()
@@ -277,6 +459,15 @@ class _Planner:
                     [],
                     [f"Librería {lib} usa el motor {eng}"],
                 )
+            # El SAS puede no traer el LIBNAME (vive en un autoexec): lo dice el catálogo de entorno.
+            catalog_library = self.environment.library(lib) if self.environment else None
+            if catalog_library and catalog_library.engine.casefold() in self.rules.engines:
+                return (
+                    self.rules.engines[catalog_library.engine.casefold()][side],
+                    rule.alternatives,
+                    [],
+                    [f"Librería {lib} según el catálogo de entorno: motor {catalog_library.engine}"],
+                )
             where = f" en {ref.path}" if ref and ref.path else ""
             return (
                 "por_determinar",
@@ -296,20 +487,27 @@ class _Planner:
     # ---- valores por operación ----
     def fill(
         self, op: IROperation, comp: str
-    ) -> tuple[dict[str, str | None], list[Expression], list[SchemaColumn], list[str]]:
+    ) -> tuple[
+        dict[str, str | None], list[Expression], list[SchemaColumn], list[str], dict[str, object]
+    ]:
         d, line = op.details, op.evidence.line
         props: dict[str, str | None] = {}
         exprs: list[Expression] = []
         cols: list[SchemaColumn] = []
         pend: list[str] = []
+        component_tables: dict[str, object] = {}
         origin = f"SAS {op.evidence.file}:{line}"
 
         def col(name: str | None) -> None:
             if name and name != "*" and all(c.name != name for c in cols):
                 cols.append(SchemaColumn(name=name, origin=origin))
 
+        kinds: dict[str, str] = {}
+
         def expr(sas: str, ln: int | None = None, target: str | None = None) -> Expression:
             t = translate(sas)
+            if target:
+                kinds[target] = t.kind
             e = Expression(
                 sas=sas,
                 talend=t.talend,
@@ -333,13 +531,57 @@ class _Planner:
                 )
                 props["USE_INTABLE"] = "true"
                 props["INTABLE"] = "\n".join(" | ".join(r) for r in rows)
+                risky = sorted({r[1] for r in rows if _format_needs_logic(r[1])})
+                if risky:
+                    pend.append(
+                        "El formato tiene rangos u OTHER ("
+                        + ", ".join(risky[:5])
+                        + "): necesita lógica equivalente, no solo una tabla de valores"
+                    )
+        elif op.type == "inline_data":
+            columns, rows, problem = _inline_data(d)
+            if problem:
+                pend.append(problem)
+            else:
+                for name, kind in columns:
+                    cols.append(SchemaColumn(name=name, talend_type=kind, origin=origin))
+                props["USE_SINGLEMODE"] = "true"
+                props["NB_ROWS"] = str(len(rows))
+                component_tables["VALUES"] = {
+                    "columns": [name for name, _kind in columns],
+                    "rows": [dict(zip((c for c, _k in columns), row, strict=True)) for row in rows],
+                }
         elif op.type in ("read", "write", "append"):
             datasets = op.outputs if op.type == "append" else op.inputs or op.outputs
             ds = datasets[0] if datasets else ""
             props["TABLE"] = ds.split(".")[-1] if ds else None
-            if op.type == "write":  # DATA lib.x reemplaza el dataset
-                props["TABLE_ACTION"], props["DATA_ACTION"] = "DROP_CREATE", "INSERT"
-                pend.append("Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo")
+            # El catálogo de entorno dice a qué tabla física y con qué columnas (WP5/WP6).
+            entry = self.environment_dataset(ds) if ds else None
+            if entry is not None:
+                props["TABLE"] = entry.physical
+                for column in entry.columns:
+                    cols.append(
+                        SchemaColumn(
+                            name=column.name,
+                            talend_type=column.talend_type,
+                            nullable=column.nullable,
+                            length=column.length,
+                            precision=column.precision,
+                            origin="catálogo de entorno",
+                        )
+                    )
+            actions = {
+                "drop_create": ("DROP_CREATE", "INSERT"),
+                "truncate": ("CLEAR", "INSERT"),
+                "append": ("NONE", "INSERT"),
+            }
+            if op.type == "write":  # DATA lib.x reemplaza el dataset: la acción es del proyecto, no del Job
+                if self.table_action not in actions:
+                    pend.append(
+                        f"Acción al escribir desconocida ({self.table_action}): usar drop_create, truncate o append"
+                    )
+                else:
+                    props["TABLE_ACTION"], props["DATA_ACTION"] = actions[self.table_action]
             elif op.type == "append":
                 props["TABLE_ACTION"], props["DATA_ACTION"] = "NONE", "INSERT"
                 if re.search(r"\bforce\b", str(d.get("options") or ""), re.IGNORECASE):
@@ -436,11 +678,16 @@ class _Planner:
             for g in gb:
                 col(g.split(".")[-1])
             if d.get("proc"):
-                pend.append(
-                    "Mapear las estadísticas de PROC "
-                    + d["proc"].upper()
-                    + " a operaciones de agregación"
-                )
+                proc_group, proc_ops, reason = _proc_aggregate(str(d["proc"]).lower(), d)
+                if reason:
+                    pend.append(reason)
+                else:
+                    props["GROUPBYS"] = ", ".join(proc_group) or None
+                    props["OPERATIONS"] = "; ".join(proc_ops) or None
+                    for name in proc_group:
+                        col(name)
+                    for operation in proc_ops:
+                        col(operation.split(" = ")[0])
         elif op.type == "sort":
             keys = [_sort_key(key) for key in d.get("keys", [])]
             props["CRITERIA"] = ", ".join(
@@ -480,17 +727,90 @@ class _Planner:
             for a in d.get("assignments", []):
                 expr(a["expression"], a["line"], a["target"])
                 col(a["target"])
-            for cnd in d.get("conditionals", []):
+            conditionals = d.get("conditionals", [])
+            index = 0
+            untranslated = 0
+            while index < len(conditionals):
+                cnd = conditionals[index]
+                m = _COND_ASSIGN.match(str(cnd["text"]))
+                if not m:
+                    # `else` suelto, `then do;` o una cadena de condiciones: no hay ternaria segura.
+                    exprs.append(
+                        Expression(
+                            sas=cnd["text"],
+                            talend=None,
+                            line=cnd["line"],
+                            warnings=["Condicional IF/ELSE sin traducción automática"],
+                        )
+                    )
+                    untranslated += 1
+                    index += 1
+                    continue
+                condition, target, when_true = m.group(1), m.group(2), m.group(3)
+                when_false, consumed = None, 1
+                if index + 1 < len(conditionals):
+                    e = _ELSE_ASSIGN.match(str(conditionals[index + 1]["text"]))
+                    if e and e.group(1) == target:
+                        when_false, consumed = e.group(2), 2
+                t_cond, t_true = translate(condition), translate(when_true)
+                t_false = translate(when_false) if when_false is not None else None
+                # Sin ELSE, SAS deja el valor perdido: `null` es compatible con cualquier tipo del lado verdadero.
+                kinds[target] = (
+                    t_true.kind if t_false is None or t_false.kind == t_true.kind else "any"
+                )
+                if (
+                    t_cond.kind != "bool"
+                    or not t_cond.talend
+                    or not t_true.talend
+                    or (t_false is not None and not t_false.talend)
+                ):
+                    exprs.append(
+                        Expression(
+                            sas=" ".join(
+                                str(conditionals[i]["text"]) for i in range(index, index + consumed)
+                            ),
+                            talend=None,
+                            line=cnd["line"],
+                            warnings=["Condicional IF/THEN sin traducción automática de la condición o los valores"],
+                        )
+                    )
+                    untranslated += 1
+                    index += consumed
+                    continue
+                else_java = t_false.talend if t_false is not None else "null"
                 exprs.append(
                     Expression(
-                        sas=cnd["text"],
-                        talend=None,
+                        sas=" ".join(str(conditionals[i]["text"]) for i in range(index, index + consumed)),
+                        talend=f"({t_cond.talend} ? {t_true.talend} : {else_java})",
+                        target=target,
                         line=cnd["line"],
-                        warnings=[
-                            "Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow"
-                        ],
+                        warnings=t_cond.warnings + t_true.warnings + (t_false.warnings if t_false else []),
                     )
                 )
+                for name in t_cond.columns + t_true.columns + (t_false.columns if t_false else []):
+                    col(name)
+                col(target)
+                index += consumed
+            if untranslated:
+                pend.append("Condicional IF/ELSE sin traducción automática: revisar a mano")
+            # El tipo de una columna calculada sale de la propia expresión (aritmética -> numérico, texto -> cadena).
+            # Solo queda pendiente lo que el traductor no sabe tipar.
+            talend_type = {"num": "Double", "str": "String", "bool": "Boolean", "date": "Date"}
+            untyped = [
+                target
+                for target in (a["target"] for a in d.get("assignments", []))
+                if target not in kinds
+            ]
+            for target, expression_kind in kinds.items():
+                kind = talend_type.get(expression_kind)
+                if not kind:
+                    untyped.append(target)
+                    continue
+                for column in cols:
+                    if column.name == target:
+                        column.talend_type = kind
+            if untyped:
+                pend.append("Tipos de las columnas calculadas")
             props["Expressions"] = (
                 f"{len(d.get('assignments', []))} asignaciones, {len(d.get('conditionals', []))} condicionales"
             )
@@ -543,17 +863,53 @@ class _Planner:
             props["PROCESS"] = d.get("path")
         elif op.type == "os_command":
             props["COMMAND"] = d.get("text")
-        return props, exprs, cols, pend
+        return props, exprs, cols, pend, component_tables
+
+    def environment_dataset(self, reference: str) -> EnvironmentDataset | None:
+        """El dataset del catálogo que corresponde a `lib.nombre`; `None` si no lo declara o es temporal."""
+        if self.environment is None or not reference or "&" in reference or "%" in reference:
+            return None
+        lib, _, name = reference.partition(".")
+        if not name:
+            return None
+        return self.environment.dataset(lib, name)
+
+    def report(self, values: dict[str, str | None], pend: list[str]) -> tuple[str, list[str]]:
+        """Qué se hace con un reporte (PROC PRINT/REPORT/TABULATE) segun la política del proyecto (WP3).
+
+        `log` (valor por defecto): el reporte se registra con `tLogRow`, sin pendiente, porque el SAS ya trae lo que hay
+        que mostrar. `csv` necesita una ruta de contexto, que sí queda como pendiente. `discard` lo descarta y lo deja
+        anotado en el paso, para que el informe diga qué se perdió.
+        """
+        comp = REPORT_POLICIES[self.report_policy]
+        if self.report_policy == "log":
+            values["BASIC_MODE"] = "true"
+        elif self.report_policy == "csv":
+            pend.append(
+                "Ruta del archivo de salida del reporte (política CSV): crear la variable de contexto path_<reporte>"
+            )
+        return comp, pend
 
     # ---- conversión de una operación ----
     def step(self, op: IROperation, order: int, prefix: str) -> PlanStep:
         rule = self.rules.operations.get(op.type) or self.rules.operations["unsupported"]
         comp, alts, pend, assume = self.component(op, rule)
-        values, exprs, cols, pend2 = self.fill(op, comp)
-        component_tables: dict[str, object] = {}
+        values, exprs, cols, pend2, component_tables = self.fill(op, comp)
+        if op.type == "report":
+            comp, pend2 = self.report(values, pend2)
         offline_configured = False
         filter_semantic_warning = False
-        if op.type in {"read_file", "write_file"}:
+        if op.type in ("read", "write", "append"):
+            # Con el dataset en el catálogo, tabla y esquema están decididos: no queda pendiente de datos.
+            datasets = op.outputs if op.type == "append" else op.inputs or op.outputs
+            offline_configured = bool(datasets) and self.environment_dataset(datasets[0]) is not None
+        if op.type == "report":
+            # La política del proyecto decide el componente; no queda decision pendiente (salvo la ruta del CSV).
+            offline_configured = self.report_policy in {"log", "discard"}
+        elif op.type == "format_definition":
+            # Un formato que solo traduce valores sueltos es una tabla de lookup: no queda decisión pendiente.
+            offline_configured = bool(values.get("INTABLE")) and not pend2
+        elif op.type in {"read_file", "write_file"}:
             file_config = op.details.get("offline_file_config")
             offline_configured = bool(isinstance(file_config, dict) and file_config.get("ready"))
         elif op.type == "filter" and op.details.get("offline_schema"):
@@ -676,7 +1032,12 @@ class _Planner:
             tests=tests,
             evidence=op.evidence,
             confidence=op.confidence,
-            status="pendiente" if pending else "propuesto",
+            status="pendiente"
+            if pending
+            else ("descartado" if op.type == "report" and self.report_policy == "discard" else "propuesto"),
+            note=f"Descartado por la política de reportes del proyecto ({self.report_policy})"
+            if op.type == "report" and self.report_policy == "discard"
+            else None,
             requires_semantic_validation=sem,
         )
 
@@ -816,9 +1177,12 @@ def plan_program(
     libraries: dict[str, LibraryRef],
     unresolved: list[str] | None = None,
     orchestration: Orchestration | None = None,
+    report_policy: str = "log",
+    environment: EnvironmentCatalog | None = None,
+    table_action: str = "drop_create",
 ) -> JobPlan:
     libs = {**libraries, **{x.name.lower(): x for x in ir.libraries}}
-    pl = _Planner(rules, libs, ir.file)
+    pl = _Planner(rules, libs, ir.file, report_policy, environment, table_action)
     source_macro = Path(ir.file.replace("\\", "/")).stem.casefold()
     entry_definition = next((macro for macro in ir.macros if macro.name.casefold() == source_macro), None)
     entry_calls = [

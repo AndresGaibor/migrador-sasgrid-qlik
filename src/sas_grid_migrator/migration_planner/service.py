@@ -4,9 +4,14 @@ import json
 from collections import defaultdict
 
 from sas_grid_migrator.dependency_graph.builder import build_dependencies, load_dependencies
+from sas_grid_migrator.environment.catalog import load_if_present
 from sas_grid_migrator.intermediate_representation.builder import build_ir
 from sas_grid_migrator.intermediate_representation.models import LibraryRef
 from sas_grid_migrator.macro_resolver.resolver import macro_index
+from sas_grid_migrator.migration_planner.job_naming import (
+    DEFAULT_NAME_TEMPLATE,
+    render_job_name,
+)
 from sas_grid_migrator.migration_planner.models import JobPlan, Orchestration, PlanSet
 from sas_grid_migrator.migration_planner.offline_files import configure_offline_file_operations
 from sas_grid_migrator.migration_planner.planner import (
@@ -24,9 +29,56 @@ from sas_grid_migrator.semantic_analysis.classify import load_rules
 from sas_grid_migrator.talend_adapter.naming import cap_job_name
 
 VALID_STATUS = {"propuesto", "pendiente", "verificado", "validado_manualmente", "descartado"}
+NAME_TEMPLATE_KEY = "job_name_template"
 
 
-def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSet:
+def current_name_template(store: Store) -> str:
+    return store.get_setting(NAME_TEMPLATE_KEY, DEFAULT_NAME_TEMPLATE) or DEFAULT_NAME_TEMPLATE
+
+
+def exclude_uninstalled_components(
+    plans: PlanSet, installed_components: set[str] | frozenset[str]
+) -> None:
+    """No propone componentes ni alternativas que no existan en el Studio activo."""
+    installed = {name.casefold() for name in installed_components}
+
+    def available(name: str) -> bool:
+        return name.split(" ", 1)[0].casefold() in installed
+
+    for recommendation in plans.grid_recommendations:
+        name = recommendation.component_candidate
+        if name and not available(name):
+            recommendation.status = "unsupported"
+            recommendation.component_candidate = None
+            recommendation.doc_url = None
+            recommendation.reason += f" El componente {name} no está instalado en este Studio."
+
+    for plan in plans.plans:
+        for step in plan.steps + [step for child in plan.children for step in child.steps]:
+            step.alternatives = [name for name in step.alternatives if available(name)]
+            step.variants = [name for name in step.variants if available(name)]
+            name = step.component_candidate
+            if name in {"por_determinar", "ninguno"} or available(name):
+                continue
+            step.component_candidate = "por_determinar"
+            step.action = "manual_decision"
+            step.in_catalog = False
+            step.doc_url = None
+            step.pending.append(f"El componente {name} no está instalado en este Studio; elegir una alternativa disponible.")
+            step.status = "pendiente"
+            plan.job_status = "needs_review"
+
+
+def generate_plans(
+    store: Store,
+    project_id: str,
+    fresh: bool = False,
+    report_policy: str | None = None,
+    installed_components: set[str] | frozenset[str] | None = None,
+) -> PlanSet:
+    """Genera los planes. La política de reportes sale de la configuración del proyecto (WP3)."""
+    report_policy = report_policy or store.settings.report_policy
+    table_action = store.settings.table_action
     """Genera los planes. Reutiliza el análisis persistido salvo `fresh` o reglas distintas."""
     analysis = None if fresh else load_analysis(store, project_id)
     if analysis is None or analysis.rules_version != load_rules().version:
@@ -36,6 +88,7 @@ def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSe
     deps = deps or build_dependencies(store, project_id)
     rules = load_mapping_rules()
     grid_catalog = load_grid_catalog()
+    environment = load_if_present(store.environment_path(project_id), set(rules.engines))
     macro_files = {name: defs[0][0] for name, defs in macro_index(analysis.programs).items()}
     libs = {
         x.name.lower(): LibraryRef(name=x.name, engine=x.engine, path=x.path)
@@ -125,8 +178,32 @@ def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSe
             downstream=sorted(down[prog.file]),
             grid_recommendations=grid_by_program[prog.file],
         )
-        plans.append(plan_program(ir, project_id, rules, libs, pending[prog.file], orch))
-    unique_job_names(plans)
+        plans.append(
+            plan_program(
+                ir,
+                project_id,
+                rules,
+                libs,
+                pending[prog.file],
+                orch,
+                report_policy,
+                environment,
+                table_action,
+            )
+        )
+    project = store.get_project(project_id)
+    project_name = project.name if project else project_id
+    template = current_name_template(store)
+    for plan in plans:
+        plan.job_name = render_job_name(
+            template, project=project_name, program=plan.program
+        )
+    unique_job_names(
+        plans,
+        lambda parts, depth: render_job_name(
+            template, project=project_name, program="/".join(parts), depth=depth
+        ),
+    )
     for plan in plans:
         plan.job_name = cap_job_name(plan.job_name)
     ps = PlanSet(
@@ -135,29 +212,71 @@ def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSe
         plans=plans,
         grid_recommendations=all_grid,
     )
+    if installed_components is not None:
+        exclude_uninstalled_components(ps, installed_components)
     write_text_atomic(store.plans_path(project_id), ps.model_dump_json())
     return ps
 
 
-def _overlay(store: Store, ps: PlanSet) -> PlanSet:
+def _overlay(store: Store, ps: PlanSet, *, with_edits: bool = True) -> PlanSet:
     states = store.get_step_states(ps.project_id)
     for plan in ps.plans:
-        for step in plan.steps + [s for c in plan.children for s in c.steps]:
-            st = states.get((plan.program, step.id))
-            if st:
-                step.status, step.note = st[0], st[1]  # type: ignore[assignment]
+        steps = plan.steps + [step for child in plan.children for step in child.steps]
+        for step in steps:
+            state = states.get((plan.program, step.id))
+            if state:
+                step.status, step.note = state[0], state[1]  # type: ignore[assignment]
+    if not with_edits:
+        return ps
+
+    overrides = store.get_job_overrides(ps.project_id)
+    reserved = {plan.job_name.casefold() for plan in ps.plans}
+    accepted: set[str] = set()
+    for plan in sorted(ps.plans, key=lambda item: item.program):
+        override = overrides.get(plan.program)
+        if override is None:
+            continue
+        if override.job_name:
+            candidate = override.job_name
+            key = candidate.casefold()
+            same_name = key == plan.job_name.casefold()
+            if same_name or (key not in reserved and key not in accepted):
+                plan.job_name = candidate
+                plan.job_name_edited = not same_name
+                accepted.add(key)
+            else:
+                plan.rename_ignored = candidate
+        plan.description = override.description
+
+    expression_overrides = store.get_expression_overrides(ps.project_id)
+    for plan in ps.plans:
+        for step in plan.steps + [step for child in plan.children for step in child.steps]:
+            for index, expression in enumerate(step.expressions):
+                override = expression_overrides.get((plan.program, step.id, index))
+                if override is None or expression.sas != override[0]:
+                    continue
+                expression.talend = override[1]
+                expression.talend_edited = True
     return ps
 
 
-def load_plans(store: Store, project_id: str) -> PlanSet | None:
+def load_plans(
+    store: Store, project_id: str, *, with_edits: bool = True
+) -> PlanSet | None:
     p = store.plans_path(project_id)
     if not p.exists():
         return None
-    return _overlay(store, PlanSet.model_validate(json.loads(p.read_text(encoding="utf-8"))))
+    return _overlay(
+        store,
+        PlanSet.model_validate(json.loads(p.read_text(encoding="utf-8"))),
+        with_edits=with_edits,
+    )
 
 
-def get_plan(store: Store, project_id: str, program: str) -> JobPlan | None:
-    ps = load_plans(store, project_id)
+def get_plan(
+    store: Store, project_id: str, program: str, *, with_edits: bool = True
+) -> JobPlan | None:
+    ps = load_plans(store, project_id, with_edits=with_edits)
     return next((p for p in ps.plans if p.program == program), None) if ps else None
 
 

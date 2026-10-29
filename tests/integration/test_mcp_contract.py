@@ -150,11 +150,29 @@ def test_published_tools_cover_the_contract(mcp_server):
     assert not missing, f"el preset portal no publica: {', '.join(missing)}"
 
 
+def test_component_icon_tool_returns_a_valid_talend_result(mcp_server):
+    import asyncio
+
+    result = asyncio.run(McpCaller(mcp_server.url).call("talend_component_icon", {"name": "tJava"}))
+
+    assert result["ok"] is True
+    assert result["source"] == "talend_component_icon"
+    assert isinstance(result["data"]["available"], bool)
+    if result["data"]["available"]:
+        assert result["data"]["svg"].lstrip().startswith("<svg")
+
+
 def test_the_restart_tool_is_published_with_the_options_the_portal_sends(mcp_server):
     contract = load_contract()
     tools = {tool["name"]: tool for tool in _published(mcp_server)}
 
     assert {"onlyIfMemoryAbove", "force"} <= tools[contract.restart_tool]["inputSchema"]["properties"].keys()
+
+
+def test_component_inventory_tool_can_list_every_palette(mcp_server):
+    tools = {tool["name"]: tool for tool in _published(mcp_server)}
+
+    assert "paletteType" in tools["talend_studio_list_components"]["inputSchema"]["properties"]
 
 
 def test_the_offline_write_tool_is_published_with_the_fields_the_portal_sends(mcp_server):

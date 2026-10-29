@@ -111,6 +111,13 @@ Al cambiar una llamada de UI, revisa en conjunto: ruta FastAPI, modelo/serializa
 tipos de `apps/web/src/api.ts`, estados de carga/error y prueba de la vista. No dupliques reglas de
 negocio dentro del componente React.
 
+`GET /api/projects/{id}/events` es un flujo SSE (`text/event-stream`) de solo lectura: emite
+`event: activity` cuando cambia el análisis o el lote, con una instantánea mínima
+(`src/sas_grid_migrator/migration_planner/activity.py`) y `: ping` cada 15 s. La UI lo consume con
+`useProjectEvents` (`apps/web/src/project-events.ts`); el evento es un disparador, no una fuente de
+datos: quien lo recibe vuelve a pedir sus rutas de siempre. Si la conexión falla o el navegador no
+soporta `EventSource`, cada vista conserva su sondeo. No añadas lógica de negocio a la instantánea.
+
 ## Aplicación en Talend: pasos y límites
 
 Antes de un lote, usa el preflight/resumen vigente y comprueba el destino, conflictos, proyecto
@@ -160,6 +167,18 @@ preset `portal` en `mcp/talend-mcp/src/server/registered-tools/preset-sets.ts` y
 3. Añade prueba de integración API y de UI/CLI en su frontera pública; para SQLite, prueba también
    lectura, persistencia y migración de esquema si aplica.
 4. Actualiza este mapa/README cuando cambie el flujo, el permiso, los comandos o los límites.
+
+### Ediciones humanas sobre el plan
+
+1. Nombre y descripción del Job, expresiones editadas y renombrados masivos viven en
+   `job_overrides` y `expression_overrides`; la plantilla de nombres, en `portal_settings`.
+2. `load_plans(store, id)` superpone esas capas al leer; `load_plans(..., with_edits=False)` es la
+   carga cruda. `plans.json` nunca se escribe con ediciones: regenerar las conserva si el SAS
+   coincide y las ignora en caso contrario (el choque de nombre queda en `rename_ignored`).
+3. Preflight, lote, aplicaciones y exportaciones consumen la carga con ediciones. Un consumidor
+   nuevo no debe leer `plans.json` por su cuenta.
+4. Pruebas: `tests/unit/test_plan_edits.py`, `tests/unit/test_store_overrides.py` y
+   `tests/integration/test_api_plan_edits.py`.
 
 ## Pruebas y comandos
 

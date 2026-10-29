@@ -113,15 +113,13 @@
         }
       ]
     },
-    "inline_data": {
-      "component": "tFixedFlowInput",
-      "alternatives": [],
-      "properties": [
-        "VALUES"
-      ],
-      "required": [
-        "Confirmar los datos incrustados"
-      ],
+  "inline_data": {
+    "component": "tFixedFlowInput",
+    "alternatives": [],
+    "properties": [
+      "VALUES"
+    ],
+    "required": [],
       "tests": [
         {
           "kind": "row_count",
@@ -303,9 +301,7 @@
         "Expressions",
         "Var table"
       ],
-      "required": [
-        "Tipos de las columnas calculadas"
-      ],
+      "required": [],
       "tests": [
         {
           "kind": "nulls",
@@ -496,18 +492,18 @@
       ],
       "tests": []
     },
-    "report": {
-      "component": "ninguno",
-      "alternatives": [
-        "tLogRow",
-        "tFileOutputDelimited"
-      ],
-      "properties": [],
-      "required": [
-        "Decidir si el reporte se migra o se descarta"
-      ],
-      "tests": []
-    },
+  "report": {
+    "component": "tLogRow",
+    "alternatives": [
+      "tFileOutputDelimited",
+      "ninguno"
+    ],
+    "properties": [
+      "BASIC_MODE"
+    ],
+    "required": [],
+    "tests": []
+  },
     "maintenance": {
       "component": "tDBRow",
       "alternatives": [

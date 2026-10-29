@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAsync } from "../hooks";
 import { processingLabel } from "../project-workspace";
+import { useProjectEvents } from "../project-events";
 import { formatErrorMessage, notifyError, notifySuccess } from "../errors";
 import type { ProjectProcessing } from "../types";
 import { Icon } from "./Icon";
@@ -16,14 +17,15 @@ export function ProjectProcessingStatus({
   onRetry?: () => void;
 }) {
   const state = useAsync(() => api.processing(projectId), [projectId]);
+  const events = useProjectEvents(projectId, state.reload);
   const [retrying, setRetrying] = useState(false);
   const [retryError, setRetryError] = useState<string>();
 
   useEffect(() => {
-    if (!state.data || !isActive(state.data.status)) return;
+    if (events.connected || !state.data || !isActive(state.data.status)) return;
     const timer = window.setInterval(state.reload, 1500);
     return () => window.clearInterval(timer);
-  }, [state.data?.status, state.reload]);
+  }, [state.data?.status, state.reload, events.connected]);
 
   if (!archiveName) {
     return <div className="project-processing legacy" role="status"><Icon name="info" size={18} /><span><strong>Proyecto existente</strong> · No tiene un ZIP de origen registrado. Puedes continuar con su flujo de importación manual.</span></div>;

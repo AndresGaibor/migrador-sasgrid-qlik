@@ -92,6 +92,26 @@ def test_zip_upload_creates_an_isolated_project_and_runs_the_static_pipeline(
         assert "set other" in second_source
 
 
+def test_individual_txt_upload_creates_project_and_detects_sas_program(tmp_path, monkeypatch):
+    monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
+    source = b"libname source '/data';\n%let batch=1;\ndata work.daily;\nset source.daily;\nrun;\n"
+
+    with TestClient(api_module.app) as client:
+        response = client.post(
+            "/api/projects/uploads",
+            files={"file": ("Cod1.txt", source, "text/plain")},
+        )
+
+        assert response.status_code == 201, response.text
+        data = response.json()
+        assert data["project"]["name"] == "Cod1"
+        assert data["project"]["archive_name"] == "Cod1.txt"
+        project_id = data["project"]["id"]
+        assert client.get(f"/api/projects/{project_id}/processing").json()["status"] == "completed"
+        programs = client.get(f"/api/projects/{project_id}/programs").json()
+        assert [program["file"] for program in programs] == ["Cod1.txt"]
+
+
 def test_analysis_summary_is_retrievable_after_refresh_and_requires_analysis(tmp_path, monkeypatch):
     monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
     with TestClient(api_module.app) as client:
@@ -104,6 +124,28 @@ def test_analysis_summary_is_retrievable_after_refresh_and_requires_analysis(tmp
 
         assert summary.status_code == 200, summary.text
         assert summary.json()["programs"] == 1
+
+
+def test_project_progress_and_pending_summary_are_available_after_pipeline(tmp_path, monkeypatch):
+    monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
+    with TestClient(api_module.app) as client:
+        uploaded = _upload(
+            client,
+            "progress.zip",
+            _zip({"daily.sas": "data work.daily; set source.daily; run;"}),
+        )
+        project_id = uploaded.json()["project"]["id"]
+
+        progress = client.get(f"/api/projects/{project_id}/progress")
+        pending = client.get(f"/api/projects/{project_id}/pending-summary")
+
+    assert progress.status_code == 200, progress.text
+    assert [stage["key"] for stage in progress.json()["stages"]] == [
+        "upload", "analysis", "guides", "talend", "studio", "complete"
+    ]
+    assert progress.json()["stages"][0]["status"] == "done"
+    assert pending.status_code == 200, pending.text
+    assert isinstance(pending.json(), list)
 
 
 def test_invalid_zip_does_not_publish_an_empty_project(tmp_path, monkeypatch):

@@ -155,7 +155,8 @@ def _data_step(n: DataStep, c: _Ctx) -> list[IROperation]:
         if "rename" in o:
             add("rename", inputs=[dsid(i)], details={"mapping": o["rename"]})
     first = next((s for s in n.statements if s.kw in ("infile", "input")), None)
-    if first and not n.inputs:
+    if first and not n.inputs and not n.datalines_rows:
+        # Con `datalines` los datos están en el programa: un solo paso (`inline_data`), no una lectura de archivo.
         add(
             "read_file",
             line=first.line,
@@ -163,7 +164,15 @@ def _data_step(n: DataStep, c: _Ctx) -> list[IROperation]:
             confidence="medium",
         )
     if "datalines" in n.constructs:
-        add("inline_data", confidence="medium", notes=["Datos incrustados en el programa"])
+        add(
+            "inline_data",
+            details={
+                "rows": list(n.datalines_rows),
+                "statements": [s.text for s in n.statements if s.kw in ("infile", "input")],
+            },
+            confidence="medium",
+            notes=["Datos incrustados en el programa"],
+        )
     if n.input_kind == "merge":
         guess = guess_join_type(n.subsetting_if, [i.in_var for i in n.inputs])
         add(

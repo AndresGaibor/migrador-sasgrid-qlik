@@ -2,7 +2,19 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const source = await readFile(new URL("./PlansTab.tsx", import.meta.url), "utf8");
+// La interfaz del plan vive en varios módulos; el contrato se comprueba sobre el conjunto.
+const planSources = [
+  "PlansTab.tsx",
+  "plans/PlanList.tsx",
+  "plans/PlanDetail.tsx",
+  "plans/PlanBatchPanel.tsx",
+  "plans/PlanSteps.tsx",
+  "plans/PlanGrid.tsx",
+  "plans/plan-status.ts",
+];
+const source = (
+  await Promise.all(planSources.map((file) => readFile(new URL(`./${file}`, import.meta.url), "utf8")))
+).join("\n");
 const hooksSource = await readFile(new URL("../hooks.ts", import.meta.url), "utf8");
 
 test("project plans expose one ZIP-level Talend action and no per-guide write action", () => {

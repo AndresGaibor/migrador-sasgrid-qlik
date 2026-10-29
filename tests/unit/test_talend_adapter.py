@@ -185,6 +185,127 @@ def test_inspect_rejects_non_item_and_error_envelope():
         run(ad.inspect_job("/w/j.item"))
 
 
+def test_component_icon_reads_only_native_canvas_svg():
+    svg = '<svg xmlns="http://www.w3.org/2000/svg"/>'
+    caller = Fake({"talend_component_icon": {"data": {"available": True, "svg": svg}}})
+    ad = TalendAdapter(caller)
+
+    assert run(ad.component_icon("tJava")) == svg
+    assert caller.calls == [("talend_component_icon", {"name": "tJava"})]
+
+
+def test_component_icon_returns_none_when_studio_has_no_canvas_svg():
+    ad = TalendAdapter(Fake({"talend_component_icon": {"data": {"available": False}}}))
+
+    assert run(ad.component_icon("tDynamicGuessSchema")) is None
+
+
+def test_installed_component_names_requests_all_studio_palettes():
+    caller = Fake({
+        "talend_studio_list_components": {
+            "data": {"result": {"count": 3, "components": ["tMap", "tJava", "tMap"]}}
+        }
+    })
+    ad = TalendAdapter(caller)
+
+    assert run(ad.installed_component_names()) == ["tJava", "tMap"]
+    assert caller.calls == [("talend_studio_list_components", {"limit": 100000, "paletteType": "*"})]
+
+
+def test_installed_component_names_rejects_a_truncated_inventory():
+    ad = TalendAdapter(Fake({
+        "talend_studio_list_components": {
+            "data": {"result": {"count": 4, "components": ["tJava"]}}
+        }
+    }))
+
+    with pytest.raises(TalendError, match="truncado"):
+        run(ad.installed_component_names())
+
+
+def test_generated_plans_do_not_propose_components_absent_from_studio():
+    from types import SimpleNamespace
+
+    from sas_grid_migrator.migration_planner.service import exclude_uninstalled_components
+
+    unavailable = SimpleNamespace(
+        component_candidate="tMissing",
+        alternatives=["tMap", "tAlsoMissing"],
+        variants=["tJava", "tMissingVariant"],
+        pending=[],
+        status="propuesto",
+        action="add_component",
+        in_catalog=True,
+        doc_url="https://example.invalid",
+    )
+    present = SimpleNamespace(
+        component_candidate="tJava",
+        alternatives=["tMissing"],
+        variants=[],
+        pending=[],
+        status="propuesto",
+        action="add_component",
+        in_catalog=True,
+        doc_url=None,
+    )
+    recommendation = SimpleNamespace(
+        component_candidate="tMissing",
+        status="supported",
+        doc_url="https://example.invalid",
+        reason="Usar componente.",
+    )
+    plans = SimpleNamespace(
+        grid_recommendations=[recommendation],
+        plans=[SimpleNamespace(steps=[unavailable, present], children=[], job_status="proposed")],
+    )
+
+    exclude_uninstalled_components(plans, {"tJava", "tMap"})
+
+    assert unavailable.component_candidate == "por_determinar"
+    assert unavailable.action == "manual_decision"
+    assert unavailable.alternatives == ["tMap"]
+    assert unavailable.variants == ["tJava"]
+    assert unavailable.status == "pendiente"
+    assert plans.plans[0].job_status == "needs_review"
+    assert present.component_candidate == "tJava"
+    assert recommendation.component_candidate is None
+    assert recommendation.status == "unsupported"
+
+
+def test_component_icon_endpoint_serves_svg_from_studio(monkeypatch):
+    svg = '<svg xmlns="http://www.w3.org/2000/svg"/>'
+    name = "TApplyCodeAssertions"
+
+    class IconAdapter:
+        async def component_icon(self, name):
+            assert name == "TApplyCodeAssertions"
+            return svg
+
+    monkeypatch.setattr(TalendAdapter, "from_env", classmethod(lambda cls: IconAdapter()))
+    response = TestClient(api).get(f"/api/talend/catalog/{name}/icon")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("image/svg+xml")
+    assert response.text == svg
+
+
+def test_catalog_excludes_components_absent_from_the_installed_studio(monkeypatch):
+    import apps.api.integrations as integration_mod
+
+    class CatalogAdapter:
+        async def installed_component_names(self):
+            return ["tJava"]
+
+    monkeypatch.setattr(TalendAdapter, "from_env", classmethod(lambda cls: CatalogAdapter()))
+    monkeypatch.setattr(integration_mod, "_STUDIO_COMPONENT_NAMES", None)
+    response = TestClient(api).get("/api/talend/catalog?q=tJava")
+
+    assert response.status_code == 200
+    catalog = response.json()
+    assert catalog["official_component_names"] == ["tJava"]
+    assert [item["name"] for item in catalog["components"]] == ["tJava"]
+
+
 def test_policy_blocks_mutating_tools():
     ad = TalendAdapter(Fake({}))
     with pytest.raises(ToolNotAllowed):

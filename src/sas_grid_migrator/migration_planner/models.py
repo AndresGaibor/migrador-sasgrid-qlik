@@ -38,6 +38,7 @@ class Connection(BaseModel):
 class Expression(BaseModel):
     sas: str
     talend: str | None = None
+    talend_edited: bool = False
     target: str | None = None
     line: int
     requires_semantic_validation: bool = True
@@ -142,6 +143,9 @@ class JobPlan(BaseModel):
     program: str
     sha256: str | None = None
     job_name: str
+    description: str | None = None
+    job_name_edited: bool = False
+    rename_ignored: str | None = None
     job_status: Literal["proposed", "needs_review"] = "needs_review"
     steps: list[PlanStep] = []
     entry_macro: MacroEntrypoint | None = None

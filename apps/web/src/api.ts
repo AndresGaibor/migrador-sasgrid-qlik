@@ -1,4 +1,4 @@
-import type { CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, ProjectUploadResponse, Summary, TalendApplyBatchPreflight, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing } from "./types";
+import type { BulkRenameRule, CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, NamingTemplate, PendingSummary, PlanRow, Program, ProgramRow, Project, ProjectProgress, ProjectUploadResponse, RenamePreviewRow, Summary, TalendApplyBatchPreflight, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing, TranslateResult } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -64,6 +64,8 @@ export const api = {
   },
   inventory: (id: string) => req<Manifest>(`/projects/${id}/inventory`),
   processing: (id: string) => req<ProjectProcessing>(`/projects/${id}/processing`),
+  projectProgress: (id: string) => req<ProjectProgress>(`/projects/${id}/progress`),
+  pendingSummary: (id: string) => req<PendingSummary[]>(`/projects/${id}/pending-summary`),
   retryProcessing: (id: string) => post<ProjectProcessing>(`/projects/${id}/processing/retry`),
   analyze: (id: string) => post<Summary>(`/projects/${id}/analyses`),
   analysis: (id: string) => req<Summary | null>(`/projects/${id}/analyses`),
@@ -76,6 +78,18 @@ export const api = {
   plans: (id: string) => req<PlanRow[]>(`/projects/${id}/plans`),
   gridRecommendations: (id: string) => req<GridRecommendation[]>(`/projects/${id}/plans/grid-recommendations`),
   plan: (id: string, file: string) => req<JobPlan>(`/projects/${id}/plans/${enc(file)}`),
+  updateJobMeta: (id: string, file: string, job_name: string | null, description: string | null) =>
+    patch<{ plan: JobPlan; warnings: string[] }>(`/projects/${id}/plans/${enc(file)}/meta`, { job_name, description }),
+  editExpression: (id: string, file: string, step: string, index: number, talend: string | null) =>
+    patch<JobPlan>(`/projects/${id}/plans/${enc(file)}/steps/${encodeURIComponent(step)}/expressions/${index}`, { talend }),
+  translate: (sas: string) => post<TranslateResult>("/translator/translate", { sas }),
+  renamePreview: (id: string, rule: BulkRenameRule) => post<RenamePreviewRow[]>(`/projects/${id}/plans/rename-preview`, rule),
+  renameJobs: (id: string, renames: { program: string; job_name: string }[]) =>
+    post<{ renamed: number }>(`/projects/${id}/plans/rename`, { renames }),
+  namingTemplate: () => req<NamingTemplate>("/settings/naming"),
+  namingExample: (template: string) => post<{ name: string }>("/settings/naming/preview", { template }),
+  setNamingTemplate: (template: string) =>
+    req<NamingTemplate>("/settings/naming", { method: "PUT", body: JSON.stringify({ template }) }),
   decide: (id: string, file: string, step: string, status: string, note: string) =>
     req<JobPlan>(`/projects/${id}/plans/${enc(file)}/steps/${encodeURIComponent(step)}`, {
       method: "PATCH",

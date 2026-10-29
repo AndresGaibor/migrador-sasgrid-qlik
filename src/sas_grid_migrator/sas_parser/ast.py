@@ -85,6 +85,7 @@ class DataStep(BaseModel):
     arrays: list[str] = []
     n_assignments: int = 0
     n_conditionals: int = 0
+    datalines_rows: list[str] = []  # filas literales de `datalines`/`cards`, si el paso las trae
     functions: list[str] = []
     statements: list[StepStmt] = []
     constructs: list[str] = []

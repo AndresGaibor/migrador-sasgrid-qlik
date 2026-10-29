@@ -1,18 +1,20 @@
+import asyncio
 import hashlib
 import json
 import os
 import re
 import tempfile
 from collections import Counter
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
+from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 from threading import Condition
 from typing import Any
 
 from fastapi import BackgroundTasks, FastAPI, Form, HTTPException, UploadFile
-from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, StrictBool
 
@@ -26,8 +28,22 @@ from sas_grid_migrator.dependency_graph.builder import (
 from sas_grid_migrator.domain.models import Manifest, Project
 from sas_grid_migrator.domain.redaction import redact
 from sas_grid_migrator.ingestion.importer import ImportError_, import_source
+from sas_grid_migrator.migration_planner.activity import activity_changed, project_activity
+from sas_grid_migrator.migration_planner.expressions import talend_expressions_enabled, translate
+from sas_grid_migrator.migration_planner.job_naming import (
+    DEFAULT_NAME_TEMPLATE,
+    TEMPLATE_TOKENS,
+    BulkRule,
+    bulk_preview,
+    render_job_name,
+    validate_job_name,
+    validate_template,
+)
 from sas_grid_migrator.migration_planner.models import JobPlan, PlanSet
+from sas_grid_migrator.migration_planner.progress import compute_progress, pending_groups
 from sas_grid_migrator.migration_planner.service import (
+    NAME_TEMPLATE_KEY,
+    current_name_template,
     generate_plans,
     get_plan,
     load_plans,
@@ -132,7 +148,13 @@ def _run_project_pipeline(project_id: str, max_concurrency: int) -> None:
             stage=current_stage,
             message="Generando una guía por cada programa SAS.",
         )
-        generate_plans(s, project_id)
+        from .integrations import _installed_studio_component_names
+
+        generate_plans(
+            s,
+            project_id,
+            installed_components=asyncio.run(_installed_studio_component_names()),
+        )
         s.update_processing(
             project_id,
             status="completed",
@@ -250,8 +272,10 @@ async def create_project_from_zip(
     """Create one isolated project from a ZIP, then analyze it in the background."""
     s = store()
     archive_name = PurePosixPath((file.filename or "").replace("\\", "/")).name
-    if PurePosixPath(archive_name).suffix.lower() != ".zip":
-        raise HTTPException(422, "solo se permiten archivos .zip para crear un proyecto")
+    suffix = PurePosixPath(archive_name).suffix.lower()
+    if suffix not in {".zip", ".sas", ".txt"}:
+        raise HTTPException(422, "solo se permiten archivos .zip, .sas o .txt para crear un proyecto")
+    is_zip = suffix == ".zip"
     display_name = (name or PurePosixPath(archive_name).stem).strip()
     if not display_name or len(display_name) > 120:
         raise HTTPException(422, "el nombre del proyecto debe tener entre 1 y 120 caracteres")
@@ -263,7 +287,7 @@ async def create_project_from_zip(
         s.settings.data_dir.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=s.settings.data_dir) as tmp:
             temp_dir = Path(tmp)
-            archive_path = temp_dir / "upload.zip"
+            archive_path = temp_dir / ("upload.zip" if is_zip else archive_name)
             digest = hashlib.sha256()
             size = 0
             with archive_path.open("wb") as target:
@@ -273,9 +297,16 @@ async def create_project_from_zip(
                         raise HTTPException(413, "archivo demasiado grande")
                     digest.update(chunk)
                     target.write(chunk)
+            source_path = archive_path if is_zip else temp_dir / "single"
+            if not is_zip:
+                source_path.mkdir()
+                archive_path.rename(source_path / archive_name)
+                archive_path = source_path / archive_name
             staged_source = temp_dir / "staged" / "src"
             try:
-                files, skipped = import_source(archive_path, staged_source, s.settings)
+                files, skipped = import_source(
+                    archive_path if is_zip else source_path, staged_source, s.settings
+                )
             except ImportError_ as exc:
                 raise HTTPException(422, str(exc)) from exc
             if not files:
@@ -310,6 +341,38 @@ def project_processing(project_id: str) -> object:
     if state is None:
         raise HTTPException(409, "el proyecto aún no tiene procesamiento automático")
     return state
+
+
+@app.get("/api/projects/{project_id}/events")
+async def project_events(project_id: str) -> StreamingResponse:
+    """Canal SSE: avisa cuando cambia el análisis o el lote; el cliente relee sus datos."""
+    s = store()
+    _require(s, project_id)
+
+    async def stream() -> AsyncIterator[str]:
+        previous = None
+        revision = 0
+        idle = 0
+        while True:
+            current = project_activity(s, project_id)
+            if activity_changed(previous, current):
+                revision += 1
+                payload = {"revision": revision, **current}
+                yield f"event: activity\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
+                previous = current
+                idle = 0
+            else:
+                idle += 1
+                if idle >= 10:
+                    idle = 0
+                    yield ": ping\n\n"
+            await asyncio.sleep(1.5)
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.post("/api/projects/{project_id}/processing/retry", status_code=202)
@@ -392,6 +455,30 @@ def inventory(project_id: str) -> Manifest:
     return s.get_manifest(project_id)
 
 
+@app.get("/api/projects/{project_id}/progress")
+def project_progress(project_id: str) -> dict[str, Any]:
+    s = store()
+    _require(s, project_id)
+    manifest = s.get_manifest(project_id)
+    processing = s.get_processing(project_id)
+    plans = load_plans(s, project_id)
+    rows = list_plans(project_id) if plans is not None else None
+    batch = s.get_talend_apply_batch_state(project_id)
+    result = compute_progress(
+        files=len(manifest.files),
+        processing_status=processing.status if processing else None,
+        plan_rows=rows,
+        batch_status=batch.get("status") if batch else None,
+    )
+    return asdict(result)
+
+
+@app.get("/api/projects/{project_id}/pending-summary")
+def project_pending_summary(project_id: str) -> list[dict[str, Any]]:
+    plans = _plans(project_id)
+    return [asdict(group) for group in pending_groups(plans)]
+
+
 @app.post("/api/projects/{project_id}/analyses", status_code=201)
 def run_analysis(project_id: str) -> AnalysisSummary:
     s = store()
@@ -468,11 +555,37 @@ class Decision(BaseModel):
     note: str | None = None
 
 
+class JobMetaEdit(BaseModel):
+    job_name: str | None = None
+    description: str | None = None
+
+
+class ExpressionEdit(BaseModel):
+    talend: str | None = None
+
+
+class TranslateBody(BaseModel):
+    sas: str = Field(min_length=1, max_length=20_000)
+
+
+class JobRename(BaseModel):
+    program: str
+    job_name: str
+
+
+class BulkRenameBody(BaseModel):
+    renames: list[JobRename] = Field(min_length=1)
+
+
 @app.post("/api/projects/{project_id}/plans", status_code=201)
-def create_plans(project_id: str) -> dict:
+async def create_plans(project_id: str) -> dict:
     s = store()
     _require(s, project_id)
-    ps = generate_plans(s, project_id)
+    from .integrations import _installed_studio_component_names
+
+    ps = generate_plans(
+        s, project_id, installed_components=await _installed_studio_component_names()
+    )
     return {"project_id": project_id, "plans": len(ps.plans), "rules_version": ps.rules_version}
 
 
@@ -512,6 +625,8 @@ def list_plans(project_id: str) -> list[dict]:
             {
                 "program": p.program,
                 "job_name": p.job_name,
+                "description": p.description,
+                "job_name_edited": p.job_name_edited,
                 "job_status": p.job_status,
                 "steps": len(steps),
                 "pending": sum(1 for x in steps if x.pending),
@@ -1792,6 +1907,178 @@ def patch_step(project_id: str, program: str, step_id: str, body: Decision) -> J
     return _annotate_plan_studio_checks(s, project_id, plan, plans)  # type: ignore[return-value]
 
 
+def _require_editable_project(s: Store, project_id: str) -> None:
+    _require(s, project_id)
+    if s.has_active_talend_work(project_id):
+        raise HTTPException(409, "No se puede editar mientras Talend crea Jobs de este proyecto.")
+
+
+@app.patch("/api/projects/{project_id}/plans/{program:path}/meta")
+def update_job_meta(project_id: str, program: str, body: JobMetaEdit) -> dict[str, Any]:
+    s = store()
+    _require_editable_project(s, project_id)
+    raw_plans = load_plans(s, project_id, with_edits=False)
+    if raw_plans is None:
+        raise HTTPException(409, "los planes aún no fueron generados")
+    raw_plan = next((item for item in raw_plans.plans if item.program == program), None)
+    if raw_plan is None:
+        raise HTTPException(404, "plan no encontrado")
+    if body.description is not None and len(body.description) > 500:
+        raise HTTPException(422, "La descripción no puede pasar de 500 caracteres.")
+
+    current = load_plans(s, project_id) or raw_plans
+    if body.job_name:
+        taken = [item.job_name for item in current.plans if item.program != program]
+        error = validate_job_name(body.job_name, taken=taken)
+        if error:
+            raise HTTPException(422, error)
+    name = None if body.job_name == raw_plan.job_name else body.job_name
+    s.set_job_override(project_id, program, name, body.description)
+    updated = get_plan(s, project_id, program)
+    if updated is None:
+        raise HTTPException(404, "plan no encontrado")
+    return {"plan": updated.model_dump(mode="json"), "warnings": []}
+
+
+@app.post("/api/projects/{project_id}/plans/rename-preview")
+def preview_job_renames(project_id: str, body: BulkRule) -> list[dict[str, Any]]:
+    s = store()
+    _require_editable_project(s, project_id)
+    plans = load_plans(s, project_id)
+    if plans is None:
+        raise HTTPException(409, "los planes aún no fueron generados")
+    try:
+        return [row.model_dump(mode="json") for row in bulk_preview(plans.plans, body)]
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.post("/api/projects/{project_id}/plans/rename")
+def rename_jobs(project_id: str, body: BulkRenameBody) -> dict[str, int]:
+    s = store()
+    _require_editable_project(s, project_id)
+    plans = load_plans(s, project_id)
+    raw_plans = load_plans(s, project_id, with_edits=False)
+    if plans is None or raw_plans is None:
+        raise HTTPException(409, "los planes aún no fueron generados")
+
+    requested = {item.program: item.job_name for item in body.renames}
+    if len(requested) != len(body.renames):
+        raise HTTPException(422, "No se puede renombrar el mismo programa más de una vez.")
+    current = {plan.program: plan for plan in plans.plans}
+    raw = {plan.program: plan for plan in raw_plans.plans}
+    unknown = set(requested).difference(current)
+    if unknown:
+        raise HTTPException(422, "Uno o más programas solicitados no existen en el plan.")
+
+    final_names = {program: plan.job_name for program, plan in current.items()}
+    final_names.update(requested)
+    for program, name in requested.items():
+        error = validate_job_name(
+            name,
+            taken=[candidate for other, candidate in final_names.items() if other != program],
+        )
+        if error:
+            raise HTTPException(422, error)
+
+    existing = s.get_job_overrides(project_id)
+    updates = {
+        program: (
+            None if name == raw[program].job_name else name,
+            existing[program].description if program in existing else None,
+        )
+        for program, name in requested.items()
+    }
+    s.set_job_overrides(project_id, updates)
+    return {"renamed": sum(name != current[program].job_name for program, name in requested.items())}
+
+
+@app.patch("/api/projects/{project_id}/plans/{program:path}/steps/{step_id}/expressions/{index}")
+def edit_plan_expression(
+    project_id: str, program: str, step_id: str, index: int, body: ExpressionEdit
+) -> JobPlan:
+    s = store()
+    _require_editable_project(s, project_id)
+    plan = get_plan(s, project_id, program)
+    if plan is None:
+        raise HTTPException(404, "plan no encontrado")
+    step = next(
+        (item for item in plan.steps + [step for child in plan.children for step in child.steps]
+         if item.id == step_id),
+        None,
+    )
+    if step is None or index < 0 or index >= len(step.expressions):
+        raise HTTPException(404, "expresión no encontrada")
+    if body.talend is not None and (
+        not body.talend.strip() or len(body.talend) > 2000 or "\n" in body.talend or "\r" in body.talend
+    ):
+        raise HTTPException(422, "La expresión debe tener entre 1 y 2000 caracteres en una sola línea.")
+    expression = step.expressions[index]
+    s.set_expression_override(
+        project_id, program, step_id, index, expression.sas, body.talend
+    )
+    updated = get_plan(s, project_id, program)
+    if updated is None:
+        raise HTTPException(404, "plan no encontrado")
+    return updated
+
+
+@app.post("/api/translator/translate")
+def translate_expression(body: TranslateBody) -> dict[str, Any]:
+    result = translate(body.sas)
+    return {
+        "sas": result.sas,
+        "talend": result.talend,
+        "columns": result.columns,
+        "warnings": result.warnings,
+        "engine": result.engine,
+        "supported": result.talend is not None,
+        "talend_engine_enabled": talend_expressions_enabled(),
+    }
+
+
+class NamingTemplateBody(BaseModel):
+    template: str = Field(min_length=1, max_length=200)
+
+
+def _naming_payload(template: str) -> dict[str, Any]:
+    return {
+        "template": template,
+        "default_template": DEFAULT_NAME_TEMPLATE,
+        "tokens": list(TEMPLATE_TOKENS),
+        "example_name": render_job_name(
+            template, project="Finanzas", program="lz/Cod 2.sas"
+        ),
+    }
+
+
+@app.get("/api/settings/naming")
+def naming_template() -> dict[str, Any]:
+    return _naming_payload(current_name_template(store()))
+
+
+@app.post("/api/settings/naming/preview")
+def naming_example(body: NamingTemplateBody) -> dict[str, str]:
+    error = validate_template(body.template)
+    if error:
+        raise HTTPException(422, error)
+    return {
+        "name": render_job_name(
+            body.template, project="Finanzas", program="lz/Cod 2.sas"
+        )
+    }
+
+
+@app.put("/api/settings/naming")
+def set_naming_template(body: NamingTemplateBody) -> dict[str, Any]:
+    error = validate_template(body.template)
+    if error:
+        raise HTTPException(422, error)
+    s = store()
+    s.set_setting(NAME_TEMPLATE_KEY, body.template)
+    return _naming_payload(body.template)
+
+
 def _annotate_plan_studio_checks(s: Store, project_id: str, plan: JobPlan, plans: PlanSet) -> dict[str, Any]:
     """Expose current apply evidence beside a step without changing its manual state."""
     data = plan.model_dump(mode="json")
@@ -1952,7 +2239,10 @@ async def verify_project_plans(project_id: str, body: VerifyBody) -> dict:
     from sas_grid_migrator.talend_adapter.verification import Catalog, verify_plans
 
     s = store()
-    ps = _plans(project_id)
+    _require(s, project_id)
+    ps = load_plans(s, project_id, with_edits=False)
+    if ps is None:
+        raise HTTPException(409, "los planes aún no fueron generados")
     catalog = Catalog()
     try:
         for path in body.job_paths:
@@ -1965,10 +2255,17 @@ async def verify_project_plans(project_id: str, body: VerifyBody) -> dict:
 
 
 @app.get("/api/talend/catalog")
-def talend_catalog(q: str = "", family: str | None = None) -> dict:
+async def talend_catalog(q: str = "", family: str | None = None) -> dict:
     from .integrations import talend_catalog as current_catalog
 
-    return current_catalog(q, family)
+    return await current_catalog(q, family)
+
+
+@app.get("/api/talend/catalog/{name}/icon")
+async def talend_component_icon(name: str):
+    from .integrations import talend_component_icon as current_icon
+
+    return await current_icon(name)
 
 
 @app.get("/api/talend/catalog/archived")
@@ -1993,10 +2290,10 @@ def talend_studio_configuration() -> dict:
 
 
 @app.get("/api/talend/catalog/{name}")
-def talend_component(name: str) -> dict:
+async def talend_component(name: str) -> dict:
     from .integrations import talend_component as current_component
 
-    return current_component(name)
+    return await current_component(name)
 
 
 # UI compilada (apps/web/dist): se monta al final para que /api/* tenga prioridad

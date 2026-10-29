@@ -36,11 +36,19 @@ def pending_category(text: str) -> str:
     return re.sub(r"\d+", "N", text)[:110]
 
 
-def measure(source: Path) -> dict:
-    """Métricas de un corpus: se importa como un proyecto y se planifica."""
+def measure(source: Path, environment: Path | None = None) -> dict:
+    """Métricas de un corpus: se importa como un proyecto y se planifica.
+
+    Con `environment`, el catálogo de entorno se copia al proyecto antes de planificar: sirve para medir cuánto sube la
+    automatización cuando el entorno se conoce (WP5/WP6).
+    """
     store = Store(Settings(data_dir=Path(tempfile.mkdtemp(prefix="sgm-metrics-")) / "data"))
     project = store.create_project(source.name)
     store.import_batch(project.id, source)
+    if environment is not None:
+        store.environment_path(project.id).write_text(
+            environment.read_text(encoding="utf-8"), encoding="utf-8"
+        )
     plans = generate_plans(store, project.id).plans
     steps = [step for plan in plans for step in plan.steps]
 
@@ -78,10 +86,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("sources", nargs="*", type=Path, help="carpetas con programas SAS (por defecto, los corpus de fixtures)")
     parser.add_argument("--json", type=Path, help="guardar el informe en este archivo")
+    parser.add_argument(
+        "--environment", type=Path, help="catálogo de entorno (environment.json) para medir con entorno conocido"
+    )
     args = parser.parse_args()
     sources = args.sources or [FIXTURES / "real", FIXTURES / "synthetic"]
 
-    report = [measure(source) for source in sources]
+    report = [measure(source, args.environment) for source in sources]
     for corpus in report:
         print(f"\n== {corpus['source']}: {corpus['programs']} programas, {corpus['steps']} pasos ==")
         print(f"automatizados (sin pendientes): {corpus['automated_percent']} %")

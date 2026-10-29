@@ -254,11 +254,36 @@ que cambia por entorno en contexto, y joblets para lo repetido.
 
 ### Estado a 28/10/2026 (lo ya hecho en esta sesión)
 
-Commiteado antes: plan, métrica `tools/automation_metrics.py`. **En el árbol sin commitear**, de esta sesión, cada pieza con su
-prueba cuando se indica: importar `.txt` como SAS y quitar el carácter invisible (con prueba); redactar `proc pwencode` (con
-prueba); ignorar `%web_drop_table`/`%web_open_table` (con prueba); `talend_translator.py`, el traductor de gramática completa
-(funciones de varios argumentos, `CASE`, `IN`, `BETWEEN`, `IS MISSING`, `.`, formatos, fechas), **detrás del interruptor
-`SGM_TALEND_EXPRESSIONS=1`, apagado por defecto**; `docs/conventions.md`. **Falta**: pruebas propias de `talend_translator.py` y comprobar en Studio que el Java que emite compila. **No enciendas el interruptor hasta que B1 lo haya comprobado.**
+Commiteado antes: plan, métrica `tools/automation_metrics.py`. Commiteado en `5fc0045`: importar `.txt` como SAS y quitar el
+carácter invisible (con prueba); redactar `proc pwencode` (con prueba); ignorar `%web_drop_table`/`%web_open_table` (con
+prueba); `talend_translator.py`, el traductor de gramática completa (funciones de varios argumentos, `CASE`, `IN`, `BETWEEN`,
+`IS MISSING`, `.`, formatos, fechas), que emite **solo rutinas de sistema de Talend y Java nativo**, **detrás del interruptor
+`SGM_TALEND_EXPRESSIONS=1`, apagado por defecto**; `docs/conventions.md`. A4 en curso:
+`tests/unit/test_talend_translator.py` fija el Java esperado por función y una prueba de contrato comprueba que cada llamada
+emitida existe en las rutinas de Studio 8.0 (nada propio que instalar). **Falta**: comprobar en Studio que el Java emitido
+compila (B1) y sustituir por componentes lo que hoy sale como expresión. **No enciendas el interruptor hasta que B1 lo haya
+comprobado.**
+
+### Avance medido (28/10/2026, segunda tanda)
+
+`real`: **8,1 % → 27,2 %** de pasos automatizados (2 063 → 1 903 pasos: los 160 `read_file` que eran el mismo paso que un
+`datalines` dejan de duplicarse). `synthetic`: 16,8 % → 22,0 %. Sin esquema en `real`: 1 749 → 1 497. Con el catálogo de
+entorno de ejemplo (`rules/environment/learning-sas-by-example.json`, que solo cubre dos datasets): 28,3 %. Hecho, con
+pruebas:
+
+| Paquete | Qué se hizo | Pasos con pendientes |
+| ------- | ----------- | -------------------- |
+| WP3 | Política de reportes del proyecto (`log` por defecto → `tLogRow`; `csv`; `discard`), en `Settings.report_policy` y en el planificador | `report` 238 → **0** |
+| WP2 | `datalines`/`cards`: el lexer conserva las filas, el parser las lleva al IR y el planificador arma `tFixedFlowInput` con esquema y filas. Entrada por columnas (`@1`, `#2`), filas que no cuadran con el `INPUT` o bloque sin `INPUT` siguen como pendiente con su motivo | `inline_data` 161 → **99** |
+| WP7 (parte) | El tipo de una columna calculada sale de la expresión (aritmética → `Double`, texto → `String`, comparación → `Boolean`, fecha → `Date`); solo queda pendiente lo que no se puede tipar | `compute` 178 → **111** |
+| WP4 (parte) | `PROC MEANS/SUMMARY/FREQ` → `tAggregateRow` con los grupos de `CLASS`/`BY`, las estadísticas pedidas y los nombres del `OUTPUT OUT=`; `PROC FORMAT` de valores sueltos → tabla de lookup sin pendiente, y los formatos con rangos, comparaciones, `OTHER` o clave vacía siguen pendientes con el motivo | `aggregate` 104 → **75**; `format_definition` 51 → **44** |
+| WP7 (condicionales) | `IF cond THEN x = a; ELSE x = b;` → ternaria de `tMap` cuando la condición y los valores se traducen; lo que no, deja de contar como automatizado y queda pendiente con su motivo. Antes, 55 pasos llevaban un condicional sin traducir y aun así contaban | `compute` 111 → **165** (el número sube porque deja de mentir) |
+| WP5 + WP6 (parte) | Catálogo de entorno: modelo, validación, esquema versionado y ejemplo. Con catálogo, `read`/`write` toman tabla, columnas y tipos y dejan de pedirlos; la acción al escribir pasa a ser del proyecto (`SGM_TABLE_ACTION`, por defecto `drop_create`) | `write` y `read` sin pendientes para los datasets del catálogo; `sin componente` 757 → **552** con el ejemplo |
+
+Lo que falta para el 80 % sigue siendo lo que depende del **catálogo de entorno** (WP5/WP6/WP7): `write` 413, `read` 264,
+`read_file` 46 y los 1 527 pasos sin esquema. Sin ese catálogo el techo es el 36 % de la sección 1, y para construirlo hacen
+falta las decisiones de la sección 10 (de dónde salen los esquemas). Después: `aggregate` 104, `macro_call` 62,
+`format_definition` 51 y `unsupported` 45.
 
 ### Reparto: dos agentes, sin pisarse
 
@@ -295,6 +320,7 @@ prueba); ignorar `%web_drop_table`/`%web_open_table` (con prueba); `talend_trans
 1. **A y B no editan los mismos archivos.** Si hace falta, el que necesita deja una petición en `docs/progress.md` con el
    formato del campo y el otro la atiende.
 2. **MCP primero**: un cambio del MCP se commitea y se publica (`docs/mcp-subtree.md`) antes de que A lo use.
-3. **Interruptores, no regresiones**: lo que depende de algo aún no instalado (la rutina) va apagado por defecto.
+3. **Interruptores, no regresiones**: lo que aún no está comprobado en Studio (hoy, el traductor de expresiones) va apagado
+   por defecto.
 4. Cada entrega: pruebas rápidas del área, entrada en `docs/progress.md`, y avisar de lo que queda sin empujar.
 5. **No se mide nada de más.** La métrica es `tools/automation_metrics.py` y se corre al cerrar cada paquete, no antes.

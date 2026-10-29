@@ -77,6 +77,7 @@ class Stmt:
     text: str  # sin comentarios, recortado
     line: int
     end_line: int
+    rows: tuple[str, ...] = ()  # filas de un bloque `datalines`/`cards`, tal cual venían
 
 
 def _skip_string(src: str, i: int) -> int:
@@ -180,6 +181,7 @@ def split_statements(src: str) -> list[Stmt]:
             if m:
                 term = ";;;;" if m.group(2) else ";"
                 first = line
+                rows: list[str] = []
                 while i < n:
                     j = src.find("\n", i)
                     j = n if j < 0 else j
@@ -188,7 +190,8 @@ def split_statements(src: str) -> list[Stmt]:
                     i = j + 1
                     if row == term or (not m.group(2) and row.startswith(";")):
                         break
-                out.append(Stmt("<datalines>", first, line))
+                    rows.append(row)
+                out.append(Stmt("<datalines>", first, line, tuple(rows)))
             continue
         add(c)
         i += 1

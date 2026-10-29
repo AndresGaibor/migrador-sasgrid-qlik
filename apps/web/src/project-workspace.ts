@@ -1,4 +1,11 @@
-import type { Project } from "./types";
+import type { PendingSummary, Project } from "./types";
+
+export function pendingTotals(groups: readonly PendingSummary[]): { steps: number; jobs: number } {
+  return {
+    steps: groups.reduce((total, group) => total + group.steps, 0),
+    jobs: new Set(groups.flatMap((group) => group.programs.map((job) => job.program))).size,
+  };
+}
 
 export function filterProjectsByQuery<T extends Pick<Project, "name" | "archive_name">>(
   projects: readonly T[],
@@ -11,6 +18,32 @@ export function filterProjectsByQuery<T extends Pick<Project, "name" | "archive_
       .toLocaleLowerCase("es")
       .includes(normalized),
   );
+}
+
+export type ProjectStatusFilter = "all" | "processing" | "completed" | "attention" | "waiting";
+export type ProjectSourceFilter = "all" | "archive" | "individual" | "manual";
+
+export function filterProjectsByFacets<
+  T extends { archive_name?: string | null; processing?: { status: string } | null },
+>(
+  projects: readonly T[],
+  status: ProjectStatusFilter,
+  source: ProjectSourceFilter,
+): T[] {
+  return projects.filter((project) => {
+    const processingStatus = project.processing?.status;
+    const isArchive = project.archive_name?.toLocaleLowerCase("es").endsWith(".zip") ?? false;
+    const matchesStatus = status === "all"
+      || (status === "processing" && (processingStatus === "queued" || processingStatus === "running"))
+      || (status === "completed" && processingStatus === "completed")
+      || (status === "attention" && (processingStatus === "failed" || processingStatus === "interrupted"))
+      || (status === "waiting" && !processingStatus);
+    const matchesSource = source === "all"
+      || (source === "archive" && isArchive)
+      || (source === "individual" && Boolean(project.archive_name) && !isArchive)
+      || (source === "manual" && !project.archive_name);
+    return matchesStatus && matchesSource;
+  });
 }
 
 export function processingLabel(processing: { status: string; stage: string }): string {
@@ -44,4 +77,13 @@ export function filterArchiveEntries<T extends { path: string }>(
   return entries.filter((entry) =>
     entry.path.replaceAll("\\", "/").toLocaleLowerCase("es").includes(normalized),
   );
+}
+
+export type InventoryKindFilter = "all" | "sas" | "shell" | "log" | "doc" | "other";
+
+export function filterFilesByKind<T extends { kind: string }>(
+  files: readonly T[],
+  kind: InventoryKindFilter,
+): T[] {
+  return kind === "all" ? [...files] : files.filter((file) => file.kind === kind);
 }

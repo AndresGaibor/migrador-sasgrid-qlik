@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { PlanListContent } from "./PlanListContent";
-import { GridRecommendations } from "../PlansTab";
+import { GridRecommendations } from "./PlanGrid";
 import type { GridRecommendation, PlanRow } from "../../types";
 
 test("opens the next unfinished group and labels Job search and progress", () => {
@@ -22,6 +22,12 @@ test("shows Studio readback separately from manually completed guide steps", () 
   expect(html).toContain("1 de 3 pasos hechos");
   expect(html).toContain("Comprobación automática en Studio: 2 de 3 pasos verificados");
   expect(html).toContain('aria-label="Avance manual de job_daily"');
+});
+
+test("shows the human-authored Job description in its guide row", () => {
+  const row = { program: "daily.sas", job_name: "job_daily", description: "Carga diaria de clientes", steps: 1, done: 0 } as PlanRow;
+  const html = renderToStaticMarkup(<PlanListContent id="project" rows={[row]} isDesktop groups={[{ title: "Jobs", hint: "", rows: [row] }]} />);
+  expect(html).toContain("Carga diaria de clientes");
 });
 
 test("orchestration separates locations, configuration fields and source references", () => {

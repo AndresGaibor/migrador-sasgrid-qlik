@@ -1,9 +1,11 @@
 import json
+import re
+import time
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 
 from sas_grid_migrator.talend_adapter.catalog import (
     LICENSE_PROFILE_CODE,
@@ -13,6 +15,43 @@ from sas_grid_migrator.talend_adapter.catalog import (
 )
 
 router = APIRouter(prefix="/api")
+_STUDIO_COMPONENT_NAMES: tuple[float, frozenset[str]] | None = None
+
+
+async def _installed_studio_component_names() -> frozenset[str]:
+    global _STUDIO_COMPONENT_NAMES
+    now = time.monotonic()
+    if _STUDIO_COMPONENT_NAMES and now < _STUDIO_COMPONENT_NAMES[0]:
+        return _STUDIO_COMPONENT_NAMES[1]
+
+    from sas_grid_migrator.talend_adapter.adapter import TalendAdapter, TalendError
+
+    try:
+        names = await TalendAdapter.from_env().installed_component_names()
+    except TalendError as exc:
+        raise HTTPException(503, "no se pudo validar el catálogo contra Talend Studio") from exc
+    installed = frozenset(names)
+    _STUDIO_COMPONENT_NAMES = (now + 60, installed)
+    return installed
+
+
+@router.get("/talend/catalog/{name}/icon")
+async def talend_component_icon(name: str) -> Response:
+    if not re.fullmatch(r"[A-Za-z0-9]+", name):
+        raise HTTPException(404, "icono de componente no disponible")
+    from sas_grid_migrator.talend_adapter.adapter import TalendAdapter, TalendError
+
+    try:
+        svg = await TalendAdapter.from_env().component_icon(name)
+    except TalendError as exc:
+        raise HTTPException(503, "no se pudo consultar Talend Studio") from exc
+    if svg is None:
+        raise HTTPException(404, "el componente no tiene SVG de lienzo en Talend Studio")
+    return Response(
+        content=svg,
+        media_type="image/svg+xml",
+        headers={"Cache-Control": "public, max-age=3600", "X-Content-Type-Options": "nosniff"},
+    )
 
 
 @lru_cache(maxsize=1)
@@ -95,8 +134,9 @@ def _official_component_description(root: Path, name: str, status: str) -> str:
 
 
 @router.get("/talend/catalog")
-def talend_catalog(q: str = "", family: str | None = None) -> dict:
+async def talend_catalog(q: str = "", family: str | None = None) -> dict:
     availability, _, available_by_name, guides_by_name = _talend_documentation_data()
+    installed_names = await _installed_studio_component_names()
     root = Path(__file__).resolve().parents[2]
     rows = []
     family_counts: dict[str, int] = {}
@@ -105,6 +145,8 @@ def talend_catalog(q: str = "", family: str | None = None) -> dict:
         "label": availability["license_branding_labels"][LICENSE_PROFILE_CODE],
     }
     for name, official in available_by_name.items():
+        if name not in installed_names:
+            continue
         records = official["availability"]
         item_families = sorted(
             {
@@ -145,9 +187,7 @@ def talend_catalog(q: str = "", family: str | None = None) -> dict:
         )
         and (not family or family.casefold() in {value.casefold() for value in item["families"]})
     ]
-    documentation_statuses = [
-        guides_by_name[name]["documentation"]["status"] for name in available_by_name
-    ]
+    documentation_statuses = [guides_by_name[item["name"]]["documentation"]["status"] for item in rows]
     return {
         "count": len(rows),
         "result_count": len(filtered),
@@ -160,7 +200,8 @@ def talend_catalog(q: str = "", family: str | None = None) -> dict:
             "snapshot_version": availability["availability_snapshot_version"],
             "source": availability["source"]["availability_page"],
             "license_profile": license_profile,
-            "count": len(available_by_name),
+            "count": len(rows),
+            "not_installed": len(available_by_name) - len(rows),
             "documented": documentation_statuses.count("documented"),
             "exception": documentation_statuses.count("exception"),
         },
@@ -223,7 +264,10 @@ def talend_studio_configuration() -> dict:
 
 
 @router.get("/talend/catalog/{name}")
-def talend_component(name: str) -> dict:
+async def talend_component(name: str) -> dict:
+    installed_names = await _installed_studio_component_names()
+    if name not in installed_names:
+        raise HTTPException(404, "componente no instalado en Talend Studio")
     availability, guides, available_by_name, guides_by_name = _talend_documentation_data()
     official = available_by_name.get(name)
     guide = guides_by_name.get(name)

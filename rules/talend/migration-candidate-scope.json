@@ -16,6 +16,7 @@
     "tFixedFlowInput",
     "tGreenplumInput",
     "tGreenplumOutput",
+    "tLogRow",
     "tMSSqlInput",
     "tMSSqlOutput",
     "tMap",
@@ -45,7 +46,6 @@
     "tFlowToIterate",
     "tJava",
     "tJavaRow",
-    "tJoin",
-    "tLogRow"
+    "tJoin"
   ]
 }

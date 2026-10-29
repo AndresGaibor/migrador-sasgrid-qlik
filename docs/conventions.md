@@ -43,7 +43,7 @@ errores   ─► tLogCatcher ─► tLogRow  (+ tDie si el subjob es crítico)  
 
 | Qué | Regla | Ejemplo |
 | --- | ----- | ------- |
-| Job | `<proyecto>_<programa>`, identificador Java, ≤ 60 caracteres, único en el proyecto | `finanzas_cod2` |
+| Job | Identificador Java, ≤ 60 caracteres, único en el proyecto; se genera con la plantilla de Configuración (`job_{programa}` por defecto, con los tokens `{proyecto}`, `{carpeta}` y `{programa}`) y se puede renombrar por Job o en lote | `finanzas_cod2` |
 | Carpeta del Job | `Process/<proyecto>/<carpeta del programa>/` sin `src`, `tests` ni `target` | `Process/finanzas/lz` |
 | Subjob | la etiqueta normalizada (sin acentos, sin espacios) | `importar_homologacion` |
 | Componente | `t<Tipo>_<n>` (único) y etiqueta `<subjob> · <operación>` | `tFilterRow_4`, «acura · filtrar» |
@@ -95,14 +95,30 @@ Se usa **el componente más específico que existe** (hay más de mil en el cat�
 
 ## 5. Esquemas y tipos
 
-- El esquema sale del **catálogo de entorno** (`environment.json`) y se propaga por el plan; nunca se inventa.
+- El esquema sale del **catálogo de entorno** (`environment.json`) y se propaga por el plan; nunca se inventa. El modelo y
+  la validación viven en `src/sas_grid_migrator/environment/catalog.py`, el esquema versionado en
+  `schemas/environment.schema.json` y un ejemplo en `rules/environment/learning-sas-by-example.json`. El catálogo declara
+  cada `libname` (motor y **nombre** del grupo de contexto, nunca credenciales) y cada dataset (tabla o archivo, formato y
+  columnas con tipo). Lo que no declare sigue siendo un pendiente con su motivo.
 - Tipos SAS → Talend: numérico → `id_Double` (o `id_Integer`/`id_Long` si el catálogo lo dice), carácter → `id_String`
   con su longitud, fecha SAS → `id_Date` con patrón `yyyy-MM-dd`. La fecha SAS cuenta días desde 1960; una fecha leída de un archivo
   o una base ya llega como `Date`, y las funciones de fecha (`TalendDate`) trabajan sobre `Date`.
 - **Valor perdido de SAS = `null`.** El traductor lo propaga como SAS (un perdido numérico es menor que cualquier número;
   `a + .` es perdido) con guardas de nulo en el Java del `tMap`, sin bibliotecas propias.
 
-## 6. Qué queda siempre como pendiente
+## 6. Reportes (PROC PRINT, REPORT, TABULATE)
+
+La política es **del proyecto**, no del Job, y tiene un valor por defecto documentado:
+
+| Política | Componente | Pendiente |
+| -------- | ---------- | --------- |
+| `log` (por defecto) | `tLogRow` con `BASIC_MODE` | ninguno: lo que hay que mostrar ya está en el SAS |
+| `csv` | `tFileOutputDelimited` | la ruta, como variable de contexto `path_<reporte>` |
+| `discard` | ninguno | ninguno; el paso queda `descartado` con la nota de qué se perdió |
+
+El informe de traducción lista los reportes descartados para que la pérdida sea visible (nunca silenciosa).
+
+## 7. Qué queda siempre como pendiente
 
 Solo lo que el SAS y el catálogo no pueden dar: una credencial, una ruta de entorno, un tipo ambiguo, código dinámico.
 Cada pendiente lleva su motivo y su línea de origen. Nada se rellena con un valor supuesto.

@@ -54,3 +54,11 @@ def test_windows_separators_and_identical_paths_still_end_up_unique():
     unique_job_names(plans)
 
     assert len({plan.job_name for plan in plans}) == 3
+
+
+def test_unique_names_use_the_custom_folder_aware_namer():
+    plans = [_plan("DB2/bulkload.sas", "job_bulkload"), _plan("Hadoop/bulkload.sas", "job_bulkload")]
+
+    unique_job_names(plans, lambda parts, depth: f"x_{parts[-2].lower()}_{parts[-1].split('.')[0]}")
+
+    assert [plan.job_name for plan in plans] == ["x_db2_bulkload", "x_hadoop_bulkload"]

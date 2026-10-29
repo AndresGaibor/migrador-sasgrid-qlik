@@ -62,14 +62,14 @@
   - `Expressions` (Editor del componente (no es un parámetro plano)) = `0 asignaciones, 3 condicionales` — SAS p0_clientes_activos.sas:5
   - `Var table` (Editor del componente (no es un parámetro plano)) = _por configurar_ — regla mappings
 - **Expresión** (línea 9): SAS `if saldo >= 100000 then segmento = 'ALTO'` → _sin traducción automática_
-  - ⚠ Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow
+  - ⚠ Condicional IF/THEN sin traducción automática de la condición o los valores
 - **Expresión** (línea 10): SAS `else if saldo >= 10000 then segmento = 'MEDIO'` → _sin traducción automática_
-  - ⚠ Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow
+  - ⚠ Condicional IF/ELSE sin traducción automática
 - **Expresión** (línea 11): SAS `else segmento = 'BAJO'` → _sin traducción automática_
-  - ⚠ Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow
+  - ⚠ Condicional IF/ELSE sin traducción automática
 - **Supuestos:** Lógica condicional: revisar orden de evaluación y valores missing
 - **Pendientes:**
-  - Tipos de las columnas calculadas
+  - Condicional IF/ELSE sin traducción automática: revisar a mano
 - **Pruebas:** `vc_op_5_compute_1_nulls`, `vc_op_5_compute_1_dates`, `vc_op_5_compute_1_numeric`
 
 ### 5. Conservar/descartar columnas
@@ -106,7 +106,6 @@
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
   - Librería stg es de tipo BASE en /data/staging: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo
-  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_5_write_1_row_count`, `vc_op_5_write_1_schema`
 
 ### 8. Leer stg.clientes_activos
@@ -161,7 +160,6 @@
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
   - Librería stg es de tipo BASE en /data/staging: Talend no lee .sas7bdat directamente; confirmar si existe copia en base de datos o archivo
-  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_15_write_1_row_count`, `vc_op_15_write_1_schema`
 
 ## Casos de validación

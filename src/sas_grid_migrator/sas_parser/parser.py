@@ -297,6 +297,8 @@ def _data_step(stmts: list[Stmt], ctx: _Ctx) -> DataStep:
         t = s.text
         kw = _kw(t)
         ds.statements.append(StepStmt(line=s.line, kw=kw, text=t[:600]))
+        if s.rows:  # bloque `datalines`/`cards`: sus filas son datos, no sentencias
+            ds.datalines_rows.extend(s.rows)
         rest = t[len(kw) :].strip()
         if kw in ("set", "merge", "update", "modify"):
             ds.input_kind = ds.input_kind or kw

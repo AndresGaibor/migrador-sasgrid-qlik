@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { TalendPreflight } from "./TalendPreflight";
-import { BatchJobRow } from "../PlansTab";
+import { BatchJobRow } from "./PlanBatchPanel";
 import type { TalendApplyBatchSummary } from "../../types";
 
 test("preflight explains the exact destination, generated scope and pending human work", () => {

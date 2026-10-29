@@ -8,6 +8,8 @@
     "talend_list_repository_contexts",
     "talend_read_repository_context",
     "talend_list_components",
+    "talend_studio_list_components",
+    "talend_component_icon",
     "talend_show_flow",
     "talend_analyze_tdboutput",
     "talend_read_run_log",

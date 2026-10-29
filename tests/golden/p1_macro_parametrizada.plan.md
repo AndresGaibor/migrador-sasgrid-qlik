@@ -75,7 +75,6 @@
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
   - Librería o sistema de origen no determinable (nombre dinámico)
-  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_m:extraer_mes:op_6_write_1_row_count`, `vc_m:extraer_mes:op_6_write_1_schema`
 
 ## Sin resolver

@@ -39,6 +39,11 @@ de escritura del proyecto.
   equivalencias que el código fuente no demuestra.
 - **Integra con Talend mediante MCP.** Antes de escribir, el portal revisa destinos y conflictos; la
   operación no ejecuta los Jobs creados.
+- **Permite ajustar el plan sin perder lo automático.** El nombre y la descripción del Job, las
+  expresiones traducidas y los renombrados en lote se guardan como capas sobre el plan generado; el
+  archivo del plan no se reescribe con esas ediciones.
+- **Muestra qué sigue y qué falta.** El resumen del proyecto trae etapas, la siguiente acción y los
+  pendientes agrupados; `#/traductor` permite probar una expresión SAS aislada.
 
 ## Empezar
 

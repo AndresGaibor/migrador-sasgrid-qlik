@@ -4,7 +4,13 @@ import { useAsync } from "../hooks";
 import { Dialog } from "../components/Dialog";
 import { Icon } from "../components/Icon";
 import { notifyError, notifySuccess } from "../errors";
-import { filterProjectsByQuery, processingLabel } from "../project-workspace";
+import {
+  filterProjectsByFacets,
+  filterProjectsByQuery,
+  processingLabel,
+  type ProjectSourceFilter,
+  type ProjectStatusFilter,
+} from "../project-workspace";
 import type { Project } from "../types";
 import { Load } from "./common";
 
@@ -13,9 +19,12 @@ export function ProjectsView({ go, startUpload = false }: { go: (h: string) => v
   const [projectName, setProjectName] = useState("");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("recent");
+  const [statusFilter, setStatusFilter] = useState<ProjectStatusFilter>("all");
+  const [sourceFilter, setSourceFilter] = useState<ProjectSourceFilter>("all");
   const [uploadOpen, setUploadOpen] = useState(startUpload);
   const [uploading, setUploading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File>();
+  const [uploadIndex, setUploadIndex] = useState(0);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [err, setErr] = useState<string>();
   const hasActiveProjects = q.data?.some((project) => project.processing?.status === "queued" || project.processing?.status === "running") ?? false;
   useEffect(() => {
@@ -23,53 +32,82 @@ export function ProjectsView({ go, startUpload = false }: { go: (h: string) => v
     const timer = window.setInterval(q.reload, 2000);
     return () => window.clearInterval(timer);
   }, [hasActiveProjects, q.reload]);
-  const openUpload = () => { setProjectName(""); setSelectedFile(undefined); setErr(undefined); setUploadOpen(true); };
+  const openUpload = () => { setProjectName(""); setSelectedFiles([]); setErr(undefined); setUploadOpen(true); };
   const upload = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (uploading || !selectedFile) return;
-    if (!selectedFile.name.toLocaleLowerCase("es").endsWith(".zip")) {
-      setErr("Selecciona un archivo .zip para crear un proyecto independiente.");
+    if (uploading || selectedFiles.length === 0) return;
+    const invalid = selectedFiles.filter((file) => !/\.(zip|sas|txt)$/i.test(file.name));
+    if (invalid.length) {
+      setErr(`Formato no admitido: ${invalid.map((file) => file.name).join(", ")}. Usa .zip, .sas o .txt.`);
       return;
     }
     setUploading(true);
     setErr(undefined);
+    const created: string[] = [];
+    const failures: string[] = [];
     try {
-      const created = await api.createProjectFromZip(selectedFile, projectName);
+      for (const [index, file] of selectedFiles.entries()) {
+        setUploadIndex(index + 1);
+        const stem = file.name.replace(/\.(zip|sas|txt)$/i, "");
+        const name = projectName.trim()
+          ? selectedFiles.length === 1 ? projectName : `${projectName.trim()} ${stem}`
+          : undefined;
+        try {
+          const result = await api.createProjectFromZip(file, name);
+          created.push(result.project.id);
+        } catch (error) {
+          failures.push(`${file.name}: ${notifyError(error, "No se pudo crear el proyecto", "Revisa el archivo y vuelve a intentarlo.")}`);
+        }
+      }
       q.reload();
-      notifySuccess("Proyecto creado", "El análisis del ZIP comenzó en segundo plano.");
-      go(`/p/${created.project.id}/resumen`);
-    } catch (error) {
-      setErr(notifyError(error, "No se pudo crear el proyecto", "Revisa el ZIP y vuelve a intentarlo."));
+      if (created.length) {
+        notifySuccess("Proyectos creados", `Se crearon ${created.length} de ${selectedFiles.length}; el análisis comenzó en segundo plano.`);
+        if (created.length === 1 && failures.length === 0) {
+          go(`/p/${created[0]}/resumen`);
+          return;
+        }
+        setSelectedFiles([]);
+      }
+      if (failures.length) setErr(`No se pudieron subir algunos archivos:\n${failures.join("\n")}`);
+      else setUploadOpen(false);
     } finally {
       setUploading(false);
     }
   };
 
   return <div className="projects-home">
-    <div className="page-heading"><div><h1>Mis proyectos <span className="count">{q.data?.length ?? "—"}</span></h1><p className="subtitle">Abre un proyecto para continuar o sube un ZIP para analizar nuevos programas SAS.</p></div><button onClick={openUpload}><Icon name="upload" size={18} /> Nuevo proyecto desde ZIP</button></div>
+    <div className="page-heading"><div><h1>Mis proyectos <span className="count">{q.data?.length ?? "—"}</span></h1><p className="subtitle">Abre un proyecto para continuar o sube archivos SAS para analizarlos.</p></div><button onClick={openUpload}><Icon name="upload" size={18} /> Nuevo proyecto</button></div>
     <section aria-labelledby="projects-title">
       <h2 id="projects-title" className="sr-only">Proyectos disponibles</h2>
       <div className="project-toolbar">
-        <label className="search-field"><Icon name="search" size={18} /><input aria-label="Buscar proyectos" placeholder="Buscar por proyecto o nombre del ZIP…" value={search} onChange={(event) => setSearch(event.target.value)} />{search && <button className="icon-button" aria-label="Limpiar búsqueda" onClick={() => setSearch("")}><Icon name="close" size={16} /></button>}</label>
-        <label className="sort-field">Ordenar por <select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recent">Más recientes</option><option value="name">Nombre: A–Z</option></select></label>
+        <label className="search-field"><Icon name="search" size={18} /><input aria-label="Buscar proyectos" placeholder="Buscar por proyecto o archivo…" value={search} onChange={(event) => setSearch(event.target.value)} />{search && <button className="icon-button" aria-label="Limpiar búsqueda" onClick={() => setSearch("")}><Icon name="close" size={16} /></button>}</label>
+        <label className="sort-field">Estado <select aria-label="Filtrar por estado" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as ProjectStatusFilter)}><option value="all">Todos</option><option value="processing">En proceso</option><option value="completed">Listos</option><option value="attention">Requieren atención</option><option value="waiting">Sin analizar</option></select></label>
+        <label className="sort-field">Origen <select aria-label="Filtrar por origen" value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value as ProjectSourceFilter)}><option value="all">Todos</option><option value="archive">ZIP</option><option value="individual">Archivo individual</option><option value="manual">Importación manual</option></select></label>
+        <label className="sort-field">Ordenar por <select aria-label="Ordenar proyectos" value={sort} onChange={(event) => setSort(event.target.value)}><option value="recent">Actividad reciente</option><option value="name">Nombre: A–Z</option><option value="programs">Más programas</option></select></label>
       </div>
       <Load q={q}>{(projects) => {
-        const filtered = filterProjectsByQuery(projects, search).sort((a, b) => sort === "name" ? a.name.localeCompare(b.name, "es") : Date.parse(b.created_at) - Date.parse(a.created_at));
-        return projects.length === 0 ? <div className="empty-state"><span className="empty-icon"><Icon name="folder" size={32} /></span><h3>Tu primer proyecto empieza aquí</h3><p>Sube un ZIP y el portal creará una carpeta independiente para analizar todos sus programas SAS.</p><button onClick={openUpload}><Icon name="upload" size={18} /> Subir ZIP y empezar</button><span className="empty-note">El análisis comienza automáticamente después de recibir el archivo.</span></div>
-          : filtered.length === 0 ? <div className="empty-state"><Icon name="search" size={30} /><h3>No encontramos ese proyecto</h3><p>Prueba con otro nombre de proyecto o del ZIP.</p><button className="secondary" onClick={() => setSearch("")}>Ver todos los proyectos</button></div>
-          : <><div className="project-grid">{filtered.map((project) => <ProjectCard key={project.id} project={project} />)}<button className="new-project-card" onClick={openUpload}><span><Icon name="plus" size={24} /></span><strong>Subir otro ZIP</strong><small>Crear un proyecto independiente</small></button></div><p className="home-project-results" role="status">{filtered.length === projects.length ? `${projects.length} proyecto${projects.length === 1 ? "" : "s"}` : `${filtered.length} de ${projects.length} proyectos`}</p></>;
+        const filtered = filterProjectsByFacets(filterProjectsByQuery(projects, search), statusFilter, sourceFilter).sort((a, b) => {
+          if (sort === "name") return a.name.localeCompare(b.name, "es");
+          if (sort === "programs") return (b.manifest_summary?.programs ?? 0) - (a.manifest_summary?.programs ?? 0);
+          const aActivity = a.processing?.updated_at ?? a.uploaded_at ?? a.created_at;
+          const bActivity = b.processing?.updated_at ?? b.uploaded_at ?? b.created_at;
+          return Date.parse(bActivity) - Date.parse(aActivity);
+        });
+        return projects.length === 0 ? <div className="empty-state"><span className="empty-icon"><Icon name="folder" size={32} /></span><h3>Tu primer proyecto empieza aquí</h3><p>Sube un ZIP o un archivo SAS individual (.sas o .txt).</p><button onClick={openUpload}><Icon name="upload" size={18} /> Subir archivo y empezar</button><span className="empty-note">El análisis comienza automáticamente después de recibir el archivo.</span></div>
+          : filtered.length === 0 ? <div className="empty-state"><Icon name="search" size={30} /><h3>No hay proyectos con estos filtros</h3><p>Cambia la búsqueda, el estado o el origen seleccionado.</p><button className="secondary" onClick={() => { setSearch(""); setStatusFilter("all"); setSourceFilter("all"); }}>Quitar filtros</button></div>
+          : <><div className="project-grid">{filtered.map((project) => <ProjectCard key={project.id} project={project} />)}<button className="new-project-card" onClick={openUpload}><span><Icon name="plus" size={24} /></span><strong>Subir otro archivo</strong><small>Crear un proyecto independiente</small></button></div><p className="home-project-results" role="status">{filtered.length === projects.length ? `${projects.length} proyecto${projects.length === 1 ? "" : "s"}` : `${filtered.length} de ${projects.length} proyectos`}</p></>;
       }}</Load>
     </section>
-    {q.data?.some((project) => !project.archive_name) && <div className="home-note"><Icon name="info" size={18} /><p>Los proyectos sin ZIP registrado conservan su importación manual. Cada ZIP nuevo crea un proyecto independiente.</p></div>}
-    {uploadOpen && <Dialog title="Crear proyecto desde un ZIP" onClose={() => { if (!uploading) { setUploadOpen(false); setSelectedFile(undefined); setErr(undefined); } }}>
-      <p className="muted">El portal extraerá y analizará el contenido en segundo plano. El proyecto aparecerá cuando el servidor confirme que recibió y registró el ZIP.</p>
+    {q.data?.some((project) => !project.archive_name) && <div className="home-note"><Icon name="info" size={18} /><p>Los proyectos sin archivo de origen registrado conservan su importación manual. Cada archivo nuevo crea un proyecto independiente.</p></div>}
+    {uploadOpen && <Dialog title="Crear proyecto desde archivos" onClose={() => { if (!uploading) { setUploadOpen(false); setSelectedFiles([]); setErr(undefined); } }}>
+      <p className="muted">Selecciona uno o varios ZIP o programas SAS (.sas o .txt). Cada archivo creará un proyecto independiente.</p>
       <form onSubmit={upload}>
-        <label>Archivo ZIP<input autoFocus type="file" accept=".zip,application/zip" disabled={uploading} onChange={(event) => { setSelectedFile(event.target.files?.[0]); setErr(undefined); }} /></label>
-        {selectedFile && <div className="selected-zip"><Icon name="file" size={18} /><span title={selectedFile.name}>{selectedFile.name}</span><small>{formatBytes(selectedFile.size)}</small></div>}
-        <label>Nombre del proyecto <span className="muted">(opcional)</span><input value={projectName} onChange={(event) => setProjectName(event.target.value)} placeholder={selectedFile?.name.replace(/\.zip$/i, "") || "Se usará el nombre del ZIP"} maxLength={120} disabled={uploading} /></label>
+        <label>Archivos<input autoFocus type="file" multiple accept=".zip,.sas,.txt,application/zip,text/plain" disabled={uploading} onChange={(event) => { setSelectedFiles(Array.from(event.target.files ?? [])); setErr(undefined); }} /></label>
+        {selectedFiles.length > 0 && <ul className="selected-zip-list" aria-label="Archivos seleccionados">{selectedFiles.map((file) => <li className="selected-zip" key={`${file.name}:${file.size}:${file.lastModified}`}><Icon name="file" size={18} /><span title={file.name}>{file.name}</span><small>{formatBytes(file.size)}</small></li>)}</ul>}
+        <label>Nombre base <span className="muted">(opcional; se combina con cada archivo)</span><input value={projectName} onChange={(event) => setProjectName(event.target.value)} placeholder={selectedFiles[0]?.name.replace(/\.(zip|sas|txt)$/i, "") || "Se usará el nombre del archivo"} maxLength={120} disabled={uploading} /></label>
         {err && <p className="error" role="alert">{err}</p>}
-        {uploading && <p className="loading-state" role="status"><span className="spinner" /> Subiendo el ZIP y preparando el proyecto…</p>}
-        <div className="dialog-actions"><button type="button" className="secondary" disabled={uploading} onClick={() => { setUploadOpen(false); setSelectedFile(undefined); setErr(undefined); }}>Cancelar</button><button disabled={uploading || !selectedFile}><Icon name="upload" size={17} />{uploading ? "Registrando ZIP…" : "Subir ZIP y analizar"}</button></div>
+        {uploading && <p className="loading-state" role="status"><span className="spinner" /> Subiendo archivo {uploadIndex} de {selectedFiles.length}…</p>}
+        <div className="dialog-actions"><button type="button" className="secondary" disabled={uploading} onClick={() => { setUploadOpen(false); setSelectedFiles([]); setErr(undefined); }}>Cancelar</button><button disabled={uploading || selectedFiles.length === 0}><Icon name="upload" size={17} />{uploading ? "Subiendo…" : `Subir ${selectedFiles.length || ""} y analizar`}</button></div>
       </form>
     </Dialog>}
   </div>;

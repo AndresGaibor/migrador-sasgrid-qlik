@@ -57,8 +57,8 @@ class E:
 
 
 class Result:
-    def __init__(self, java: str, columns: list[str], warnings: list[str]):
-        self.java, self.columns, self.warnings = java, columns, warnings
+    def __init__(self, java: str, columns: list[str], warnings: list[str], kind: str = "any"):
+        self.java, self.columns, self.warnings, self.kind = java, columns, warnings, kind
 
 
 def _tokens(text: str) -> list[tuple[str, str]]:
@@ -264,9 +264,11 @@ class _P:
             return E(f"({expr})", "num")
         guard = [a, b]
         body = f"Double.valueOf({expr})"
+        # En SAS no hay aritmética de texto: el resultado de + - * / ** es siempre numérico, aunque no sepamos el
+        # tipo de las columnas.
         if op == "/":  # dividir por cero es perdido en SAS
-            return E(f"({_guard(guard, f'({_num(b)} == 0 ? null : {body})')})", "any")
-        return E(_guard(guard, body), "any")
+            return E(f"({_guard(guard, f'({_num(b)} == 0 ? null : {body})')})", "num")
+        return E(_guard(guard, body), "num")
 
     def pow(self) -> E:
         base = self.unary()
@@ -454,25 +456,31 @@ def _compress(p: _P, args: list[E]) -> E:
 
 
 def _round(_p: _P, args: list[E]) -> E:
+    """ROUND de SAS redondea el 0,5 hacia fuera del cero (`Math.round` lo lleva hacia arriba: -2,5 -> -2)."""
     _need(args, 1, 2, "round")
     x = args[0]
     if len(args) == 1:
-        return E(_guard([x], f"Double.valueOf(Math.round({_num(x)}))"))
+        v = _num(x)
+        return E(_guard([x], f"Double.valueOf({v} < 0 ? -Math.round(-{v}) : Math.round({v}))"), "num")
     unit = args[1]
-    return E(_guard([x, unit], f"Double.valueOf(Math.round({_num(x)} / {_num(unit)}) * {_num(unit)})"))
+    v, u = _num(x), _num(unit)
+    q = f"({v} / {u})"
+    return E(
+        _guard([x, unit], f"Double.valueOf(({q} < 0 ? -Math.round(-{q}) : Math.round({q})) * {u})"), "num"
+    )
 
 
 def _unary_math(fn: str):
     def build(_p: _P, args: list[E]) -> E:
         _need(args, 1, 1, fn)
-        return E(_guard(args, f"Double.valueOf({fn}({_num(args[0])}))"))
+        return E(_guard(args, f"Double.valueOf({fn}({_num(args[0])}))"), "num")
 
     return build
 
 
 def _int(_p: _P, args: list[E]) -> E:
     _need(args, 1, 1, "int")
-    return E(_guard(args, f"Long.valueOf(((Number) {args[0].java}).longValue())"))
+    return E(_guard(args, f"Long.valueOf(((Number) {args[0].java}).longValue())"), "num")
 
 
 def _coalesce(_p: _P, args: list[E]) -> E:
@@ -505,7 +513,9 @@ def _aggregate(kind: str):
         out = _num(present[-1])
         for a in reversed(present[:-1]):
             out = f"({a.java} == null ? {out} : {fn}({_num(a)}, {out}))"
-        return E(f"Double.valueOf({out})")
+        # Todos perdidos es perdido en SAS; sin esta guarda la anidacion desreferencia un null.
+        empty = " && ".join(f"{a.java} == null" for a in present)
+        return E(f"({empty} ? null : Double.valueOf({out}))")
 
     return build
 
@@ -627,4 +637,4 @@ def translate_to_talend(sas: str) -> Result:
     result = parser.expr()
     if parser.i != len(parser.t):
         raise Unsupported(f"texto sobrante: {parser.peek()[1]!r}")
-    return Result(result.java, sorted(set(parser.cols)), sorted(parser.warnings))
+    return Result(result.java, sorted(set(parser.cols)), sorted(parser.warnings), result.kind)

@@ -563,6 +563,23 @@ class TalendAdapter:
     async def read_contexts(self, job_name: str) -> list[dict[str, Any]]:
         return (await self._data("talend_read_contexts", {"jobName": job_name})).get("contexts", [])
 
+    async def component_icon(self, name: str) -> str | None:
+        data = await self._data("talend_component_icon", {"name": name})
+        svg = data.get("svg")
+        return svg if data.get("available") and isinstance(svg, str) else None
+
+    async def installed_component_names(self) -> list[str]:
+        data = await self._data(
+            "talend_studio_list_components", {"limit": 100000, "paletteType": "*"}
+        )
+        result = data.get("result")
+        names = result.get("components") if isinstance(result, dict) else None
+        if not isinstance(names, list) or not all(isinstance(name, str) for name in names):
+            raise TalendError("talend_studio_list_components devolvió un inventario incompleto")
+        if result.get("count") != len(names):
+            raise TalendError("talend_studio_list_components devolvió un inventario truncado")
+        return sorted(set(names), key=str.casefold)
+
     async def inspect_job(self, job_path: str) -> JobInspection:
         if not job_path.endswith(".item"):
             raise TalendError("job_path debe apuntar a un archivo .item")

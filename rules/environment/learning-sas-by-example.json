@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "project": "learning-sas-by-example",
+  "libraries": [
+    {
+      "name": "learn",
+      "engine": "postgres",
+      "connection": "ctx_learn",
+      "note": "Librería del libro (antes .sas7bdat en c:\\books\\learning). Las credenciales viven en el grupo de contexto ctx_learn."
+    },
+    {
+      "name": "work",
+      "engine": "base",
+      "note": "Temporal de SAS: no se cataloga."
+    }
+  ],
+  "datasets": [
+    {
+      "library": "learn",
+      "name": "blood",
+      "kind": "table",
+      "target": "learn_blood",
+      "columns": [
+        { "name": "PatientID", "talend_type": "id_Integer", "nullable": false },
+        { "name": "Gender", "talend_type": "id_String", "length": 1 },
+        { "name": "Cholesterol", "talend_type": "id_Double" },
+        { "name": "BloodPressure", "talend_type": "id_String", "length": 2 }
+      ]
+    },
+    {
+      "library": "learn",
+      "name": "survey",
+      "kind": "delimited",
+      "target": "data/in/survey.csv",
+      "delimiter": ",",
+      "header": true,
+      "encoding": "UTF-8",
+      "columns": [
+        { "name": "id", "talend_type": "id_Integer", "nullable": false },
+        { "name": "age", "talend_type": "id_Integer" },
+        { "name": "income", "talend_type": "id_Double" }
+      ]
+    }
+  ]
+}

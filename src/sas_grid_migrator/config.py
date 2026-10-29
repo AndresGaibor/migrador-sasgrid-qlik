@@ -13,6 +13,10 @@ class Settings:
     max_pipeline_concurrency: int = 2
     max_queued_pipelines: int = 20
     import_roots: tuple[Path, ...] = ()  # vacío = cualquier ruta local (uso de un solo usuario)
+    # Política de reportes (PROC PRINT/REPORT/TABULATE): "log" | "csv" | "discard". Ver docs/automation-plan.md, WP3.
+    report_policy: str = "log"
+    # Acción al escribir una tabla (WP6): SAS reemplaza el dataset completo -> "drop_create". Nunca implícita.
+    table_action: str = "drop_create"
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -28,4 +32,6 @@ class Settings:
             import_roots=tuple(
                 Path(r).resolve() for r in e.get("SGM_IMPORT_ROOTS", "").split(os.pathsep) if r
             ),
+            report_policy=e.get("SGM_REPORT_POLICY", cls.report_policy),
+            table_action=e.get("SGM_TABLE_ACTION", cls.table_action),
         )

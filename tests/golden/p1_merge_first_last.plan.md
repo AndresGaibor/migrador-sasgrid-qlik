@@ -57,7 +57,6 @@
 - **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
-  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_6_write_1_row_count`, `vc_op_6_write_1_schema`
 
 ### 5. Leer work.clientes
@@ -99,7 +98,6 @@
 - **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
-  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_7_write_1_row_count`, `vc_op_7_write_1_schema`
 
 ### 8. Leer work.clientes
@@ -156,7 +154,7 @@
 - **Propiedades:**
   - `Expressions` (Editor del componente (no es un parámetro plano)) = `3 asignaciones, 3 condicionales` — SAS p1_merge_first_last.sas:9
   - `Var table` (Editor del componente (no es un parámetro plano)) = _por configurar_ — regla mappings
-- **Esquema:** `dias`, `mes_pago`, `tramo` _(tipos por determinar)_
+- **Esquema:** `dias`, `mes_pago`, `tramo`, `monto`, `flag_sin_pago`:Double _(tipos por determinar)_
 - **Expresión** (línea 18): SAS `intck('day', fecha_pago, today())` → _sin traducción automática_
   - ⚠ Sin traducción automática: función intck
 - **Expresión** (línea 19): SAS `put(fecha_pago, yymmn6.)` → _sin traducción automática_
@@ -164,13 +162,14 @@
 - **Expresión** (línea 20): SAS `put(edad, tramo.)` → _sin traducción automática_
   - ⚠ Sin traducción automática: token no soportado: '.)'
 - **Expresión** (línea 15): SAS `if first.cliente_id then acumulado = 0` → _sin traducción automática_
-  - ⚠ Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow
-- **Expresión** (línea 17): SAS `if missing(monto) then flag_sin_pago = 1` → _sin traducción automática_
-  - ⚠ Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow
+  - ⚠ Condicional IF/THEN sin traducción automática de la condición o los valores
+- **Expresión** (línea 17): SAS `if missing(monto) then flag_sin_pago = 1` → Java `((input_row.monto == null) ? 1 : null)`
+  - ⚠ missing(): null (y cadena vacía si es texto) en Java
 - **Expresión** (línea 21): SAS `if last.cliente_id then output` → _sin traducción automática_
-  - ⚠ Condicional IF/ELSE: traducir a expresión ternaria o bloque de tMap/tJavaRow
+  - ⚠ Condicional IF/ELSE sin traducción automática
 - **Supuestos:** Lógica condicional: revisar orden de evaluación y valores missing
 - **Pendientes:**
+  - Condicional IF/ELSE sin traducción automática: revisar a mano
   - Tipos de las columnas calculadas
 - **Pruebas:** `vc_op_9_compute_1_nulls`, `vc_op_9_compute_1_dates`, `vc_op_9_compute_1_numeric`
 
@@ -197,7 +196,6 @@
 - **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
-  - Confirmar la acción sobre la tabla: SAS reemplaza el dataset completo
 - **Pruebas:** `vc_op_9_write_1_row_count`, `vc_op_9_write_1_schema`
 
 ## Casos de validación

@@ -212,6 +212,16 @@ def test_plan_steps_have_contract(tmp_path):
     assert not any(s.verified for p in ps.plans for s in p.steps)
 
 
+def test_saved_job_name_template_is_used_when_generating_plans(tmp_path):
+    store, pid = project(tmp_path)
+    store.set_setting("job_name_template", "{proyecto}_{programa}")
+
+    plans = generate_plans(store, pid)
+
+    target = next(plan for plan in plans.plans if plan.program == "p0_clientes_activos.sas")
+    assert target.job_name == "t_p0_clientes_activos"
+
+
 def test_plan_flattens_invoked_entry_macro_and_keeps_its_parameters_in_context():
     include = IROperation(
         id="op_2_include_1",

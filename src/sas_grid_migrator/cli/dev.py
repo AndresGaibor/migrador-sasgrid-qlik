@@ -79,12 +79,23 @@ def create_job() -> _JobObject | None:
     return kernel32, handle
 
 
-def spawn(command: list[str], cwd: Path, env: dict[str, str], job: _JobObject | None) -> Any:
-    options: dict[str, Any] = (
-        {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
-        if IS_WINDOWS
-        else {"start_new_session": True}
-    )
+def spawn(
+    command: list[str],
+    cwd: Path,
+    env: dict[str, str],
+    job: _JobObject | None,
+    *,
+    no_console: bool = False,
+) -> Any:
+    if IS_WINDOWS:
+        flags = subprocess.CREATE_NEW_PROCESS_GROUP
+        if no_console:
+            # Uvicorn's reload worker can emit Ctrl+C on Windows; keep it from
+            # delivering that console event to this supervisor and sibling services.
+            flags |= subprocess.CREATE_NO_WINDOW
+        options: dict[str, Any] = {"creationflags": flags}
+    else:
+        options = {"start_new_session": True}
     process = subprocess.Popen(command, cwd=cwd, env=env, **options)
     if job is not None:
         kernel32, handle = job
@@ -194,7 +205,7 @@ def dev(
         ensure_deps(mcp_dir, bun, "el MCP")
         named.append(("MCP", spawn(command, mcp_dir, mcp_env, job)))
         typer.echo(f"MCP: http://127.0.0.1:{mcp_port}/mcp (preset portal)")
-    named.append(("API", spawn(api_command, root, env, job)))
+    named.append(("API", spawn(api_command, root, env, job, no_console=reload)))
     named.append(("UI", spawn([bun, "run", "dev", "--host", host, "--port", str(web_port)], web, env, job)))
     processes = [process for _, process in named]
     url = f"http://{host}:{web_port}/"

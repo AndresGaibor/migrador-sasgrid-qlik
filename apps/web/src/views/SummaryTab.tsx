@@ -5,6 +5,8 @@ import { Icon } from "../components/Icon";
 import { formatErrorMessage, notifyError, notifySuccess } from "../errors";
 import type { Summary } from "../types";
 import { Badge, Load, link, prioTone } from "./common";
+import { pendingTotals } from "../project-workspace";
+import { useProjectEvents } from "../project-events";
 
 export function SummaryTab({ id, refreshKey = 0 }: { id: string; refreshKey?: number }) {
   const inventory = useAsync(() => api.inventory(id), [id]);
@@ -22,18 +24,33 @@ export function SummaryTab({ id, refreshKey = 0 }: { id: string; refreshKey?: nu
       throw error;
     }
   }, [id, refreshKey]);
+  const progress = useAsync(async () => {
+    try { return await api.projectProgress(id); }
+    catch (error) { if (error instanceof ApiError && error.status === 409) return undefined; throw error; }
+  }, [id, refreshKey]);
+  const pending = useAsync(async () => {
+    try { return await api.pendingSummary(id); }
+    catch (error) { if (error instanceof ApiError && error.status === 409) return undefined; throw error; }
+  }, [id, refreshKey]);
   const [s, setS] = useState<Summary>();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string>();
   const summary = s ?? persisted.data;
+  const pendingCount = pendingTotals(pending.data ?? []);
+  const events = useProjectEvents(id, processing.reload);
   const isProcessing = processing.data?.status === "queued" || processing.data?.status === "running";
   useEffect(() => {
-    if (isProcessing) {
-      const timer = window.setInterval(processing.reload, 1500);
-      return () => window.clearInterval(timer);
+    if (!isProcessing) {
+      if (processing.data?.status === "completed") persisted.reload();
+      return;
     }
-    if (processing.data?.status === "completed") persisted.reload();
-  }, [isProcessing, processing.data?.status, processing.reload, persisted.reload]);
+    if (events.connected) return;
+    const timer = window.setInterval(processing.reload, 1500);
+    return () => window.clearInterval(timer);
+  }, [isProcessing, processing.data?.status, processing.reload, persisted.reload, events.connected]);
+  useEffect(() => {
+    if (processing.data?.status === "completed") { progress.reload(); pending.reload(); }
+  }, [processing.data?.status, progress.reload, pending.reload]);
   const run = async () => {
     setBusy(true); setErr(undefined);
     try {
@@ -50,6 +67,20 @@ export function SummaryTab({ id, refreshKey = 0 }: { id: string; refreshKey?: nu
     <p className="subtitle">Analiza tus programas para descubrir cómo funcionan y qué necesita atención antes de migrar.</p>
     {processing.data && <div className={`project-processing-inline ${isProcessing ? "active" : processing.data.status}`} role="status" aria-live="polite"><span>{isProcessing ? <span className="spinner" /> : <Icon name={processing.data.status === "completed" ? "check" : "info"} size={17} />}</span><div><strong>{processing.data.message}</strong><small>Etapa: {processing.data.stage} · Estado: {processing.data.status}</small></div></div>}
     {processing.error && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{formatErrorMessage(processing.error, undefined, processing.errorStatus)}</span></div>}
+    {progress.data && <section className="panel command-center" aria-label="Progreso de migración">
+      <div className="command-center-heading"><div><span className="eyebrow">CENTRO DE MANDO</span><h2>Tu ruta de migración</h2><p>Avance basado en el estado guardado de este proyecto.</p></div>
+        {progress.data.next && <a className="button" href={link(id, progress.data.next.tab)}>{progress.data.next.label}<Icon name="arrow" size={17} /></a>}
+      </div>
+      <ol className="migration-progress-list">{progress.data.stages.map((stage) => <li key={stage.key} className={`migration-progress-step ${stage.status}`}>
+        <span className="migration-progress-marker" aria-hidden="true">{stage.status === "done" ? "✓" : stage.status === "blocked" ? "!" : stage.status === "current" ? "●" : "○"}</span>
+        <span className="migration-progress-copy"><strong>{stage.label}</strong><small>{stage.detail}</small></span>
+      </li>)}</ol>
+    </section>}
+    {pending.data && pending.data.length > 0 && <section className="panel pending-summary" aria-label="Pendientes de migración">
+      <div className="section-heading"><div><h2>Pendientes por resolver</h2><p className="muted">Agrupados por decisión necesaria; abre el Job para revisar los pasos.</p></div><Badge tone="warn">{pendingCount.steps} {pendingCount.steps === 1 ? "paso" : "pasos"} en {pendingCount.jobs} {pendingCount.jobs === 1 ? "Job" : "Jobs"}</Badge></div>
+      <ul>{pending.data.map((group) => <li key={group.reason}><div><strong>{group.reason}</strong><small>{group.steps} {group.steps === 1 ? "paso" : "pasos"}</small></div><div className="pending-job-links">{group.programs.map((job) => <a key={`${job.program}:${job.job_name}`} href={link(id, "planes", job.program)}>{job.job_name}<Icon name="arrow" size={14} /></a>)}</div></li>)}</ul>
+    </section>}
+    {progress.error && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>No se pudo recuperar el progreso: {formatErrorMessage(progress.error, undefined, progress.errorStatus)}</span><button className="secondary" onClick={progress.reload}>Reintentar</button></div>}
     <Load q={inventory}>{(m) => <section className="panel">
       <div className="panel-heading"><Icon name={m.files.length ? "chart" : "upload"} size={28} /><div><h2>{m.files.length ? isProcessing ? "El análisis automático está en curso" : "Tu proyecto está listo" : "Empecemos por tus archivos"}</h2><p>{m.files.length ? `${m.files.length} archivos cargados. El portal analiza programas, instrucciones y aspectos por revisar.` : "Carga tus programas SAS para obtener un resumen de tu proyecto."}</p></div></div>
       {m.files.length ? <button onClick={run} disabled={busy || (Boolean(processing.data) && isProcessing)}><Icon name="play" size={16} />{busy ? "Analizando proyecto…" : isProcessing ? "Análisis en curso…" : summary ? "Volver a analizar" : "Analizar proyecto"}</button> : <a className="button" href={link(id, "importar")}><Icon name="upload" size={18} /> Cargar mis archivos <Icon name="arrow" size={16} /></a>}

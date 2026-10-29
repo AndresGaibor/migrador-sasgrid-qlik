@@ -4,6 +4,7 @@ import { useAsync } from "../hooks";
 import { Icon } from "../components/Icon";
 import { Badge, Load } from "./common";
 import { notifyError, notifySuccess } from "../errors";
+import { NamingTemplateCard } from "./settings/NamingTemplateCard";
 
 type Health = Awaited<ReturnType<typeof api.talendHealth>>;
 
@@ -40,6 +41,7 @@ function bridgeModeLabel(mode: string | undefined) {
 export function SettingsView() {
   const q = useAsync(api.talendHealth, []);
   const permissions = useAsync(api.talendPermissions, []);
+  const naming = useAsync(api.namingTemplate, []);
   const [permission, setPermission] = useState<boolean>();
   const [savingWrite, setSavingWrite] = useState(false);
   const [writeError, setWriteError] = useState<string>();
@@ -146,6 +148,10 @@ export function SettingsView() {
       <button className="secondary" onClick={q.reload} disabled={q.loading}><Icon name="check" size={18} />{q.loading ? "Comprobando…" : "Comprobar conexión"}</button>
       <button className="secondary" onClick={() => void restartStudio()} disabled={restarting || !enabled}><Icon name="settings" size={18} />{restarting ? "Reiniciando Studio…" : "Reiniciar Studio"}</button>
       <p className="muted">Cierra Studio (y sus diálogos abiertos; si no sale, fuerza el cierre) y lo vuelve a abrir. Los editores sin guardar se pierden y Talend Cloud puede pedir iniciar sesión de nuevo. Requiere el permiso de escritura.</p>
+    </section>
+    <section className="panel" aria-labelledby="naming-template-title">
+      <div className="panel-heading"><Icon name="file" size={28} /><div><h2 id="naming-template-title">Nombres de los Jobs</h2><p>Define cómo se nombran los Jobs nuevos con los tokens de proyecto, carpeta y programa.</p></div></div>
+      <Load q={naming}>{(data) => <NamingTemplateCard key={data.template} initial={data} />}</Load>
     </section>
   </>;
 }
