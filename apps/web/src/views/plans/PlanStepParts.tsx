@@ -5,12 +5,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { Step } from "../../types";
+import type { JobPlan, Step } from "../../types";
 import { stepDoes } from "../../step-guide";
 import { GUIDE_PROGRESS, type GuideProgress } from "../../guide-progress";
 import { link } from "../common";
+import { ExpressionEditor } from "./ExpressionEditor";
 
-export function StepInstructions({ id, step, allSteps, officialUrl }: { id: string; step: Step; allSteps: Step[]; officialUrl?: string | null }) {
+export function StepInstructions({ id, step, allSteps, officialUrl, file, locked, onPlan }: { id: string; step: Step; allSteps: Step[]; officialUrl?: string | null; file?: string; locked?: boolean; onPlan?: (plan: JobPlan) => void }) {
   return <>
     <h4 className="guide-actions-heading">Pasos para configurar este componente</h4>
     <ol className="do-list" aria-label="Pasos para configurar este componente">
@@ -25,6 +26,10 @@ export function StepInstructions({ id, step, allSteps, officialUrl }: { id: stri
         </li>
       ))}
     </ol>
+    {file && onPlan && step.expressions.length > 0 && <section className="step-expressions" aria-label="Expresiones del paso">
+      <h4>Expresiones del paso</h4>
+      {step.expressions.map((expression, index) => <ExpressionEditor key={`${index}:${expression.sas}`} id={id} file={file} stepId={step.id} index={index} expression={expression} locked={locked} onSaved={onPlan} />)}
+    </section>}
     <div className="guide-links">{step.evidence?.file && <a href={`${link(id, "programas", step.evidence.file)}?line=${step.evidence.line}`}><Icon name="search" size={15} /> Ver el SAS original · {step.evidence.file.split("/").pop()}:{step.evidence.line}</a>}{officialUrl && <a href={officialUrl} target="_blank" rel="noreferrer"><Icon name="book" size={15} /> Documentación oficial</a>}</div>
     <details><summary>Trazabilidad</summary><p className="muted">Subjob: {step.subjob} · confianza: {step.confidence} · {step.verified ? "cotejado con Talend MCP" : "sin cotejar con Talend MCP"}{step.alternatives.length > 0 && ` · alternativas: ${step.alternatives.join(", ")}`}</p></details>
     {step.assumptions.length > 0 && <p className="muted">Supuestos: {step.assumptions.join("; ")}</p>}

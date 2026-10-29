@@ -33,3 +33,9 @@ test("orchestration separates locations, configuration fields and source referen
   expect(html).toContain("Referencias en el SAS (1)");
   expect(html).not.toContain('open=""');
 });
+
+test("shows the job description under its name in the list", () => {
+  const row = { program: "daily.sas", job_name: "job_daily", description: "Carga diaria de ventas", steps: 1, done: 0 } as PlanRow;
+  const html = renderToStaticMarkup(<PlanListContent id="project" rows={[row]} isDesktop groups={[{ title: "Jobs", hint: "", rows: [row] }]} />);
+  expect(html).toContain("Carga diaria de ventas");
+});

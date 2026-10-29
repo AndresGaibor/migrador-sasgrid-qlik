@@ -13,9 +13,11 @@ import { PlanPreparation } from "./plans/PlanPreparation";
 import { decodeProgress, encodeProgress, isUncertainStep, storageStatus, type GuideProgress } from "../guide-progress";
 import { StepDecisionDialogs, StepInstructions, StepProgressEditor } from "./plans/PlanStepParts";
 import { PlanListContent } from "./plans/PlanListContent";
+import { JobIdentity } from "./plans/JobIdentity";
 import { ArchivePathTree } from "../components/ArchivePathTree";
 import { Dialog } from "../components/Dialog";
 import { TalendPreflight } from "./plans/TalendPreflight";
+import { BulkRename, shouldCloseBulkRename } from "./plans/BulkRename";
 
 export function PlansTab({ id, file }: { id: string; file?: string }) {
   return file ? <PlanDetail key={`${id}:${decodeURI(file)}`} id={id} file={decodeURI(file)} /> : <PlanList id={id} />;
@@ -55,6 +57,9 @@ function PlanList({ id }: { id: string }) {
   const [batchBusy, setBatchBusy] = useState(false);
   const [batchError, setBatchError] = useState<string>();
   const [confirmation, setConfirmation] = useState<TalendApplyBatchSummary>();
+  const [renaming, setRenaming] = useState(false);
+  const [renameWarnings, setRenameWarnings] = useState<string[]>([]);
+  const [renamingBusy, setRenamingBusy] = useState(false);
   const batchState = batch.data;
   const batchActive = batchState?.status === "queued" || batchState?.status === "running";
   const preflightReady = Boolean(!preflight.loading && !preflight.error && preflight.data?.available && preflight.data.conflict_count === 0);
@@ -124,8 +129,9 @@ function PlanList({ id }: { id: string }) {
   return (
     <>
       <div className="migration-heading"><div><h1>Plan de migración</h1><p className="subtitle">Primero crea la estructura, después completa los Jobs y al final programa su ejecución.</p></div>
-      <div className="plan-rebuild-toolbar"><button type="button" className={q.data?.length ? "secondary" : undefined} onClick={gen} disabled={busy || batchActive || batchBusy || Boolean(confirmation)} title="Tu progreso se conserva al volver a preparar las guías"><Icon name="play" size={16} />{busy ? "Preparando guías…" : q.data?.length ? "Actualizar guías" : "Preparar guías de migración"}</button><small>Tu progreso se conserva.</small></div></div>
+      <div className="plan-rebuild-toolbar"><button type="button" className={q.data?.length ? "secondary" : undefined} onClick={gen} disabled={busy || batchActive || batchBusy || Boolean(confirmation)} title="Tu progreso se conserva al volver a preparar las guías"><Icon name="play" size={16} />{busy ? "Preparando guías…" : q.data?.length ? "Actualizar guías" : "Preparar guías de migración"}</button><button type="button" className="secondary" onClick={() => { setRenameWarnings([]); setRenaming(true); }} disabled={batchActive || batchBusy || Boolean(confirmation) || !q.data?.length}>Renombrar Jobs</button><small>Tu progreso se conserva.</small></div></div>
       {err && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{err}</span></div>}
+      {renameWarnings.map((warning, index) => <p className="notice warning" role="status" key={`rename-warning-${index}`}>{warning}</p>)}
       <div className="migration-workspace">
       {q.data?.length ? <section className="talend-batch-panel" aria-labelledby="talend-batch-title">
         <div className="talend-batch-heading"><div><h2 id="talend-batch-title">1. Crea la estructura de los Jobs</h2><p>El MCP crea componentes y conexiones en Talend Studio; no se ejecutan ni se publican en Qlik Talend Cloud.</p></div>
@@ -163,6 +169,9 @@ function PlanList({ id }: { id: string }) {
         <TalendPreflight id={id} summary={confirmation} />
         {batchError && <p className="error" role="alert">{batchError}</p>}
         <div className="dialog-actions"><button type="button" className="secondary" disabled={batchBusy} onClick={() => setConfirmation(undefined)}>Cancelar</button><button type="button" disabled={!canStartBatch} onClick={() => void implementProject()}>{batchBusy ? "Iniciando…" : "Crear Jobs en Talend Studio"}</button></div>
+      </Dialog>}
+      {renaming && <Dialog title="Renombrar Jobs" onClose={() => { if (shouldCloseBulkRename(renamingBusy)) setRenaming(false); }}>
+        <BulkRename id={id} onClose={() => { if (shouldCloseBulkRename(renamingBusy)) setRenaming(false); }} onBusyChange={setRenamingBusy} onDone={(warnings) => { setRenaming(false); setRenamingBusy(false); setRenameWarnings(warnings); q.reload(); summary.reload(); preflight.reload(); notifySuccess("Jobs renombrados", "Los nombres de los Jobs se han actualizado."); }} />
       </Dialog>}
     </>
   );
@@ -305,7 +314,7 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
       <Load q={{ ...q, data: plan }}>
         {(p) => (
           <>
-            <h1>{p.job_name}</h1>
+            <JobIdentity key={file} id={id} plan={p} folderPath={preview.data?.identity.folder_path} locked={isBatchRunning || isApplyRunning} onSaved={setOverride} />
             <p className="subtitle">Sigue las tarjetas en orden para configurar cada componente; el estado muestra el avance general del componente.</p>
             <section className="talend-apply-panel" aria-label="Estado de implementación en Talend">
               <div className="talend-apply-heading"><div><h2>Creación en Talend Studio</h2><p>El MCP crea la estructura del Job; no lo ejecuta ni lo publica en Qlik Talend Cloud.</p></div><span className={`talend-mcp-status ${health.data?.available ? health.data.write_enabled ? "online" : "readonly" : "offline"}`} role="status">{health.loading ? "Consultando MCP…" : health.data?.available ? health.data.write_enabled ? "MCP listo" : "Solo lectura" : "MCP sin conexión"}</span></div>
@@ -321,11 +330,11 @@ function PlanDetail({ id, file }: { id: string; file: string }) {
             <PlanPreparation plan={p} />
             {ownGrid.length > 0 && <GridRecommendations id={id} items={ownGrid} isDesktop={isDesktop} />}
             <h2>{ownGrid.some((g) => PARENT_PATTERN.test(g.pattern_id)) ? "Después: el resto del programa" : "Construye el Job"}</h2>
-            <StepGroups id={id} steps={p.steps} onDecide={decide} />
+            <StepGroups id={id} steps={p.steps} onDecide={decide} file={file} locked={isBatchRunning || isApplyRunning} onPlan={setOverride} />
             {p.children.map((c) => (
               <section key={c.name}>
                 <h2>Crea también un Job aparte para la macro %{c.name}</h2><p className="muted">Nombre sugerido: <code>job_{c.name.toLowerCase()}</code>{c.params.length > 0 && <> · parámetros que recibe: {c.params.map((x) => <code key={x}> {x}</code>)}</>}. Sus pasos son estos:</p>
-                <StepGroups id={id} steps={c.steps} onDecide={decide} />
+                <StepGroups id={id} steps={c.steps} onDecide={decide} file={file} locked={isBatchRunning || isApplyRunning} onPlan={setOverride} />
               </section>
             ))}
             {p.validation_cases.length > 0 && (
@@ -419,7 +428,9 @@ function ComponentLink({ name, known }: { name: string; known?: boolean | null }
 type Decide = (s: Step, progress: GuideProgress, note: string, blockReason: string) => Promise<void>;
 
 // Los pasos que comparten «subjob» salen de un mismo bloque del SAS (un DATA o PROC): se construyen juntos.
-function StepGroups({ id, steps, onDecide }: { id: string; steps: Step[]; onDecide: Decide }) {
+type StepEditing = { file: string; locked: boolean; onPlan: (plan: JobPlan) => void };
+
+function StepGroups({ id, steps, onDecide, file, locked, onPlan }: { id: string; steps: Step[]; onDecide: Decide } & StepEditing) {
   const ordered = orderSteps(steps);
   const groups: Step[][] = [];
   for (const st of ordered) {
@@ -435,7 +446,7 @@ function StepGroups({ id, steps, onDecide }: { id: string; steps: Step[]; onDeci
         const writes = g.filter((x) => x.purpose.startsWith("Escribir ")).map((x) => x.purpose.slice(9).replace(/ \(reemplaza\)/, ""));
         const title = reads.length || writes.length ? `${reads.join(" + ") || "datos"} → ${writes.join(" + ") || "resultado"}` : g[0].purpose;
         const done = g.filter(isDone).length;
-        const cards = <>{g.length > 1 && <p className="muted">Estos {g.length} pasos van en el mismo lienzo, uno detrás de otro. Conéctalos como indica cada paso.</p>}{g.map((st) => <StepCard key={st.id} id={id} s={st} allSteps={ordered} previous={ordered[ordered.indexOf(st) - 1]} onDecide={onDecide} />)}</>;
+        const cards = <>{g.length > 1 && <p className="muted">Estos {g.length} pasos van en el mismo lienzo, uno detrás de otro. Conéctalos como indica cada paso.</p>}{g.map((st) => <StepCard key={st.id} id={id} s={st} allSteps={ordered} previous={ordered[ordered.indexOf(st) - 1]} onDecide={onDecide} file={file} locked={locked} onPlan={onPlan} />)}</>;
         // Con un solo bloque el desplegable sólo repite el título del paso: se muestran los pasos directamente.
         if (groups.length === 1) return <div key={g[0].id}>{cards}</div>;
         return (
@@ -455,7 +466,7 @@ function jumpToStep(stepId: string) {
   el?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step; allSteps: Step[]; previous?: Step; onDecide: Decide }) {
+function StepCard({ id, s, allSteps, previous, onDecide, file, locked, onPlan }: { id: string; s: Step; allSteps: Step[]; previous?: Step; onDecide: Decide } & StepEditing) {
   const saved = decodeProgress(s.status, s.note);
   const [progress, setProgress] = useState<GuideProgress>(saved.state);
   const [note, setNote] = useState(saved.note);
@@ -476,7 +487,7 @@ function StepCard({ id, s, allSteps, previous, onDecide }: { id: string; s: Step
   return <article className="guide-step" id={`step-${s.id}`}>
     <div className="guide-step-heading"><div className="step-head"><h3>{s.purpose}</h3><span className="step-component">Componente: <code>{s.component_candidate}</code></span></div></div>
     {studioCheck && <div className={`studio-step-verification ${studioCheck.status}`} role="status"><Badge tone={studioCheck.status === "verified" ? "ok" : "warn"}>{studioCheck.status === "verified" ? "Configurado en Studio" : studioCheck.status === "unavailable" ? "Studio no disponible" : "Pendiente de configuración"}</Badge>{studioUniqueName && <code>{studioUniqueName}</code>}{studioCheck.checked_at && <small>Lectura de Studio: {new Date(studioCheck.checked_at).toLocaleString("es")}</small>}{studioCheck.reason && <span>{studioCheck.reason}</span>}{Object.keys(studioCheck.checks).length > 0 && <details><summary>Verificación automática</summary><ul>{Object.entries(studioCheck.checks).map(([name, check]) => <li key={name}><strong>{verificationCheckLabel(name)}:</strong> {verificationStatusLabel(check.status)}{check.reason ? ` · ${check.reason}` : ""}</li>)}</ul></details>}</div>}
-    <StepInstructions id={id} step={s} allSteps={allSteps} officialUrl={officialUrl} />
+    <StepInstructions id={id} step={s} allSteps={allSteps} officialUrl={officialUrl} file={file} locked={locked} onPlan={onPlan} />
     <StepProgressEditor progress={progress} note={note} blockReason={blockReason} previous={previous} error={err} onProgress={chooseProgress} onNoteChange={setNote} onNoteBlur={() => note !== saved.note && void save(progress)} onEditBlock={() => setDialog("blocked")} onJumpPrevious={(step) => jumpToStep(step.id)} />
     <StepDecisionDialogs step={s} dialog={dialog} setDialog={setDialog} confirmed={confirmed} setConfirmed={setConfirmed} blockReason={blockReason} setBlockReason={setBlockReason} onSave={(state) => void save(state)} />
   </article>;

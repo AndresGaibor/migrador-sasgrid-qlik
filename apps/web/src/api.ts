@@ -1,4 +1,4 @@
-import type { CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, PlanRow, Program, ProgramRow, Project, ProjectUploadResponse, Summary, TalendApplyBatchPreflight, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing } from "./types";
+import type { BulkRenameRule, CatalogComponent, CatalogList, Deps, GridRecommendation, JobMetaResult, JobPlan, Manifest, NamingTemplate, PendingGroup, PlanRow, Program, ProgramRow, Project, ProjectProgress, ProjectUploadResponse, RenamePreviewRow, Summary, TalendApplyBatchPreflight, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing, TranslateResult } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -76,6 +76,21 @@ export const api = {
   plans: (id: string) => req<PlanRow[]>(`/projects/${id}/plans`),
   gridRecommendations: (id: string) => req<GridRecommendation[]>(`/projects/${id}/plans/grid-recommendations`),
   plan: (id: string, file: string) => req<JobPlan>(`/projects/${id}/plans/${enc(file)}`),
+  updateJobMeta: (id: string, file: string, body: { job_name: string | null; description: string | null }) =>
+    patch<JobMetaResult>(`/projects/${id}/plans/${enc(file)}/meta`, body),
+  renamePreview: (id: string, rule: BulkRenameRule) =>
+    post<RenamePreviewRow[]>(`/projects/${id}/plans/rename-preview`, rule),
+  renameJobs: (id: string, renames: { program: string; job_name: string }[]) =>
+    post<{ renamed: number; warnings: string[] }>(`/projects/${id}/plans/rename`, { renames }),
+  editExpression: (id: string, file: string, step: string, index: number, talend: string | null) =>
+    patch<JobPlan>(`/projects/${id}/plans/${enc(file)}/steps/${encodeURIComponent(step)}/expressions/${index}`, { talend }),
+  translate: (sas: string) => post<TranslateResult>("/translator/translate", { sas }),
+  namingTemplate: () => req<NamingTemplate>("/settings/naming"),
+  setNamingTemplate: (template: string) => patch<NamingTemplate>("/settings/naming", { template }),
+  namingExample: (template: string) =>
+    req<{ example: string | null; error: string | null }>(`/settings/naming/example?template=${encodeURIComponent(template)}`),
+  progress: (id: string) => req<ProjectProgress>(`/projects/${id}/progress`),
+  pendingSummary: (id: string) => req<PendingGroup[]>(`/projects/${id}/pending-summary`),
   decide: (id: string, file: string, step: string, status: string, note: string) =>
     req<JobPlan>(`/projects/${id}/plans/${enc(file)}/steps/${encodeURIComponent(step)}`, {
       method: "PATCH",

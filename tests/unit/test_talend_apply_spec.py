@@ -87,6 +87,18 @@ def test_build_apply_spec_maps_verified_steps_to_mcp_custom_job_spec():
     assert result.blocked_steps == []
 
 
+def test_description_goes_to_the_mcp_arguments_with_a_default():
+    migration = plan(step("read_1", "tFileInputDelimited"))
+    default = build_apply_spec(migration)
+    assert default.to_mcp_arguments()["description"] == "Migrated from SAS program daily.sas"
+
+    migration.description = "Carga diaria"
+    described = build_apply_spec(migration)
+
+    assert described.to_mcp_arguments()["description"] == "Carga diaria"
+    assert described.model_dump() != default.model_dump()
+
+
 def test_context_file_overrides_known_values_and_adds_per_job_parameters(tmp_path):
     migration = plan(step("read_1", "tFileInputDelimited"))
     migration.context_variables = [

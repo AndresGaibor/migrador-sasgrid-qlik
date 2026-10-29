@@ -42,6 +42,7 @@ class Expression(BaseModel):
     line: int
     requires_semantic_validation: bool = True
     warnings: list[str] = []
+    talend_edited: bool = False  # `talend` viene de una edición manual, no de las reglas
 
 
 class PlanStep(BaseModel):
@@ -142,6 +143,9 @@ class JobPlan(BaseModel):
     program: str
     sha256: str | None = None
     job_name: str
+    job_name_edited: bool = False  # el nombre viene de una edición manual
+    rename_ignored: str | None = None  # nombre pedido que se descartó por chocar con otro Job
+    description: str | None = None
     job_status: Literal["proposed", "needs_review"] = "needs_review"
     steps: list[PlanStep] = []
     entry_macro: MacroEntrypoint | None = None

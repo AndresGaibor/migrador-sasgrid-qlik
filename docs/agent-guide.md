@@ -25,6 +25,7 @@ límites obligatorios (permisos, subtree y acciones prohibidas), prevalece [AGEN
 | Dependencias SAS y planificación Grid | `src/sas_grid_migrator/dependency_graph/`, `grid_analysis/` | `tests/unit/test_dependencies.py`; [`architecture.md`](architecture.md) |
 | Modelo intermedio y guías por Job | `src/sas_grid_migrator/intermediate_representation/`, `migration_planner/`, `rules/` | `tests/unit/test_planner.py`, `tests/unit/test_talend_eligibility.py`; [`migration-rules.md`](migration-rules.md), [`equivalence-testing.md`](equivalence-testing.md) |
 | API y persistencia de estados | `apps/api/`, `src/sas_grid_migrator/persistence/store.py` | `tests/integration/test_api_*.py`, `tests/unit/test_store_*.py`; OpenAPI local en `/docs` |
+| Ediciones humanas sobre el plan, nombres de Job y progreso | `src/sas_grid_migrator/migration_planner/service.py` (`_apply_edits`), `job_naming.py`, `progress.py`; rutas en `apps/api/main.py` | `tests/unit/test_plan_edits.py`, `test_job_naming.py`, `test_progress.py`, `test_store_overrides.py`; `tests/integration/test_api_plan_edits.py`, `test_api_progress.py`; receta «Ediciones humanas sobre el plan» |
 | CLI y desarrollo local | `src/sas_grid_migrator/cli/` | `tests/integration/test_cli_pipeline.py`, `tests/unit/test_cli_agent.py` |
 | UI, pestañas y llamadas API | `apps/web/src/`, `apps/web/src/api.ts` | pruebas junto al componente en `apps/web/src/**/*.test.*` |
 | Catálogo, política y adaptador Talend | `src/sas_grid_migrator/talend_adapter/`, `rules/talend/`, `rules/mappings/` | `tests/unit/test_talend_*.py`, `tests/integration/test_mcp_contract.py`; [`talend-mcp-tools.md`](talend-mcp-tools.md) |
@@ -160,6 +161,43 @@ preset `portal` en `mcp/talend-mcp/src/server/registered-tools/preset-sets.ts` y
 3. Añade prueba de integración API y de UI/CLI en su frontera pública; para SQLite, prueba también
    lectura, persistencia y migración de esquema si aplica.
 4. Actualiza este mapa/README cuando cambie el flujo, el permiso, los comandos o los límites.
+
+### Ediciones humanas sobre el plan
+
+Nombre del Job, descripción y traducción Talend de una expresión son ediciones del usuario. Se guardan en SQLite y se
+superponen al plan al leerlo; no se escriben en `plans.json`:
+
+| Tabla | Clave | Contenido |
+| ----- | ----- | --------- |
+| `job_overrides` | `project_id`, `program` | `job_name`, `description` |
+| `expression_overrides` | `project_id`, `program`, `step_id`, `idx` | `sas` (texto SAS al editar), `talend` |
+| `portal_settings` | `key` | ajustes del portal; hoy `job_name_template` |
+
+Reglas:
+
+- `load_plans(store, id)` y `get_plan(...)` superponen las ediciones por defecto. Con `with_edits=False` no se aplican
+  las ediciones de nombre, descripción ni expresión, pero la superposición de decisiones de paso (estado y notas de
+  `step_state`) se hace siempre al leer.
+- `plans.json` nunca lleva ediciones de nombre, descripción ni expresión: `generate_plans` lo escribe en crudo. Las
+  decisiones de paso sí se superponen al leer y `verify_project_plans` las vuelve a grabar; por eso, si escribes un plan
+  de vuelta a disco, cárgalo con `with_edits=False` (así lo hace `verify_project_plans`) para no grabar las ediciones.
+- Una expresión editada solo cambia `talend` y `talend_edited`; `requires_semantic_validation` se conserva. La edición
+  se aplica únicamente si el texto SAS guardado sigue igual al del paso.
+- Un nombre que choca con el de otro Job (generado o ya aceptado) se ignora y queda en `JobPlan.rename_ignored`.
+- Las escrituras de edición responden 409 mientras hay un lote o una operación Talend activa en el proyecto
+  (`Store.has_active_talend_work`).
+- La plantilla de nombres (`{proyecto}`, `{carpeta}`, `{programa}`) se aplica al generar guías; un nombre editado a mano
+  no cambia.
+
+Las rutas viven en `apps/api/main.py`: `PATCH .../plans/{program}/meta`, `POST .../plans/rename-preview`,
+`POST .../plans/rename`, `PATCH .../steps/{step_id}/expressions/{index}`, `POST /api/translator/translate` y
+`GET|PATCH /api/settings/naming`, `GET /api/settings/naming/example`, `GET /api/projects/{id}/progress` y
+`GET /api/projects/{id}/pending-summary` (lógica de progreso en `migration_planner/progress.py`). `apps/api/plans.py` y
+`projects.py` no están montados en ninguna aplicación; no añadas rutas ahí.
+
+Reglas de nombre de Job (`migration_planner/job_naming.py`): identificador que cumple `^[A-Za-z_][A-Za-z0-9_]*$`, como
+máximo 60 caracteres y único sin distinguir mayúsculas. La plantilla debe incluir `{programa}`; los únicos tokens
+permitidos son `{proyecto}`, `{carpeta}` y `{programa}`.
 
 ## Pruebas y comandos
 

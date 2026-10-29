@@ -7,6 +7,7 @@ from sas_grid_migrator.dependency_graph.builder import build_dependencies, load_
 from sas_grid_migrator.intermediate_representation.builder import build_ir
 from sas_grid_migrator.intermediate_representation.models import LibraryRef
 from sas_grid_migrator.macro_resolver.resolver import macro_index
+from sas_grid_migrator.migration_planner.job_naming import DEFAULT_NAME_TEMPLATE, render_job_name
 from sas_grid_migrator.migration_planner.models import JobPlan, Orchestration, PlanSet
 from sas_grid_migrator.migration_planner.offline_files import configure_offline_file_operations
 from sas_grid_migrator.migration_planner.planner import (
@@ -23,6 +24,12 @@ from sas_grid_migrator.semantic_analysis.classify import load_rules
 from sas_grid_migrator.talend_adapter.naming import cap_job_name
 
 VALID_STATUS = {"propuesto", "pendiente", "verificado", "validado_manualmente", "descartado"}
+NAME_TEMPLATE_KEY = "job_name_template"
+
+
+def current_name_template(store: Store) -> str:
+    """Plantilla de nombres de Job guardada en los ajustes, o la de por defecto."""
+    return store.get_setting(NAME_TEMPLATE_KEY) or DEFAULT_NAME_TEMPLATE
 
 
 def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSet:
@@ -113,6 +120,9 @@ def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSe
         if schedule.file.lower().endswith(".sas"):
             grid_by_program[schedule.file].append(rec)
 
+    template = current_name_template(store)
+    project = store.get_project(project_id)
+    project_name = project.name if project else project_id
     plans = []
     for prog in analysis.programs:
         ir = build_ir(prog, macro_files)
@@ -124,8 +134,15 @@ def generate_plans(store: Store, project_id: str, fresh: bool = False) -> PlanSe
             downstream=sorted(down[prog.file]),
             grid_recommendations=grid_by_program[prog.file],
         )
-        plans.append(plan_program(ir, project_id, rules, libs, pending[prog.file], orch))
-    unique_job_names(plans)
+        plan = plan_program(ir, project_id, rules, libs, pending[prog.file], orch)
+        plan.job_name = render_job_name(template, project=project_name, program=plan.program)
+        plans.append(plan)
+    unique_job_names(
+        plans,
+        lambda parts, depth: render_job_name(
+            template, project=project_name, program="/".join(parts), depth=depth
+        ),
+    )
     for plan in plans:
         plan.job_name = cap_job_name(plan.job_name)
     ps = PlanSet(
@@ -148,15 +165,48 @@ def _overlay(store: Store, ps: PlanSet) -> PlanSet:
     return ps
 
 
-def load_plans(store: Store, project_id: str) -> PlanSet | None:
+def _apply_edits(store: Store, ps: PlanSet) -> PlanSet:
+    """Superpone las ediciones del usuario (nombre, descripción, expresiones) sin tocar plans.json."""
+    jobs = store.get_job_overrides(ps.project_id)
+    expressions = store.get_expression_overrides(ps.project_id)
+    generated = {plan.program: plan.job_name.casefold() for plan in ps.plans}
+    accepted: set[str] = set()
+    for plan in sorted(ps.plans, key=lambda item: item.program):
+        override = jobs.get(plan.program)
+        if override is None:
+            continue
+        requested = override.job_name
+        if requested is not None:
+            folded = requested.casefold()
+            taken = {name for program, name in generated.items() if program != plan.program}
+            if folded in taken or folded in accepted:
+                plan.rename_ignored = requested
+            else:
+                accepted.add(folded)
+                plan.job_name, plan.job_name_edited = requested, True
+        if override.description is not None:
+            plan.description = override.description
+    for plan in ps.plans:
+        for step in plan.steps + [s for c in plan.children for s in c.steps]:
+            for index, expression in enumerate(step.expressions):
+                saved = expressions.get((plan.program, step.id, index))
+                if saved and saved[0] == expression.sas:
+                    expression.talend, expression.talend_edited = saved[1], True
+    return ps
+
+
+def load_plans(store: Store, project_id: str, *, with_edits: bool = True) -> PlanSet | None:
     p = store.plans_path(project_id)
     if not p.exists():
         return None
-    return _overlay(store, PlanSet.model_validate(json.loads(p.read_text(encoding="utf-8"))))
+    ps = _overlay(store, PlanSet.model_validate(json.loads(p.read_text(encoding="utf-8"))))
+    return _apply_edits(store, ps) if with_edits else ps
 
 
-def get_plan(store: Store, project_id: str, program: str) -> JobPlan | None:
-    ps = load_plans(store, project_id)
+def get_plan(
+    store: Store, project_id: str, program: str, *, with_edits: bool = True
+) -> JobPlan | None:
+    ps = load_plans(store, project_id, with_edits=with_edits)
     return next((p for p in ps.plans if p.program == program), None) if ps else None
 
 

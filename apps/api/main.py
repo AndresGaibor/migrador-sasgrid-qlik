@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import os
 import re
 import tempfile
@@ -26,8 +27,26 @@ from sas_grid_migrator.dependency_graph.builder import (
 from sas_grid_migrator.domain.models import Manifest, Project
 from sas_grid_migrator.domain.redaction import redact
 from sas_grid_migrator.ingestion.importer import ImportError_, import_source
+from sas_grid_migrator.migration_planner.expressions import talend_expressions_enabled, translate
+from sas_grid_migrator.migration_planner.job_naming import (
+    DEFAULT_NAME_TEMPLATE,
+    TEMPLATE_TOKENS,
+    BulkRule,
+    RenamePreview,
+    bulk_preview,
+    render_job_name,
+    validate_job_name,
+    validate_template,
+)
 from sas_grid_migrator.migration_planner.models import JobPlan, PlanSet
+from sas_grid_migrator.migration_planner.progress import (
+    ProjectProgress,
+    compute_progress,
+    pending_groups,
+)
 from sas_grid_migrator.migration_planner.service import (
+    NAME_TEMPLATE_KEY,
+    current_name_template,
     generate_plans,
     get_plan,
     load_plans,
@@ -45,6 +64,8 @@ from sas_grid_migrator.sas_parser.ast import ParsedProgram
 from sas_grid_migrator.talend_adapter.batch import collect_child_results, order_plans_for_batch
 from sas_grid_migrator.talend_adapter.best_practices import check_job_arguments
 from sas_grid_migrator.talend_adapter.naming import folder_path, folder_segment
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -505,6 +526,7 @@ def list_plans(project_id: str) -> list[dict]:
             {
                 "program": p.program,
                 "job_name": p.job_name,
+                "description": p.description,
                 "job_status": p.job_status,
                 "steps": len(steps),
                 "pending": sum(1 for x in steps if x.pending),
@@ -520,6 +542,34 @@ def list_plans(project_id: str) -> list[dict]:
             }
         )
     return out
+
+
+@app.get("/api/projects/{project_id}/progress")
+def project_progress(project_id: str) -> ProjectProgress:
+    s = store()
+    _require(s, project_id)
+    project = s.get_project(project_id)
+    files = (project.manifest_summary or {}).get("files", 0) if project else 0
+    processing = s.get_processing(project_id)
+    try:
+        plan_rows = list_plans(project_id)
+    except HTTPException as exc:
+        if exc.status_code != 409:
+            raise
+        plan_rows = None
+    batch = s.get_talend_apply_batch_state(project_id)
+    return compute_progress(
+        files=files,
+        processing_status=processing.status if processing else None,
+        plan_rows=plan_rows,
+        batch_status=batch.get("status") if batch else None,
+    )
+
+
+@app.get("/api/projects/{project_id}/pending-summary")
+def project_pending_summary(project_id: str) -> list[dict]:
+    ps = _plans(project_id)
+    return [group.model_dump() for group in pending_groups(ps)]
 
 
 @app.get("/api/projects/{project_id}/plans/grid-recommendations")
@@ -1784,6 +1834,272 @@ def patch_step(project_id: str, program: str, step_id: str, body: Decision) -> J
         raise HTTPException(404, "plan no encontrado")
     return _annotate_plan_studio_checks(s, project_id, plan, plans)  # type: ignore[return-value]
 
+EDIT_LOCKED_MESSAGE = "No se puede editar mientras Talend crea Jobs de este proyecto."
+MAX_DESCRIPTION = 500
+MAX_EXPRESSION = 2000
+_CREATED_STATUSES = {"applied", "partially_applied"}
+
+
+def _editable_store(project_id: str) -> Store:
+    """Store del proyecto para una edición: 404 si no existe y 409 mientras Talend trabaja en él."""
+    s = store()
+    _require(s, project_id)
+    if s.has_active_talend_work(project_id):
+        raise HTTPException(409, EDIT_LOCKED_MESSAGE)
+    return s
+
+
+def _raw_and_effective_plans(s: Store, project_id: str) -> tuple[PlanSet, PlanSet]:
+    """Planes tal como los generó el planificador y con las ediciones superpuestas."""
+    raw = load_plans(s, project_id, with_edits=False)
+    effective = load_plans(s, project_id)
+    if raw is None or effective is None:
+        raise HTTPException(409, "los planes aún no fueron generados")
+    return raw, effective
+
+
+def _name_error(name: str, program: str, finals: dict[str, str], generated: dict[str, str]) -> str | None:
+    """Error de un nombre pedido frente a los nombres finales y a los generados de los demás Jobs.
+
+    Los generados cuentan porque la superposición descarta un nombre que choca con el de otro Job, aunque ese
+    otro Job vaya a renombrarse en el mismo cambio.
+    """
+    taken = [n for other, n in finals.items() if other != program]
+    taken += [n for other, n in generated.items() if other != program]
+    return validate_job_name(name, taken=taken)
+
+
+class PlanMeta(BaseModel):
+    job_name: str | None = None
+    description: str | None = None
+
+
+def _already_created_name(s: Store, project_id: str, program: str, fallback: str) -> str | None:
+    """Nombre con el que Studio ya creó el Job de este programa, o `None` si aún no existe."""
+    state = s.get_talend_apply_state(project_id, program)
+    if state and state.get("status") in _CREATED_STATUSES:
+        identity = state.get("identity")
+        return (identity.get("job_name") if isinstance(identity, dict) else None) or fallback
+    batch = s.get_talend_apply_batch_state(project_id) or {}
+    for job in batch.get("jobs", []):
+        if job.get("program") == program and job.get("status") in _CREATED_STATUSES:
+            return fallback
+    return None
+
+
+def _created_rename_warning(created_as: str) -> str:
+    return (
+        f"Este Job ya se creó en Talend Studio con el nombre anterior ({created_as}). "
+        "El portal no lo renombra en Studio: ese Job se conserva con el nombre anterior y la próxima "
+        "aplicación puede pedir confirmar la nueva revisión."
+    )
+
+
+@app.patch("/api/projects/{project_id}/plans/{program:path}/meta")
+def patch_plan_meta(project_id: str, program: str, body: PlanMeta) -> dict:
+    """Edita el nombre del Job y su descripción; lo omitido se conserva, `None` o vacío lo restaura."""
+    s = _editable_store(project_id)
+    raw, effective = _raw_and_effective_plans(s, project_id)
+    generated_plan = next((p for p in raw.plans if p.program == program), None)
+    if generated_plan is None:
+        raise HTTPException(404, "plan no encontrado")
+    previous = next(p for p in effective.plans if p.program == program)
+    saved = s.get_job_overrides(project_id).get(program)
+    job_name = saved.job_name if saved else None
+    description = saved.description if saved else None
+
+    if "job_name" in body.model_fields_set:
+        requested = (body.job_name or "").strip()
+        if not requested or requested == generated_plan.job_name:
+            job_name = None
+        else:
+            finals = {p.program: p.job_name for p in effective.plans}
+            generated = {p.program: p.job_name for p in raw.plans}
+            if error := _name_error(requested, program, finals, generated):
+                raise HTTPException(422, error)
+            job_name = requested
+    if "description" in body.model_fields_set:
+        text = (body.description or "").strip()
+        if len(text) > MAX_DESCRIPTION:
+            raise HTTPException(422, f"La descripción no puede pasar de {MAX_DESCRIPTION} caracteres.")
+        description = text or None
+
+    s.set_job_override(project_id, program, job_name, description)
+    plans = load_plans(s, project_id)
+    plan = next((p for p in plans.plans if p.program == program), None) if plans else None
+    if plan is None or plans is None:
+        raise HTTPException(404, "plan no encontrado")
+    warnings = []
+    renamed = plan.job_name != previous.job_name
+    if renamed or plan.description != previous.description:
+        created_as = _already_created_name(s, project_id, program, previous.job_name)
+        if created_as is not None and renamed:
+            warnings.append(_created_rename_warning(created_as))
+        elif created_as is not None:
+            warnings.append(
+                "Este Job ya se creó en Talend Studio; el cambio de descripción no se refleja allí hasta volver "
+                "a aplicar y la aplicación puede pedir confirmar la nueva revisión."
+            )
+    return {"plan": _annotate_plan_studio_checks(s, project_id, plan, plans), "warnings": warnings}
+
+
+@app.post("/api/projects/{project_id}/plans/rename-preview")
+def preview_bulk_rename(project_id: str, rule: BulkRule) -> list[RenamePreview]:
+    """Vista previa del renombrado masivo; no escribe nada y no necesita el bloqueo de edición."""
+    s = store()
+    _require(s, project_id)
+    raw, effective = _raw_and_effective_plans(s, project_id)
+    try:
+        rows = bulk_preview(effective.plans, rule)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from e
+    generated = {p.program: p.job_name for p in raw.plans}
+    for row in rows:
+        if row.error is None and row.proposed != row.current:
+            row.error = _name_error(row.proposed, row.program, {}, generated)
+    return rows
+
+
+class RenameItem(BaseModel):
+    program: str
+    job_name: str
+
+
+class BulkRename(BaseModel):
+    renames: list[RenameItem]
+
+
+@app.post("/api/projects/{project_id}/plans/rename")
+def apply_bulk_rename(project_id: str, body: BulkRename) -> dict[str, Any]:
+    """Aplica varios nombres de Job: todo o nada, validados contra el conjunto final."""
+    s = _editable_store(project_id)
+    raw, effective = _raw_and_effective_plans(s, project_id)
+    generated = {p.program: p.job_name for p in raw.plans}
+    finals = {p.program: p.job_name for p in effective.plans}
+    programs = [item.program for item in body.renames]
+    if len(set(programs)) != len(programs):
+        raise HTTPException(422, "Un programa aparece más de una vez.")
+    if unknown := next((name for name in programs if name not in generated), None):
+        raise HTTPException(404, f"plan no encontrado: {unknown}")
+    wanted = {item.program: item.job_name.strip() or generated[item.program] for item in body.renames}
+    previous = dict(finals)
+    finals.update(wanted)
+    for program, name in wanted.items():
+        if name != generated[program] and (error := _name_error(name, program, finals, generated)):
+            raise HTTPException(422, f"{program}: {error}")
+    warnings = []
+    for program, name in wanted.items():
+        if name == previous[program]:
+            continue
+        created_as = _already_created_name(s, project_id, program, previous[program])
+        if created_as is not None:
+            warnings.append(_created_rename_warning(created_as))
+    saved = s.get_job_overrides(project_id)
+    s.set_job_overrides_bulk(
+        project_id,
+        [
+            (
+                program,
+                None if name == generated[program] else name,
+                saved[program].description if program in saved else None,
+            )
+            for program, name in wanted.items()
+        ],
+    )
+    return {"renamed": len(wanted), "warnings": warnings}
+
+
+class ExpressionEdit(BaseModel):
+    talend: str | None = None
+
+
+@app.patch("/api/projects/{project_id}/plans/{program:path}/steps/{step_id}/expressions/{index}")
+def patch_expression(project_id: str, program: str, step_id: str, index: int, body: ExpressionEdit) -> dict:
+    """Fija la traducción Talend de una expresión; `None` vuelve a la automática."""
+    s = _editable_store(project_id)
+    raw = load_plans(s, project_id, with_edits=False)
+    if raw is None:
+        raise HTTPException(409, "los planes aún no fueron generados")
+    plan = next((p for p in raw.plans if p.program == program), None)
+    if plan is None:
+        raise HTTPException(404, "plan no encontrado")
+    step = next((x for x in plan.steps + [x for c in plan.children for x in c.steps] if x.id == step_id), None)
+    if step is None:
+        raise HTTPException(404, "paso no encontrado")
+    if not 0 <= index < len(step.expressions):
+        raise HTTPException(404, "expresión no encontrada")
+    talend = body.talend
+    if talend is not None:
+        if not talend.strip():
+            raise HTTPException(422, "La expresión no puede estar vacía.")
+        if "\n" in talend or "\r" in talend:
+            raise HTTPException(422, "La expresión debe ir en una sola línea.")
+        if len(talend) > MAX_EXPRESSION:
+            raise HTTPException(422, f"La expresión no puede pasar de {MAX_EXPRESSION} caracteres.")
+    s.set_expression_override(project_id, program, step_id, index, step.expressions[index].sas, talend)
+    plans = load_plans(s, project_id)
+    updated = next((p for p in plans.plans if p.program == program), None) if plans else None
+    if updated is None or plans is None:
+        raise HTTPException(404, "plan no encontrado")
+    return _annotate_plan_studio_checks(s, project_id, updated, plans)
+
+
+class TranslateBody(BaseModel):
+    sas: str = Field(min_length=1, max_length=20_000)
+
+
+@app.post("/api/translator/translate")
+def translate_expression(body: TranslateBody) -> dict:
+    """Traduce una expresión SAS suelta con el mismo traductor que usan los planes."""
+    try:
+        result = translate(body.sas)
+        talend, columns, warnings, engine = result.talend, result.columns, result.warnings, result.engine
+    except Exception:  # noqa: BLE001 - entrada hostil: el traductor nunca debe responder 500
+        logger.exception("El traductor falló; se responde sin traducción automática")
+        talend, columns, engine = None, [], "inline"
+        warnings = ["Sin traducción automática: no se pudo analizar la expresión (demasiado compleja o no válida)."]
+    return {
+        "sas": body.sas,
+        "talend": talend,
+        "columns": columns,
+        "warnings": warnings,
+        "engine": engine,
+        "supported": talend is not None,
+        "talend_engine_enabled": talend_expressions_enabled(),
+    }
+
+
+class NamingTemplate(BaseModel):
+    template: str = Field(max_length=200)
+
+
+def _naming_settings(s: Store) -> dict[str, object]:
+    return {"template": current_name_template(s), "default": DEFAULT_NAME_TEMPLATE, "tokens": list(TEMPLATE_TOKENS)}
+
+
+@app.get("/api/settings/naming")
+def get_naming_settings() -> dict[str, object]:
+    return _naming_settings(store())
+
+
+@app.patch("/api/settings/naming")
+def update_naming_settings(body: NamingTemplate) -> dict[str, object]:
+    """Guarda la plantilla de nombres; se aplica al volver a generar los planes."""
+    if error := validate_template(body.template):
+        raise HTTPException(422, error)
+    s = store()
+    s.set_setting(NAME_TEMPLATE_KEY, body.template)
+    return _naming_settings(s)
+
+
+@app.get("/api/settings/naming/example")
+def naming_example(template: str | None = None) -> dict[str, str | None]:
+    """Nombre de ejemplo con proyecto `finanzas` y programa `lz/cod2.sas`."""
+    text = current_name_template(store()) if template is None else template
+    if error := validate_template(text):
+        return {"example": None, "error": error}
+    return {"example": render_job_name(text, project="finanzas", program="lz/cod2.sas"), "error": None}
+
 
 def _annotate_plan_studio_checks(s: Store, project_id: str, plan: JobPlan, plans: PlanSet) -> dict[str, Any]:
     """Expose current apply evidence beside a step without changing its manual state."""
@@ -1945,7 +2261,11 @@ async def verify_project_plans(project_id: str, body: VerifyBody) -> dict:
     from sas_grid_migrator.talend_adapter.verification import Catalog, verify_plans
 
     s = store()
-    ps = _plans(project_id)
+    _require(s, project_id)
+    # Carga cruda: las ediciones del usuario viven en SQLite y no deben quedar grabadas en plans.json.
+    ps = load_plans(s, project_id, with_edits=False)
+    if ps is None:
+        raise HTTPException(409, "los planes aún no fueron generados")
     catalog = Catalog()
     try:
         for path in body.job_paths:

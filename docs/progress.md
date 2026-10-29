@@ -102,3 +102,32 @@ respuesta perdida tras una escritura completa, el portal añade una marca SHA-25
 reintento el par que conserva esa misma marca y no sobrescribe un Job distinto. Métrica antes → después: `real` 8,1 % →
 8,1 % (2 063 pasos), `synthetic` 16,8 % → 16,8 % (429 pasos). Verificación focal offline de Python y MCP; la simulación
 de timeout posterior a persistencia completa no se ejecutó. Sin Studio ni Jobs Talend.
+
+## Fase 1 de UX del portal (28/10/2026)
+
+Se entregaron las opciones 1, 2, 3, 8, 9, 10, 19 y 20 de la hoja de ruta de [`docs/superpowers/specs/2026-10-28-portal-ux-design.md`](superpowers/specs/2026-10-28-portal-ux-design.md). El plan de ejecución está en [`docs/superpowers/plans/2026-10-28-portal-ux-fase1.md`](superpowers/plans/2026-10-28-portal-ux-fase1.md).
+
+| Opción | Entrega | Dónde se ve |
+| ------ | ------- | ----------- |
+| 1 y 2 | Nombre y descripción del Job editables. La descripción se incluye en los argumentos enviados al MCP (`to_mcp_arguments`); no se ha verificado que Studio muestre el valor personalizado | Cabecera de la guía del Job (`views/plans/JobIdentity.tsx`) |
+| 3 | Renombrado masivo con vista previa, error por fila y aplicación todo o nada | Lista del plan (`views/plans/BulkRename.tsx`) |
+| 8 | Plantilla de nombres `job_{programa}`, editable, con ejemplo en vivo | Configuración |
+| 9 | Laboratorio del traductor: SAS de entrada, Java para Talend, columnas, avisos y motor | Ruta `#/traductor` |
+| 10 | Edición de la expresión Talend en cada paso, con marca «editada» y «Volver a la traducción automática» | Tarjeta de paso (`views/plans/ExpressionEditor.tsx`) |
+| 19 | Barra de seis etapas y botón con la siguiente acción | Resumen del proyecto (`components/ProjectStepper.tsx`, `views/summary/ProjectCommandCenter.tsx`) |
+| 20 | «Qué falta»: pendientes agrupados por motivo, con enlaces a los Jobs afectados | Resumen del proyecto (`views/summary/PendingPanel.tsx`) |
+
+Las ediciones se guardan en SQLite (tablas `job_overrides`, `expression_overrides` y `portal_settings`) y se superponen al plan al leerlo. `plans.json` no recibe ediciones de nombre, descripción ni expresión. Detalle y reglas en la receta «Ediciones humanas sobre el plan» de [`agent-guide.md`](agent-guide.md). Las escrituras de edición responden 409 mientras un lote o una operación Talend esté activo en el proyecto.
+
+Verificación ejecutada en el worktree `migrador-sasgrid-qlik-ux`:
+
+- `uv run pytest -q --ignore=tests/integration/test_corpus_gate.py --ignore=tests/integration/test_mcp_contract.py`: 584 passed, 1 skipped. Esos dos archivos dependen del MCP, que no está instalado en el worktree, así que no se ejecutaron.
+- `cd apps/web && bun test`: 106 pass, 0 fail.
+- `cd apps/web && bun run typecheck`: sin errores.
+
+Pendiente y no verificado:
+
+- Nada se ha comprobado en un navegador. Solo hay pruebas unitarias y de componente con `bun test`.
+- Nada se ha comprobado contra Talend Studio. La `description` enviada al MCP no se ha aplicado en Studio.
+- No se ha ejecutado `tests/integration/test_mcp_contract.py` para comprobar que el MCP acepta una `description` personalizada; queda pendiente hasta tener el MCP instalado.
+- Renombrar un Job que ya existe en Studio no lo renombra en Studio. El portal lo indica; el Job anterior queda y el nuevo se creará al aplicar de nuevo (no verificado contra Studio).

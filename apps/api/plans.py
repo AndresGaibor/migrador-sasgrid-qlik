@@ -117,7 +117,11 @@ async def verify_project_plans(project_id: str, body: VerifyBody) -> dict:
     from sas_grid_migrator.talend_adapter.verification import Catalog, verify_plans
 
     s = store()
-    result = get_plans(project_id)
+    require_project(s, project_id)
+    # Carga cruda: las ediciones del usuario viven en SQLite y no deben quedar grabadas en plans.json.
+    result = load_plans(s, project_id, with_edits=False)
+    if result is None:
+        raise HTTPException(409, "los planes aún no fueron generados")
     catalog = Catalog()
     try:
         from .common import talend

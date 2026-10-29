@@ -141,6 +141,7 @@ def render_plan_md(plan: JobPlan, icon_base: str = "/talend-icons") -> str:
     out = [
         f"# Job `{plan.job_name}`",
         "",
+        *([plan.description, ""] if plan.description else []),
         f"- **Programa SAS:** `{plan.program}`"
         + (f" (sha256 `{plan.sha256[:12]}`)" if plan.sha256 else ""),
         f"- **Instrucciones:** {n_steps} · **Reglas:** v{plan.rules_version}",

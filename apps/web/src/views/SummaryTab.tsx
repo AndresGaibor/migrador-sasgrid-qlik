@@ -5,6 +5,7 @@ import { Icon } from "../components/Icon";
 import { formatErrorMessage, notifyError, notifySuccess } from "../errors";
 import type { Summary } from "../types";
 import { Badge, Load, link, prioTone } from "./common";
+import { ProjectCommandCenter } from "./summary/ProjectCommandCenter";
 
 export function SummaryTab({ id, refreshKey = 0 }: { id: string; refreshKey?: number }) {
   const inventory = useAsync(() => api.inventory(id), [id]);
@@ -25,6 +26,7 @@ export function SummaryTab({ id, refreshKey = 0 }: { id: string; refreshKey?: nu
   const [s, setS] = useState<Summary>();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string>();
+  const [commandRefresh, setCommandRefresh] = useState(0);
   const summary = s ?? persisted.data;
   const isProcessing = processing.data?.status === "queued" || processing.data?.status === "running";
   useEffect(() => {
@@ -33,6 +35,7 @@ export function SummaryTab({ id, refreshKey = 0 }: { id: string; refreshKey?: nu
       return () => window.clearInterval(timer);
     }
     if (processing.data?.status === "completed") persisted.reload();
+    if (processing.data?.status === "completed" || processing.data?.status === "failed" || processing.data?.status === "interrupted") setCommandRefresh((n) => n + 1);
   }, [isProcessing, processing.data?.status, processing.reload, persisted.reload]);
   const run = async () => {
     setBusy(true); setErr(undefined);
@@ -40,6 +43,7 @@ export function SummaryTab({ id, refreshKey = 0 }: { id: string; refreshKey?: nu
       const result = await api.analyze(id);
       setS(result);
       persisted.reload();
+      setCommandRefresh((n) => n + 1);
       notifySuccess("Análisis completado", `${result.programs} programas revisados.`);
     }
     catch (x) { setErr(notifyError(x, "No se pudo analizar el proyecto")); }
@@ -48,6 +52,7 @@ export function SummaryTab({ id, refreshKey = 0 }: { id: string; refreshKey?: nu
   return <>
     <h1>Conoce tu punto de partida</h1>
     <p className="subtitle">Analiza tus programas para descubrir cómo funcionan y qué necesita atención antes de migrar.</p>
+    <ProjectCommandCenter id={id} refreshKey={refreshKey + commandRefresh} />
     {processing.data && <div className={`project-processing-inline ${isProcessing ? "active" : processing.data.status}`} role="status" aria-live="polite"><span>{isProcessing ? <span className="spinner" /> : <Icon name={processing.data.status === "completed" ? "check" : "info"} size={17} />}</span><div><strong>{processing.data.message}</strong><small>Etapa: {processing.data.stage} · Estado: {processing.data.status}</small></div></div>}
     {processing.error && <div className="notice error-notice" role="alert"><Icon name="warning" /><span>{formatErrorMessage(processing.error, undefined, processing.errorStatus)}</span></div>}
     <Load q={inventory}>{(m) => <section className="panel">

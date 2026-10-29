@@ -4,6 +4,7 @@ import shutil
 import sqlite3
 import uuid
 from contextlib import closing
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -51,11 +52,32 @@ create table if not exists talend_apply_batches(
   attempt_count integer not null default 1, started_at text not null, updated_at text not null,
   warnings_json text not null default '[]'
 );
+create table if not exists job_overrides(
+  project_id text not null references projects(id), program text not null,
+  job_name text, description text, updated_at text not null,
+  primary key(project_id, program)
+);
+create table if not exists expression_overrides(
+  project_id text not null references projects(id), program text not null,
+  step_id text not null, idx integer not null, sas text not null, talend text,
+  updated_at text not null, primary key(project_id, program, step_id, idx)
+);
+create table if not exists portal_settings(
+  key text primary key, value text not null
+);
 """
 
 
 class ProjectDeletionBlockedError(RuntimeError):
     """Indica que no se puede retirar un proyecto mientras sigue trabajando."""
+
+
+@dataclass(frozen=True)
+class JobOverride:
+    """Nombre y descripción del Job en Talend que el usuario ha editado a mano."""
+
+    job_name: str | None
+    description: str | None
 
 
 class Store:
@@ -97,6 +119,113 @@ class Store:
                 "on conflict(id) do update set write_enabled=excluded.write_enabled",
                 (int(enabled),),
             )
+
+    def set_job_override(
+        self, project_id: str, program: str, job_name: str | None, description: str | None
+    ) -> None:
+        """Guarda la edición de un Job; con nombre y descripción vacíos borra la fila."""
+        with closing(self._conn()) as c, c:
+            if job_name is None and description is None:
+                c.execute(
+                    "delete from job_overrides where project_id=? and program=?",
+                    (project_id, program),
+                )
+                return
+            c.execute(
+                "insert into job_overrides(project_id,program,job_name,description,updated_at) "
+                "values(?,?,?,?,?) on conflict(project_id,program) do update set "
+                "job_name=excluded.job_name, description=excluded.description, updated_at=excluded.updated_at",
+                (project_id, program, job_name, description, datetime.now(UTC).isoformat()),
+            )
+
+    def set_job_overrides_bulk(
+        self, project_id: str, items: list[tuple[str, str | None, str | None]]
+    ) -> None:
+        """Guarda varias ediciones de Job en una sola transacción: todas o ninguna."""
+        now = datetime.now(UTC).isoformat()
+        with closing(self._conn()) as c, c:
+            for program, job_name, description in items:
+                if job_name is None and description is None:
+                    c.execute(
+                        "delete from job_overrides where project_id=? and program=?",
+                        (project_id, program),
+                    )
+                    continue
+                c.execute(
+                    "insert into job_overrides(project_id,program,job_name,description,updated_at) "
+                    "values(?,?,?,?,?) on conflict(project_id,program) do update set "
+                    "job_name=excluded.job_name, description=excluded.description, "
+                    "updated_at=excluded.updated_at",
+                    (project_id, program, job_name, description, now),
+                )
+
+    def get_job_overrides(self, project_id: str) -> dict[str, JobOverride]:
+        with closing(self._conn()) as c:
+            rows = c.execute(
+                "select program,job_name,description from job_overrides where project_id=?",
+                (project_id,),
+            ).fetchall()
+        return {program: JobOverride(name, desc) for program, name, desc in rows}
+
+    def set_expression_override(
+        self,
+        project_id: str,
+        program: str,
+        step_id: str,
+        index: int,
+        sas: str,
+        talend: str | None,
+    ) -> None:
+        """Guarda la traducción manual de una expresión; `talend=None` borra la fila."""
+        with closing(self._conn()) as c, c:
+            if talend is None:
+                c.execute(
+                    "delete from expression_overrides where project_id=? and program=? and step_id=? and idx=?",
+                    (project_id, program, step_id, index),
+                )
+                return
+            c.execute(
+                "insert into expression_overrides(project_id,program,step_id,idx,sas,talend,updated_at) "
+                "values(?,?,?,?,?,?,?) on conflict(project_id,program,step_id,idx) do update set "
+                "sas=excluded.sas, talend=excluded.talend, updated_at=excluded.updated_at",
+                (project_id, program, step_id, index, sas, talend, datetime.now(UTC).isoformat()),
+            )
+
+    def get_expression_overrides(
+        self, project_id: str
+    ) -> dict[tuple[str, str, int], tuple[str, str]]:
+        with closing(self._conn()) as c:
+            rows = c.execute(
+                "select program,step_id,idx,sas,talend from expression_overrides "
+                "where project_id=? and talend is not null",
+                (project_id,),
+            ).fetchall()
+        return {(p, s, i): (sas, talend) for p, s, i, sas, talend in rows}
+
+    def get_setting(self, key: str, default: str | None = None) -> str | None:
+        with closing(self._conn()) as c:
+            row = c.execute("select value from portal_settings where key=?", (key,)).fetchone()
+        return row[0] if row else default
+
+    def set_setting(self, key: str, value: str) -> None:
+        with closing(self._conn()) as c, c:
+            c.execute(
+                "insert into portal_settings(key,value) values(?,?) "
+                "on conflict(key) do update set value=excluded.value",
+                (key, value),
+            )
+
+    def has_active_talend_work(self, project_id: str) -> bool:
+        """True si hay un lote Talend en cola o ejecución, o alguna operación en curso."""
+        with closing(self._conn()) as c:
+            batch = c.execute(
+                "select status from talend_apply_batches where project_id=?", (project_id,)
+            ).fetchone()
+            operation = c.execute(
+                "select 1 from talend_apply_operations where project_id=? and status='running' limit 1",
+                (project_id,),
+            ).fetchone()
+        return bool((batch and batch[0] in {"queued", "running"}) or operation)
 
     def source_dir(self, project_id: str) -> Path:
         return self.settings.data_dir / "projects" / project_id / "src"
@@ -325,6 +454,8 @@ class Store:
                     "project_processing",
                     "talend_apply_operations",
                     "talend_apply_batches",
+                    "job_overrides",
+                    "expression_overrides",
                 ):
                     connection.execute(f"delete from {table} where project_id=?", (project_id,))
                 connection.execute("delete from projects where id=?", (project_id,))

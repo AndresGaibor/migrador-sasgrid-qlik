@@ -4,6 +4,7 @@ import { useAsync } from "../hooks";
 import { Icon } from "../components/Icon";
 import { Badge, Load } from "./common";
 import { notifyError, notifySuccess } from "../errors";
+import { NamingTemplateCard } from "./settings/NamingTemplateCard";
 
 type Health = Awaited<ReturnType<typeof api.talendHealth>>;
 
@@ -147,5 +148,6 @@ export function SettingsView() {
       <button className="secondary" onClick={() => void restartStudio()} disabled={restarting || !enabled}><Icon name="settings" size={18} />{restarting ? "Reiniciando Studio…" : "Reiniciar Studio"}</button>
       <p className="muted">Cierra Studio (y sus diálogos abiertos; si no sale, fuerza el cierre) y lo vuelve a abrir. Los editores sin guardar se pierden y Talend Cloud puede pedir iniciar sesión de nuevo. Requiere el permiso de escritura.</p>
     </section>
+    <NamingTemplateCard />
   </>;
 }

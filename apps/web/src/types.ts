@@ -79,7 +79,7 @@ export type Deps = {
   unresolved: { kind: string; name: string; file: string; line: number; detail: string }[];
   orchestration: { tasks: GridTask[]; schedules: { file: string; line: number; text: string }[]; order: string[] };
 };
-export type PlanRow = { program: string; job_name: string; job_status: string; steps: number; pending: number; done: number; studio_verified?: number; studio_pending?: number; studio_status?: "not_checked" | "verified" | "pending" | "unavailable" };
+export type PlanRow = { program: string; job_name: string; description?: string | null; job_status: string; steps: number; pending: number; done: number; studio_verified?: number; studio_pending?: number; studio_status?: "not_checked" | "verified" | "pending" | "unavailable" };
 export type TalendStepVerification = {
   status: "verified" | "pending" | "unavailable";
   reason: string | null;
@@ -101,7 +101,7 @@ export type Step = {
   operation_id?: string | null;
   operation_type?: string | null;
   schema_columns?: { name: string; talend_type: string | null }[];
-  expressions: { sas: string; talend: string | null; line: number; warnings: string[] }[];
+  expressions: { sas: string; talend: string | null; line: number; warnings: string[]; talend_edited?: boolean; target?: string | null }[];
   assumptions: string[];
   pending: string[];
   tests: string[];
@@ -127,6 +127,43 @@ export type JobPlan = {
   libraries_needed: { sas_name: string; engine: string | null; path: string | null; suggested_connection: string }[];
   orchestration: { grid_tasks: string[]; grid_recommendations: GridRecommendation[]; schedules: string[]; upstream: string[]; downstream: string[] };
   unresolved: string[];
+  description?: string | null;
+  job_name_edited?: boolean;
+  rename_ignored?: string | null;
+};
+export type JobMetaResult = { plan: JobPlan; warnings: string[] };
+export type BulkRenameRule = {
+  mode: "prefix" | "suffix" | "replace" | "regex";
+  text?: string;
+  find?: string;
+  replace_with?: string;
+  programs?: string[];
+};
+export type RenamePreviewRow = { program: string; current: string; proposed: string; error: string | null };
+export type TranslateResult = {
+  sas: string;
+  talend: string | null;
+  columns: string[];
+  warnings: string[];
+  engine: string;
+  supported: boolean;
+  talend_engine_enabled: boolean;
+};
+export type NamingTemplate = { template: string; default: string; tokens: string[] };
+export type ProjectStage = {
+  key: "upload" | "analysis" | "guides" | "studio" | "complete" | "verify";
+  label: string;
+  status: "done" | "current" | "todo" | "blocked";
+  detail: string;
+};
+export type ProjectProgress = {
+  stages: ProjectStage[];
+  next: { key: string; label: string; tab: "importar" | "resumen" | "planes"; reason: string } | null;
+};
+export type PendingGroup = {
+  reason: string;
+  steps: number;
+  programs: { program: string; job_name: string; step_ids: string[] }[];
 };
 export type TalendLicenseProfile = { code: string; label: string };
 export type CatalogItem = {

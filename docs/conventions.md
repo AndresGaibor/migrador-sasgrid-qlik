@@ -43,13 +43,15 @@ errores   ─► tLogCatcher ─► tLogRow  (+ tDie si el subjob es crítico)  
 
 | Qué | Regla | Ejemplo |
 | --- | ----- | ------- |
-| Job | `<proyecto>_<programa>`, identificador Java, ≤ 60 caracteres, único en el proyecto | `finanzas_cod2` |
+| Job | Plantilla `job_{programa}` por defecto (tokens `{proyecto}`, `{carpeta}`, `{programa}`), identificador Java, ≤ 60 caracteres, único en el proyecto | `job_cod2` |
 | Carpeta del Job | `Process/<proyecto>/<carpeta del programa>/` sin `src`, `tests` ni `target` | `Process/finanzas/lz` |
 | Subjob | la etiqueta normalizada (sin acentos, sin espacios) | `importar_homologacion` |
 | Componente | `t<Tipo>_<n>` (único) y etiqueta `<subjob> · <operación>` | `tFilterRow_4`, «acura · filtrar» |
 | Conexión | `row_<n>_<m>` si es de datos; en un `tMap`, el nombre de la conexión es el de su tabla | `row_3_1` |
 | Joblet | `JL_<patrón>` en `Joblet/<proyecto>/` | `JL_drop_create_tabla` |
 | Contexto | ver la sección 2 | `db_lz_host` |
+
+La plantilla se edita en Configuración y se aplica al preparar o actualizar las guías; un nombre editado a mano se conserva al cambiarla. El nombre y la descripción de cada Job se pueden editar uno a uno o en bloque desde el plan: esas ediciones se guardan aparte y se superponen al plan, sin reescribir `plans.json`.
 
 ## 4. Elección de componentes
 
