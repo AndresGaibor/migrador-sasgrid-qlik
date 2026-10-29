@@ -137,10 +137,22 @@ def test_mapping_rules_use_current_studio_components():
     assert not bad, bad
 
 
-def test_api_catalog_exposes_only_current_studio_8_components():
+def test_api_catalog_exposes_only_current_studio_8_components(monkeypatch):
+    import apps.api.integrations as integration_mod
     from apps.api.main import app
     from fastapi.testclient import TestClient
+    from sas_grid_migrator.talend_adapter.adapter import TalendAdapter
 
+    # El catálogo muestra lo instalado en Studio. Aquí Studio "tiene" todos los componentes oficiales
+    # de Studio 8, así que la prueba no depende de qué palettes haya en este equipo.
+    official = sorted(current_profile_names(_INVENTORY, {"license_profile": {"code": "TP_ALL"}, "components": list(_GUIDES.values())}))
+
+    class FullStudioAdapter:
+        async def installed_component_names(self):
+            return official
+
+    monkeypatch.setattr(TalendAdapter, "from_env", classmethod(lambda cls: FullStudioAdapter()))
+    monkeypatch.setattr(integration_mod, "_STUDIO_COMPONENT_NAMES", None)
     c = TestClient(app)
     official_list = c.get("/api/talend/catalog", params={"q": "filterrow"}).json()
     filter_row = next(x for x in official_list["components"] if x["name"] == "tFilterRow")
