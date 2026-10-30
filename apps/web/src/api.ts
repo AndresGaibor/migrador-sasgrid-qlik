@@ -1,5 +1,7 @@
 import type { BulkRenameRule, CatalogComponent, CatalogList, Deps, GridRecommendation, JobPlan, Manifest, NamingTemplate, PendingSummary, PlanRow, Program, ProgramRow, Project, ProjectProgress, ProjectUploadResponse, RenamePreviewRow, Summary, TalendApplyBatchPreflight, TalendApplyBatchState, TalendApplyBatchSummary, TalendApplyPreview, TalendApplyResult, TalendApplyState, ProjectProcessing, TranslateResult } from "./types";
 
+import type { PanelsSnapshot } from "./studio/panel-types";
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -95,6 +97,9 @@ export const api = {
       method: "PATCH",
       body: JSON.stringify({ status, note }),
     }),
+  setGuideField: (id: string, file: string, step: string, field_done: Record<string, boolean>) =>
+    patch<{ step_id: string; guide_status: string; field_done: Record<string, boolean> }>(`/projects/${id}/plans/${enc(file)}/steps/${encodeURIComponent(step)}/guide`, { field_done }),
+  componentPanels: () => req<PanelsSnapshot>("/talend/component-panels"),
   applyTalend: (id: string, file: string) =>
     post<TalendApplyResult>(`/projects/${id}/plans/${enc(file)}/talend-apply`),
   talendApplyPreview: (id: string, file: string) =>

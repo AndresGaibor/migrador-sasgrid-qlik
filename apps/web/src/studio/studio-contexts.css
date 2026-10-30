@@ -1,0 +1,11 @@
+/* Tabla de contextos: mismo aspecto que la pestaña Contexts de Talend Studio. */
+.studio-contexts-how { margin: 0 0 12px; padding-left: 20px; display: grid; gap: 4px; font-size: 13px; }
+.studio-contexts-summary { margin: 0 0 8px; font-size: 13px; color: #444; }
+.studio-contexts-wrap { max-height: 420px; overflow: auto; border: 1px solid #aaa; background: #fff; margin-bottom: 10px; }
+.studio-contexts-table { width: 100%; border-collapse: collapse; font: 12px "Segoe UI", sans-serif; }
+.studio-contexts-table th { position: sticky; top: 0; background: #e8e8e8; text-align: left; padding: 4px 8px; border-bottom: 1px solid #aaa; border-right: 1px solid #ccc; font-weight: 600; }
+.studio-contexts-table td { padding: 3px 8px; border-bottom: 1px solid #eee; border-right: 1px solid #eee; vertical-align: top; }
+.studio-contexts-table tr.needs-value td:first-child { box-shadow: inset 3px 0 0 #d9822b; }
+.studio-type { padding: 0 6px; border: 1px solid #bbb; background: #f4f4f4; }
+.studio-type.secret { border-color: #b33; color: #b33; }
+.studio-pending { color: #9a5b00; font-style: italic; }

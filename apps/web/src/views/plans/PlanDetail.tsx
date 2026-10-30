@@ -15,6 +15,8 @@ import { StepGroups } from "./PlanSteps";
 import { applyStatusLabel } from "./plan-status";
 import { PARENT_PATTERN, useDesktopLayout, visible } from "./plan-rows";
 import { useProjectEvents } from "../../project-events";
+import { NotMigratedPanel } from "../../studio/NotMigratedPanel";
+import { JobletGuide } from "../../studio/JobletGuide";
 
 export function PlanDetail({ id, file }: { id: string; file: string }) {
   const isDesktop = useDesktopLayout();
@@ -89,6 +91,7 @@ export function PlanDetail({ id, file }: { id: string; file: string }) {
     try { await operation; }
     finally { pendingSaves.current -= 1; setSaving(pendingSaves.current > 0); }
   };
+  const fieldDone = async (stepId: string, field: string, done: boolean) => { await api.setGuideField(id, file, stepId, { [field]: done }); };
   const saveJobMeta = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -160,12 +163,14 @@ export function PlanDetail({ id, file }: { id: string; file: string }) {
             <p><strong>Programa SAS de origen:</strong> <a href={link(id, "programas", p.program)}><code>{p.program}</code></a></p>
             <PlanPreparation plan={p} />
             {ownGrid.length > 0 && <GridRecommendations id={id} items={ownGrid} isDesktop={isDesktop} />}
+            <NotMigratedPanel id={id} plan={p} />
+            <JobletGuide plan={p} />
             <h2>{ownGrid.some((g) => PARENT_PATTERN.test(g.pattern_id)) ? "Después: el resto del programa" : "Construye el Job"}</h2>
-            <StepGroups id={id} steps={p.steps} onDecide={decide} onEditExpression={editExpression} expressionsDisabled={Boolean(isApplyRunning || isBatchRunning)} />
+            <StepGroups id={id} steps={p.steps} parts={p.job_parts} onDecide={decide} onEditExpression={editExpression} expressionsDisabled={Boolean(isApplyRunning || isBatchRunning)} onFieldDone={fieldDone} />
             {p.children.map((c) => (
               <section key={c.name}>
                 <h2>Crea también un Job aparte para la macro %{c.name}</h2><p className="muted">Nombre sugerido: <code>job_{c.name.toLowerCase()}</code>{c.params.length > 0 && <> · parámetros que recibe: {c.params.map((x) => <code key={x}> {x}</code>)}</>}. Sus pasos son estos:</p>
-              <StepGroups id={id} steps={c.steps} onDecide={decide} onEditExpression={editExpression} expressionsDisabled={Boolean(isApplyRunning || isBatchRunning)} />
+              <StepGroups id={id} steps={c.steps} onDecide={decide} onEditExpression={editExpression} expressionsDisabled={Boolean(isApplyRunning || isBatchRunning)} onFieldDone={fieldDone} />
               </section>
             ))}
             {p.validation_cases.length > 0 && (

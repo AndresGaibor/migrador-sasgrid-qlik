@@ -19,6 +19,25 @@ const looksLikePath = (v: string) => /[\\/]|\.sas\b/i.test(v);
 const RESOLVED = /^(Formato físico|Esquema y tipos de columnas|Sistema y tabla|Confirmar la acción sobre la tabla|Librería |Tabla base destino|Job o joblet hijo|Crear\/identificar el Job hijo|Confirmar si el programa incluido)/;
 const DATASET = /^(Leer|Escribir|Añadir filas a) +([\w&]+)\.(\S+)/;
 
+/**
+ * Componente y valores de un paso de lectura/escritura de dataset cuyo componente el planificador dejó «por_determinar».
+ * Es la misma decisión que toman las instrucciones (datasetSteps): se comparte para que el panel de Studio no la contradiga.
+ */
+export function datasetConfig(s: Step): { component: string; values: Record<string, string> } | null {
+  if (s.component_candidate.split(" ")[0] !== "por_determinar" || !["read", "write", "append"].includes(s.operation_type ?? "")) return null;
+  const m = s.purpose.match(DATASET);
+  if (!m) return null;
+  const [, , lib, table] = m;
+  if (lib.includes("&")) return null;
+  const isRead = s.operation_type === "read";
+  if (lib.toLowerCase() === "work") return { component: isRead ? "tHashInput" : "tHashOutput", values: {} };
+  const tableExpr = table.includes("&") ? toContext(table.replace(/\(.*$/, "")) : `"${table.replace(/\(.*$/, "").toLowerCase()}"`;
+  const filename = `context.${lib.toUpperCase()}_DIR + "/" + ${tableExpr} + ".csv"`;
+  return isRead
+    ? { component: "tFileInputDelimited", values: { FILENAME: filename, FIELDSEPARATOR: '","', HEADER: "1" } }
+    : { component: "tFileOutputDelimited", values: { FILENAME: filename, FIELDSEPARATOR: '","', APPEND: s.operation_type === "append" ? "true" : "false", INCLUDEHEADER: "true" } };
+}
+
 // Dataset SAS → archivo CSV en la carpeta de su librería (variable de contexto <LIB>_DIR); WORK → tHash*.
 function datasetSteps(s: Step, all: Step[], comp: string): Do[] | null {
   if (comp !== "por_determinar" || !["read", "write", "append"].includes(s.operation_type ?? "")) return null;

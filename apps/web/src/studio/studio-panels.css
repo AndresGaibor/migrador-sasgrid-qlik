@@ -1,0 +1,40 @@
+/* Estilos de los paneles de la guía de migración: panel «Lo que NO hace falta migrar», joblets y etiqueta de fusión. */
+
+/* Lo que NO hace falta migrar */
+.nm-panel > summary { cursor: pointer; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+.nm-panel > summary .icon { color: var(--accent); }
+.nm-lead { margin: 14px 0 4px; }
+.nm-group { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
+.nm-group h3 { font-size: 13px; margin: 0 0 8px; }
+.nm-group p { font-size: 13px; margin: 6px 0; }
+.nm-meta { font-size: 12px; }
+
+/* Joblets */
+.jl-guide > h2 { margin-bottom: 8px; }
+.jl-card { border: 1px solid var(--line); border-radius: 7px; padding: 18px; margin-top: 18px; background: #fbfcfb; }
+.jl-card-head h3 { margin: 0 0 8px; font-size: 15px; }
+.jl-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+.jl-card h4 { font-size: 13px; margin: 18px 0 8px; }
+.jl-card p { font-size: 13px; margin: 6px 0; }
+.jl-table-wrap { overflow-x: auto; max-width: 100%; border: 1px solid var(--line); border-radius: 5px; background: #fff; }
+.jl-table { border-collapse: collapse; font-size: 12px; width: 100%; min-width: 420px; }
+.jl-table th, .jl-table td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.jl-table th { color: var(--muted); font-weight: 600; background: #f7f9f8; }
+.jl-table small { font-weight: 400; }
+.jl-steps { margin: 0; padding-left: 22px; font-size: 13px; }
+.jl-steps li { margin: 4px 0; }
+.jl-copy-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; font-size: 12px; }
+button.jl-copy { min-height: 30px; padding: 4px 10px; font-size: 12px; font-weight: 500; }
+button.jl-copy code { font-size: 12px; }
+.jl-usage { margin-bottom: 10px; }
+.jl-usage p { margin: 4px 0; }
+.jl-diagram { margin-top: 18px; overflow-x: auto; }
+
+/* Etiqueta de paso fusionado */
+.fused-badge { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0; font-size: 12px; }
+.fused-badge .badge.info { color: #2c5d8a; border-color: #c6dbef; background: #eef5fb; }
+
+@media (max-width: 600px) {
+  .jl-card { padding: 14px; }
+  .jl-steps { padding-left: 18px; }
+}

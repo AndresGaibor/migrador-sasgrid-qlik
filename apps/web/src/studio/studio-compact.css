@@ -1,0 +1,7 @@
+/* Ajustes del panel de Studio frente a los estilos globales de botones e inputs de la app. */
+.studio-panel .studio-suggestion { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 3px 8px; margin-top: 3px; }
+.studio-panel button.studio-copy { width: auto; height: auto; min-height: 0; padding: 1px 8px; font-size: 11px; line-height: 1.5; }
+.studio-panel .studio-done { display: inline-flex; flex-direction: row; align-items: center; gap: 4px; font-size: 11px; margin: 0; white-space: nowrap; }
+.studio-panel .studio-done span { display: inline; }
+.studio-panel .studio-done input[type="checkbox"] { width: 14px; height: 14px; min-height: 0; margin: 0; padding: 0; }
+.studio-panel .studio-chip { font-size: 11px; }

@@ -124,6 +124,53 @@ export type Step = {
   variants?: string[];
   requires_semantic_validation?: boolean;
   studio_verification?: TalendStepVerification;
+  /** Paso de buena práctica que no viene del SAS (conexión compartida, manejo de errores…). */
+  recommended?: boolean;
+  /** Por qué se hace así, en español. */
+  why?: string | null;
+  job_part?: string | null;
+  business_subjob?: string | null;
+  guide_status?: "pending" | "in_progress" | "completed" | "blocked";
+  /** Campos del panel de Studio que el usuario ya dejó configurados. */
+  field_done?: Record<string, boolean>;
+  /** Operaciones SAS que este paso absorbe (p. ej. varias en un solo tMap). */
+  fused_from?: string[];
+  joblet_id?: string | null;
+};
+export type JobPart = { name: string; title: string; of: string; step_ids: string[]; component_count: number };
+/** Fontanería de SAS detectada y no traducida (troceado, esperas, conteos…). */
+export type NotMigrated = {
+  category: string;
+  lines: number[];
+  what: string;
+  reason: string;
+  talend_equivalent: string;
+};
+/** Una aparición de un bloque repetido: en qué Job y qué pasos lo forman. */
+export type JobletOccurrence = {
+  job: string;
+  label: string;
+  step_ids: string[];
+  /** Valor concreto de cada parámetro en esta aparición (clave: nombre del parámetro). */
+  values: Record<string, string>;
+  usage_steps: string[];
+};
+export type JobletParameter = { name: string; context_variable: string; example_values: string[] };
+/** Joblet propuesto: bloque repetido que se crea una vez en Studio y se reutiliza. */
+export type JobletPlan = {
+  id: string;
+  name: string;
+  title: string;
+  kind: "macro" | "sequence";
+  occurrences: JobletOccurrence[];
+  parameters: JobletParameter[];
+  components: string[];
+  inputs: string[];
+  outputs: string[];
+  trigger_inputs: string[];
+  why: string;
+  creation_steps: string[];
+  operation_count: number;
 };
 export type JobPlan = {
   program: string;
@@ -132,13 +179,19 @@ export type JobPlan = {
   job_name_edited?: boolean;
   rename_ignored?: string | null;
   steps: Step[];
+  /** Reparto del Job en partes de tamaño razonable (máx. ~25 componentes). */
+  job_parts?: JobPart[];
   entry_macro?: { name: string; params: string[]; arguments: Record<string, string> } | null;
   children: { name: string; params: string[]; steps: Step[] }[];
   validation_cases: { id: string; kind: string; description: string }[];
-  context_variables: { name: string; suggested: string; sas_value: string | null }[];
+  context_variables: { name: string; suggested: string; sas_value: string | null; talend_type?: string; is_secret?: boolean; needs_value?: boolean; sas_line?: number | null; group_values?: Partial<Record<"DEV" | "QA" | "PROD", string | null>> | null }[];
   libraries_needed: { sas_name: string; engine: string | null; path: string | null; suggested_connection: string }[];
   orchestration: { grid_tasks: string[]; grid_recommendations: GridRecommendation[]; schedules: string[]; upstream: string[]; downstream: string[] };
   unresolved: string[];
+  /** Bloques repetidos que conviene convertir en joblet. */
+  joblets?: JobletPlan[];
+  /** Fontanería de SAS que no genera pasos. */
+  not_migrated?: NotMigrated[];
 };
 export type TranslateResult = {
   sas: string;

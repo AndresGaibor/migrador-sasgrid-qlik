@@ -1,0 +1,546 @@
+/* Estilo «Studio» (Talend). Todo cuelga de .studio-panel para no tocar el resto de la interfaz.
+   Los colores propios de Studio van fijos; los de estado reusan los tokens de index.css. */
+
+.studio-panel {
+  --studio-bg: #f0f0f0;
+  --studio-border: #aaa;
+  --studio-input-border: #7f9db9;
+  --studio-text: #333;
+  --studio-muted: #6b6b6b;
+  --studio-focus: #0a64d6;
+  --studio-ok: var(--success, #08733d);
+  --studio-error: var(--destructive, #b53030);
+  --studio-warn: var(--warning, #936000);
+
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--studio-bg);
+  border: 1px solid var(--studio-border);
+  color: var(--studio-text);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.studio-panel *,
+.studio-panel *::before,
+.studio-panel *::after {
+  box-sizing: border-box;
+}
+
+.studio-panel :focus-visible {
+  outline: 2px solid var(--studio-focus);
+  outline-offset: 1px;
+}
+
+.studio-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--studio-border);
+  background: #e8e8e8;
+  flex-wrap: wrap;
+}
+
+.studio-header-icon {
+  width: 32px;
+  height: 32px;
+  flex: none;
+}
+
+.studio-header-text {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.studio-component-name {
+  font-weight: 700;
+}
+
+.studio-component-label,
+.studio-step-label {
+  color: var(--studio-muted);
+}
+
+.studio-step-label {
+  margin-left: auto;
+  font-style: italic;
+}
+
+.studio-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 12px;
+}
+
+.studio-message,
+.studio-muted {
+  color: var(--studio-muted);
+  margin: 4px 0;
+}
+
+.studio-static {
+  color: var(--studio-text);
+}
+
+.studio-warning {
+  margin: 4px 0 0;
+  color: var(--studio-warn);
+  font-size: 11px;
+}
+
+.studio-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Progreso de la pestaña */
+.studio-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: var(--studio-muted);
+}
+
+.studio-progress-bar {
+  flex: 0 1 200px;
+  height: 8px;
+  background: #fff;
+  border: 1px solid var(--studio-input-border);
+  overflow: hidden;
+}
+
+.studio-progress-fill {
+  height: 100%;
+  background: var(--studio-ok);
+}
+
+/* Filas y campos */
+.studio-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.studio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  align-items: flex-start;
+}
+
+.studio-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1 1 320px;
+  min-width: 0;
+  padding: 2px 4px;
+  border-left: 3px solid transparent;
+}
+
+.studio-field.is-active {
+  border-left-color: var(--studio-focus);
+  background: #fffbe6;
+}
+
+.studio-field-label {
+  flex: 0 0 150px;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding-top: 5px;
+  color: #333;
+}
+
+.studio-label-text {
+  color: var(--studio-text);
+}
+
+.studio-required {
+  color: var(--studio-error);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.studio-required-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0 3px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+}
+
+.studio-field-control {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.studio-inline {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Controles: inputs blancos con borde Studio */
+.studio-control {
+  font: inherit;
+  color: var(--studio-text);
+  background: #fff;
+  border: 1px solid var(--studio-input-border);
+  border-radius: 0;
+  padding: 3px 5px;
+  height: 24px;
+  min-width: 0;
+  width: 100%;
+}
+
+.studio-input {
+  flex: 1 1 auto;
+}
+
+.studio-select {
+  width: auto;
+  min-width: 160px;
+}
+
+.studio-memo {
+  height: auto;
+  min-height: 56px;
+  font-family: Consolas, ui-monospace, monospace;
+  resize: vertical;
+}
+
+.studio-check {
+  width: 14px;
+  height: 14px;
+  margin: 5px 0;
+  accent-color: #2c6bb5;
+}
+
+.studio-button {
+  font: inherit;
+  color: var(--studio-text);
+  background: linear-gradient(#fdfdfd, #e6e6e6);
+  border: 1px solid #8e8e8e;
+  border-radius: 2px;
+  padding: 2px 8px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.studio-button:hover:not(:disabled) {
+  background: linear-gradient(#fff, #dcdcdc);
+}
+
+.studio-button:disabled {
+  color: #9a9a9a;
+  cursor: not-allowed;
+}
+
+.studio-ellipsis {
+  min-width: 26px;
+  padding: 2px 4px;
+}
+
+/* Chip de sugerencia */
+.studio-suggestion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 3px 6px;
+  border: 1px dashed #b9b9b9;
+  background: #fafafa;
+  font-size: 11px;
+}
+
+.studio-suggestion.is-active {
+  border: 1px solid var(--studio-focus);
+  background: #eef5ff;
+}
+
+.studio-suggestion.is-done {
+  border-style: solid;
+  border-color: var(--studio-ok);
+  background: #eef8f1;
+}
+
+.studio-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.studio-chip code {
+  font-family: Consolas, ui-monospace, monospace;
+  background: #fff;
+  border: 1px solid #c9c9c9;
+  padding: 0 4px;
+}
+
+.studio-copy {
+  font-size: 11px;
+  height: 20px;
+  padding: 0 6px;
+}
+
+.studio-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.studio-why {
+  flex-basis: 100%;
+}
+
+.studio-why summary {
+  cursor: pointer;
+  color: #2c6bb5;
+  text-decoration: underline;
+  width: max-content;
+}
+
+.studio-why p {
+  margin: 4px 0 0;
+}
+
+.studio-copy-status {
+  color: var(--studio-muted);
+}
+
+/* Pestañas inferiores estilo Eclipse */
+.studio-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 6px;
+  border-top: 1px solid var(--studio-border);
+  background: #e4e4e4;
+  overflow-x: auto;
+}
+
+.studio-tab {
+  font: inherit;
+  color: var(--studio-text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.studio-tab:hover {
+  background: #ececec;
+}
+
+.studio-tab.is-active {
+  background: var(--studio-bg);
+  border-color: var(--studio-border);
+  border-top: 2px solid #2c6bb5;
+  font-weight: 600;
+  margin-top: 0;
+  padding-top: 4px;
+}
+
+/* Tabla de tablas y de esquema */
+.studio-table-wrap {
+  overflow: auto;
+  max-height: 320px;
+  border: 1px solid var(--studio-input-border);
+  background: #fff;
+}
+
+.studio-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.studio-table th {
+  position: sticky;
+  top: 0;
+  text-align: left;
+  font-weight: 600;
+  background: #e8e8e8;
+  border-bottom: 1px solid #b9b9b9;
+  padding: 3px 6px;
+  white-space: nowrap;
+}
+
+.studio-table td {
+  padding: 3px 6px;
+  border-bottom: 1px solid #ececec;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.studio-table tbody tr:nth-child(even) {
+  background: #f8f8f8;
+}
+
+.studio-cell-input {
+  font: inherit;
+  width: 100%;
+  min-width: 80px;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 1px 3px;
+}
+
+.studio-cell-input:focus {
+  border-color: var(--studio-input-border);
+  background: #fff;
+}
+
+.studio-mismatch {
+  color: var(--studio-error);
+  font-weight: 700;
+  cursor: help;
+}
+
+.studio-schema {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.studio-schema-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Lienzo del Job (JobCanvas) */
+.studio-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--studio-bg);
+  border: 1px solid var(--studio-border);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 12px;
+}
+
+.studio-canvas-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--studio-border);
+  background: #e8e8e8;
+}
+
+.studio-canvas-zoom {
+  min-width: 44px;
+  text-align: center;
+}
+
+.studio-canvas-scroll {
+  overflow: auto;
+  max-height: 560px;
+  background: #fff;
+}
+
+.studio-canvas-svg {
+  display: block;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.studio-subjob-box {
+  fill: #e6f0fb;
+  stroke: #7fa6d6;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.studio-subjob-title {
+  fill: #2c5a8c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.studio-node-body {
+  fill: #fff;
+  stroke: #9a9a9a;
+  stroke-width: 1.5;
+}
+
+.studio-node.status-pending .studio-node-body { stroke: #9a9a9a; }
+.studio-node.status-in_progress .studio-node-body { stroke: #2c6bb5; stroke-width: 2; }
+.studio-node.status-done .studio-node-body { stroke: var(--studio-ok); stroke-width: 2; }
+.studio-node.status-blocked .studio-node-body { stroke: var(--studio-error); stroke-width: 2; }
+
+.studio-node { cursor: pointer; outline: none; }
+.studio-node:focus-visible .studio-node-body { stroke: var(--studio-focus); stroke-width: 2; }
+.studio-node.is-selected .studio-node-body { fill: #fff8d6; stroke: #d08a00; stroke-width: 2.5; }
+
+.studio-node-label {
+  fill: var(--studio-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.studio-node-component {
+  fill: var(--studio-muted);
+  font-size: 11px;
+}
+
+.studio-node-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.studio-node-icon .component-icon {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.studio-edge-line {
+  fill: none;
+  stroke-width: 1.6;
+}
+
+.studio-edge.is-trigger .studio-edge-line {
+  stroke-dasharray: 5 4;
+}
+
+.studio-edge-row .studio-edge-line { stroke: #4a4a4a; }
+.studio-edge-reject .studio-edge-line { stroke: #b26a00; }
+.studio-edge-ok .studio-edge-line { stroke: var(--studio-ok); }
+.studio-edge-error .studio-edge-line { stroke: var(--studio-error); }
+.studio-edge-other .studio-edge-line { stroke: #5c7a99; }
+
+.studio-arrow-row { fill: #4a4a4a; }
+.studio-arrow-reject { fill: #b26a00; }
+.studio-arrow-ok { fill: var(--studio-ok); }
+.studio-arrow-error { fill: var(--studio-error); }
+.studio-arrow-other { fill: #5c7a99; }
+
+.studio-edge-label {
+  fill: var(--studio-text);
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3px;
+}

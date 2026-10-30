@@ -76,7 +76,7 @@ export function ProjectView({ id, tab, rest, go }: { id: string; tab: string; re
     </div>
     <ProjectNavigation id={id} active={active} hasArchive={Boolean(project.archive_name)} />
     <div className="tab-content" key={active + (rest ?? "")}>
-      {active === "resumen" && <SummaryTab id={id} refreshKey={processingRefresh} />}
+      {active === "resumen" && <SummaryTab id={id} rest={rest} refreshKey={processingRefresh} />}
       {active === "importar" && (project.archive_name ? <div className="empty-state"><Icon name="folder" size={30} /><h2>Este proyecto ya tiene un ZIP de origen</h2><p>Para analizar otros archivos, crea un proyecto independiente. Los archivos y el progreso de este proyecto se conservan.</p><a className="button" href="#/projects/nuevo"><Icon name="upload" size={17} />Crear proyecto desde otro ZIP</a></div> : <ImportTab id={id} go={go} />)}
       {active === "inventario" && <InventoryTab id={id} />}
       {active === "programas" && <ProgramsTab id={id} file={rest} />}
