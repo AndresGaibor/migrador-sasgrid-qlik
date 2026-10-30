@@ -21,6 +21,9 @@ import pytest
 from sas_grid_migrator.talend_adapter.adapter import McpCaller, TalendAdapter
 from sas_grid_migrator.talend_adapter.contract import load_contract
 
+#: Arranca el MCP real (bun) en cada módulo: fuera de la pasada rápida; en CI sí se ejecuta (ver tests/conftest.py).
+pytestmark = pytest.mark.slow
+
 ROOT = Path(__file__).resolve().parents[2]
 MCP_DIR = ROOT / "mcp" / "talend-mcp"
 BUN = shutil.which("bun")

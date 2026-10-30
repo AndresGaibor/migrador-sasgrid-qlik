@@ -1,7 +1,7 @@
 # Job `job_p0_resumen_sql`
 
 - **Programa SAS:** `p0_resumen_sql.sas` (sha256 `fb6d9d23beef`)
-- **Instrucciones:** 8 · **Reglas:** v1
+- **Instrucciones:** 9 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Variables de contexto
@@ -16,7 +16,7 @@
 
 ### 1. Leer dwh.ventas
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`
 - **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Propiedades:**
   - `TABLE` = `ventas` — SAS p0_resumen_sql.sas:6
@@ -30,7 +30,7 @@
 
 ### 2. Leer dwh.clientes
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`
 - **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Propiedades:**
   - `TABLE` = `clientes` — SAS p0_resumen_sql.sas:6
@@ -44,7 +44,7 @@
 
 ### 3. Leer dwh.productos
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`
 - **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Propiedades:**
   - `TABLE` = `productos` — SAS p0_resumen_sql.sas:6
@@ -74,12 +74,12 @@
 - **Propiedades:**
   - `LOGICAL_OP` (Logical operator used to combine conditions) = _por configurar_ — regla mappings · nombre oficial · opciones: OR, AND
   - `CONDITIONS` (Conditions) = _por configurar_ — regla mappings · nombre oficial
-  - `USE_ADVANCED` (Use advanced mode) = _por configurar_ — regla mappings · nombre oficial
-  - `ADVANCED_COND` (Advanced) = _por configurar_ — regla mappings · nombre oficial
-- **Expresión** (línea 6): SAS `year(v.fecha) = &anio.` → _sin traducción automática_
-  - ⚠ Sin traducción automática: función year
-- **Pendientes:**
-  - Traducir la condición manualmente (no hay traducción automática segura)
+  - `USE_ADVANCED` (Use advanced mode) = `true` — SAS p0_resumen_sql.sas:6 · nombre oficial
+  - `ADVANCED_COND` (Advanced) = `((input_row.fecha == null ? null : TalendDate.getPartOfDate("YEAR", input_row.fecha)) == context.anio)` — SAS p0_resumen_sql.sas:6 · nombre oficial
+- **Esquema:** `fecha` _(tipos por determinar)_
+- **Expresión** (línea 6): SAS `year(v.fecha) = &anio.` → Java `((input_row.fecha == null ? null : TalendDate.getPartOfDate("YEAR", input_row.fecha)) == context.anio)`
+  - ⚠ Macrovariable &anio → context.anio (crear variable de contexto)
+  - ⚠ year/month/day(): sobre un Date de Talend; con fecha SAS numérica validar la conversión de época
 - **Pruebas:** `vc_op_6_filter_1_row_count`, `vc_op_6_filter_1_nulls`, `vc_op_6_filter_1_empty`
 
 ### 6. Agregar por c.region, p.categoria
@@ -113,7 +113,7 @@
 
 ### 8. Escribir work.ventas_resumen (reemplaza)
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`
 - **Subjob:** `s5` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
 - **Conexiones:** Main desde `op_6_filter_2`
 - **Propiedades:**
@@ -126,6 +126,12 @@
   - Sistema y tabla/archivo de destino
 - **Pruebas:** `vc_op_6_write_1_row_count`, `vc_op_6_write_1_schema`
 
+### 10. Detiene el Job ante un error de componente
+
+- **Acción:** add_component · **Componente:** `tDie` ![Icono Talend](/talend-icons/tDie_icon32.png) (sin verificar)
+- **Subjob:** `recomendado` · **Confianza:** high · **Origen SAS:** `p0_resumen_sql.sas:6`
+- **Conexiones:** OnComponentError desde `op_6_write_1`
+
 ## Casos de validación
 
 - `vc_op_6_read_1_row_count` (row_count): Mismo número de filas leídas que en SAS
@@ -137,11 +143,11 @@
 - `vc_op_6_filter_1_row_count` (row_count): Filas que cumplen el filtro igual a SAS
 - `vc_op_6_filter_1_nulls` (nulls): Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)
 - `vc_op_6_filter_1_empty` (empty): Entrada vacía produce salida vacía
-- `vc_op_6_aggregate_1_aggregates` (aggregates): Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS
-- `vc_op_6_aggregate_1_numeric` (numeric): Tolerancia numérica y redondeo
 - `vc_op_6_filter_2_row_count` (row_count): Filas que cumplen el filtro igual a SAS
 - `vc_op_6_filter_2_nulls` (nulls): Filas con valores missing en las columnas del filtro (SAS trata missing numérico como menor que cualquier número)
 - `vc_op_6_filter_2_empty` (empty): Entrada vacía produce salida vacía
+- `vc_op_6_aggregate_1_aggregates` (aggregates): Sumas, conteos y promedios por grupo iguales; AVG/SUM ignoran missing en SAS
+- `vc_op_6_aggregate_1_numeric` (numeric): Tolerancia numérica y redondeo
 - `vc_op_6_write_1_row_count` (row_count): Filas escritas iguales
 - `vc_op_6_write_1_schema` (schema): Esquema destino
 

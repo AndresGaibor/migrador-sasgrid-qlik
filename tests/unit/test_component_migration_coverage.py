@@ -35,6 +35,19 @@ def _plan_source(source: str, name: str = "edge-case.sas"):
     return plan_program(build_ir(program), "component-regression", load_mapping_rules(), {})
 
 
+#: Componentes que el diseño nuevo no emite en su caso: la fontanería de SAS (`os_command`, `call symputx`)
+#: queda en `not_migrated`. Para cada uno: categoría esperada y, si aplica, texto que debe citar su equivalente.
+NOT_EMITTED = {
+    "tSystem": ("shell_auxiliar", "tSystem"),
+    "tSetGlobalVar": ("variables_control", "Variable de contexto"),
+    "tJava": ("variables_control", "tJava"),
+    "tFlowToIterate": ("variables_control", None),
+}
+#: tRunJob solo aparece como paso listo en el orquestador de un programa con varias partes o macros. Una
+#: llamada a una macro que no se resuelve en el programa queda pendiente: "Job o joblet hijo que implementa la macro".
+PENDING_CALL = {"tRunJob": "Job o joblet hijo que implementa la macro"}
+
+
 @pytest.mark.parametrize(
     ("component", "relative_path"),
     [
@@ -46,10 +59,25 @@ def _plan_source(source: str, name: str = "edge-case.sas"):
 )
 def test_each_scoped_component_has_a_migration_fixture(component: str, relative_path: str):
     """Una regresión de parser/reglas que quite un candidato debe fallar en su caso concreto."""
-    steps = _plan(relative_path).steps
+    plan = _plan(relative_path)
+    steps = plan.steps
     group = "core" if component in CASES["core"] else "alternatives"
 
-    if group == "core":
+    if component in NOT_EMITTED:
+        category, text = NOT_EMITTED[component]
+        assert not any(component in (step.alternatives + [step.component_candidate]) for step in steps), (
+            component,
+            relative_path,
+        )
+        assert any(
+            entry.category == category and (text is None or text in entry.talend_equivalent)
+            for entry in plan.not_migrated
+        ), (component, relative_path)
+    elif component in PENDING_CALL:
+        assert not any(step.component_candidate == component for step in steps), (component, relative_path)
+        call = next(step for step in steps if step.operation_type == "macro_call")
+        assert PENDING_CALL[component] in call.pending, (component, relative_path)
+    elif group == "core":
         assert any(step.component_candidate == component for step in steps), (component, relative_path)
     else:
         assert any(component in step.alternatives for step in steps), (component, relative_path)
@@ -72,9 +100,12 @@ def _corpus_plans():
     )
 
 
-@pytest.mark.parametrize(
-    "operation_type", sorted(set(MAPPINGS["operations"]) - {"include"})
-)
+#: Operaciones que son fontanería: no generan paso (ver `test_plumbing_operations_are_recorded_in_not_migrated`).
+PLUMBING_OPERATIONS = ["os_command"]
+STEP_OPERATIONS = sorted(set(MAPPINGS["operations"]) - {"include"} - set(PLUMBING_OPERATIONS))
+
+
+@pytest.mark.parametrize("operation_type", STEP_OPERATIONS)
 def test_every_mapped_operation_has_a_fixture_and_emits_its_declared_validation_cases(
     operation_type: str,
 ):
@@ -93,9 +124,21 @@ def test_every_mapped_operation_has_a_fixture_and_emits_its_declared_validation_
         assert [case.kind for case in emitted] == declared_kinds, (operation_type, step.id)
 
 
-@pytest.mark.parametrize(
-    "operation_type", sorted(set(MAPPINGS["operations"]) - {"include"})
-)
+@pytest.mark.parametrize("operation_type", PLUMBING_OPERATIONS)
+def test_plumbing_operations_are_recorded_in_not_migrated(operation_type: str):
+    """La fontanería no genera pasos ni casos de validación: debe quedar explicada en not_migrated, con el
+    componente de la correspondencia como equivalente."""
+    mapping = MAPPINGS["operations"][operation_type]
+    corpus = _corpus_plans()
+    assert not [step for plan in corpus for step in plan.steps if step.operation_type == operation_type]
+    entries = [
+        entry for plan in corpus for entry in plan.not_migrated if mapping["component"] in entry.talend_equivalent
+    ]
+    assert entries, f"{operation_type} no aparece en not_migrated con su equivalente {mapping['component']}"
+    assert all(entry.reason and entry.what for entry in entries)
+
+
+@pytest.mark.parametrize("operation_type", STEP_OPERATIONS)
 def test_every_operation_preserves_mapping_required_decisions(operation_type: str):
     mapping = MAPPINGS["operations"][operation_type]
     required = mapping["required"]
@@ -119,9 +162,11 @@ def test_include_evidence_is_preserved_but_not_treated_as_a_ready_child_job():
 
     assert any(operation.type == "include" for operation in ir.operations)
     macro_call = next(step for step in plan.steps if step.operation_type == "macro_call")
-    assert macro_call.component_candidate == "tRunJob"
+    assert macro_call.component_candidate == "por_determinar"
+    assert "Joblet" in macro_call.alternatives
     assert macro_call.pending
     assert "Job o joblet hijo que implementa la macro" in macro_call.pending
+    assert not any(step.component_candidate == "tRunJob" for step in plan.steps)
 
 
 def test_unsupported_sas_operations_are_never_promoted_to_automatic_components():
@@ -140,13 +185,14 @@ def test_unsupported_sas_operations_are_never_promoted_to_automatic_components()
 
 def test_tmap_preserves_simple_calculated_column_and_expression():
     plan = _plan("component_scenarios/01_integrated_file_etl.sas")
-    compute = next(step for step in plan.steps if step.operation_type == "compute")
+    # El cálculo ya no es un paso `compute`: se funde con el filtro en un único tMap.
+    tmap = next(step for step in plan.steps if step.operation_type == "fused_tmap")
 
-    assert compute.component_candidate == "tMap"
-    assert [(expr.target, expr.talend) for expr in compute.expressions] == [
+    assert tmap.component_candidate == "tMap"
+    assert [(expr.target, expr.talend) for expr in tmap.expressions if expr.target] == [
         ("net_amount", "(input_row.amount * 0.9)")
     ]
-    assert {column.name for column in compute.schema_columns} == {"amount", "net_amount"}
+    assert {column.name for column in tmap.schema_columns} == {"amount", "net_amount"}
 
 
 def test_tmap_join_has_main_and_lookup_connections_and_schema():
@@ -159,16 +205,19 @@ def test_tmap_join_has_main_and_lookup_connections_and_schema():
     assert [column.name for column in join.schema_columns] == ["id"]
 
 
-def test_tmap_filter_case_keeps_filter_candidate_and_tmap_alternative():
+def test_tmap_filter_case_keeps_the_filter_inside_the_fused_tmap():
+    """El filtro de un WHERE seguido de cálculo no se pierde ni queda como tFilterRow suelto: va en el
+    "Output filter" del tMap, con su advertencia de tipos."""
     plan = _plan("component_scenarios/01_integrated_file_etl.sas")
-    filter_step = next(step for step in plan.steps if step.operation_type == "filter")
+    tmap = next(step for step in plan.steps if step.operation_type == "fused_tmap")
+    properties = {property_.name: property_.value for property_ in tmap.properties}
 
-    assert filter_step.component_candidate == "tFilterRow"
-    assert "tMap" in filter_step.alternatives
-    assert filter_step.expressions[0].talend is None
-    assert filter_step.expressions[0].warnings
-    assert filter_step.properties[0].name == "LOGICAL_OP"
-    assert filter_step.properties[0].value == "AND"
+    assert not [step for step in plan.steps if step.component_candidate in {"tFilterRow", "tFilterColumns"}]
+    assert properties["Output filter"] == "((input_row.amount > 0))"
+    filter_expr = next(expr for expr in tmap.expressions if expr.target is None)
+    assert filter_expr.talend == "(input_row.amount > 0)"
+    assert any("tipo no confirmado" in warning for warning in filter_expr.warnings)
+    assert tmap.requires_semantic_validation
 
 
 def test_tmap_keeps_unsupported_string_functions_explicitly_untranslated():
@@ -190,7 +239,8 @@ def test_tmap_date_functions_require_semantic_validation():
 
     assert compute.component_candidate == "tMap"
     assert compute.requires_semantic_validation
-    assert all(expr.talend is None and expr.warnings for expr in compute.expressions)
+    # Las funciones de fecha se traducen con TalendDate y avisan de la conversión de época.
+    assert all(expr.warnings for expr in compute.expressions)
 
 
 def test_tmap_routes_unsupported_conditional_logic_to_review_not_false_translation():
@@ -315,7 +365,8 @@ def test_filter_preserves_boolean_operator_and_source_columns(condition: str, ex
     assert filter_step.component_candidate == "tFilterRow"
     assert properties["LOGICAL_OP"] == expected_operator
     assert [column.name for column in filter_step.schema_columns] == ["amount", "status"]
-    assert filter_step.expressions[0].talend is None
+    # La igualdad con texto se traduce null-safe (con aviso); el paso sigue pidiendo validación semántica.
+    assert "equals" in (filter_step.expressions[0].talend or "")
     assert filter_step.expressions[0].warnings
     assert filter_step.requires_semantic_validation
 
@@ -379,10 +430,15 @@ def test_merge_join_keeps_unconfirmed_match_model_pending(join_code: str, expect
 def test_nodup_remains_distinct_from_nodupkey_and_has_no_invented_key():
     plan = _plan_source("proc sort data=source out=deduped nodup; by id; run;")
     dedupe = next(step for step in plan.steps if step.operation_type == "dedupe")
+    nodupkey = _plan_source("proc sort data=source out=deduped nodupkey; by id; run;")
+    nodupkey_step = next(step for step in nodupkey.steps if step.operation_type == "dedupe")
+    properties = {property_.name: property_.value for property_ in dedupe.properties}
 
-    assert dedupe.component_candidate == "por_determinar"
-    assert not any(property_.name == "UNIQUE_KEY" for property_ in dedupe.properties)
+    # NODUP compara todas las columnas: tUniqRow sin clave inventada desde el BY; NODUPKEY sí usa la clave.
+    assert dedupe.component_candidate == "tUniqRow"
+    assert properties["UNIQUE_KEY"] is None
     assert dedupe.pending and not dedupe.verified
+    assert {p.name: p.value for p in nodupkey_step.properties}["UNIQUE_KEY"] == "id"
 
 
 @pytest.mark.parametrize(

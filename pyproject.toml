@@ -15,7 +15,13 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.6"]
+dev = [
+    "pytest>=8",
+    "httpx>=0.27",
+    "ruff>=0.6",
+    "pytest-xdist>=3.8.0",
+    "pytest-testmon>=2.2.0",
+]
 
 [project.scripts]
 sgm = "sas_grid_migrator.cli.main:app"
@@ -30,6 +36,13 @@ packages = ["src/sas_grid_migrator"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "."]
+# Por defecto: en paralelo (xdist). Las pruebas `slow` (MCP real, corpus completo) se omiten en tests/conftest.py
+# salvo con `--runslow`. Incremental: `--testmon` (no combinar con `-m`: testmon no deselecciona entonces).
+# Los resultados caros se cachean en .test-cache/ (tests/support/cache.py); `scripts/test.ps1` lo documenta.
+addopts = ["-n", "auto"]
+markers = [
+    "slow: prueba cara (arranca el MCP real o planifica el corpus completo); fuera de la pasada rápida",
+]
 
 [tool.ruff]
 line-length = 100

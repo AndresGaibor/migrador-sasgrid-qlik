@@ -22,12 +22,15 @@ import time
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
+from collections.abc import Mapping
+from contextlib import contextmanager
 from pathlib import Path
 
 import apps.api.main as api_module
 import pytest
 from fastapi.testclient import TestClient
 from jsonschema import Draft202012Validator
+from tests.support.cache import cached_json, mcp_fingerprint, tree_fingerprint
 from tests.support.item_invariants import item_problems
 from tests.support.spec_invariants import project_problems, walk
 
@@ -36,6 +39,7 @@ from sas_grid_migrator.talend_adapter.offline_payload import to_batch_arguments
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests" / "fixtures" / "sas"
+REPO_TESTS_SUPPORT = ROOT / "tests" / "support"
 MCP_DIR = ROOT / "mcp" / "talend-mcp"
 BUN = shutil.which("bun")
 WRITE_TOOL = "talend_job_apply_custom_spec"
@@ -65,37 +69,78 @@ def _require_bun() -> None:
         pytest.skip("bun no esta instalado")
 
 
-@pytest.fixture(scope="module")
-def corpus_trees(tmp_path_factory):
-    """Para cada corpus, los argumentos de cada programa que se puede aplicar."""
-    root = tmp_path_factory.mktemp("corpus-gate")
-    os.environ.update(
-        SGM_DATA_DIR=str(root / "data"), TALEND_APPLY_FOLDER="Process/Pruebas", TALEND_MCP_READONLY="false"
-    )
-    results: dict[str, dict] = {}
+#: Variables que fijan el resultado del corpus: entran en la clave de caché.
+GATE_ENV = {"TALEND_APPLY_FOLDER": "Process/Pruebas", "TALEND_MCP_READONLY": "false"}
+
+
+@pytest.fixture(scope="session")
+def gate_env(tmp_path_factory):
+    """Entorno de la puerta. Se fija una vez por sesión y se restaura al final (antes se filtraba al resto)."""
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setenv("SGM_DATA_DIR", str(tmp_path_factory.mktemp("gate-data") / "data"))
+        for key, value in GATE_ENV.items():
+            patch.setenv(key, value)
+        yield
+
+
+def _compute_corpus(label: str, root: Path) -> dict:
+    """Planifica y prepara UN corpus con el API real (sin caché). Es lo caro de la puerta."""
     # La raiz de fixtures contiene los demas corpus: se prueba solo con sus archivos propios.
-    own = root / "raiz"
-    shutil.copytree(FIXTURES, own, ignore=shutil.ignore_patterns("real", "synthetic"))
+    if label == "raiz":
+        path = root / "raiz"
+        shutil.copytree(FIXTURES, path, ignore=shutil.ignore_patterns("real", "synthetic"))
+    else:
+        path = CORPORA[label]
     with TestClient(api_module.app) as client:
-        for label, path in CORPORA.items():
-            path = own if label == "raiz" else path
-            project = client.post("/api/projects", json={"name": label.replace("/", "-")}).json()["id"]
-            assert client.post(f"/api/projects/{project}/imports", json={"path": str(path)}).status_code == 201
-            assert client.post(f"/api/projects/{project}/analyses").status_code == 201
-            assert client.post(f"/api/projects/{project}/plans").status_code == 201
-            plans = client.get(f"/api/projects/{project}/plans").json()
-            items = plans if isinstance(plans, list) else plans.get("plans", [])
-            trees, skipped, errors = {}, [], []
-            for item in items:
-                response = client.post(f"/api/projects/{project}/plans/{item['program']}/talend-apply/preview")
-                if response.status_code >= 500:
-                    errors.append(f"{item['program']}: HTTP {response.status_code}")
-                elif response.status_code == 200 and response.json().get("arguments"):
-                    trees[item["program"]] = response.json()["arguments"]
-                else:
-                    skipped.append(item["program"])
-            results[label] = {"trees": trees, "skipped": skipped, "errors": errors, "programs": len(items)}
-    return results
+        project = client.post("/api/projects", json={"name": label.replace("/", "-")}).json()["id"]
+        assert client.post(f"/api/projects/{project}/imports", json={"path": str(path)}).status_code == 201
+        assert client.post(f"/api/projects/{project}/analyses").status_code == 201
+        assert client.post(f"/api/projects/{project}/plans").status_code == 201
+        plans = client.get(f"/api/projects/{project}/plans").json()
+        items = plans if isinstance(plans, list) else plans.get("plans", [])
+        trees, skipped, errors = {}, [], []
+        for item in items:
+            response = client.post(f"/api/projects/{project}/plans/{item['program']}/talend-apply/preview")
+            if response.status_code >= 500:
+                errors.append(f"{item['program']}: HTTP {response.status_code}")
+            elif response.status_code == 200 and response.json().get("arguments"):
+                trees[item["program"]] = response.json()["arguments"]
+            else:
+                skipped.append(item["program"])
+    return {"trees": trees, "skipped": skipped, "errors": errors, "programs": len(items)}
+
+
+class _Corpora(Mapping):
+    """`corpus_trees[label]` calcula (o lee de la caché) solo ese corpus.
+
+    Así cada corpus es una entrada de caché propia y, con xdist, varios workers calculan corpus distintos
+    en paralelo en vez de uno solo calcularlos todos en serie.
+    """
+
+    def __init__(self, tmp_path_factory):
+        self._tmp = tmp_path_factory
+        self._memo: dict[str, dict] = {}
+
+    def __getitem__(self, label: str) -> dict:
+        if label not in self._memo:
+            self._memo[label] = cached_json(
+                "corpus",
+                {"label": label, "fixtures": tree_fingerprint(FIXTURES), "env": GATE_ENV},
+                lambda: _compute_corpus(label, self._tmp.mktemp(f"corpus-{label.replace('/', '-')}")),
+            )
+        return self._memo[label]
+
+    def __iter__(self):
+        return iter(CORPORA)
+
+    def __len__(self) -> int:
+        return len(CORPORA)
+
+
+@pytest.fixture(scope="session")
+def corpus_trees(gate_env, tmp_path_factory):
+    """Para cada corpus, los argumentos de cada programa que se puede aplicar (ver `_Corpora`)."""
+    return _Corpora(tmp_path_factory)
 
 
 @pytest.mark.parametrize("label", CORPORA)
@@ -108,7 +153,13 @@ def test_the_api_never_crashes_and_plans_every_program(corpus_trees, label):
 
 @pytest.mark.parametrize("label", CORPORA)
 def test_every_spec_meets_the_talend_invariants(corpus_trees, label):
-    problems = project_problems(corpus_trees[label]["trees"], component_limit=api_module._max_apply_components())
+    # Función pura de los árboles del corpus: la caché guarda el resultado y se invalida con el código de tests/support.
+    problems = cached_json(
+        "corpus-check",
+        {"check": "talend-invariants", "label": label, "fixtures": tree_fingerprint(FIXTURES),
+         "support": tree_fingerprint(REPO_TESTS_SUPPORT), "limit": api_module._max_apply_components()},
+        lambda: project_problems(corpus_trees[label]["trees"], component_limit=api_module._max_apply_components()),
+    )
 
     assert not problems, f"{label}:\n" + "\n".join(problems[:30])
 
@@ -127,17 +178,22 @@ def _wait(url: str, process: subprocess.Popen, timeout: float = 40.0) -> None:
     raise RuntimeError("el MCP no respondio")
 
 
-@pytest.fixture(scope="module")
-def mcp(corpus_trees, tmp_path_factory):
-    """El MCP real con el preset portal y un proyecto vacio cuyo catalogo conoce los componentes del corpus."""
+def _component_names(corpus_trees) -> list[str]:
+    return sorted(
+        {
+            component["componentName"]
+            for data in corpus_trees.values()
+            for tree in data["trees"].values()
+            for job in walk(tree)
+            for component in job["components"]
+        }
+    )
+
+
+@contextmanager
+def _mcp_server(names: list[str], tmp_path_factory):
+    """Arranca el MCP real (preset portal) y devuelve la URL de su endpoint /mcp. Necesita bun."""
     _require_bun()
-    names = {
-        component["componentName"]
-        for data in corpus_trees.values()
-        for tree in data["trees"].values()
-        for job in walk(tree)
-        for component in job["components"]
-    }
     base = tmp_path_factory.mktemp("mcp-gate")
     project = base / "proyecto"
     project.mkdir()
@@ -149,7 +205,7 @@ def mcp(corpus_trees, tmp_path_factory):
         {"componentName": name, "family": "Gate", "version": "0.102", "pluginJar": "", "definitionFiles": [],
          "parameters": [], "schemas": {"hasInputSchema": True, "hasOutputSchema": True, "hasDynamicSchema": False},
          "connectors": [], "dependencies": [], "limitations": []}
-        for name in sorted(names)
+        for name in names
     ]
     (cwd / ".talend-mcp" / "component-catalog.json").write_text(json.dumps({"entries": entries}), encoding="utf-8")
     with socket.socket() as sock:
@@ -173,23 +229,51 @@ def mcp(corpus_trees, tmp_path_factory):
             process.kill()
 
 
-@pytest.fixture(scope="module")
-def schemas(mcp):
+@pytest.fixture(scope="session")
+def mcp(corpus_trees, tmp_path_factory):
+    """El MCP real con el preset portal (lo usan las pruebas `slow` de dry-run y escritura)."""
+    with _mcp_server(_component_names(corpus_trees), tmp_path_factory) as url:
+        yield url
+
+
+@pytest.fixture(scope="session")
+def schemas(tmp_path_factory):
+    """Esquemas que publica el MCP real para las dos herramientas de escritura.
+
+    Caché: la clave es el código del MCP. Los esquemas de estas dos herramientas son estáticos (no dependen
+    del catálogo de componentes), así que el arranque para publicarlos usa un catálogo vacío y no necesita
+    calcular ningún corpus. Solo si falta la caché se arranca el MCP.
+    """
     from sas_grid_migrator.talend_adapter.adapter import McpCaller
 
-    tools = {tool["name"]: tool for tool in asyncio.run(McpCaller(mcp).list_tools())}
-    return {name: Draft202012Validator(tools[name]["inputSchema"]) for name in (WRITE_TOOL, BATCH_TOOL)}
+    def publish() -> dict:
+        with _mcp_server([], tmp_path_factory) as url:
+            tools = {tool["name"]: tool for tool in asyncio.run(McpCaller(url).list_tools())}
+        return {name: tools[name]["inputSchema"] for name in (WRITE_TOOL, BATCH_TOOL)}
+
+    published = cached_json("mcp-tools", {"mcp": mcp_fingerprint(), "tools": [WRITE_TOOL, BATCH_TOOL]}, publish)
+    return {name: Draft202012Validator(schema) for name, schema in published.items()}
 
 
 @pytest.mark.parametrize("label", CORPORA)
 def test_arguments_validate_against_the_schema_the_mcp_publishes(corpus_trees, schemas, label):
-    failures = []
-    for program, tree in corpus_trees[label]["trees"].items():
-        for error in schemas[WRITE_TOOL].iter_errors(tree):
-            failures.append(f"{program}: {'/'.join(str(part) for part in error.absolute_path)}: {error.message[:140]}")
+    def validate() -> list[str]:
+        failures = []
+        for program, tree in corpus_trees[label]["trees"].items():
+            for error in schemas[WRITE_TOOL].iter_errors(tree):
+                failures.append(f"{program}: {'/'.join(str(part) for part in error.absolute_path)}: {error.message[:140]}")
+        return failures
+
+    # Caché: depende del corpus (fixtures, código del API) y de los esquemas que publica el MCP.
+    failures = cached_json(
+        "corpus-check",
+        {"check": "schema", "label": label, "fixtures": tree_fingerprint(FIXTURES), "mcp": mcp_fingerprint()},
+        validate,
+    )
     assert not failures, f"{label}:\n" + "\n".join(failures[:15])
 
 
+@pytest.mark.slow  # arranca el MCP real y hace dryRun: fuera de la pasada rápida (ver pyproject.toml)
 @pytest.mark.parametrize("label", CORPORA)
 def test_offline_eligible_jobs_validate_and_the_real_mcp_accepts_them_with_dry_run(corpus_trees, schemas, mcp, label):
     from mcp import Client
@@ -222,6 +306,7 @@ def test_offline_eligible_jobs_validate_and_the_real_mcp_accepts_them_with_dry_r
     assert not refused, f"{label}: el MCP rechazo {len(refused)} de {len(payloads)} Jobs:\n" + "\n".join(refused[:10])
 
 
+@pytest.mark.slow  # escribe Jobs reales con el MCP: fuera de la pasada rápida (ver pyproject.toml)
 @pytest.mark.parametrize("label", CORPORA)
 def test_the_files_the_mcp_writes_are_well_formed_xml_that_studio_can_link(corpus_trees, mcp, label):
     """Escribe de verdad los Jobs elegibles y parsea sus archivos con un parser estricto.

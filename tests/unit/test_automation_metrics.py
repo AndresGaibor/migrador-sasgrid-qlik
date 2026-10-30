@@ -15,7 +15,9 @@ def test_measure_reports_how_many_steps_still_need_a_person():
     assert report["programs"] > 0
     assert report["steps"] >= report["steps_with_pending"] > 0
     assert 0 <= report["automated_percent"] <= 100
-    assert "read" in report["by_operation"]
+    # Las lecturas de datasets intermedios ya no son pasos (versions.py los encadena); lo que queda son lecturas de
+    # archivo (proc import), que sí cuentan como pasos que pueden necesitar a una persona.
+    assert "read_file" in report["by_operation"]
     assert report["pending_categories"]
 
 

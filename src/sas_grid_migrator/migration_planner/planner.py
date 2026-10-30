@@ -12,14 +12,35 @@ from typing import Literal
 from pydantic import BaseModel
 
 from sas_grid_migrator.environment.catalog import EnvironmentCatalog, EnvironmentDataset
-from sas_grid_migrator.intermediate_representation.models import IROperation, LibraryRef, ProgramIR
+from sas_grid_migrator.intermediate_representation.models import (
+    IROperation,
+    LibraryRef,
+    MacroIR,
+    ProgramIR,
+)
+from sas_grid_migrator.migration_planner import context_rules
 from sas_grid_migrator.migration_planner.expressions import (
     is_simple_arithmetic_translation,
     translate,
 )
+from sas_grid_migrator.migration_planner.job_structure import apply_structure
+from sas_grid_migrator.migration_planner.joblets import attach_joblets, macro_call_joblets
+from sas_grid_migrator.migration_planner.regions import fold_regions, place_region_jobs
+from sas_grid_migrator.migration_planner.copy_back import fold_copy_back
+from sas_grid_migrator.migration_planner.elt import fold_elt
+from sas_grid_migrator.migration_planner.sql_compose import compose_items
+from sas_grid_migrator.migration_planner.job_structure import (
+    engine_hint_from_texts,
+    installed_components,
+    official_inventory_names,
+)
+from sas_grid_migrator.migration_planner.pipeline import build_flow
+from sas_grid_migrator.migration_planner.plan_cleanup import collapse_undefined_macros, prune_unused_context
+from sas_grid_migrator.migration_planner.plumbing import macro_parts, plumbing_macros, tag_macro_calls
 from sas_grid_migrator.migration_planner.models import (
     ChildJob,
     Connection,
+    NotMigrated,
     ContextVariable,
     Expression,
     GridRecommendation,
@@ -267,11 +288,13 @@ class GridCatalog(BaseModel):
 
 class MappingRules(BaseModel):
     version: str
+    # motor -> {"input", "output", "row"}; un lado ausente o vacío = el Studio no trae componente para él
     engines: dict[str, dict[str, str]]
     operations: dict[str, OpRule]
     grid: dict[str, GridRule] = {}
     editor_properties: dict[str, list[str]] = {}
     generic_components: list[str] = []
+    engine_notes: dict[str, str] = {}
 
 
 def load_mapping_rules(path: Path | None = None) -> MappingRules:
@@ -427,18 +450,73 @@ class _Planner:
         self.catalog = load_catalog()
         self.cases: list[ValidationCase] = []
         self.used_libs: set[str] = set()
+        #: Motor de las cargas (transferencias) del programa: el que nombran sus librerías o su entorno.
+        self.transfer_engine: str | None = None
+
+    def tmap_meta(self) -> tuple[bool | None, str | None, list[str]]:
+        """Catálogo del tMap (en catálogo, documentación y variantes) para los pasos fusionados."""
+        cat = self.catalog.get("tMap")
+        if not cat:
+            return None, None, []
+        return True, cat.get("doc_url"), self.catalog.variants_of("tMap")[:12]
 
     # ---- componentes ----
+    def _engine_component(self, engine: str, side: str) -> tuple[str, list[str]]:
+        """Componente del motor para un lado (input/output/row) y la pendiente si no hay ninguno."""
+        component = self.rules.engines.get(engine, {}).get(side, "")
+        if component:
+            return component, []
+        note = self.rules.engine_notes.get(engine) or (
+            f"El Studio instalado no trae un componente de {side} para el motor {engine}. "
+            "Elige el conector del motor o el genérico que trae la edición de Studio en uso."
+        )
+        return "", [note]
+
     def component(
         self, op: IROperation, rule: OpRule
     ) -> tuple[str, list[str], list[str], list[str]]:
         """(componente, alternativas, pendientes, supuestos)"""
+        if op.details.get("passthrough") and op.type == "read":
+            # R46: lectura pass-through (`from connection to <motor> (...)`): componente de entrada del motor.
+            engine = str(op.details.get("engine") or "")
+            component, pend = self._engine_component(engine, "input")
+            return component, rule.alternatives, pend, [f"Lectura pass-through del motor {engine}"]
+        if op.type == "sql_passthrough":
+            # SQL pass-through (`execute (...) by <motor>`): se ejecuta en el motor con su componente Row.
+            engine = str(op.details.get("engine") or "")
+            if not engine:
+                return (
+                    "",
+                    rule.alternatives,
+                    ["SQL pass-through sin motor identificado: indicar el motor de la sentencia `by`."],
+                    [],
+                )
+            component, pend = self._engine_component(engine, "row")
+            if component and component not in installed_components() and component not in official_inventory_names():
+                # Solo se propone un componente que el Studio instalado trae (snapshot) o que el inventario oficial documenta.
+                pend = [f"{component} no está en el Studio instalado: elige el componente Row del motor"]
+                component = ""
+            return component, rule.alternatives, pend, []
+        if op.details.get("transfer"):
+            # Carga de una tabla WORK a la base del entorno: el componente de salida del motor que nombra el programa.
+            table = op.details.get("tabla_destino", "")
+            if self.transfer_engine and self.transfer_engine in self.rules.engines:
+                component, pend = self._engine_component(self.transfer_engine, "output")
+                return component, rule.alternatives, pend, [f"Carga de WORK.{table} al motor {self.transfer_engine}"]
+            return (
+                "por_determinar",
+                rule.alternatives,
+                ["Motor de destino de la carga no identificado en el programa: indicar la base de destino"],
+                [],
+            )
         if not rule.component.startswith("@engine."):
             return rule.component, rule.alternatives, [], []
         side = rule.component.split(".")[1]
         ds = (op.inputs if side == "input" else op.outputs) or op.inputs or op.outputs
         target = ds[0] if ds else ""
-        lib = target.split(".")[0] if "." in target and "&" not in target else None
+        # La librería es literal aunque la tabla sea dinámica (`td.&destino`); el nombre dinámico de la librería no.
+        prefix = target.split(".")[0] if "." in target else ""
+        lib = prefix if prefix and "&" not in prefix else None
         if lib == "work":
             return (
                 "por_determinar",
@@ -453,19 +531,17 @@ class _Planner:
             ref = self.libs.get(lib)
             eng = (ref.engine or "").lower() if ref else ""
             if eng in self.rules.engines:
-                return (
-                    self.rules.engines[eng][side],
-                    rule.alternatives,
-                    [],
-                    [f"Librería {lib} usa el motor {eng}"],
-                )
+                component, pend = self._engine_component(eng, side)
+                return component, rule.alternatives, pend, [f"Librería {lib} usa el motor {eng}"]
             # El SAS puede no traer el LIBNAME (vive en un autoexec): lo dice el catálogo de entorno.
             catalog_library = self.environment.library(lib) if self.environment else None
             if catalog_library and catalog_library.engine.casefold() in self.rules.engines:
+                engine = catalog_library.engine.casefold()
+                component, pend = self._engine_component(engine, side)
                 return (
-                    self.rules.engines[catalog_library.engine.casefold()][side],
+                    component,
                     rule.alternatives,
-                    [],
+                    pend,
                     [f"Librería {lib} según el catálogo de entorno: motor {catalog_library.engine}"],
                 )
             where = f" en {ref.path}" if ref and ref.path else ""
@@ -863,6 +939,8 @@ class _Planner:
             props["PROCESS"] = d.get("path")
         elif op.type == "os_command":
             props["COMMAND"] = d.get("text")
+        elif (op.type == "sql_passthrough" or d.get("passthrough")) and d.get("sql"):
+            props["QUERY"] = d.get("sql")
         return props, exprs, cols, pend, component_tables
 
     def environment_dataset(self, reference: str) -> EnvironmentDataset | None:
@@ -1004,13 +1082,20 @@ class _Planner:
             id=sid,
             order=order,
             subjob=f"{prefix}{op.step}",
+            library=_dataset_library(op),
             action="manual_decision"
-            if comp in ("por_determinar", "ninguno")
-            and op.type in ("stateful", "dynamic_code", "unsupported", "report")
+            if comp == ""
+            or (
+                comp in ("por_determinar", "ninguno")
+                and op.type in ("stateful", "dynamic_code", "unsupported", "report")
+            )
             else "add_component",
             operation_id=op.id,
             operation_type=op.type,
             component_candidate=comp,
+            why=(pend[0] if pend else "Sin componente en el Studio instalado: elige el conector del motor.")
+            if comp == ""
+            else None,
             in_catalog=True
             if cat
             else (
@@ -1081,69 +1166,77 @@ class _Planner:
         }.get(t, t)
 
 
-def _connect(steps: list[PlanStep], prev_subjob_last: str | None) -> None:
-    """Conexiones Main/Lookup dentro de cada subjob y OnSubjobOk entre subjobs consecutivos."""
-    by_subjob: dict[str, list[PlanStep]] = {}
-    for s in steps:
-        by_subjob.setdefault(s.subjob, []).append(s)
-    last = prev_subjob_last
-    for group in by_subjob.values():
-        reads: list[PlanStep] = []
-        prev: PlanStep | None = None
-        first_join_done = False
-        for s in group:
-            if s.operation_type in _READS:
-                reads.append(s)
-                prev = prev or s
-                continue
-            if s.operation_type == "join" and not first_join_done and reads:
-                s.connections = [Connection(type="Main", from_step=reads[0].id)] + [
-                    Connection(type="Lookup", from_step=r.id) for r in reads[1:]
-                ]
-                first_join_done = True
-            elif s.operation_type == "union" and reads:
-                s.connections = [Connection(type="Main", from_step=r.id) for r in reads]
-            elif prev is not None:
-                s.connections = [Connection(type="Main", from_step=prev.id)]
-            prev = s
-        if reads and not reads[0].connections and last:
-            reads[0].connections = [Connection(type="OnSubjobOk", from_step=last)]
-        elif not reads and group and last:
-            group[0].connections = [
-                *group[0].connections,
-                Connection(type="OnSubjobOk", from_step=last),
-            ]
-        last = group[-1].id
+def _variable(
+    name: str, value: str | None, origin: str, line: int | None
+) -> ContextVariable:
+    """Variable de contexto con tipo Talend. Un secreto nunca conserva su valor en el plan."""
+    info = context_rules.classify(name, value)
+    return ContextVariable(
+        name=name,
+        sas_value=None if info.is_secret else value,
+        suggested=f"context.{name}",
+        origin=origin,
+        talend_type=info.talend_type,
+        is_secret=info.is_secret,
+        needs_value=info.needs_value,
+        sas_line=line,
+    )
 
 
-def _context_variables(ir: ProgramIR, steps: list[PlanStep]) -> list[ContextVariable]:
-    variables = {
-        name: ContextVariable(
-            name=name, sas_value=value, suggested=f"context.{name}", origin="%LET de primer nivel"
+def _apply_environment_groups(
+    variables: dict[str, ContextVariable], environment: dict[str, dict[str, str]]
+) -> None:
+    """Marca por ambiente (DEV/QA/PROD) las variables que el programa cambia según el ambiente elegido."""
+    for name, variable in variables.items():
+        if name in environment:
+            variable.group_values = context_rules.env_group(environment[name])
+
+
+def _dataset_library(op: IROperation) -> str | None:
+    """Biblioteca SAS (LIB de LIB.TABLA) del primer dataset del paso, si lo tiene."""
+    for dataset in [*op.inputs, *op.outputs]:
+        if "." in dataset:
+            return dataset.split(".", 1)[0].upper()
+    return None
+
+
+def _context_variables(
+    ir: ProgramIR, steps: list[PlanStep], source_text: str | None = None
+) -> list[ContextVariable]:
+    variables: dict[str, ContextVariable] = {
+        name: _variable(
+            name, value, "%LET de primer nivel", ir.parameter_lines.get(name)
         )
         for name, value in ir.parameters.items()
     }
+    environment = context_rules.environment_groups(source_text)
+    for name in context_rules.environment_parameters(source_text):
+        variables.setdefault(
+            name, _variable(name, None, "parámetro de ambiente (D/C/P) comparado en el SAS", None)
+        )
+    for name in environment:
+        variables.setdefault(
+            name,
+            _variable(name, None, "%LET dentro de %if &<selector> (valor por ambiente)", None),
+        )
     for step in steps:
         for expression in step.expressions:
             for name in re.findall(r"context\.(\w+)", expression.talend or ""):
                 variables.setdefault(
                     name,
-                    ContextVariable(
-                        name=name,
-                        suggested=f"context.{name}",
-                        origin=f"&{name} en {step.evidence.file}:{step.evidence.line}",
+                    _variable(
+                        name, None, f"&{name} en {step.evidence.file}:{step.evidence.line}", step.evidence.line
                     ),
                 )
         for prop in step.properties:
             for name in re.findall(r"&(\w+)", prop.value or ""):
                 variables.setdefault(
                     name,
-                    ContextVariable(
-                        name=name,
-                        suggested=f"context.{name}",
-                        origin=f"&{name} en {step.evidence.file}:{step.evidence.line}",
+                    _variable(
+                        name, None, f"&{name} en {step.evidence.file}:{step.evidence.line}", step.evidence.line
                     ),
                 )
+    _apply_environment_groups(variables, environment)
     return sorted(variables.values(), key=lambda variable: variable.name.lower())
 
 
@@ -1170,6 +1263,63 @@ def _needed_libraries(
     return needed
 
 
+def _composition_entries(notes: list[str]) -> list[NotMigrated]:
+    """Sentencias SQL que no se compusieron (sql_compose.py), agrupadas por motivo: cada una sigue como paso propio."""
+    by_reason: dict[str, int] = {}
+    for note in notes:
+        if note.startswith("No se compone") and ": " in note:
+            reason = note.split(": ", 1)[1]
+            by_reason[reason] = by_reason.get(reason, 0) + 1
+    return [
+        NotMigrated(
+            category="composicion_sql",
+            what=f"{count} sentencia(s) SQL no compuesta(s): {reason}",
+            reason="La composición de sentencias SQL solo se hace si el resultado es seguro y se puede comprobar.",
+            talend_equivalent="Cada sentencia se mantiene como su propio paso, como antes de la composición.",
+        )
+        for reason, count in by_reason.items()
+    ]
+
+
+def _datasets_of(operations) -> set[str]:
+    return {d for op in operations for d in [*op.inputs, *op.outputs] if d}
+
+
+def _inline_calls(ir: ProgramIR, entry_name: str | None) -> dict[str, MacroIR]:
+    """Macros que se expanden en línea: llamadas una sola vez, desde el programa, y sin fontanería."""
+    calls: dict[str, int] = {}
+    for op in [*ir.operations, *(o for m in ir.macros for o in m.operations)]:
+        if op.type == "macro_call":
+            key = str(op.details.get("name", "")).casefold()
+            calls[key] = calls.get(key, 0) + 1
+    top_level = {
+        str(op.details.get("name", "")).casefold(): op
+        for op in ir.operations
+        if op.type == "macro_call"
+    }
+    result: dict[str, MacroIR] = {}
+    for macro in ir.macros:
+        key = macro.name.casefold()
+        if key == entry_name or calls.get(key) != 1 or key not in top_level:
+            continue
+        result[key] = macro
+    return result
+
+
+def _prune_cases(cases, retarget: dict[str, str | None], live: set[str]):
+    """Casos de prueba de pasos que ya no existen: se retargetean al paso que los absorbe o se quitan."""
+    out = []
+    for case in cases:
+        applies: list[str] = []
+        for sid in case.applies_to:
+            target = retarget.get(sid, sid)
+            if target and target in live and target not in applies:
+                applies.append(target)
+        if applies:
+            out.append(case.model_copy(update={"applies_to": applies}))
+    return out
+
+
 def plan_program(
     ir: ProgramIR,
     project_id: str,
@@ -1180,9 +1330,18 @@ def plan_program(
     report_policy: str = "log",
     environment: EnvironmentCatalog | None = None,
     table_action: str = "drop_create",
+    source_text: str | None = None,
+    shared_datasets: set[str] | None = None,
 ) -> JobPlan:
     libs = {**libraries, **{x.name.lower(): x for x in ir.libraries}}
     pl = _Planner(rules, libs, ir.file, report_policy, environment, table_action)
+    env_texts = [v for group in context_rules.environment_groups(source_text).values() for v in group.values() if v]
+    pl.transfer_engine = (
+        (engine_hint_from_texts([ref.engine or "" for ref in libs.values()] + env_texts + list(ir.parameters.values())) or "").lower()
+        or None
+    )
+    plumbing = plumbing_macros(ir.macros)
+    tag_macro_calls(ir, plumbing)
     source_macro = Path(ir.file.replace("\\", "/")).stem.casefold()
     entry_definition = next((macro for macro in ir.macros if macro.name.casefold() == source_macro), None)
     entry_calls = [
@@ -1192,7 +1351,7 @@ def plan_program(
         and str(operation.details.get("name", "")).casefold() == source_macro
     ]
     entry_macro = None
-    expanded_operations: list[tuple[IROperation, str]] = []
+    expanded: list[tuple[IROperation, str]] = []
     if entry_definition and entry_calls:
         entry_call = entry_calls[0]
         entry_macro = MacroEntrypoint(
@@ -1209,32 +1368,87 @@ def plan_program(
             if operation.id in calls_by_id:
                 suffix = f"{operation.id}:" if len(entry_calls) > 1 else ""
                 prefix = f"m:{entry_definition.name}:{suffix}"
-                expanded_operations.extend((body_operation, prefix) for body_operation in entry_definition.operations)
+                expanded.extend((body_operation, prefix) for body_operation in entry_definition.operations)
             else:
-                expanded_operations.append((operation, ""))
+                expanded.append((operation, ""))
     else:
-        expanded_operations = [
-            (operation, "") for operation in ir.operations if operation.type != "include"
-        ]
-    steps = [pl.step(operation, index + 1, prefix) for index, (operation, prefix) in enumerate(expanded_operations)]
-    written: dict[str, str] = {}
-    for st, (op, _) in zip(steps, expanded_operations, strict=True):
-        if op.type == "read" and op.inputs and op.inputs[0] in written:
-            st.assumptions.append(
-                f"Dataset producido antes en este programa ({written[op.inputs[0]]}): puede sustituirse por una conexión directa o un tHashOutput"
+        expanded = [(operation, "") for operation in ir.operations if operation.type != "include"]
+
+    # Macros llamadas una sola vez se expanden en línea: sus operaciones entran en la corriente del Job.
+    inlined = _inline_calls(ir, entry_macro.name.casefold() if entry_macro else None)
+    inlined_names: set[str] = set()
+    flow_items: list[tuple[IROperation, str]] = []
+    for operation, prefix in expanded:
+        key = str(operation.details.get("name", "")).casefold() if operation.type == "macro_call" else ""
+        if key in inlined:
+            inlined_names.add(key)
+            flow_items.extend((body, f"m:{inlined[key].name}:") for body in inlined[key].operations)
+        else:
+            flow_items.append((operation, prefix))
+    children_macros = [
+        m
+        for m in ir.macros
+        if not (entry_macro and m.name.casefold() == entry_macro.name.casefold())
+        and m.name.casefold() not in inlined_names
+        and m.name.casefold() not in plumbing
+
+    ]
+
+    # Un dataset que usa otro ámbito (otra macro o el programa) no es intermedio para el ámbito actual.
+    # La composición SQL va ANTES del ELT: el ELT necesita la consulta ya compuesta (sql_compose.py).
+    top_datasets = _datasets_of(op for op, _ in flow_items)
+    macro_datasets = {m.name: _datasets_of(m.operations) for m in children_macros}
+    external = set(shared_datasets or set())
+    flow_items, composed_notes = compose_items(
+        flow_items, external | set().union(set(), *macro_datasets.values()), libs, rules.engines
+    )
+    flow_items, _ = fold_elt(flow_items, libs, rules.engines)
+    flow_items, _ = fold_copy_back(flow_items)
+    top_flow = build_flow(
+        pl,
+        flow_items,
+        external | set().union(set(), *macro_datasets.values()),
+    )
+    steps = top_flow.steps
+    not_migrated = list(top_flow.not_migrated)
+    macros_by_name = {m.name.casefold(): m for m in ir.macros}
+    for key, info in sorted(plumbing.items()):
+        macro = macros_by_name.get(key)
+        lines = [macro.loc.line, macro.loc.end_line] if macro else []
+        parts = macro_parts(macro, plumbing, macros_by_name) if macro else [info]
+        for part in parts:
+            not_migrated.append(
+                NotMigrated(
+                    category=part.category,
+                    lines=lines,
+                    what=f"macro %{macro.name if macro else key} no se migra: {part.what}",
+                    reason=part.reason,
+                    talend_equivalent=part.talend,
+                )
             )
-        if op.type == "write":
-            written.update({o: st.id for o in op.outputs})
-    _connect(steps, None)
-    children = []
-    for m in ir.macros:
-        if entry_macro and m.name.casefold() == entry_macro.name.casefold():
-            continue
-        ms = [pl.step(op, i + 1, f"m:{m.name}:") for i, op in enumerate(m.operations)]
-        _connect(ms, None)
-        children.append(ChildJob(name=m.name, params=m.params, steps=ms))
+    not_migrated.extend(_remote_session_entries(source_text))
+    retarget: dict[str, str | None] = dict(top_flow.retarget)
+    children: list[ChildJob] = []
+    for m in children_macros:
+        others = set().union(set(), top_datasets, *(ds for name, ds in macro_datasets.items() if name != m.name))
+        child_items, child_notes = compose_items(
+            [(op, f"m:{m.name}:") for op in m.operations], external | others, libs, rules.engines
+        )
+        composed_notes.extend(child_notes)
+        child_items, _ = fold_elt(child_items, libs, rules.engines)
+        child_items, _ = fold_copy_back(child_items)
+        flow = build_flow(pl, child_items, external | others)
+        children.append(ChildJob(name=m.name, params=m.params, steps=flow.steps))
+        not_migrated.extend(flow.not_migrated)
+        retarget.update(flow.retarget)
+    not_migrated.extend(_composition_entries(composed_notes))
     all_steps = steps + [s for c in children for s in c.steps]
-    context_by_name = {variable.name: variable for variable in _context_variables(ir, all_steps)}
+    live = {s.id for s in all_steps}
+    cases = _prune_cases(pl.cases, retarget, live)
+
+    context_by_name = {
+        variable.name: variable for variable in _context_variables(ir, all_steps, source_text)
+    }
     if entry_macro:
         for parameter in entry_macro.params:
             argument = entry_macro.arguments.get(parameter)
@@ -1257,22 +1471,85 @@ def plan_program(
                         origin=f"Variable SAS referenciada por %{entry_macro.name}({parameter}=...)",
                     ),
                 )
+    _apply_environment_groups(context_by_name, context_rules.environment_groups(source_text))
     context_variables = sorted(context_by_name.values(), key=lambda variable: variable.name.lower())
     needed = _needed_libraries(pl.used_libs, libs, rules)
     pending = any(s.pending or s.confidence == "low" for s in all_steps)
-    return JobPlan(
+    # Las credenciales se avisan sin copiar su valor: el aviso va a `unresolved`.
+    warnings = [*(unresolved or []), *_credential_warnings(ir.file, source_text), *_literal_dsn_warnings(source_text)]
+    plan = JobPlan(
         project_id=project_id,
         rules_version=rules.version,
         program=ir.file,
         sha256=ir.sha256,
         job_name="job_" + slug(Path(ir.file).stem),
-        job_status="needs_review" if pending or unresolved else "proposed",
+        job_status="needs_review" if pending or warnings else "proposed",
         steps=steps,
         entry_macro=entry_macro,
         children=children,
-        validation_cases=pl.cases,
+        validation_cases=cases,
         context_variables=context_variables,
         libraries_needed=needed,
         orchestration=orchestration or Orchestration(),
-        unresolved=unresolved or [],
+        unresolved=warnings,
+        not_migrated=not_migrated,
     )
+    macro_call_joblets(plan, ir, lambda op: _call_values(op, ir))
+    collapse_undefined_macros(plan, ir)
+    fold_regions(plan)  # regiones largas repetidas: antes de repartir el Job, para que la partición vea el plegado
+    apply_structure(plan, source_text)
+    place_region_jobs(plan)
+    attach_joblets(plan, ir)
+    prune_unused_context(plan)  # después de la estructura: el motor se deduce del valor de ambiente
+    return plan
+
+
+_REMOTE_SESSION = re.compile(r"^\s*(signon|signoff|rsubmit|endrsubmit|waitfor)\b|\boptions\s+remote\s*=", re.IGNORECASE)
+
+
+def _remote_session_entries(source_text: str | None) -> list[NotMigrated]:
+    """R04: las sentencias de sesión remota no producen operaciones; se registran como fontanería."""
+    if not source_text:
+        return []
+    lines = [i for i, text in enumerate(source_text.splitlines(), 1) if _REMOTE_SESSION.search(text)]
+    if not lines:
+        return []
+    return [
+        NotMigrated(
+            category="sesion_remota",
+            lines=lines,
+            what="sesión remota de SAS (signon, rsubmit, waitfor, signoff)",
+            reason="La sesión solo orquesta un proceso en otro servidor; no transforma filas.",
+            talend_equivalent="Sin sesión: el Job lee y escribe en la ruta o el motor del contexto; el orden lo marca el Job.",
+        )
+    ]
+
+
+_LITERAL_DSN = re.compile(r"\bdsn\s*=\s*([A-Za-z_]\w*)", re.IGNORECASE)
+
+
+def _literal_dsn_warnings(source_text: str | None) -> list[str]:
+    """R13: un DSN escrito a mano en un programa que ya elige su entorno (selector) salta el selector."""
+    if not source_text or not context_rules.environment_groups(source_text):
+        return []
+    literals = sorted({m.group(1) for m in _LITERAL_DSN.finditer(source_text)})
+    return [
+        f"Aviso de alta severidad: DSN literal {name} en una conexión, aunque el programa elige el entorno con un selector. "
+        "Una conexión así puede escribir en producción desde otro entorno: parametrizar el DSN con el contexto del entorno."
+        for name in literals
+    ]
+
+
+def _call_values(op: IROperation, ir: ProgramIR) -> dict[str, str]:
+    """Argumentos de una llamada a macro, por nombre del parámetro de la definición."""
+    name = str(op.details.get("name", "")).casefold()
+    macro = next((m for m in ir.macros if m.name.casefold() == name), None)
+    return _macro_call_arguments(str(op.details.get("args", "")), macro.params if macro else [])
+
+
+def _credential_warnings(file: str, source_text: str | None) -> list[str]:
+    return [
+        f"Credencial en claro o cifrada en {file}:{hit.line} ({'proc pwencode' if hit.kind == 'pwencode' else 'pass= literal'}): "
+        "guárdala en una variable de contexto de tipo id_Password; el valor no se copia al plan."
+        for hit in context_rules.credential_hits(source_text)
+    ]

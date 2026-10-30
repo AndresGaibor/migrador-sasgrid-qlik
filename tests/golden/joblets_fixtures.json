@@ -1,0 +1,479 @@
+{
+  "cod1_macros_repetidas.sas": [
+    {
+      "components": [
+        "por_determinar",
+        "tFilterRow",
+        "por_determinar"
+      ],
+      "creation_steps": [
+        "Repository › Joblet Designs › clic derecho › Create Joblet.",
+        "Dale el nombre jl_CargaTabla y guárdalo en la carpeta por defecto del proyecto.",
+        "Añade los componentes del bloque y conéctalos con Main: tFilterRow.",
+        "Añade un componente Input por cada tabla de entrada: tabla_entrada_1.",
+        "Añade un componente Output por cada tabla de salida: tabla_salida_1.",
+        "Añade un componente Trigger Input para la señal de inicio del joblet.",
+        "Define en Contexts del joblet las variables: context.expresion_18. Los valores concretos se asignan en cada Job al usar el joblet.",
+        "Usa el joblet en el Job arrastrándolo desde Repository › Joblet Designs › jl_CargaTabla al lienzo, y conéctalo con el paso anterior y el siguiente.",
+        "Guarda el joblet y comprueba que no quedan componentes sin conectar."
+      ],
+      "id": "joblet-01",
+      "inputs": [
+        "tabla_entrada_1"
+      ],
+      "kind": "macro",
+      "name": "jl_CargaTabla",
+      "occurrences": [
+        {
+          "job": "carga_tabla",
+          "label": "macro %carga_tabla (línea 3)",
+          "step_ids": [
+            "m:carga_tabla:op_4_read_1",
+            "m:carga_tabla:op_6_filter_1",
+            "m:carga_tabla:op_4_write_1"
+          ],
+          "usage_steps": [
+            "En carga_tabla, sustituye los componentes m:carga_tabla:op_4_read_1, m:carga_tabla:op_6_filter_1, m:carga_tabla:op_4_write_1 por el joblet jl_CargaTabla.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de carga_tabla y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior.",
+            "Asigna en el contexto del Job: expresion_18 = 18."
+          ],
+          "values": {
+            "expresion_18": "18"
+          }
+        },
+        {
+          "job": "carga_tabla",
+          "label": "macro %carga_tabla (línea 21)",
+          "step_ids": [
+            "m:carga_tabla:op_4_read_1",
+            "m:carga_tabla:op_6_filter_1",
+            "m:carga_tabla:op_4_write_1"
+          ],
+          "usage_steps": [
+            "En carga_tabla, sustituye los componentes m:carga_tabla:op_4_read_1, m:carga_tabla:op_6_filter_1, m:carga_tabla:op_4_write_1 por el joblet jl_CargaTabla.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de carga_tabla y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior.",
+            "Asigna en el contexto del Job: expresion_18 = 18."
+          ],
+          "values": {
+            "expresion_18": "18"
+          }
+        },
+        {
+          "job": "carga_tabla_v2",
+          "label": "macro %carga_tabla_v2 (línea 36)",
+          "step_ids": [
+            "m:carga_tabla_v2:op_37_read_1",
+            "m:carga_tabla_v2:op_39_filter_1",
+            "m:carga_tabla_v2:op_37_write_1"
+          ],
+          "usage_steps": [
+            "En carga_tabla_v2, sustituye los componentes m:carga_tabla_v2:op_37_read_1, m:carga_tabla_v2:op_39_filter_1, m:carga_tabla_v2:op_37_write_1 por el joblet jl_CargaTabla.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de carga_tabla_v2 y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior.",
+            "Asigna en el contexto del Job: expresion_18 = 30."
+          ],
+          "values": {
+            "expresion_18": "30"
+          }
+        }
+      ],
+      "operation_count": 3,
+      "outputs": [
+        "tabla_salida_1"
+      ],
+      "parameters": [
+        {
+          "context_variable": "context.expresion_18",
+          "example_values": [
+            "18",
+            "30"
+          ],
+          "name": "expresion_18"
+        }
+      ],
+      "title": "Macro %carga_tabla (3 apariciones)",
+      "trigger_inputs": [
+        "inicio"
+      ],
+      "why": "La macro %carga_tabla aparece 3 veces con la misma estructura de 3 operaciones (carga_tabla, carga_tabla_v2). Solo cambian 1 valor(es) entre apariciones; se propone un joblet con esos valores como parámetros."
+    },
+    {
+      "components": [
+        "por_determinar",
+        "tSortRow",
+        "por_determinar"
+      ],
+      "creation_steps": [
+        "Repository › Joblet Designs › clic derecho › Create Joblet.",
+        "Dale el nombre jl_Split2 y guárdalo en la carpeta por defecto del proyecto.",
+        "Añade los componentes del bloque y conéctalos con Main: tSortRow.",
+        "Añade un componente Input por cada tabla de entrada: tabla_entrada_1.",
+        "Añade un componente Output por cada tabla de salida: tabla_salida_1.",
+        "Añade un componente Trigger Input para la señal de inicio del joblet.",
+        "Usa el joblet en el Job arrastrándolo desde Repository › Joblet Designs › jl_Split2 al lienzo, y conéctalo con el paso anterior y el siguiente.",
+        "Guarda el joblet y comprueba que no quedan componentes sin conectar."
+      ],
+      "id": "joblet-02",
+      "inputs": [
+        "tabla_entrada_1"
+      ],
+      "kind": "macro",
+      "name": "jl_Split2",
+      "occurrences": [
+        {
+          "job": "job_cod1_macros_repetidas",
+          "label": "macro %split2 (línea 10)",
+          "step_ids": [
+            "m:split2:op_11_read_1",
+            "m:split2:op_11_sort_1",
+            "m:split2:op_11_write_1"
+          ],
+          "usage_steps": [
+            "En job_cod1_macros_repetidas, sustituye los componentes m:split2:op_11_read_1, m:split2:op_11_sort_1, m:split2:op_11_write_1 por el joblet jl_Split2.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de job_cod1_macros_repetidas y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior."
+          ],
+          "values": {}
+        },
+        {
+          "job": "job_cod1_macros_repetidas",
+          "label": "macro %split2 (línea 28)",
+          "step_ids": [
+            "m:split2:op_11_read_1",
+            "m:split2:op_11_sort_1",
+            "m:split2:op_11_write_1"
+          ],
+          "usage_steps": [
+            "En job_cod1_macros_repetidas, sustituye los componentes m:split2:op_11_read_1, m:split2:op_11_sort_1, m:split2:op_11_write_1 por el joblet jl_Split2.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de job_cod1_macros_repetidas y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior."
+          ],
+          "values": {}
+        }
+      ],
+      "operation_count": 3,
+      "outputs": [
+        "tabla_salida_1"
+      ],
+      "parameters": [],
+      "title": "Macro %split2 (2 apariciones)",
+      "trigger_inputs": [
+        "inicio"
+      ],
+      "why": "El macro %split2 aparece 2 veces con la misma estructura y los mismos valores (3 operaciones; job_cod1_macros_repetidas). Un solo joblet evita mantener las copias."
+    }
+  ],
+  "conversion_tipo.sas": [
+    {
+      "components": [
+        "por_determinar",
+        "tMap",
+        "por_determinar"
+      ],
+      "creation_steps": [
+        "Repository › Joblet Designs › clic derecho › Create Joblet.",
+        "Dale el nombre jl_ConversionTipo y guárdalo en la carpeta por defecto del proyecto.",
+        "Añade los componentes del bloque y conéctalos con Main: tMap.",
+        "Añade un componente Input por cada tabla de entrada: tabla_entrada_1.",
+        "Añade un componente Output por cada tabla de salida: tabla_salida_1.",
+        "Añade un componente Trigger Input para la señal de inicio del joblet.",
+        "Define en Contexts del joblet las variables: context.expresion_var7, context.expresion_30, context.columna_destino_nro_cta. Los valores concretos se asignan en cada Job al usar el joblet.",
+        "Usa el joblet en el Job arrastrándolo desde Repository › Joblet Designs › jl_ConversionTipo al lienzo, y conéctalo con el paso anterior y el siguiente.",
+        "Guarda el joblet y comprueba que no quedan componentes sin conectar."
+      ],
+      "id": "joblet-01",
+      "inputs": [
+        "tabla_entrada_1"
+      ],
+      "kind": "sequence",
+      "name": "jl_ConversionTipo",
+      "occurrences": [
+        {
+          "job": "job_conversion_tipo",
+          "label": "pasos s2–s12",
+          "step_ids": [
+            "op_2_read_1",
+            "op_2_compute_1",
+            "op_2_write_1"
+          ],
+          "usage_steps": [
+            "En job_conversion_tipo, sustituye los componentes op_2_read_1, op_2_compute_1, op_2_write_1 por el joblet jl_ConversionTipo.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de job_conversion_tipo y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior.",
+            "Asigna en el contexto del Job: expresion_var7 = VAR7, expresion_30 = 30, columna_destino_nro_cta = NRO_CTA."
+          ],
+          "values": {
+            "columna_destino_nro_cta": "NRO_CTA",
+            "expresion_30": "30",
+            "expresion_var7": "VAR7"
+          }
+        },
+        {
+          "job": "job_conversion_tipo",
+          "label": "pasos s15–s25",
+          "step_ids": [
+            "op_15_read_1",
+            "op_15_compute_1",
+            "op_15_write_1"
+          ],
+          "usage_steps": [
+            "En job_conversion_tipo, sustituye los componentes op_15_read_1, op_15_compute_1, op_15_write_1 por el joblet jl_ConversionTipo.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de job_conversion_tipo y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior.",
+            "Asigna en el contexto del Job: expresion_var7 = VAR8, expresion_30 = 30, columna_destino_nro_cta = LLAVE_NOMBRE."
+          ],
+          "values": {
+            "columna_destino_nro_cta": "LLAVE_NOMBRE",
+            "expresion_30": "30",
+            "expresion_var7": "VAR8"
+          }
+        },
+        {
+          "job": "job_conversion_tipo",
+          "label": "pasos s28–s38",
+          "step_ids": [
+            "op_28_read_1",
+            "op_28_compute_1",
+            "op_28_write_1"
+          ],
+          "usage_steps": [
+            "En job_conversion_tipo, sustituye los componentes op_28_read_1, op_28_compute_1, op_28_write_1 por el joblet jl_ConversionTipo.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de job_conversion_tipo y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior.",
+            "Asigna en el contexto del Job: expresion_var7 = VAR9, expresion_30 = 8, columna_destino_nro_cta = TIPO_DOC."
+          ],
+          "values": {
+            "columna_destino_nro_cta": "TIPO_DOC",
+            "expresion_30": "8",
+            "expresion_var7": "VAR9"
+          }
+        },
+        {
+          "job": "job_conversion_tipo",
+          "label": "pasos s41–s51",
+          "step_ids": [
+            "op_41_read_1",
+            "op_41_compute_1",
+            "op_41_write_1"
+          ],
+          "usage_steps": [
+            "En job_conversion_tipo, sustituye los componentes op_41_read_1, op_41_compute_1, op_41_write_1 por el joblet jl_ConversionTipo.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de job_conversion_tipo y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior.",
+            "Asigna en el contexto del Job: expresion_var7 = VAR10, expresion_30 = 30, columna_destino_nro_cta = NRO_DOC."
+          ],
+          "values": {
+            "columna_destino_nro_cta": "NRO_DOC",
+            "expresion_30": "30",
+            "expresion_var7": "VAR10"
+          }
+        },
+        {
+          "job": "job_conversion_tipo",
+          "label": "pasos s54–s64",
+          "step_ids": [
+            "op_54_read_1",
+            "op_54_compute_1",
+            "op_54_write_1"
+          ],
+          "usage_steps": [
+            "En job_conversion_tipo, sustituye los componentes op_54_read_1, op_54_compute_1, op_54_write_1 por el joblet jl_ConversionTipo.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de job_conversion_tipo y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior.",
+            "Asigna en el contexto del Job: expresion_var7 = VAR11, expresion_30 = 3, columna_destino_nro_cta = GMF."
+          ],
+          "values": {
+            "columna_destino_nro_cta": "GMF",
+            "expresion_30": "3",
+            "expresion_var7": "VAR11"
+          }
+        }
+      ],
+      "operation_count": 6,
+      "outputs": [
+        "tabla_salida_1"
+      ],
+      "parameters": [
+        {
+          "context_variable": "context.expresion_var7",
+          "example_values": [
+            "VAR7",
+            "VAR8",
+            "VAR9",
+            "VAR10",
+            "VAR11"
+          ],
+          "name": "expresion_var7"
+        },
+        {
+          "context_variable": "context.expresion_30",
+          "example_values": [
+            "30",
+            "8",
+            "3"
+          ],
+          "name": "expresion_30"
+        },
+        {
+          "context_variable": "context.columna_destino_nro_cta",
+          "example_values": [
+            "NRO_CTA",
+            "LLAVE_NOMBRE",
+            "TIPO_DOC",
+            "NRO_DOC",
+            "GMF"
+          ],
+          "name": "columna_destino_nro_cta"
+        }
+      ],
+      "title": "Conversión de tipo con input()/put() (5 apariciones)",
+      "trigger_inputs": [
+        "inicio"
+      ],
+      "why": "El mismo bloque de 6 operaciones aparece 5 veces (job_conversion_tipo). Solo cambian 3 valor(es) entre apariciones (tablas o literales); se propone un joblet con esos valores como parámetros."
+    }
+  ],
+  "cte_aho.sas": [
+    {
+      "components": [
+        "por_determinar",
+        "tMap",
+        "por_determinar",
+        "por_determinar",
+        "por_determinar",
+        "tMap",
+        "tMap",
+        "tSortRow",
+        "por_determinar"
+      ],
+      "creation_steps": [
+        "Repository › Joblet Designs › clic derecho › Create Joblet.",
+        "Dale el nombre jl_Cruce y guárdalo en la carpeta por defecto del proyecto.",
+        "Añade los componentes del bloque y conéctalos con Main: tMap, tMap, tMap, tSortRow.",
+        "Añade un componente Input por cada tabla de entrada: tabla_entrada_1, tabla_entrada_2.",
+        "Añade un componente Output por cada tabla de salida: tabla_salida_1, tabla_salida_2.",
+        "Añade un componente Trigger Input para la señal de inicio del joblet.",
+        "Define en Contexts del joblet las variables: context.expresion_cumple_norma_cte, context.condicion_union_formato_sabana_final_cte, context.tabla_entrada_1, context.tabla_salida_1, context.tabla_entrada_2, context.tabla_salida_2. Los valores concretos se asignan en cada Job al usar el joblet.",
+        "Usa el joblet en el Job arrastrándolo desde Repository › Joblet Designs › jl_Cruce al lienzo, y conéctalo con el paso anterior y el siguiente.",
+        "Guarda el joblet y comprueba que no quedan componentes sin conectar."
+      ],
+      "id": "joblet-01",
+      "inputs": [
+        "tabla_entrada_1",
+        "tabla_entrada_2"
+      ],
+      "kind": "sequence",
+      "name": "jl_Cruce",
+      "occurrences": [
+        {
+          "job": "job_cte_aho",
+          "label": "pasos s7–s41",
+          "step_ids": [
+            "op_8_read_1",
+            "tmap_op_8_filter_1",
+            "op_8_write_1",
+            "op_42_read_1",
+            "op_42_read_2",
+            "op_42_join_1",
+            "op_42_project_1",
+            "op_42_sort_1",
+            "op_42_write_1"
+          ],
+          "usage_steps": [
+            "En job_cte_aho, sustituye los componentes op_8_read_1, tmap_op_8_filter_1, op_8_write_1, op_42_read_1, op_42_read_2, op_42_join_1, op_42_project_1, op_42_sort_1, op_42_write_1 por el joblet jl_Cruce.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de job_cte_aho y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior.",
+            "Asigna en el contexto del Job: expresion_cumple_norma_cte = CUMPLE_NORMA_CTE, condicion_union_formato_sabana_final_cte = FORMATO_SABANA_FINAL_CTE, tabla_entrada_1 = work.cumple_norma_cte, tabla_salida_1 = work.campos_neg_dep_cte, tabla_entrada_2 = work.formato_sabana_final_cte, tabla_salida_2 = work.paq_cumple_norma_cte."
+          ],
+          "values": {
+            "condicion_union_formato_sabana_final_cte": "FORMATO_SABANA_FINAL_CTE",
+            "expresion_cumple_norma_cte": "CUMPLE_NORMA_CTE",
+            "tabla_entrada_1": "work.cumple_norma_cte",
+            "tabla_entrada_2": "work.formato_sabana_final_cte",
+            "tabla_salida_1": "work.campos_neg_dep_cte",
+            "tabla_salida_2": "work.paq_cumple_norma_cte"
+          }
+        },
+        {
+          "job": "job_cte_aho",
+          "label": "pasos s59–s93",
+          "step_ids": [
+            "op_60_read_1",
+            "tmap_op_60_filter_1",
+            "op_60_write_1",
+            "op_94_read_1",
+            "op_94_read_2",
+            "op_94_join_1",
+            "op_94_project_1",
+            "op_94_sort_1",
+            "op_94_write_1"
+          ],
+          "usage_steps": [
+            "En job_cte_aho, sustituye los componentes op_60_read_1, tmap_op_60_filter_1, op_60_write_1, op_94_read_1, op_94_read_2, op_94_join_1, op_94_project_1, op_94_sort_1, op_94_write_1 por el joblet jl_Cruce.",
+            "Arrástralo desde Repository › Joblet Designs al lienzo de job_cte_aho y conéctalo: Trigger Input con OnSubjobOk desde el paso anterior.",
+            "Asigna en el contexto del Job: expresion_cumple_norma_cte = CUMPLE_NORMA_AHORROS, condicion_union_formato_sabana_final_cte = FORMATO_SABANA_FINAL_AHO, tabla_entrada_1 = work.cumple_norma_ahorros, tabla_salida_1 = work.campos_neg_dep_aho, tabla_entrada_2 = work.formato_sabana_final_aho, tabla_salida_2 = work.paq_cumple_norma_aho."
+          ],
+          "values": {
+            "condicion_union_formato_sabana_final_cte": "FORMATO_SABANA_FINAL_AHO",
+            "expresion_cumple_norma_cte": "CUMPLE_NORMA_AHORROS",
+            "tabla_entrada_1": "work.cumple_norma_ahorros",
+            "tabla_entrada_2": "work.formato_sabana_final_aho",
+            "tabla_salida_1": "work.campos_neg_dep_aho",
+            "tabla_salida_2": "work.paq_cumple_norma_aho"
+          }
+        }
+      ],
+      "operation_count": 10,
+      "outputs": [
+        "tabla_salida_1",
+        "tabla_salida_2"
+      ],
+      "parameters": [
+        {
+          "context_variable": "context.expresion_cumple_norma_cte",
+          "example_values": [
+            "CUMPLE_NORMA_CTE",
+            "CUMPLE_NORMA_AHORROS"
+          ],
+          "name": "expresion_cumple_norma_cte"
+        },
+        {
+          "context_variable": "context.condicion_union_formato_sabana_final_cte",
+          "example_values": [
+            "FORMATO_SABANA_FINAL_CTE",
+            "FORMATO_SABANA_FINAL_AHO"
+          ],
+          "name": "condicion_union_formato_sabana_final_cte"
+        },
+        {
+          "context_variable": "context.tabla_entrada_1",
+          "example_values": [
+            "work.cumple_norma_cte",
+            "work.cumple_norma_ahorros"
+          ],
+          "name": "tabla_entrada_1"
+        },
+        {
+          "context_variable": "context.tabla_salida_1",
+          "example_values": [
+            "work.campos_neg_dep_cte",
+            "work.campos_neg_dep_aho"
+          ],
+          "name": "tabla_salida_1"
+        },
+        {
+          "context_variable": "context.tabla_entrada_2",
+          "example_values": [
+            "work.formato_sabana_final_cte",
+            "work.formato_sabana_final_aho"
+          ],
+          "name": "tabla_entrada_2"
+        },
+        {
+          "context_variable": "context.tabla_salida_2",
+          "example_values": [
+            "work.paq_cumple_norma_cte",
+            "work.paq_cumple_norma_aho"
+          ],
+          "name": "tabla_salida_2"
+        }
+      ],
+      "title": "Cruce (2 apariciones)",
+      "trigger_inputs": [
+        "inicio"
+      ],
+      "why": "El mismo bloque de 10 operaciones aparece 2 veces (job_cte_aho). Solo cambian 6 valor(es) entre apariciones (tablas o literales); se propone un joblet con esos valores como parámetros."
+    }
+  ]
+}

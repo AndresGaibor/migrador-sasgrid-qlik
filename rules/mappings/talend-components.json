@@ -4,52 +4,71 @@
   "engines": {
     "oracle": {
       "input": "tOracleInput",
-      "output": "tOracleOutput"
+      "output": "tOracleOutput",
+      "row": "tOracleRow"
     },
     "teradata": {
       "input": "tTeradataInput",
-      "output": "tTeradataOutput"
+      "output": "tTeradataOutput",
+      "row": "tTeradataRow"
     },
     "db2": {
       "input": "tDB2Input",
-      "output": "tDB2Output"
+      "output": "tDB2Output",
+      "row": "tDB2Row"
+    },
+    "impala": {
+      "input": "tImpalaInput",
+      "output": "tImpalaOutput",
+      "row": "tImpalaRow"
     },
     "odbc": {
-      "input": "tDBInput",
-      "output": "tDBOutput"
+      "input": "",
+      "output": ""
     },
     "postgres": {
       "input": "tPostgresqlInput",
-      "output": "tPostgresqlOutput"
+      "output": "tPostgresqlOutput",
+      "row": "tPostgresqlRow"
     },
     "sqlsvr": {
       "input": "tMSSqlInput",
-      "output": "tMSSqlOutput"
+      "output": "tMSSqlOutput",
+      "row": "tMSSqlRow"
     },
     "mysql": {
       "input": "tMysqlInput",
-      "output": "tMysqlOutput"
+      "output": "tMysqlOutput",
+      "row": "tMysqlRow"
     },
     "redshift": {
       "input": "tRedshiftInput",
-      "output": "tRedshiftOutput"
+      "output": "tRedshiftOutput",
+      "row": "tRedshiftRow"
     },
     "greenplm": {
       "input": "tGreenplumInput",
-      "output": "tGreenplumOutput"
+      "output": "tGreenplumOutput",
+      "row": "tGreenplumRow"
     },
     "netezza": {
       "input": "tNetezzaInput",
-      "output": "tNetezzaOutput"
+      "output": "tNetezzaOutput",
+      "row": "tNetezzaRow"
     },
     "aster": {
-      "input": "tDBInput",
-      "output": "tDBOutput"
+      "input": "",
+      "output": ""
     },
     "hawq": {
-      "input": "tDBInput",
-      "output": "tDBOutput"
+      "input": "",
+      "output": ""
     }
+  },
+  "engine_notes": {
+    "odbc": "ODBC no tiene componente propio en el Studio instalado. Elige el conector del motor de origen o el genérico que trae la edición de Studio en uso.",
+    "aster": "Aster no tiene componente propio en el Studio instalado. Elige el conector del motor o el genérico que trae la edición de Studio en uso.",
+    "hawq": "HAWQ no tiene componente propio en el Studio instalado. Elige el conector del motor o el genérico que trae la edición de Studio en uso."
   },
   "type_hints": {
     "character": "String",
@@ -63,8 +82,7 @@
     "read": {
       "component": "@engine.input",
       "alternatives": [
-        "tFileInputDelimited",
-        "tDBInput"
+        "tFileInputDelimited"
       ],
       "properties": [
         "TABLE",
@@ -234,11 +252,13 @@
       ]
     },
     "dedupe": {
-      "component": "por_determinar",
+      "component": "tUniqRow",
       "alternatives": [],
-      "properties": [],
+      "properties": [
+        "UNIQUE_KEY"
+      ],
       "required": [
-        "Definir la clave y la lógica para conservar la fila correcta por grupo; confirmar una opción disponible en la instalación actual."
+        "Confirmar la clave única (columnas del esquema) y que tUniqRow conserva la primera fila por clave."
       ],
       "tests": [
         {
@@ -342,8 +362,7 @@
     "write": {
       "component": "@engine.output",
       "alternatives": [
-        "tFileOutputDelimited",
-        "tDBOutput"
+        "tFileOutputDelimited"
       ],
       "properties": [
         "TABLE",
@@ -390,9 +409,7 @@
     },
     "append": {
       "component": "@engine.output",
-      "alternatives": [
-        "tDBOutput"
-      ],
+      "alternatives": [],
       "properties": [
         "TABLE",
         "DATA_ACTION"
@@ -505,7 +522,7 @@
     "tests": []
   },
     "maintenance": {
-      "component": "tDBRow",
+      "component": "@engine.row",
       "alternatives": [
         "ninguno"
       ],
@@ -623,9 +640,5 @@
       "INCLUDEHEADER"
     ]
   },
-  "generic_components": [
-    "tDBInput",
-    "tDBOutput",
-    "tDBRow"
-  ]
+  "generic_components": []
 }

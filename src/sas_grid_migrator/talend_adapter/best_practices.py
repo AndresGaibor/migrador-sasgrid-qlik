@@ -9,19 +9,21 @@ from typing import Any, Literal
 
 from pydantic import BaseModel
 
-MAX_COMPONENTS = 20  # guía de buenas prácticas de Talend: "evita más de 20 componentes en un Job"
+from sas_grid_migrator.migration_planner.limits import (
+    DATABASE_ACCESS,
+    DATABASE_CONNECTION,
+    MAX_COMPONENTS_PER_JOB,
+)
+
+MAX_COMPONENTS = MAX_COMPONENTS_PER_JOB  # umbral único: migration_planner/limits.py
 RESERVED_GIT_NAMES = frozenset({"tests", "target", "src"})
 JOB_PREFIX = "job_"
 
 _ENVIRONMENT_PARAMETERS = ("FILENAME", "DIRECTORY", "HOST", "PORT", "DBNAME", "URL")
 _PASSWORD_PARAMETERS = ("PASS", "PASSWORD", "PASSPHRASE")
 _CONTEXT_REFERENCE = re.compile(r"\bcontext\.\w+")
-_DATABASES = (
-    "DB|Mysql|Oracle|Postgresql|Mssql|Teradata|Snowflake|Redshift|Vertica|Netezza|"
-    "Db2|Informix|Sybase|MariaDB|SingleStore|Greenplum"
-)
-_DATABASE_ACCESS = re.compile(rf"^t(?:{_DATABASES})(?:Input|Output|Row|SP|BulkExec|OutputBulk|OutputBulkExec)$")
-_DATABASE_CONNECTION = re.compile(rf"^t(?:{_DATABASES})Connection$")
+_DATABASE_ACCESS = DATABASE_ACCESS
+_DATABASE_CONNECTION = DATABASE_CONNECTION
 _ERROR_COMPONENTS = frozenset({"tDie", "tWarn", "tLogCatcher", "tStatCatcher", "tFlowMeterCatcher", "tAssertCatcher"})
 _ERROR_CONNECTORS = frozenset({"SUBJOB_ERROR", "COMPONENT_ERROR", "REJECT"})
 
@@ -109,4 +111,119 @@ def check_job_arguments(arguments: dict[str, Any]) -> list[PracticeFinding]:
             severity="warning",
             message=f"El Job tiene {len(components)} componentes (máximo recomendado {MAX_COMPONENTS}); divídelo en Jobs hijo con tRunJob.",
         ))
+    return findings
+
+
+class PlanPracticeFinding(BaseModel):
+    """Hallazgo de buenas prácticas sobre un `JobPlan`. `id` es estable; `step_ids` son los pasos afectados."""
+
+    id: str
+    severity: Literal["error", "warning", "info"]
+    message: str
+    job: str | None = None
+    step_ids: list[str] = []
+
+
+_PLAN_ENV_PARAMETERS = frozenset({"FILENAME", "DIRECTORY", "HOST", "PORT", "DBNAME", "URL", "PATH"})
+_PLAN_PASSWORD_PARAMETERS = frozenset({"PASS", "PASSWORD", "PWD", "PASSPHRASE"})
+_JAVA_COMPONENTS = frozenset({"tJava", "tJavaRow"})
+_JAVA_LINES_LIMIT = 40
+_JAVA_EXPRESSIONS_LIMIT = 15
+_ERROR_STEP_COMPONENTS = frozenset({"tDie", "tWarn", "tLogCatcher"})
+
+
+def _literal_value(value: Any) -> bool:
+    return _is_literal(value) and not re.search(r"\$\w+|&\w+", str(value))
+
+
+def evaluate_job_practices(plan: Any) -> list[PlanPracticeFinding]:
+    """Reglas de buenas prácticas sobre un plan (`JobPlan`), agrupadas por Job.
+
+    Cada hallazgo indica los pasos afectados. Son recomendaciones: no bloquean la aplicación.
+    """
+    findings: list[PlanPracticeFinding] = []
+    # Un Job = pasos de una misma lista (principal o hijo) agrupados por parte: dos macros con el
+    # mismo nombre (bloques repetidos) no se suman en un único Job.
+    units: list[tuple[str, list[Any]]] = []
+    for container, default in [(plan.steps, plan.job_name), *((c.steps, c.name) for c in plan.children)]:
+        grouped: dict[str, list[Any]] = {}
+        for step in container:
+            grouped.setdefault(step.job_part or default, []).append(step)
+        units.extend(grouped.items())
+
+    for job, steps in units:
+        ids = [step.id for step in steps]
+        real = [step for step in steps if not step.recommended]
+
+        if len(steps) > MAX_COMPONENTS:
+            findings.append(PlanPracticeFinding(
+                id="PLAN-SIZE-01", severity="warning", job=job, step_ids=ids,
+                message=f"El Job {job} tiene {len(steps)} componentes (máximo {MAX_COMPONENTS}); "
+                "divídelo en Jobs hijo con tRunJob.",
+            ))
+
+        database = [s for s in steps if _DATABASE_ACCESS.match(s.component_candidate)]
+        names = {s.component_candidate for s in steps}
+        has_connection = any(_DATABASE_CONNECTION.match(name) for name in names)
+        if len(database) >= 2 and not has_connection:
+            findings.append(PlanPracticeFinding(
+                id="PLAN-DB-01", severity="warning", job=job,
+                step_ids=[s.id for s in database],
+                message=f"El Job {job} abre {len(database)} accesos a base de datos sin una conexión "
+                "compartida; usa una conexión única con cierre al final.",
+            ))
+
+        if len(real) >= 2 and not (names & _ERROR_STEP_COMPONENTS) and not any(
+            connection.type == "OnComponentError" for s in steps for connection in s.connections
+        ):
+            findings.append(PlanPracticeFinding(
+                id="PLAN-ERR-01", severity="info", job=job, step_ids=ids,
+                message=f"El Job {job} no maneja errores (tDie, tWarn, tLogCatcher u OnComponentError).",
+            ))
+
+        by_library: dict[str, list[Any]] = {}
+        for step in database:
+            if step.library:
+                by_library.setdefault(step.library, []).append(step)
+        for library, library_steps in by_library.items():
+            if len(library_steps) >= 2:
+                findings.append(PlanPracticeFinding(
+                    id="PLAN-BI-01", severity="info", job=job,
+                    step_ids=[s.id for s in library_steps],
+                    message=f"La biblioteca {library} se usa en {len(library_steps)} pasos del Job {job} "
+                    "con esquema incrustado; crea una metadata de Repository y reutilízala.",
+                ))
+
+        for step in steps:
+            if step.recommended:
+                continue
+            if step.component_candidate in _JAVA_COMPONENTS and (
+                step.evidence.end_line - step.evidence.line > _JAVA_LINES_LIMIT
+                or len(step.expressions) > _JAVA_EXPRESSIONS_LIMIT
+            ):
+                findings.append(PlanPracticeFinding(
+                    id="PLAN-JAVA-01", severity="warning", job=job, step_ids=[step.id],
+                    message=f"{step.component_candidate} extenso en {job} ({step.id}): mueve la lógica a "
+                    "una rutina de Talend o a un componente de transformación.",
+                ))
+            for prop in step.properties:
+                if prop.name.upper() in _PLAN_PASSWORD_PARAMETERS and _literal_value(prop.value):
+                    findings.append(PlanPracticeFinding(
+                        id="PLAN-SEC-01", severity="error", job=job, step_ids=[step.id],
+                        message=f"{step.id}: {prop.name} contiene una contraseña en claro; guárdala en "
+                        "una variable de contexto de tipo id_Password.",
+                    ))
+                elif prop.name.upper() in _PLAN_ENV_PARAMETERS and _literal_value(prop.value):
+                    findings.append(PlanPracticeFinding(
+                        id="PLAN-CTX-01", severity="warning", job=job, step_ids=[step.id],
+                        message=f"{step.id}: {prop.name} tiene un valor fijo; usa una variable de contexto "
+                        "para cambiar de entorno sin editar el Job.",
+                    ))
+
+    for warning in plan.unresolved:
+        if warning.startswith("Credencial en claro"):
+            findings.append(PlanPracticeFinding(
+                id="PLAN-SEC-02", severity="error", job=plan.job_name,
+                message=warning,
+            ))
     return findings

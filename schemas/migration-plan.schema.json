@@ -38,6 +38,7 @@
             "Reject",
             "OnSubjobOk",
             "OnComponentOk",
+            "OnComponentError",
             "Iterate"
           ],
           "title": "Type",
@@ -99,6 +100,55 @@
         "origin": {
           "title": "Origin",
           "type": "string"
+        },
+        "talend_type": {
+          "default": "id_String",
+          "title": "Talend Type",
+          "type": "string"
+        },
+        "is_secret": {
+          "default": false,
+          "title": "Is Secret",
+          "type": "boolean"
+        },
+        "needs_value": {
+          "default": false,
+          "title": "Needs Value",
+          "type": "boolean"
+        },
+        "sas_line": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sas Line"
+        },
+        "group_values": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Group Values"
         }
       },
       "required": [
@@ -274,6 +324,212 @@
       "title": "GridRecommendation",
       "type": "object"
     },
+    "JobPart": {
+      "description": "Job hijo en que se reparte el plan cuando supera MAX_COMPONENTS_PER_JOB.",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "of": {
+          "title": "Of",
+          "type": "string"
+        },
+        "step_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Step Ids",
+          "type": "array"
+        },
+        "component_count": {
+          "default": 0,
+          "title": "Component Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "title",
+        "of"
+      ],
+      "title": "JobPart",
+      "type": "object"
+    },
+    "JobletOccurrence": {
+      "description": "Una aparición del bloque repetido: en qué Job y qué pasos del plan lo forman.",
+      "properties": {
+        "job": {
+          "title": "Job",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "step_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Step Ids",
+          "type": "array"
+        },
+        "values": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Values",
+          "type": "object"
+        },
+        "usage_steps": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Usage Steps",
+          "type": "array"
+        }
+      },
+      "required": [
+        "job",
+        "label"
+      ],
+      "title": "JobletOccurrence",
+      "type": "object"
+    },
+    "JobletParameter": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "context_variable": {
+          "title": "Context Variable",
+          "type": "string"
+        },
+        "example_values": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Example Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "context_variable"
+      ],
+      "title": "JobletParameter",
+      "type": "object"
+    },
+    "JobletPlan": {
+      "description": "Joblet propuesto: bloque repetido que se crea una vez y se usa en cada aparición.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "kind": {
+          "default": "sequence",
+          "enum": [
+            "macro",
+            "sequence",
+            "feed"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "occurrences": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/JobletOccurrence"
+          },
+          "title": "Occurrences",
+          "type": "array"
+        },
+        "parameters": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/JobletParameter"
+          },
+          "title": "Parameters",
+          "type": "array"
+        },
+        "components": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Components",
+          "type": "array"
+        },
+        "inputs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "outputs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "trigger_inputs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Trigger Inputs",
+          "type": "array"
+        },
+        "why": {
+          "title": "Why",
+          "type": "string"
+        },
+        "creation_steps": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Creation Steps",
+          "type": "array"
+        },
+        "operation_count": {
+          "default": 0,
+          "title": "Operation Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "title",
+        "why"
+      ],
+      "title": "JobletPlan",
+      "type": "object"
+    },
     "LibraryNeeded": {
       "properties": {
         "sas_name": {
@@ -374,6 +630,43 @@
       "title": "MacroEntrypoint",
       "type": "object"
     },
+    "NotMigrated": {
+      "description": "Fontanería de SAS que no genera pasos: por qué no hace falta y qué hace Talend en su lugar.",
+      "properties": {
+        "category": {
+          "title": "Category",
+          "type": "string"
+        },
+        "lines": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Lines",
+          "type": "array"
+        },
+        "what": {
+          "title": "What",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "talend_equivalent": {
+          "title": "Talend Equivalent",
+          "type": "string"
+        }
+      },
+      "required": [
+        "category",
+        "what",
+        "reason",
+        "talend_equivalent"
+      ],
+      "title": "NotMigrated",
+      "type": "object"
+    },
     "Orchestration": {
       "properties": {
         "grid_tasks": {
@@ -418,6 +711,28 @@
         }
       },
       "title": "Orchestration",
+      "type": "object"
+    },
+    "OrchestratorJob": {
+      "description": "Job padre con una cadena de tRunJob que llama a las partes y a las macros.",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "run_jobs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RunJobCall"
+          },
+          "title": "Run Jobs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "OrchestratorJob",
       "type": "object"
     },
     "PlanStep": {
@@ -624,6 +939,98 @@
           "default": false,
           "title": "Requires Semantic Validation",
           "type": "boolean"
+        },
+        "recommended": {
+          "default": false,
+          "title": "Recommended",
+          "type": "boolean"
+        },
+        "why": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Why"
+        },
+        "job_part": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Job Part"
+        },
+        "business_subjob": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Business Subjob"
+        },
+        "library": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Library"
+        },
+        "guide_status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "in_progress",
+            "completed",
+            "blocked"
+          ],
+          "title": "Guide Status",
+          "type": "string"
+        },
+        "field_done": {
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "default": {},
+          "title": "Field Done",
+          "type": "object"
+        },
+        "joblet_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Joblet Id"
+        },
+        "fused_from": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Fused From",
+          "type": "array"
         }
       },
       "required": [
@@ -702,6 +1109,34 @@
         "origin"
       ],
       "title": "Property",
+      "type": "object"
+    },
+    "RunJobCall": {
+      "properties": {
+        "job": {
+          "title": "Job",
+          "type": "string"
+        },
+        "order": {
+          "title": "Order",
+          "type": "integer"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "transmit_context": {
+          "default": true,
+          "title": "Transmit Context",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "job",
+        "order",
+        "title"
+      ],
+      "title": "RunJobCall",
       "type": "object"
     },
     "SchemaColumn": {
@@ -843,8 +1278,12 @@
     },
     "description": {
       "anyOf": [
-        { "type": "string" },
-        { "type": "null" }
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ],
       "default": null,
       "title": "Description"
@@ -856,8 +1295,12 @@
     },
     "rename_ignored": {
       "anyOf": [
-        { "type": "string" },
-        { "type": "null" }
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ],
       "default": null,
       "title": "Rename Ignored"
@@ -938,6 +1381,41 @@
         "type": "string"
       },
       "title": "Unresolved",
+      "type": "array"
+    },
+    "job_parts": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/JobPart"
+      },
+      "title": "Job Parts",
+      "type": "array"
+    },
+    "orchestrator": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OrchestratorJob"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "joblets": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/JobletPlan"
+      },
+      "title": "Joblets",
+      "type": "array"
+    },
+    "not_migrated": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/NotMigrated"
+      },
+      "title": "Not Migrated",
       "type": "array"
     }
   },

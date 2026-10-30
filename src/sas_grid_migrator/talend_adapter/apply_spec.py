@@ -11,6 +11,7 @@ from sas_grid_migrator.migration_planner.expressions import is_simple_arithmetic
 from sas_grid_migrator.migration_planner.models import (
     Connection,
     ContextVariable,
+    Expression,
     JobPlan,
     PlanStep,
     Property,
@@ -115,6 +116,7 @@ class TalendApplySpec(BaseModel):
 
 
 _ALLOWED_ACTIONS = frozenset({"add_component", "configure"})
+_NAMED_OUTPUTS = {"tfilterrow": "FILTER", "tuniqrow": "UNIQUE"}
 _CONNECTORS = {
     "Main": "FLOW",
     # Lookup describe el rol de entrada en tMap, pero Talend exige el
@@ -204,6 +206,35 @@ def _bigdecimal_expression(expression: str) -> str | None:
     return value if value is not None and index == len(tokens) else None
 
 
+def _translate_output_filter(
+    expression: Expression, input_name: str, input_columns: dict[str, Any]
+) -> str | None:
+    """Filtro de salida del tMap (`input_row.TABLA.col == "x"`) a `entrada.col == "x"`; None si no es seguro.
+
+    Solo se admiten comparaciones entre columnas conocidas y literales, unidas con && o ||, y paréntesis.
+    La advertencia de tipo no confirmado es informativa: el componente sigue en borrador hasta validarse.
+    """
+    if expression.talend is None:
+        return None
+    if any("Comparación con columna de tipo no confirmado" not in warning for warning in expression.warnings):
+        return None
+    text = re.sub(r"input_row\.[A-Za-z_]\w*\.([A-Za-z_]\w*)", r"\1", expression.talend)
+    text = re.sub(r"input_row\.([A-Za-z_]\w*)", r"\1", text)
+    references = re.findall(r"(?<![\"\w])([A-Za-z_]\w*)(?![\"\w])", re.sub(r'"[^"]*"', "", text))
+    if not references or any(name not in input_columns for name in references if name not in {"true", "false", "null"}):
+        return None
+    rest = re.sub(r'"[^"]*"', "", text)
+    if not re.fullmatch(r"[\s\w().!=<>&|+\-*/]*", rest):
+        return None
+    def qualify(match: re.Match[str]) -> str:
+        name = match.group(1)
+        if name is None:  # literal entre comillas: se deja tal cual
+            return match.group(0)
+        return f"{input_name}.{name}" if name in input_columns else name
+
+    return re.sub(r'"[^"]*"|(?<![\w.])([A-Za-z_]\w*)(?![\w(])', qualify, text)
+
+
 def _build_tmap_mapper(
     step: PlanStep, candidate_steps: dict[str, PlanStep]
 ) -> tuple[dict[str, Any] | None, list[ApplySchemaColumn] | None, str | None]:
@@ -220,11 +251,15 @@ def _build_tmap_mapper(
     input_columns = {column.name: column for column in source_step.schema_columns if column.name}
     if not input_columns or any(not column.talend_type for column in input_columns.values()):
         return None, None, "El tMap requiere un esquema de entrada con tipos conocidos."
+    filters = [expression for expression in step.expressions if expression.target is None]
+    column_expressions = [expression for expression in step.expressions if expression.target is not None]
+    if len(filters) > 1:
+        return None, None, "El tMap tiene más de un filtro de salida: se confirma la condición combinada en Studio."
     if any(
         expression.requires_semantic_validation
         or expression.warnings
         or not is_simple_arithmetic_translation(expression.talend)
-        for expression in step.expressions
+        for expression in column_expressions
     ):
         return None, None, "La expresión no pertenece al subconjunto seguro de referencias directas y aritmética simple."
 
@@ -241,8 +276,14 @@ def _build_tmap_mapper(
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", output_name):
         return None, None, "El nombre de la conexión de salida del tMap no es válido."
 
+    output_filter: str | None = None
+    if filters:
+        output_filter = _translate_output_filter(filters[0], input_name, input_columns)
+        if output_filter is None:
+            return None, None, "El filtro de salida usa una condición fuera del subconjunto seguro (comparaciones y &&/||)."
+
     assignments: dict[str, Any] = {}
-    for expression in step.expressions:
+    for expression in column_expressions:
         if not expression.target or expression.target in assignments:
             return None, None, "Cada expresión del tMap debe tener una columna destino única."
         if expression.requires_semantic_validation or expression.warnings or not is_simple_arithmetic_translation(expression.talend):
@@ -269,8 +310,8 @@ def _build_tmap_mapper(
             translated = compiled
         assignments[expression.target] = (translated, reference_names)
 
-    if not assignments:
-        return None, None, "El plan no contiene asignaciones que se puedan mapear automáticamente."
+    if not assignments and not output_filter:
+        return None, None, "El plan no contiene asignaciones ni filtro que se puedan mapear automáticamente."
 
     output_schema: list[ApplySchemaColumn] = []
     output_columns: list[dict[str, Any]] = []
@@ -322,7 +363,13 @@ def _build_tmap_mapper(
                     ],
                 }
             ],
-            "outputs": [{"name": output_name, "columns": output_columns}],
+            "outputs": [
+                {
+                    "name": output_name,
+                    "columns": output_columns,
+                    **({"filter": output_filter} if output_filter else {}),
+                }
+            ],
         },
         output_schema,
         None,
@@ -954,6 +1001,27 @@ def _add_error_handling(
     )
 
 
+def _applied_view(plan: JobPlan) -> JobPlan:
+    """Vista del plan que recibe Studio: sin los pasos recomendados por el portal.
+
+    Tabla de conexión, tPrejob/tPostjob, errores, observabilidad y tRunJob son guía para el
+    desarrollador (`recommended=True`); no se escriben en el Job hasta que se decida lo contrario.
+    """
+    if not any(step.recommended for step in plan.steps) and not any(
+        step.recommended for child in plan.children for step in child.steps
+    ):
+        return plan
+    return plan.model_copy(
+        update={
+            "steps": [step for step in plan.steps if not step.recommended],
+            "children": [
+                child.model_copy(update={"steps": [s for s in child.steps if not s.recommended]})
+                for child in plan.children
+            ],
+        }
+    )
+
+
 def build_apply_spec(
     plan: JobPlan,
     folder_path: str = "Process",
@@ -966,6 +1034,8 @@ def build_apply_spec(
     _visited_programs: set[str] | None = None,
 ) -> TalendApplySpec:
     """Build a deterministic spec without filling missing SAS details with sample values."""
+    plan = _applied_view(plan)
+    related_plans = [_applied_view(item) for item in related_plans] if related_plans else related_plans
     safe_folder = _safe_folder_path(folder_path)
     eligible: dict[str, PlanStep] = {}
     draft_steps: dict[str, tuple[PlanStep, str]] = {}
@@ -1018,7 +1088,7 @@ def build_apply_spec(
     def include_step(step: PlanStep) -> None:
         reason = _step_block_reason(step)
         mapper_candidate = step.component_candidate == "tMap" and step.operation_type in {
-            "join", "project", "compute", "rename"
+            "join", "project", "compute", "rename", "fused_tmap"
         }
         mapper = None
         mapped_schema = None
@@ -1183,13 +1253,9 @@ def build_apply_spec(
             if edge.from_step not in unique_names or edge.type not in _CONNECTORS:
                 continue
             source_step = candidate_steps.get(edge.from_step)
-            connector = (
-                "FILTER"
-                if edge.type == "Main"
-                and source_step is not None
-                and source_step.component_candidate.casefold() == "tfilterrow"
-                else _CONNECTORS[edge.type]
-            )
+            # Algunos componentes sacan las filas por un conector con nombre propio, no por FLOW.
+            named_output = _NAMED_OUTPUTS.get(source_step.component_candidate.casefold()) if source_step is not None else None
+            connector = named_output if edge.type == "Main" and named_output else _CONNECTORS[edge.type]
             connections.append(
                 ApplyConnection(
                     source=unique_names[edge.from_step],

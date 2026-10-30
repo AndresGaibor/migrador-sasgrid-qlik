@@ -1057,3 +1057,73 @@ def test_component_limit_reserves_space_for_error_handling_nodes():
         len(job.get("components") or []) <= 200
         for job in [arguments, *arguments.get("childJobs", [])]
     )
+
+
+def _filter_tmap(expression_text: str, *, extra_column: bool = False, warnings: list[str] | None = None):
+    source = step("read_1", "tFileInputDelimited")
+    source.schema_columns = [
+        SchemaColumn(name="Make", talend_type="id_String", nullable=False),
+        SchemaColumn(name="Model", talend_type="id_String", nullable=False),
+    ]
+    mapping = step("filter_1", "tMap", from_step="read_1")
+    mapping.order = 2
+    mapping.operation_type = "fused_tmap"
+    mapping.schema_columns = [
+        SchemaColumn(name="Make", talend_type="id_String", nullable=False),
+        SchemaColumn(name="Model", talend_type="id_String", nullable=False),
+    ]
+    mapping.expressions = [
+        Expression(
+            sas="Make = 'Acura'",
+            talend=expression_text,
+            line=8,
+            target=None,
+            requires_semantic_validation=False,
+            warnings=warnings if warnings is not None else [
+                "Filtro de salida del tMap: Comparación con columna de tipo no confirmado: validar tipos y nulos en Studio"
+            ],
+        )
+    ]
+    target = step("write_1", "tFileOutputDelimited", from_step="filter_1")
+    target.order = 3
+    return plan(source, mapping, target)
+
+
+def test_fused_tmap_with_output_filter_builds_a_mapper_with_filter():
+    result = build_apply_spec(_filter_tmap('(input_row.CARS_POC.Make == "Acura")'))
+    component = next(item for item in result.components if item.component_name == "tMap")
+
+    assert component.mapper is not None
+    assert component.mapper["outputs"][0]["filter"] == '(row_2_1.Make == "Acura")'
+    assert [column["name"] for column in component.mapper["outputs"][0]["columns"]] == ["Make", "Model"]
+
+
+def _mapper_reason(filter_plan) -> tuple[object, str | None]:
+    from sas_grid_migrator.talend_adapter.apply_spec import _build_tmap_mapper
+
+    steps = {item.id: item for item in filter_plan.steps}
+    mapper, _, reason = _build_tmap_mapper(steps["filter_1"], steps)
+    return mapper, reason
+
+
+def test_output_filter_with_unknown_column_stays_manual():
+    mapper, reason = _mapper_reason(_filter_tmap('(input_row.CARS_POC.Brand == "Acura")'))
+
+    assert mapper is None
+    assert "subconjunto seguro" in reason
+
+
+def test_output_filter_with_function_call_stays_manual():
+    mapper, reason = _mapper_reason(_filter_tmap('(input_row.CARS_POC.Make.toLowerCase() == "acura")'))
+
+    assert mapper is None
+    assert "subconjunto seguro" in reason
+
+
+def test_output_filter_with_unconfirmed_warning_other_than_types_stays_manual():
+    mapper, reason = _mapper_reason(
+        _filter_tmap('(input_row.CARS_POC.Make == "Acura")', warnings=["Sin traducción automática: funcion symget"])
+    )
+
+    assert mapper is None
+    assert "subconjunto seguro" in reason

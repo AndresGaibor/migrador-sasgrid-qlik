@@ -40,6 +40,7 @@ from sas_grid_migrator.migration_planner.job_naming import (
     validate_job_name,
     validate_template,
 )
+from sas_grid_migrator.migration_planner.limits import MAX_COMPONENTS_PER_JOB
 from sas_grid_migrator.migration_planner.models import JobPlan, PlanSet
 from sas_grid_migrator.migration_planner.progress import compute_progress, pending_groups
 from sas_grid_migrator.migration_planner.service import (
@@ -49,6 +50,7 @@ from sas_grid_migrator.migration_planner.service import (
     get_plan,
     load_plans,
     set_decision,
+    set_guide_state,
 )
 from sas_grid_migrator.persistence.artifacts import write_text_atomic
 from sas_grid_migrator.persistence.store import ProjectDeletionBlockedError, Store
@@ -61,7 +63,10 @@ from sas_grid_migrator.sas_parser.analyze import (
 )
 from sas_grid_migrator.sas_parser.ast import ParsedProgram
 from sas_grid_migrator.talend_adapter.batch import collect_child_results, order_plans_for_batch
-from sas_grid_migrator.talend_adapter.best_practices import check_job_arguments
+from sas_grid_migrator.talend_adapter.best_practices import (
+    check_job_arguments,
+    evaluate_job_practices,
+)
 from sas_grid_migrator.talend_adapter.naming import folder_path, folder_segment
 
 logger = logging.getLogger(__name__)
@@ -1247,7 +1252,7 @@ def _component_limit_error(spec) -> str | None:
         f"El Job {name} tendría {count} componentes y el máximo para aplicarlo en "
         f"Studio es {limit}. Un Job grande se parte solo en Jobs hijo cuando sus componentes son independientes; "
         f"este tiene un flujo conectado demasiado grande. Divide el programa SAS en programas más pequeños (la guía "
-        f"de Talend recomienda hasta 20 componentes por Job) o sube TALEND_MAX_COMPONENTS."
+        f"de Talend recomienda hasta {MAX_COMPONENTS_PER_JOB} componentes por Job) o sube TALEND_MAX_COMPONENTS."
     )
 
 
@@ -1910,6 +1915,39 @@ def patch_step(project_id: str, program: str, step_id: str, body: Decision) -> J
     return _annotate_plan_studio_checks(s, project_id, plan, plans)  # type: ignore[return-value]
 
 
+class GuideStateBody(BaseModel):
+    """Estado estructurado de la guía de un paso (ver docs/guide-state.md)."""
+
+    guide_status: str | None = None  # pending | in_progress | completed | blocked
+    field_done: dict[str, bool] | None = None
+
+
+@app.patch("/api/projects/{project_id}/plans/{program:path}/steps/{step_id}/guide")
+def patch_step_guide(project_id: str, program: str, step_id: str, body: GuideStateBody) -> dict[str, Any]:
+    s = store()
+    _plans(project_id)
+    if not set_guide_state(s, project_id, program, step_id, body.guide_status, body.field_done):
+        raise HTTPException(422, "paso o estado de guía inválido")
+    plan = get_plan(s, project_id, program)
+    step = next(
+        (item for item in (plan.steps + [c for child in plan.children for c in child.steps] if plan else []) if item.id == step_id),
+        None,
+    )
+    if step is None:
+        raise HTTPException(404, "paso no encontrado")
+    return {"step_id": step.id, "guide_status": step.guide_status, "field_done": step.field_done}
+
+
+@app.get("/api/projects/{project_id}/plans/{program:path}/practices")
+def get_plan_practices(project_id: str, program: str) -> list[dict[str, Any]]:
+    """Hallazgos de buenas prácticas del plan (solo lectura). Va antes de la ruta genérica del plan."""
+    _plans(project_id)
+    plan = get_plan(store(), project_id, program)
+    if plan is None:
+        raise HTTPException(404, "plan no encontrado")
+    return [finding.model_dump(mode="json") for finding in evaluate_job_practices(plan)]
+
+
 def _require_editable_project(s: Store, project_id: str) -> None:
     _require(s, project_id)
     if s.has_active_talend_work(project_id):
@@ -2333,6 +2371,43 @@ def talend_archived_component(name: str) -> dict:
     from .integrations import talend_archived_component as archived_component
 
     return archived_component(name)
+
+
+_PANELS_PATH = Path(__file__).resolve().parents[2] / "rules" / "talend" / "component-panels.json"
+_panels_cache: dict[str, Any] = {"mtime": None, "data": None}
+
+
+def _component_panels() -> dict[str, Any]:
+    """Snapshot de paneles de Studio (`rules/talend/component-panels.json`), cacheado por mtime."""
+    try:
+        mtime = _PANELS_PATH.stat().st_mtime
+    except OSError as exc:
+        raise HTTPException(
+            404,
+            "No existe rules/talend/component-panels.json: genera el snapshot de paneles de Studio antes de consultarlo.",
+        ) from exc
+    if _panels_cache["mtime"] != mtime or _panels_cache["data"] is None:
+        try:
+            data = json.loads(_PANELS_PATH.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            raise HTTPException(500, "rules/talend/component-panels.json no es un JSON válido.") from exc
+        if not isinstance(data, dict):
+            raise HTTPException(500, "rules/talend/component-panels.json debe ser un objeto JSON.")
+        _panels_cache.update(mtime=mtime, data=data)
+    return _panels_cache["data"]
+
+
+@app.get("/api/talend/component-panels")
+def talend_component_panels() -> dict[str, Any]:
+    return _component_panels()
+
+
+@app.get("/api/talend/component-panels/{name}")
+def talend_component_panel(name: str) -> dict[str, Any]:
+    components = _component_panels().get("components")
+    if not isinstance(components, dict) or name not in components:
+        raise HTTPException(404, f"El componente {name} no está en component-panels.json.")
+    return {"name": name, "panel": components[name]}
 
 
 @app.get("/api/talend/studio-configuration")

@@ -137,15 +137,16 @@ def test_error_connectors_count_as_error_handling():
 
 
 def test_oversized_jobs_should_be_split():
-    components = [_component(f"tLogRow_{i}", "tLogRow") for i in range(1, 22)]
+    # Umbral único: MAX_COMPONENTS_PER_JOB (25, migration_planner/limits.py).
+    components = [_component(f"tLogRow_{i}", "tLogRow") for i in range(1, 26)]
     components.append(_component("tLogCatcher_99", "tLogCatcher"))
 
     finding = next(f for f in check_job_arguments(_job(components)) if f.rule == "BP-SIZE-01")
 
     assert finding.severity == "warning"
-    assert "22" in finding.message
-    twenty = [_component(f"tLogRow_{i}", "tLogRow") for i in range(1, 20)] + [_component("tLogCatcher_99", "tLogCatcher")]
-    assert "BP-SIZE-01" not in _rules(check_job_arguments(_job(twenty)))
+    assert "26" in finding.message
+    twenty_five = [_component(f"tLogRow_{i}", "tLogRow") for i in range(1, 25)] + [_component("tLogCatcher_99", "tLogCatcher")]
+    assert "BP-SIZE-01" not in _rules(check_job_arguments(_job(twenty_five)))
 
 
 def test_single_component_jobs_do_not_ask_for_error_handling():

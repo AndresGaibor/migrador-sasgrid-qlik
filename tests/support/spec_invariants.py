@@ -17,7 +17,7 @@ COMPONENT_NAME = re.compile(r"^t[A-Za-z0-9_]+$")
 UNIQUE_NAME = re.compile(r"^[A-Za-z_]\w*$")
 CONTEXT_NAME = re.compile(r"^[A-Za-z_]\w*$")
 CONNECTORS = {
-    "FLOW", "FILTER", "REJECT", "SUBJOB_OK", "SUBJOB_ERROR", "COMPONENT_OK", "COMPONENT_ERROR", "ITERATE", "RUN_IF",
+    "FLOW", "FILTER", "UNIQUE", "DUPLICATE", "REJECT", "SUBJOB_OK", "SUBJOB_ERROR", "COMPONENT_OK", "COMPONENT_ERROR", "ITERATE", "RUN_IF",
 }
 CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
 

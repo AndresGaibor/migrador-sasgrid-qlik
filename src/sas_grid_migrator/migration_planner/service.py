@@ -1,6 +1,7 @@
 """Orquesta análisis → dependencias → IR → planes y conserva las decisiones humanas."""
 
 import json
+import re
 from collections import defaultdict
 
 from sas_grid_migrator.dependency_graph.builder import build_dependencies, load_dependencies
@@ -58,7 +59,7 @@ def exclude_uninstalled_components(
             step.alternatives = [name for name in step.alternatives if available(name)]
             step.variants = [name for name in step.variants if available(name)]
             name = step.component_candidate
-            if name in {"por_determinar", "ninguno"} or available(name):
+            if name in {"", "por_determinar", "ninguno"} or available(name):
                 continue
             step.component_candidate = "por_determinar"
             step.action = "manual_decision"
@@ -189,6 +190,7 @@ def generate_plans(
                 report_policy,
                 environment,
                 table_action,
+                source_text=_source_text(store, project_id, prog.file),
             )
         )
     project = store.get_project(project_id)
@@ -218,14 +220,47 @@ def generate_plans(
     return ps
 
 
+def _source_text(store: Store, project_id: str, file: str) -> str | None:
+    """Texto SAS del programa (para etiquetas, %let por ambiente y credenciales). None si no existe."""
+    try:
+        return (store.source_dir(project_id) / file).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+
+
+GUIDE_STATUS = {"pendiente": "pending", "en_progreso": "in_progress", "completado": "completed", "bloqueado": "blocked"}
+_LEGACY_GUIDE = re.compile(r"^\[Estado de guía: (pendiente|en_progreso|completado|bloqueado)\]", re.MULTILINE)
+
+
+def legacy_guide_status(status: str, note: str | None) -> str:
+    """Estado de guía de un paso sin estado estructurado: se lee del texto legado de `note`.
+
+    Mismo criterio que la web (`decodeProgress`): `[Estado de guía: ...]` en la nota, y si no
+    hay nota, el estado de decisión (verificado/validado -> completado, descartado -> bloqueado).
+    """
+    found = _LEGACY_GUIDE.search(note or "")
+    if found:
+        return GUIDE_STATUS[found.group(1)]
+    if status in ("verificado", "validado_manualmente"):
+        return "completed"
+    if status == "descartado":
+        return "blocked"
+    return "pending"
+
+
 def _overlay(store: Store, ps: PlanSet, *, with_edits: bool = True) -> PlanSet:
     states = store.get_step_states(ps.project_id)
+    guides = store.get_guide_states(ps.project_id)
     for plan in ps.plans:
         steps = plan.steps + [step for child in plan.children for step in child.steps]
         for step in steps:
             state = states.get((plan.program, step.id))
             if state:
                 step.status, step.note = state[0], state[1]  # type: ignore[assignment]
+            step.guide_status = legacy_guide_status(step.status, step.note)  # type: ignore[assignment]
+            guide = guides.get((plan.program, step.id))
+            if guide:
+                step.guide_status, step.field_done = guide[0], guide[1]  # type: ignore[assignment]
     if not with_edits:
         return ps
 
@@ -278,6 +313,36 @@ def get_plan(
 ) -> JobPlan | None:
     ps = load_plans(store, project_id, with_edits=with_edits)
     return next((p for p in ps.plans if p.program == program), None) if ps else None
+
+
+GUIDE_STATUS_VALUES = frozenset(GUIDE_STATUS.values())
+
+
+def set_guide_state(
+    store: Store,
+    project_id: str,
+    program: str,
+    step_id: str,
+    guide_status: str | None,
+    field_done: dict[str, bool] | None,
+) -> bool:
+    """Guarda el estado estructurado de la guía de un paso. Campos no enviados se conservan."""
+    plan = get_plan(store, project_id, program)
+    ids = (
+        {s.id for s in plan.steps + [s for c in plan.children for s in c.steps]} if plan else set()
+    )
+    if step_id not in ids:
+        return False
+    if guide_status is not None and guide_status not in GUIDE_STATUS_VALUES:
+        return False
+    current = store.get_guide_states(project_id).get((program, step_id))
+    status = guide_status or (current[0] if current else None)
+    if status is None:
+        step = next(s for s in (plan.steps + [s for c in plan.children for s in c.steps]) if s.id == step_id)  # type: ignore[union-attr]
+        status = legacy_guide_status(step.status, step.note)
+    done = {**(current[1] if current else {}), **(field_done or {})}
+    store.set_guide_state(project_id, program, step_id, status, done)
+    return True
 
 
 def set_decision(

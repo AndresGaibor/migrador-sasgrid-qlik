@@ -62,6 +62,11 @@ create table if not exists expression_overrides(
   step_id text not null, idx integer not null, sas text not null, talend text not null,
   updated_at text not null, primary key(project_id, program, step_id, idx)
 );
+create table if not exists guide_state(
+  project_id text not null references projects(id), program text not null,
+  step_id text not null, guide_status text not null, field_done text not null default '{}',
+  updated_at text not null, primary key(project_id, program, step_id)
+);
 create table if not exists portal_settings(
   key text primary key, value text not null
 );
@@ -142,6 +147,37 @@ class Store:
                 "insert or replace into step_state values (?,?,?,?,?,?)",
                 (project_id, program, step_id, status, note, datetime.now(UTC).isoformat()),
             )
+
+    def set_guide_state(
+        self,
+        project_id: str,
+        program: str,
+        step_id: str,
+        guide_status: str,
+        field_done: dict[str, bool],
+    ) -> None:
+        with closing(self._conn()) as c, c:
+            c.execute(
+                "insert or replace into guide_state values (?,?,?,?,?,?)",
+                (
+                    project_id,
+                    program,
+                    step_id,
+                    guide_status,
+                    json.dumps(field_done, ensure_ascii=False, sort_keys=True),
+                    datetime.now(UTC).isoformat(),
+                ),
+            )
+
+    def get_guide_states(
+        self, project_id: str
+    ) -> dict[tuple[str, str], tuple[str, dict[str, bool]]]:
+        with closing(self._conn()) as c:
+            rows = c.execute(
+                "select program,step_id,guide_status,field_done from guide_state where project_id=?",
+                (project_id,),
+            ).fetchall()
+        return {(p, i): (st, json.loads(fd or "{}")) for p, i, st, fd in rows}
 
     def set_job_override(
         self, project_id: str, program: str, job_name: str | None, description: str | None
@@ -443,6 +479,7 @@ class Store:
                 for table in (
                     "source_files",
                     "step_state",
+                    "guide_state",
                     "skipped",
                     "project_processing",
                     "talend_apply_operations",

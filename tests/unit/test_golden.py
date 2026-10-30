@@ -5,10 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from sas_grid_migrator.config import Settings
-from sas_grid_migrator.migration_planner.service import generate_plans
-from sas_grid_migrator.persistence.store import Store
 from sas_grid_migrator.reporting.exports import render_plan_md
+from tests.support.cache import cached_planset
 
 FIXTURES = Path(__file__).parent.parent / "fixtures" / "sas"
 GOLDEN = Path(__file__).parent.parent / "golden"
@@ -21,12 +19,10 @@ PROGRAMS = [
 ]
 
 
-@pytest.fixture(scope="module")
-def plans(tmp_path_factory):
-    store = Store(Settings(data_dir=tmp_path_factory.mktemp("g") / "data"))
-    p = store.create_project("g")
-    store.import_batch(p.id, FIXTURES)
-    return {pl.program: pl for pl in generate_plans(store, p.id).plans}
+@pytest.fixture(scope="session")
+def plans():
+    # Caché de disco por contenido de FIXTURES y del código: se recalcula solo si cambia algo de eso.
+    return {pl.program: pl for pl in cached_planset(FIXTURES).plans}
 
 
 @pytest.mark.parametrize("program", PROGRAMS)

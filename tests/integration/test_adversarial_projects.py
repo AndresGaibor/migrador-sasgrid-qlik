@@ -3,12 +3,16 @@
 Esta prueba existe para que un proyecto real que se salga de lo habitual falle aqui, no en produccion.
 """
 
+import hashlib
+import os
 import re
+import tempfile
 from pathlib import Path
 
 import apps.api.main as api_module
 import pytest
 from fastapi.testclient import TestClient
+from tests.support.cache import cached_json
 from tests.support.spec_invariants import project_problems
 
 JOB_NAME = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
@@ -70,13 +74,21 @@ def _write(root: Path) -> None:
         path.write_bytes(content if isinstance(content, bytes) else content.encode("utf-8"))
 
 
-@pytest.fixture(scope="module")
-def hostile_previews(tmp_path_factory):
-    root = tmp_path_factory.mktemp("hostile")
+class _Reply:
+    """Lo que los tests leen de una respuesta del API: el código de estado y el cuerpo JSON."""
+
+    def __init__(self, status_code: int, body):
+        self.status_code = status_code
+        self._body = body
+
+    def json(self):
+        return self._body
+
+
+def _compute_previews() -> dict:
+    root = Path(tempfile.mkdtemp(prefix="hostile-"))
     source = root / "sas"
     _write(source)
-    import os
-
     os.environ["SGM_DATA_DIR"] = str(root / "data")
     os.environ["TALEND_APPLY_FOLDER"] = "Process/Pruebas"
     os.environ["TALEND_MCP_READONLY"] = "false"
@@ -90,8 +102,25 @@ def hostile_previews(tmp_path_factory):
         previews = {}
         for item in items:
             response = client.post(f"/api/projects/{project_id}/plans/{item['program']}/talend-apply/preview")
-            previews[item["program"]] = response
+            try:
+                body = response.json()
+            except ValueError:
+                body = None
+            previews[item["program"]] = {"status_code": response.status_code, "body": body}
     return previews
+
+
+@pytest.fixture(scope="module")
+def hostile_previews():
+    """Respuestas del API sobre los programas hostiles. Caché de disco: la clave es el contenido de HOSTILE
+    y el código (tests/support/cache.py), así que solo se recalcula si cambia algo de eso."""
+    digests = {
+        relative: hashlib.sha256(content if isinstance(content, bytes) else content.encode("utf-8")).hexdigest()
+        for relative, content in HOSTILE.items()
+    }
+    env = {"TALEND_APPLY_FOLDER": "Process/Pruebas", "TALEND_MCP_READONLY": "false"}
+    stored = cached_json("adversarial", {"hostile": digests, "env": env}, _compute_previews)
+    return {program: _Reply(item["status_code"], item["body"]) for program, item in stored.items()}
 
 
 def _arguments(hostile_previews):

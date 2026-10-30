@@ -4,6 +4,7 @@ import json
 import re
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from sas_grid_migrator.cli.main import app
@@ -11,6 +12,7 @@ from sas_grid_migrator.cli.main import app
 FIXTURES = Path(__file__).parent.parent / "fixtures" / "sas"
 
 
+@pytest.mark.slow  # importa y planifica el corpus entero por CLI (~11 s): fuera de la pasada rápida
 def test_full_pipeline(tmp_path, monkeypatch):
     monkeypatch.setenv("SGM_DATA_DIR", str(tmp_path / "data"))
     r = CliRunner()

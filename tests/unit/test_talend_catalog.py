@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from sas_grid_migrator.migration_planner.job_structure import official_inventory_names
 from sas_grid_migrator.talend_adapter.catalog import current_profile_names, load_catalog
 
 ROOT = Path(__file__).parent.parent.parent
@@ -27,6 +28,19 @@ CURRENT_COMPONENTS = {
         for record in item["availability"]
     )
 }
+# Snapshot del Studio instalado: manda sobre el catálogo abierto y sobre la lista de exclusiones
+# (Impala, por ejemplo, está instalado aunque figure como excluido del Studio 8 por defecto).
+INSTALLED_COMPONENTS = frozenset(
+    json.loads((ROOT / "rules" / "talend" / "component-panels.json").read_text(encoding="utf-8"))[
+        "components"
+    ]
+)
+
+
+# Componentes que el repositorio reconoce como de Studio: el snapshot de paneles y el inventario oficial. El snapshot
+# cubre solo un alcance (no trae los Row de motor, p. ej. tOracleRow, aunque el inventario oficial los documenta);
+# el planificador usa el mismo criterio (job_structure.official_inventory_names).
+DOCUMENTED_COMPONENTS = INSTALLED_COMPONENTS | official_inventory_names()
 
 
 def test_profile_index_must_match_selected_license():
@@ -93,7 +107,7 @@ def test_mapping_rules_use_current_studio_components():
     archive = json.loads(
         (ROOT / "rules" / "archive" / "talend" / "studio8-default-install-exclusions.json").read_text()
     )
-    archived = {item["name"] for item in archive["components"]}
+    archived = {item["name"] for item in archive["components"]} - DOCUMENTED_COMPONENTS
     candidates = set(scope["core"]) | set(scope["alternatives"]) | generic
     candidates |= {name for roles in RULES["engines"].values() for name in roles.values()}
     candidates |= {
@@ -111,7 +125,12 @@ def test_mapping_rules_use_current_studio_components():
     for op, r in RULES["operations"].items():
         for comp in [r["component"], *r.get("alternatives", [])]:
             base = comp.split(" ")[0]
-            if base.startswith("t") and base not in generic and base not in CURRENT_COMPONENTS:
+            if (
+            base.startswith("t")
+            and base not in generic
+            and base not in CURRENT_COMPONENTS
+            and base not in DOCUMENTED_COMPONENTS
+        ):
                 bad.append(f"{op}: componente fuera de Studio 8: {comp}")
         base = r["component"].split(" ")[0]
         if cat.has(base):
@@ -121,6 +140,8 @@ def test_mapping_rules_use_current_studio_components():
     want = {
         "input": ops["read"]["properties"],
         "output": sorted({*ops["write"]["properties"], *ops["append"]["properties"]}),
+        # Un Row de motor ejecuta su consulta: su única propiedad de SQL que se coteja es QUERY.
+        "row": ["QUERY"],
     }
     for eng, roles in RULES["engines"].items():
         for role, comp in roles.items():
@@ -132,7 +153,10 @@ def test_mapping_rules_use_current_studio_components():
         bad += [
             f"engine {eng}: {c}"
             for c in roles.values()
-            if c.startswith("t") and c not in generic and c not in CURRENT_COMPONENTS
+            if c.startswith("t")
+            and c not in generic
+            and c not in CURRENT_COMPONENTS
+            and c not in DOCUMENTED_COMPONENTS
         ]
     assert not bad, bad
 

@@ -22,6 +22,7 @@ from sas_grid_migrator.reporting.exports import render_plan_md, steps_csv, write
 from sas_grid_migrator.sas_parser.ast import Loc, ProcStep
 from sas_grid_migrator.sas_parser.parser import parse_program
 from sas_grid_migrator.talend_adapter.apply_spec import build_apply_spec
+from tests.support.cache import cached_planset
 
 FIXTURES = Path(__file__).parent.parent / "fixtures" / "sas"
 ROOT = Path(__file__).parent.parent.parent
@@ -61,12 +62,22 @@ def test_column_equality_without_known_types_stays_untranslated():
         assert translated.warnings, source
 
 
-def test_text_comparison_stays_untranslated_without_type_and_missing_semantics():
+def test_text_equality_is_translated_null_safe_and_flagged_as_unconfirmed_type():
+    """Igualdad o `in` contra literal de TEXTO: se traduce (null-safe) y el aviso pide confirmar con el esquema."""
     for source in ("name = 'A'", "'A' = name", "name in ('A', 'B')"):
         translated = translate(source)
 
+        assert translated.talend is not None, source
+        assert any("tipo no confirmado: se asumió texto" in warning for warning in translated.warnings), source
+
+
+def test_text_order_comparison_stays_untranslated_without_collation_equivalence():
+    """El orden de texto (<, >) no se traduce: la colación de SAS no equivale a compareTo de Java."""
+    for source in ("name < 'M'", "name > 'M'", "name <= 'M'"):
+        translated = translate(source)
+
         assert translated.talend is None, source
-        assert any("missing/nulos" in warning for warning in translated.warnings), source
+        assert translated.warnings, source
 
 
 def test_offline_text_order_filter_stays_a_draft_until_semantics_are_validated():
@@ -198,8 +209,7 @@ def test_conditional_multi_output_data_step_stays_manual_until_routing_is_modele
 
 
 def test_plan_steps_have_contract(tmp_path):
-    store, pid = project(tmp_path)
-    ps = generate_plans(store, pid)
+    ps = cached_planset(FIXTURES)  # solo lee el plan: caché de disco (tests/support/cache.py)
     plan = next(p for p in ps.plans if p.program == "p0_clientes_activos.sas")
     assert plan.job_status == "needs_review" and plan.steps
     ids = {s.id for s in plan.steps}
@@ -271,7 +281,8 @@ def test_plan_flattens_invoked_entry_macro_and_keeps_its_parameters_in_context()
 
     result = plan_program(ir, "project-1", load_mapping_rules(), {})
 
-    assert [step.operation_id for step in result.steps] == ["op_8_filter_1", "op_12_macro_call_1"]
+    # Los pasos recomendados (buenas prácticas) no son traducciones de SAS.
+    assert [step.operation_id for step in result.steps if not step.recommended] == ["op_8_filter_1", "op_12_macro_call_1"]
     assert all(step.operation_type not in {"include", "macro_call"} or step.operation_id == "op_12_macro_call_1" for step in result.steps)
     assert result.entry_macro is not None
     assert result.entry_macro.name == "daily"
@@ -282,8 +293,7 @@ def test_plan_flattens_invoked_entry_macro_and_keeps_its_parameters_in_context()
 
 
 def test_grid_recommendations_use_versioned_catalog_and_keep_unsupported_evidence(tmp_path):
-    store, pid = project(tmp_path)
-    ps = generate_plans(store, pid)
+    ps = cached_planset(FIXTURES)  # solo lee el plan: caché de disco (tests/support/cache.py)
     assert ps.grid_recommendations
     all_patterns = {r.pattern_id: r for r in ps.grid_recommendations}
     # Mantén las aserciones de línea ligadas al fixture que define estos casos.
@@ -348,8 +358,7 @@ def test_reimport_clears_plans(tmp_path):
 
 
 def test_exports(tmp_path):
-    store, pid = project(tmp_path)
-    ps = generate_plans(store, pid)
+    ps = cached_planset(FIXTURES)  # solo lee el plan y escribe en tmp_path: caché de disco
     plan = next(p for p in ps.plans if p.program == "p0_resumen_sql.sas")
     plan.steps[0].status = "descartado"
     plan.steps[0].note = "No usar este estado manual"
@@ -444,8 +453,7 @@ def test_long_proc_format_statement_reaches_format_row_parser():
 
 
 def test_banking_format_uses_documented_inline_table_mapping_with_all_rows(tmp_path):
-    store, pid = project(tmp_path)
-    plans = generate_plans(store, pid)
+    plans = cached_planset(FIXTURES)  # solo lee el plan: caché de disco (tests/support/cache.py)
     plan = next(
         p
         for p in plans.plans

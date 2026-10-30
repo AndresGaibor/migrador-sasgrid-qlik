@@ -1,7 +1,7 @@
 # Job `job_p1_merge_first_last`
 
 - **Programa SAS:** `p1_merge_first_last.sas` (sha256 `e59f0d643755`)
-- **Instrucciones:** 13 · **Reglas:** v1
+- **Instrucciones:** 14 · **Reglas:** v1
 - **Aviso:** los esquemas y propiedades son candidatos derivados de fuentes comunitarias. El enlace oficial solo acredita la referencia documental; `verificado` requiere contraste con un Job real.
 
 ## Pasos
@@ -20,7 +20,7 @@
 
 ### 2. Leer work.pagos
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`
 - **Subjob:** `s6` · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:6`
 - **Conexiones:** OnSubjobOk desde `op_2_format_definition_1`
 - **Propiedades:**
@@ -46,7 +46,7 @@
 
 ### 4. Escribir work.pagos
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`
 - **Subjob:** `s6` · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:6`
 - **Conexiones:** Main desde `op_6_sort_1`
 - **Propiedades:**
@@ -61,7 +61,7 @@
 
 ### 5. Leer work.clientes
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`
 - **Subjob:** `s7` · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:7`
 - **Conexiones:** OnSubjobOk desde `op_6_write_1`
 - **Propiedades:**
@@ -87,7 +87,7 @@
 
 ### 7. Escribir work.clientes
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`
 - **Subjob:** `s7` · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:7`
 - **Conexiones:** Main desde `op_7_sort_1`
 - **Propiedades:**
@@ -102,14 +102,14 @@
 
 ### 8. Leer work.clientes
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`
 - **Subjob:** `s9` · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:9`
 - **Conexiones:** OnSubjobOk desde `op_7_write_1`
 - **Propiedades:**
   - `TABLE` = `clientes` — SAS p1_merge_first_last.sas:9
   - `QUERY` = _por configurar_ — regla mappings
   - `CONNECTION` = _por configurar_ — regla mappings
-- **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal; Dataset producido antes en este programa (op_7_write_1): puede sustituirse por una conexión directa o un tHashOutput
+- **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal
 - **Pendientes:**
   - Formato físico o sistema de origen del dataset
   - Esquema y tipos de columnas
@@ -117,13 +117,13 @@
 
 ### 9. Leer work.pagos
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`, `tDBInput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileInputDelimited`
 - **Subjob:** `s9` · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:9`
 - **Propiedades:**
   - `TABLE` = `pagos` — SAS p1_merge_first_last.sas:9
   - `QUERY` = _por configurar_ — regla mappings
   - `CONNECTION` = _por configurar_ — regla mappings
-- **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal; Dataset producido antes en este programa (op_6_write_1): puede sustituirse por una conexión directa o un tHashOutput
+- **Supuestos:** Dataset temporal (WORK): dentro del mismo subjob conviene una conexión Main; entre subjobs, tHashOutput/tHashInput o archivo temporal
 - **Pendientes:**
   - Formato físico o sistema de origen del dataset
   - Esquema y tipos de columnas
@@ -152,11 +152,14 @@
 - **Referencia:** [documentación](https://help.qlik.com/talend/en-US/components/8.0/tmap/tmap-standard-properties)
 - **Conexiones:** Main desde `op_9_join_1`
 - **Propiedades:**
-  - `Expressions` (Editor del componente (no es un parámetro plano)) = `3 asignaciones, 3 condicionales` — SAS p1_merge_first_last.sas:9
+  - `Expressions` (Editor del componente (no es un parámetro plano)) = `4 asignaciones, 3 condicionales` — SAS p1_merge_first_last.sas:9
   - `Var table` (Editor del componente (no es un parámetro plano)) = _por configurar_ — regla mappings
-- **Esquema:** `dias`, `mes_pago`, `tramo`, `monto`, `flag_sin_pago`:Double _(tipos por determinar)_
-- **Expresión** (línea 18): SAS `intck('day', fecha_pago, today())` → _sin traducción automática_
-  - ⚠ Sin traducción automática: función intck
+- **Esquema:** `acumulado`:Double, `monto`, `fecha_pago`, `dias`, `mes_pago`, `tramo`, `flag_sin_pago`:Double _(tipos por determinar)_
+- **Expresión** (línea 16): SAS `acumulado + coalesce(monto, 0)` → Java `(input_row.acumulado + (input_row.monto != null ? input_row.monto : 0))`
+  - ⚠ coalesce(): el orden de los argumentos se conserva
+- **Expresión** (línea 18): SAS `intck('day', fecha_pago, today())` → Java `(input_row.fecha_pago == null ? null : (TalendDate.diffDate(TalendDate.getCurrentDate(), input_row.fecha_pago, "dd")))`
+  - ⚠ intck(): cuenta fronteras de unidad como SAS; diffDate devuelve la diferencia de la unidad, validar el signo
+  - ⚠ today(): en SAS es días desde 1960; en Talend es un Date: validar al comparar con fechas SAS
 - **Expresión** (línea 19): SAS `put(fecha_pago, yymmn6.)` → _sin traducción automática_
   - ⚠ Sin traducción automática: token no soportado: '.)'
 - **Expresión** (línea 20): SAS `put(edad, tramo.)` → _sin traducción automática_
@@ -185,7 +188,7 @@
 
 ### 13. Escribir work.pagos_cliente
 
-- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`, `tDBOutput`
+- **Acción:** add_component · **Componente:** `por_determinar` (sin verificar) · alternativas: `tFileOutputDelimited`
 - **Subjob:** `s9` · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:9`
 - **Conexiones:** Main desde `op_9_stateful_1`
 - **Propiedades:**
@@ -197,6 +200,12 @@
 - **Pendientes:**
   - Sistema y tabla/archivo de destino
 - **Pruebas:** `vc_op_9_write_1_row_count`, `vc_op_9_write_1_schema`
+
+### 15. Detiene el Job ante un error de componente
+
+- **Acción:** add_component · **Componente:** `tDie` ![Icono Talend](/talend-icons/tDie_icon32.png) (sin verificar)
+- **Subjob:** `recomendado` · **Confianza:** high · **Origen SAS:** `p1_merge_first_last.sas:2`
+- **Conexiones:** OnComponentError desde `op_9_write_1`
 
 ## Casos de validación
 
@@ -215,12 +224,12 @@
 - `vc_op_9_read_1_schema` (schema): Mismos nombres y tipos de columna
 - `vc_op_9_read_2_row_count` (row_count): Mismo número de filas leídas que en SAS
 - `vc_op_9_read_2_schema` (schema): Mismos nombres y tipos de columna
-- `vc_op_9_join_1_duplicates` (duplicates): Claves duplicadas en ambos lados (MERGE y JOIN difieren)
-- `vc_op_9_join_1_row_count` (row_count): Filas sin pareja en cada lado
-- `vc_op_9_join_1_nulls` (nulls): Claves nulas no deben emparejarse (o sí, según SAS)
 - `vc_op_9_compute_1_nulls` (nulls): Cálculos con valores missing (SAS propaga missing en aritmética)
 - `vc_op_9_compute_1_dates` (dates): Fechas calculadas (epoch 1960 vs 1970)
 - `vc_op_9_compute_1_numeric` (numeric): Redondeo y precisión
+- `vc_op_9_join_1_duplicates` (duplicates): Claves duplicadas en ambos lados (MERGE y JOIN difieren)
+- `vc_op_9_join_1_row_count` (row_count): Filas sin pareja en cada lado
+- `vc_op_9_join_1_nulls` (nulls): Claves nulas no deben emparejarse (o sí, según SAS)
 - `vc_op_9_stateful_1_ordering` (ordering): Resultado depende del orden de entrada: probar con datos desordenados y con claves repetidas
 - `vc_op_9_stateful_1_duplicates` (duplicates): Grupos de una sola fila y de muchas filas
 - `vc_op_9_write_1_row_count` (row_count): Filas escritas iguales
