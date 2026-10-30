@@ -8,6 +8,21 @@ Clasificación definitiva en `rules/sas/`. Esta matriz se llena con el corpus re
 | P1 | `MERGE ... BY`, `FIRST.`/`LAST.`, `RETAIN`, arrays, formatos/informats, funciones de fecha, missing, macros parametrizadas, joins con reglas particulares | Traducción propuesta con advertencias y casos de prueba específicos |
 | P2 | `CALL EXECUTE`, código dinámico, `X`/`SYSTASK`, macros no resolubles, PROCs especializados, dependencias externas | Sin conversión automática: documentar lógica, datos faltantes y decisiones manuales |
 
+## Fontanería y fusión
+
+Qué se migra como paso y qué queda en `JobPlan.not_migrated` (detalle y ejemplos en
+[pipeline-fusion.md](pipeline-fusion.md)):
+
+- **Se funde en un `tMap`**: `WHERE`/`IF` (filtro de salida), cálculos, `RENAME`, `KEEP`/`DROP` y
+  `PROC SQL` de proyección. Un `filter` o `select_columns` aislado conserva `tFilterRow` o
+  `tFilterColumns`.
+- **Deduplicado**: `PROC SORT NODUPKEY` y `NODUP` → `tUniqRow`. NODUPKEY usa la clave del `BY`; NODUP
+  deja la clave pendiente.
+- **No genera paso (fontanería)**: `x`/comandos del shell, `sleep`/`until`, `%put`, `datetime()`,
+  borrado de WORK, troceo por lotes, espera, control de errores,
+  conteos (`select count(*)`) y `call symputx` de un DATA step. Cada caso tiene su equivalente Talend
+  en `not_migrated`.
+
 ## Corpus inicial (`tests/fixtures/sas/`)
 
 No se encontró código SAS real en el host. El corpus es sintético, escrito para cubrir la matriz, salvo `p0_ejemplo_basico.sas` (de `qlikdojo`). Reemplazar/ampliar con programas reales anonimizados cuando existan. Cada archivo declara `priority: Px` en su primera línea.

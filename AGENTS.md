@@ -98,6 +98,16 @@ el preset `portal` (`bun run start:server`), la API en `127.0.0.1:8000` y la web
 `--no-mcp` omite el MCP. No reinstala el Bridge ni mata procesos ajenos: para instalar el plugin usa
 `bun run bridge:install` en `mcp/talend-mcp` con Studio sin Jobs ni diálogos en curso.
 
+## Tests
+
+- Ciclo normal: `scripts/test.ps1`. En paralelo (xdist), con caché, sin las pruebas `slow` (MCP real y corpus completo).
+- Incremental: `scripts/test.ps1 -Incremental -n 0` (pytest-testmon; solo re-ejecuta lo afectado por cambios de código). La primera vez tarda como una pasada completa. No combinar con `-m`: testmon deja de deseleccionar.
+- Completa, la que corre el CI: `scripts/test.ps1 -Full` (añade `--runslow`). Con `CI=true` las `slow` se incluyen solas (`tests/conftest.py`).
+- Caché: `.test-cache/` guarda planificaciones y resultados del corpus por contenido (`tests/support/cache.py`). La clave incluye el hash de `src/`, `apps/api/`, `rules/`, `contract/`, `schemas/` y de las fixtures: si cambia algo, se recalcula. Nunca se sirve un dato viejo.
+- Limpiar la caché: `scripts/test.ps1 -Clean`. Desactivarla una vez: `SGM_TEST_CACHE=0`.
+- Un archivo o un test: `scripts/test.ps1 tests/unit/test_golden.py -k p0`. Cualquier argumento se pasa a pytest.
+- Si `uv run` falla por un proceso que bloquea `sgm.exe`, usa `uv run --no-sync pytest` (lo hace el script).
+
 ## Subtree del MCP
 
 Cómo traer cambios del upstream y cómo publicar los del portal: [docs/mcp-subtree.md](docs/mcp-subtree.md).

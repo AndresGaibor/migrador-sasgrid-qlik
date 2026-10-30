@@ -23,3 +23,7 @@ docs/reference/talend/*
 
 mcp/talend-mcp/workspace/
 mcp/talend-mcp/docs/media/video/out/
+
+# Caché de pruebas (tests/support/cache.py) y datos de pytest-testmon
+.test-cache/
+.testmondata*
